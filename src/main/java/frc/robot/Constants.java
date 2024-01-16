@@ -23,6 +23,13 @@ public final class Constants {
         public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     }
 
+    public static final class ShooterConstants {
+        public static final int flywheelLeftID = 20;
+        public static final int flywheelRightID = 21;
+        public static final int kickerID = 22;
+        public static final int pivotID = 23;
+    }
+
     public static final class Swerve {
         public static final int pigeonID = 15;
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
