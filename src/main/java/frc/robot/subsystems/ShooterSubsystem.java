@@ -73,11 +73,15 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
 
-    public void enableKicker(double value) {
+    public void setKickerVoltage(double value) {
         kickerMotor.setVoltage(value);
     }
 
     public void stopKicker() {
         kickerMotor.stopMotor();
+    }
+
+    public void stopFlywheel() {
+        flywheelMaster.stopMotor();
     }
 }
