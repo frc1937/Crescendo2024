@@ -30,10 +30,6 @@ public class RobotContainer {
     /* Subsystems */
     private final Swerve swerve = new Swerve();
 
-    /* Photonvision */
-    // private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
-    //private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera, swerve);
-
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
