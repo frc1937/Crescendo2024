@@ -19,7 +19,17 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         ctreConfigs = new CTREConfigs();
         robotContainer = new RobotContainer();
+    
+        try {
+            System.out.println("Starting VisionDataReceiver...");
+            VisionDataReceiver.main(new String[]{});
+            System.out.println("VisionDataReceiver started successfully.");
+        } catch (Exception e) {
+            System.err.println("Error starting VisionDataReceiver:");
+            e.printStackTrace();
+        }
     }
+    
 
     @Override
     public void robotPeriodic() {
