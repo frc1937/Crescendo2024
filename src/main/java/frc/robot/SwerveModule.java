@@ -32,7 +32,7 @@ public class SwerveModule {
 
     // Speed control variables
     private final SparkPIDController angleController;
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
+    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Swerve.DRIVE_KS, Constants.Swerve.DRIVE_KV, Constants.Swerve.DRIVE_KA);
 
     /**
      * Every module of the swerve needs to be defined, here we define it.
@@ -71,17 +71,17 @@ public class SwerveModule {
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
+            double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.MAX_SPEED;
             driveMotor.set(ControlMode.PercentOutput, percentOutput);
         } else {
-            double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Constants.Swerve.wheelCircumference, Constants.Swerve.driveGearRatio);
+            double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Constants.Swerve.WHEEL_CIRCUMFERENCE, Constants.Swerve.DRIVE_GEAR_RATIO);
             driveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, feedforward.calculate(desiredState.speedMetersPerSecond));
         }
     }
 
     private void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle =
-                (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed * 0.01))
+                (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.MAX_SPEED * 0.01))
                         ? lastAngle
                         : desiredState.angle;
         angleController.setReference(angle.getDegrees(), com.revrobotics.CANSparkBase.ControlType.kPosition);
@@ -112,18 +112,18 @@ public class SwerveModule {
 
         CANSparkMaxUtil.setCANSparkMaxBusUsage(mAngleMotor, Usage.kPositionOnly);
 
-        mAngleMotor.setSmartCurrentLimit(Constants.Swerve.angleContinuousCurrentLimit);
+        mAngleMotor.setSmartCurrentLimit(Constants.Swerve.ANGLE_CONTINUOUS_CURRENT_LIMIT);
 
-        mAngleMotor.setInverted(Constants.Swerve.angleInvert);
-        mAngleMotor.setIdleMode(Constants.Swerve.angleNeutralMode);
+        mAngleMotor.setInverted(Constants.Swerve.ANGLE_INVERT);
+        mAngleMotor.setIdleMode(Constants.Swerve.ANGLE_NEUTRAL_MODE);
 
-        integratedAngleEncoder.setPositionConversionFactor(Constants.Swerve.angleConversionFactor);
-        angleController.setP(Constants.Swerve.angleKP);
-        angleController.setI(Constants.Swerve.angleKI);
-        angleController.setD(Constants.Swerve.angleKD);
-        angleController.setFF(Constants.Swerve.angleKFF);
+        integratedAngleEncoder.setPositionConversionFactor(Constants.Swerve.ANGLE_CONVERSION_FACTOR);
+        angleController.setP(Constants.Swerve.ANGLE_KP);
+        angleController.setI(Constants.Swerve.ANGLE_KI);
+        angleController.setD(Constants.Swerve.ANGLE_KD);
+        angleController.setFF(Constants.Swerve.ANGLE_KFF);
 
-        mAngleMotor.enableVoltageCompensation(Constants.Swerve.voltageComp);
+        mAngleMotor.enableVoltageCompensation(Constants.Swerve.VOLTAGE_COMP);
         mAngleMotor.burnFlash();
         resetToAbsolute();
     }
@@ -132,21 +132,21 @@ public class SwerveModule {
         driveMotor.configFactoryDefault();
 
         driveMotor.configAllSettings(Robot.ctreConfigs.swerveDriveFXConfig);
-        driveMotor.setInverted(Constants.Swerve.driveMotorInvert);
-        driveMotor.setNeutralMode(Constants.Swerve.driveNeutralMode);
+        driveMotor.setInverted(Constants.Swerve.DRIVE_MOTOR_INVERT);
+        driveMotor.setNeutralMode(Constants.Swerve.DRIVE_NEUTRAL_MODE);
         driveMotor.setSelectedSensorPosition(0);
     }
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-                Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Constants.Swerve.wheelCircumference, Constants.Swerve.driveGearRatio),
+                Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Constants.Swerve.WHEEL_CIRCUMFERENCE, Constants.Swerve.DRIVE_GEAR_RATIO),
                 getAngle()
         );
     }
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-                Conversions.falconToMeters(driveMotor.getSelectedSensorPosition(), Constants.Swerve.wheelCircumference, Constants.Swerve.driveGearRatio),
+                Conversions.falconToMeters(driveMotor.getSelectedSensorPosition(), Constants.Swerve.WHEEL_CIRCUMFERENCE, Constants.Swerve.DRIVE_GEAR_RATIO),
                 getAngle()
         );
     }
