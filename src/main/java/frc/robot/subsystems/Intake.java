@@ -9,7 +9,7 @@ public class Intake extends SubsystemBase {
     private final TalonSRX engineMotor;
 
     public Intake() {
-        // Replace 1 with the CAN ID of your TalonSRX motor controller
+        // Replace 1 with the CAN ID of the actual TalonSRX motor controller
         engineMotor = new TalonSRX(1);
     }
 
