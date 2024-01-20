@@ -35,6 +35,6 @@ Example response:
 The `VisionDrive` command is responsible for integrating vision data into the control of the robot's Swerve drive system. It fetches distance and angle information from the `Vision` subsystem and calculates the appropriate forward and turn speeds to drive towards the detected object.
 
 ## Shooter Command
-The `ShooterCommand` controlling the shooter subsystem. It provides a convenient way to orchestrate the shooter's pivot and flywheel angles, initiate shooting, and handle the stopping of the shooter subsystem.
+The `ShooterCommand` is controlling the shooter subsystem. It provides a convenient way to orchestrate the shooter's pivot and flywheel angles, initiate shooting, and handle the stopping of the shooter subsystem.
 
 ## Please add important info (if neccecry) about your code here, i just added the shooter as an example (not my code).
