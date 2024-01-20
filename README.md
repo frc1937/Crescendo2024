@@ -37,4 +37,4 @@ The `VisionDrive` command is responsible for integrating vision data into the co
 ## Shooter Command
 The `ShooterCommand` is controlling the shooter subsystem. It provides a convenient way to orchestrate the shooter's pivot and flywheel angles, initiate shooting, and handle the stopping of the shooter subsystem.
 
-## Please add important info (if neccecry) about your code here, i just added the shooter as an example (not my code).
+### Please add important info (if neccecry) about your code here, i just added the shooter as an example.
