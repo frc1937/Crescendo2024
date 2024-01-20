@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.VisionDrive;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 public class RobotContainer {
     private final Joystick driver = new Joystick(0);
@@ -29,6 +31,7 @@ public class RobotContainer {
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
     /* Subsystems */
     private final Swerve swerve = new Swerve();
+    private final Vision Vision = new Vision();
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
@@ -56,6 +59,7 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        VisionDrive autonomousCommand = new VisionDrive(Vision, swerve);
+        return autonomousCommand;
     }
 }
