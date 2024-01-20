@@ -1,14 +1,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeSubsystem;
 
 public class SpinIntake extends Command {
 
-    private final Intake intakeSubsystem;
+    private final IntakeSubsystem intakeSubsystem;
     private final double speed;
 
-    public SpinIntake(Intake intakeSubsystem, double speed, double duration) {
+    public SpinIntake(IntakeSubsystem intakeSubsystem, double speed) {
         this.intakeSubsystem = intakeSubsystem;
         this.speed = speed;
 
@@ -18,6 +18,7 @@ public class SpinIntake extends Command {
 
     @Override
     public void initialize() {
+        intakeSubsystem.setSpeed(speed);
         // Called when the command is initially scheduled.
         // You can perform any setup here.
     }
@@ -25,12 +26,11 @@ public class SpinIntake extends Command {
     @Override
     public void execute() {
         // Called repeatedly when this Command is scheduled to run.
-        intakeSubsystem.spin(speed);
     }
 
     @Override
     public void end(boolean interrupted) {
         // Called once the command ends or is interrupted.
-        intakeSubsystem.stop();
+        intakeSubsystem.stopMotor();
     }
 }

@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.SpinIntake;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.VisionDrive;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -29,9 +31,11 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton xButton = new JoystickButton(driver, XboxController.Button.kX.value);
     /* Subsystems */
     private final Swerve swerve = new Swerve();
     private final Vision Vision = new Vision();
+    private final IntakeSubsystem intake = new IntakeSubsystem();
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
@@ -55,6 +59,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro));
+        xButton.whileTrue(new SpinIntake(intake, 0));
     }
 
 

@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Shooter extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase {
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(Constants.ShooterConstants.kickerID);
     private final CANSparkFlex pivotMotor = new CANSparkFlex(Constants.ShooterConstants.pivotID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANSparkFlex flywheelMaster = new CANSparkFlex(Constants.ShooterConstants.flywheelLeftID, CANSparkLowLevel.MotorType.kBrushless);
@@ -21,13 +21,13 @@ public class Shooter extends SubsystemBase {
     private final PIDController pivotPIDController;
     private final PIDController flywheelPIDController;
 
-    private final static Shooter INSTANCE = new Shooter();
+    private final static ShooterSubsystem INSTANCE = new ShooterSubsystem();
 
-    public static Shooter getInstance() {
+    public static ShooterSubsystem getInstance() {
         return INSTANCE;
     }
 
-    public Shooter() { //todo: calibrate PID values
+    public ShooterSubsystem() { //todo: calibrate PID values
         pivotPIDController = new PIDController(0, 0, 0);
         pivotPIDController.enableContinuousInput(-180, 180);
 

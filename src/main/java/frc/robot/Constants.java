@@ -30,6 +30,10 @@ public final class Constants {
         public static final int pivotID = 23;
     }
 
+    public static final class IntakeConstants {
+        public static final int IntakeMotorPort = 0;
+    }
+
     public static final class Swerve {
         public static final int pigeonID = 15;
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
