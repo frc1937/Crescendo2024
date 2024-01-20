@@ -10,8 +10,9 @@ This API provides information about detected objects in real-time.
 
 The response is a JSON array containing information about detected objects:
 
-Distance - In meters
-Angles - In degrees (calculated from the center of the camera)
+* Distance - In meters
+
+* Angles - In degrees (calculated from the center of the camera)
 
 Example response:
 
