@@ -30,6 +30,6 @@ Example response:
     }
 ]
 ```
-## VisionDrive WPILib Subsystem Automatic System
+## VisionDrive Subsystem
 
 The `VisionDrive` command is responsible for integrating vision data into the control of the robot's Swerve drive system. It fetches distance and angle information from the `Vision` subsystem and calculates the appropriate forward and turn speeds to drive towards the detected object.
