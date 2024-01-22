@@ -4,11 +4,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommands {
-    private Shooter shooter;
-    public ShooterCommands(Shooter shooter) {
+    private ShooterSubsystem shooter;
+    public ShooterCommands(ShooterSubsystem shooter) {
         this.shooter = shooter;
     } //usage: new ShooterCommands(subsystem).shoot(angle, angle)
 

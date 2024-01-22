@@ -23,6 +23,11 @@ public final class Constants {
         public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     }
 
+    public static final class IntakeConstants {
+        public static final int
+                INTAKE_MOTOR_ID = 13;
+    }
+
     public static final class ShooterConstants {
         public static final int
                 FLYWHEEL_LEFT_ID = 20,
@@ -47,8 +52,8 @@ public final class Constants {
                 COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L2);
 
         /* Drivetrain Constants */
-        public static final double TRACK_WIDTH = 0.565;
-        public static final double WHEEL_BASE = 0.615;
+        public static final double TRACK_WIDTH = 0.6961;
+        public static final double WHEEL_BASE = 0.806;
         public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
 
         /* Swerve Kinematics

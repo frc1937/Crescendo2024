@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve.AutoConstants;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.List;
 
 public class exampleAuto extends SequentialCommandGroup {
-    public exampleAuto(Swerve swerve) {
+    public exampleAuto(SwerveSubsystem swerve) {
         TrajectoryConfig config =
                 new TrajectoryConfig(
                         AutoConstants.MAX_SPEED_METERS_PER_SECOND,
@@ -44,7 +44,7 @@ public class exampleAuto extends SequentialCommandGroup {
         );
     }
 
-    private static SwerveControllerCommand getSwerveControllerCommand(Swerve swerve, Trajectory exampleTrajectory) {
+    private static SwerveControllerCommand getSwerveControllerCommand(SwerveSubsystem swerve, Trajectory exampleTrajectory) {
         var thetaController =
                 new ProfiledPIDController(
                         AutoConstants.P_THETA_CONTROLLER, 0, 0, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);

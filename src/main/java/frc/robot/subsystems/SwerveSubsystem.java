@@ -18,12 +18,12 @@ import java.util.Optional;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 
-public class Swerve extends SubsystemBase {
+public class SwerveSubsystem extends SubsystemBase {
     public final SwerveDriveOdometry swerveOdometry;
     public final SwerveModule[] swerveMods;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
 
-    public Swerve() {
+    public SwerveSubsystem() {
         gyro.configFactoryDefault();
         zeroGyro();
 

@@ -11,31 +11,29 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.photonvision.PoseEstimator;
 import org.photonvision.PhotonCamera;
 
-import java.util.logging.Logger;
-
 public class Robot extends TimedRobot {
     public static CTREConfigs ctreConfigs;
     private Command autonomousCommand;
-    private PoseEstimator poseEstimator;
-    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
     private RobotContainer robotContainer;
+
+    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
+    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera);
 
     @Override
     public void robotInit() {
         ctreConfigs = new CTREConfigs();
         robotContainer = new RobotContainer();
-        poseEstimator = new PoseEstimator(photonCamera);
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        Logger.getGlobal().info("--------------------------------");
-        Logger.getGlobal().info("Has Target: " + poseEstimator.hasTarget());
+        System.out.println("-------------------------");
+        System.out.println("Has Target: " + poseEstimator.hasTarget());
 
-        if(poseEstimator.getBestTargetID() != null) {
-            Logger.getGlobal().info("Target ID: " + poseEstimator.getBestTargetID());
+        if(poseEstimator.hasTarget()) {
+            System.out.println("Target's ID: " + poseEstimator.getBestTargetID());
         }
     }
 

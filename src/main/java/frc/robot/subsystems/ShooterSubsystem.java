@@ -11,7 +11,7 @@ import frc.robot.Constants;
 
 import static frc.robot.Constants.ShooterConstants.*;
 
-public class Shooter extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase {
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(Constants.ShooterConstants.KICKER_ID);
     private final CANSparkFlex pivotMotor = new CANSparkFlex(Constants.ShooterConstants.PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANSparkFlex flywheelMaster = new CANSparkFlex(Constants.ShooterConstants.FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
@@ -22,7 +22,7 @@ public class Shooter extends SubsystemBase {
     private final PIDController pivotPIDController;
     private final PIDController flywheelPIDController;
 
-    public Shooter() { //todo: calibrate PID values
+    public ShooterSubsystem() { //todo: calibrate PID values
         pivotPIDController = new PIDController(PIVOT_KP, PIVOT_KI, PIVOT_KD);
         pivotPIDController.enableContinuousInput(-180, 180);
 
@@ -57,7 +57,6 @@ public class Shooter extends SubsystemBase {
         flywheelPIDController.setSetpoint(angle.getDegrees());
     }
 
-
     /**
      * @param angle in rotations, turned into degress. 0 being lowest point
      */
@@ -77,7 +76,6 @@ public class Shooter extends SubsystemBase {
     public void stopFlywheel() {
         flywheelMaster.stopMotor();
     }
-
 
     //todo: necessary configurations, no idea what they are
     private void configureTalonMotor(WPI_TalonSRX motor) {
