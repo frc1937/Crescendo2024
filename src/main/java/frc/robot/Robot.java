@@ -8,16 +8,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.photonvision.PoseEstimator;
-import org.photonvision.PhotonCamera;
 
 public class Robot extends TimedRobot {
     public static CTREConfigs ctreConfigs;
     private Command autonomousCommand;
     private RobotContainer robotContainer;
 
-    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
-    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera);
+//    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
+//    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera);
 
     @Override
     public void robotInit() {
@@ -28,13 +26,13 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-
+/*
         System.out.println("-------------------------");
         System.out.println("Has Target: " + poseEstimator.hasTarget());
 
         if(poseEstimator.hasTarget()) {
             System.out.println("Target's ID: " + poseEstimator.getBestTargetID());
-        }
+        }*/
     }
 
     @Override

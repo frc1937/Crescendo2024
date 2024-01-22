@@ -1,14 +1,23 @@
 package frc.robot.photonvision;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SwerveSubsystem;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import java.util.List;
+
+import static edu.wpi.first.math.util.Units.degreesToRadians;
+import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.VisionConstants.CAMERA_TO_ROBOT;
 
 public class PoseEstimator extends SubsystemBase {
@@ -40,34 +49,9 @@ public class PoseEstimator extends SubsystemBase {
 
      /*Ordered list of target poses by ID (WPILib is adding some functionality for
      this)*/
-    private static final List<Pose3d> targetPoses = Collections.unmodifiableList(List.of(
-            new Pose3d(3.0, 1.165, 0.287 + 0.165, new Rotation3d(0, 0, degreesToRadians(180.0))),
-            new Pose3d(3.0, 0.0, 0.287 + .165, new Rotation3d(0, 0, degreesToRadians(180.0)))));
-/*
-     Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
-     you trust your various sensors. Smaller numbers will cause the filter to
-     "trust" the estimate from that particular component more than the others.
-     This in turn means the particualr component will have a stronger influence
-     on the final pose estimate.*/
-
-    /**
-     * Standard deviations of model states. Increase these numbers to trust your model's state estimates less. This
-            * matrix is in the form [x, y, theta, s_0, ... s_n]ᵀ, with units in meters and radians, then meters.
-            */
-    private static final Vector<N7> stateStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05, 0.05, 0.05);
-
-    /**
-     * Standard deviations of the encoder and gyro measurements. Increase these numbers to trust sensor readings from
-     * encoders and gyros less. This matrix is in the form [theta, s_0, ... s_n], with units in radians followed by meters.
-            */
-    private static final Vector<N5> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0.01), 0.01, 0.01, 0.01, 0.01);
-
-    /**
-     * Standard deviations of the vision measurements. Increase these numbers to trust global measurements from vision
-     * less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians.
-    */
-    private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
-
+    private static final List<Pose3d> targetPoses = List.of(
+             new Pose3d(3.0, 1.165, 0.287 + 0.165, new Rotation3d(0, 0, degreesToRadians(180.0))),
+             new Pose3d(3.0, 0.0, 0.287 + .165, new Rotation3d(0, 0, degreesToRadians(180.0))));
     private final SwerveDrivePoseEstimator poseEstimator;
 
     private final Field2d field2d = new Field2d();
@@ -81,25 +65,11 @@ public class PoseEstimator extends SubsystemBase {
         ShuffleboardTab tab = Shuffleboard.getTab("photonvision");
 
         poseEstimator = new SwerveDrivePoseEstimator(
-                swerveKinematics,
+                SWERVE_KINEMATICS,
                 swerveSubsystem.getYaw(),
                 swerveSubsystem.getModulePositions(),
                 new Pose2d()
-                  ,stateStdDevs,
-                    visionMeasurementStdDevs
         );
-                /* new SwerveDrivePoseEstimator(
-                Nat.N7(),
-                Nat.N7(),
-                Nat.N5(),
-                swerveSubsystem.getYaw(),
-                swerveSubsystem.getModulePositions(),
-                new Pose2d(),
-                swerveKinematics,
-                stateStdDevs,
-                localMeasurementStdDevs,
-                visionMeasurementStdDevs);
-*/
 
         tab.addString("Pose", this::getFormattedPose).withPosition(0, 0).withSize(2, 0);
         tab.add("Field", field2d).withPosition(2, 0).withSize(6, 4);

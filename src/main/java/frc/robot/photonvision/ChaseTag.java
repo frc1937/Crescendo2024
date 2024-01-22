@@ -74,8 +74,10 @@ public class ChaseTag extends CommandBase {
                         new Rotation3d(0.0, 0.0, robotPose2d.getRotation().getRadians()));
 
         PhotonPipelineResult photonRes = photonCamera.getLatestResult();
+
         if (photonRes.hasTargets()) {
             // Find the tag we want to chase
+
             Optional<PhotonTrackedTarget> targetOpt = photonRes.getTargets().stream()
                     .filter(t -> t.getFiducialId() == TAG_TO_CHASE)
                     .filter(t -> !t.equals(lastTarget) && t.getPoseAmbiguity() <= .2 && t.getPoseAmbiguity() != -1)

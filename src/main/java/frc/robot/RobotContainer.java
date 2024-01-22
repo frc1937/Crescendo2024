@@ -40,7 +40,9 @@ public class RobotContainer {
 
     /* Photonvision */
     private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
-    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera);
+    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera, swerve);
+
+    private final ChaseTag chaseTag = new ChaseTag(photonCamera, swerve, poseEstimator::getCurrentPose);
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
@@ -70,7 +72,7 @@ public class RobotContainer {
 
         intakeStopButton.onTrue(new InstantCommand(intake::stopMotor));
 
-        chaseTagCommand.onTrue(new InstantCommand(new ChaseTag(photonCamera, swerve, )))
+        chaseTagCommand.whileTrue(chaseTag);
     }
 
 
