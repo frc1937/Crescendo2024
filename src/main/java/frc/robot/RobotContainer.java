@@ -14,9 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.photonvision.PoseEstimator;
 import frc.robot.subsystems.Swerve;
-import org.photonvision.PhotonCamera;
 
 public class RobotContainer {
     private final Joystick driver = new Joystick(0);
@@ -33,8 +31,6 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
 
     /* Photonvision */
-    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
-    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera);
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
