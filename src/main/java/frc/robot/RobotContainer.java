@@ -84,7 +84,8 @@ public class RobotContainer {
                 if (Distance > 0.01) {
                     new VisionDrive(swerve).schedule();
                     new IntakeCommand().startIntakeMotor(0.8).schedule();
-
+                else{
+                    new IntakeCommand().stopIntakeMotor().schedule();
                 }
                 try {
                     Thread.sleep(100); // Adjust the sleep duration as needed
