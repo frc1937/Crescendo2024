@@ -81,6 +81,7 @@ public class ChaseTagCommand extends Command {
             System.out.println("CurrentPose: " + robotPose2d);
             System.out.println("TION------------------");
 
+
             xController.setGoal(goalPose.getX());
             yController.setGoal(goalPose.getY());
             omegaController.setGoal(goalPose.getRotation().getRadians());
@@ -105,7 +106,8 @@ public class ChaseTagCommand extends Command {
             if (omegaController.atGoal()) {
                 omegaSpeed = 0;
             }
-//
+//   todo :  Choose which way is the correct to drive the robot
+
 //            double translationValue = MathUtil.applyDeadband(, Constants.stickDeadband);
 //            double strafeValue = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
 //            double rotationValue = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
