@@ -5,9 +5,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -19,12 +17,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
+import static frc.robot.Constants.VisionConstants.CAMERA_TO_ROBOT;
 
 public class Swerve extends SubsystemBase {
 
@@ -33,6 +34,8 @@ public class Swerve extends SubsystemBase {
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     private final AprilTagFieldLayout aprilTagFieldLayout;
     private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
+
+    private double previousTimestamp = 0;
 
     public Swerve()  {
         try {
@@ -163,28 +166,37 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-        }/*
+        }
 
-        var pipelineResult = photonCamera.getLatestResult();
-        var resultTimestamp = pipelineResult.getTimestampSeconds();
+        PhotonPipelineResult result = photonCamera.getLatestResult();
+        double currentTimestamp = result.getTimestampSeconds();
 
-        if (resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()) {
-            previousPipelineTimestamp = resultTimestamp;
-            var target = pipelineResult.getBestTarget();
-            var fiducialId = target.getFiducialId();
+        if (currentTimestamp != previousTimestamp && result.hasTargets()) {
+            previousTimestamp = currentTimestamp;
+
+            PhotonTrackedTarget target = result.getBestTarget();
+            int fiducialId = target.getFiducialId();
+
             // Get the tag pose from field layout - consider that the layout will be null if it failed to load
             Optional<Pose3d> tagPose = aprilTagFieldLayout == null ? Optional.empty() : aprilTagFieldLayout.getTagPose(fiducialId);
-            if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
-                var targetPose = tagPose.get();
-                Transform3d camToTarget = target.getBestCameraToTarget();
-                Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
-                var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-                poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), resultTimestamp);
+       //     SmartDashboard.putNumber("currentTAGID", fiducialId);
+
+            if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
+                Pose3d targetPose = tagPose.get();
+                Transform3d cameraToTarget = target.getBestCameraToTarget();
+                Pose3d cameraPose = targetPose.transformBy(cameraToTarget.inverse());
+
+                Pose3d visionMeasurement = cameraPose.transformBy(CAMERA_TO_ROBOT);
+                poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), currentTimestamp);
             }
-        }*/
-        // Update pose estimator with drivetrain sensors
+        }
+
         poseEstimator.update(getYaw(), getModulePositions());
+
+     //   SmartDashboard.putNumber("currentPOS Y: ", poseEstimator.getEstimatedPosition().getY());
+      //  SmartDashboard.putNumber("currentPOS X: ", poseEstimator.getEstimatedPosition().getX());
+
     }
 
     public void stop() {
