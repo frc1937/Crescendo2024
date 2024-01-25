@@ -44,7 +44,6 @@ Our codebase is organized as follows:
 - **src/main/java/frc/robot**: Contains the main robot code.
 - **src/main/java/frc/robot/subsystems**: Subsystem classes for different robot components.
 - **src/main/java/frc/robot/commands**: Command classes that define specific robot actions.
-- **src/main/java/frc/robot/utils**: Utility classes and helper functions.
 - **src/main/java/frc/robot/RobotContainer.java**: Main entry point for the robot code.
 
 Feel free to explore these directories and files to understand how our robot code is structured.
