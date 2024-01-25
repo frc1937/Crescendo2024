@@ -2,7 +2,7 @@
 
 ## Overview
 
-Welcome to Team 1937's WPILib Java code repository! This repository contains the Java codebase for our robot, designed to compete in the FIRST Robotics Competition (FRC).
+Welcome to Elysium's (Team 1937) WPILib Java code repository! This repository contains the Java codebase for our robot, designed to compete in the FIRST Robotics Competition (FRC).
 
 ## Table of Contents
 
