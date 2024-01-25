@@ -28,7 +28,6 @@ import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 import static frc.robot.Constants.VisionConstants.CAMERA_TO_ROBOT;
 
 public class Swerve extends SubsystemBase {
-
     public final SwerveDrivePoseEstimator poseEstimator;
     public final SwerveModule[] swerveMods;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
@@ -180,7 +179,7 @@ public class Swerve extends SubsystemBase {
             // Get the tag pose from field layout - consider that the layout will be null if it failed to load
             Optional<Pose3d> tagPose = aprilTagFieldLayout == null ? Optional.empty() : aprilTagFieldLayout.getTagPose(fiducialId);
 
-       //     SmartDashboard.putNumber("currentTAGID", fiducialId);
+            SmartDashboard.putNumber("currentTAGID", fiducialId);
 
             if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
                 Pose3d targetPose = tagPose.get();
@@ -194,9 +193,8 @@ public class Swerve extends SubsystemBase {
 
         poseEstimator.update(getYaw(), getModulePositions());
 
-     //   SmartDashboard.putNumber("currentPOS Y: ", poseEstimator.getEstimatedPosition().getY());
-      //  SmartDashboard.putNumber("currentPOS X: ", poseEstimator.getEstimatedPosition().getX());
-
+        SmartDashboard.putNumber("currentPOS Y: ", poseEstimator.getEstimatedPosition().getY());
+        SmartDashboard.putNumber("currentPOS X: ", poseEstimator.getEstimatedPosition().getX());
     }
 
     public void stop() {

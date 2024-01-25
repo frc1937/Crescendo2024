@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ChaseTagCommand;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.Swerve;
+import org.photonvision.PhotonCamera;
 
 public class RobotContainer {
     private final Joystick driver = new Joystick(0);
@@ -27,8 +29,12 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton chaseTagButton = new JoystickButton(driver, XboxController.Button.kB.value);
     /* Subsystems */
     private final Swerve swerve = new Swerve();
+    /* PhotonVision */
+    private final PhotonCamera camera = new PhotonCamera("Photon1937");
+    private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(camera, swerve);
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
@@ -52,6 +58,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro));
+        chaseTagButton.whileTrue(chaseTagCommand);
     }
 
 
