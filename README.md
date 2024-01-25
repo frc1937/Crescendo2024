@@ -2,7 +2,7 @@
 
 ## Overview
 
-Welcome to Team 1937's WPILib Java code repository! This repository contains the Java codebase for our robot, designed to compete in the FIRST Robotics Competition (FRC). Our team, Elysium, is based in Modi'in-Maccabim-Re'ut, Israel.
+Welcome to Team 1937's WPILib Java code repository! This repository contains the Java codebase for our robot, designed to compete in the FIRST Robotics Competition (FRC).
 
 ## Table of Contents
 
