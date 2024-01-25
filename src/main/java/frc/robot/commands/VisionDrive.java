@@ -32,18 +32,22 @@ public class VisionDrive extends Command {
         DistanceEntry = visionTable.getEntry("Distance");
         Angle = AngleEntry.getDouble(0.0);
         Distance = DistanceEntry.getDouble(0.0);
+        
+        // Check if Distance is zero, and end the command if true
+        if (Distance == 0.0) {
+            end(false); // Ending the command with interrupted = false
+            return;
+        }
         // Drive the robot
         swerve.drive(new ChassisSpeeds(Distance, 0, Angle));
     }
 
     @Override
     public void execute() {
-        // No need for additional logic in execute since the movement is handled in initialize
         Angle = AngleEntry.getDouble(0.0);
         Distance = DistanceEntry.getDouble(0.0);
 
         // Check if Distance is zero, and end the command if true
-        
         if (Distance == 0.0) {
             end(false); // Ending the command with interrupted = false
             return;
