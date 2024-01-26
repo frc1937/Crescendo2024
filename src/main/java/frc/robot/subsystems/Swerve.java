@@ -156,10 +156,6 @@ public class Swerve extends SubsystemBase {
 
 
         poseEstimator.update(getYaw(), getModulePositions());
-
-     //   SmartDashboard.putNumber("currentPOS Y: ", poseEstimator.getEstimatedPosition().getY());
-      //  SmartDashboard.putNumber("currentPOS X: ", poseEstimator.getEstimatedPosition().getX());
-
     }
 
     public void stop() {

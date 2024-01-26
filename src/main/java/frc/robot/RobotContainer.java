@@ -15,10 +15,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.VisionDrive;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -33,13 +35,14 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton xButton = new JoystickButton(driver, XboxController.Button.kX.value);
 
     /* Subsystems */
     private final Swerve swerve = new Swerve();
+    private final IntakeSubsystem IntakeSubsystem = new IntakeSubsystem();
+
     private final NetworkTable visionTable;
     private NetworkTableEntry DistanceEntry;
-    private double Distance;
-
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
@@ -59,46 +62,24 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        VisionStop();
     }
 
-    public boolean VisionStop() {
-        DistanceEntry = visionTable.getEntry("Distance");
-        Distance = DistanceEntry.getDouble(0.0);
-        if (Distance == 0.0){
-            return false;
-        }
-        return true;
-    }
     private void configureBindings() {
-    
-        DistanceEntry = visionTable.getEntry("Distance");
-        Distance = DistanceEntry.getDouble(0.0);
         
+        DistanceEntry = visionTable.getEntry("Distance");
+        DistanceEntry.getDouble(0.0);
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro));
 
-        // Run VisionDrive continuously if distance is not zero
-        new Thread(() -> {
-            while (true) {
-                Distance = DistanceEntry.getDouble(0.0);
-                while (true) {
-                    Distance = DistanceEntry.getDouble(0.0);
-                    if (Distance > 0.01) {
-                        new VisionDrive(swerve).schedule();
-                        new IntakeCommand().startIntakeMotor(0.8).schedule();
-                    } else {
-                        new IntakeCommand().stopIntakeMotor().schedule();
-                    }
-                    try {
-                        Thread.sleep(100); // Adjust the sleep duration as needed
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }                
-            }
-        }).start();
+        xButton.whileTrue(
+                new ParallelCommandGroup(
+                        new VisionDrive(swerve),
+                        new IntakeCommand(IntakeSubsystem).startIntakeMotor(0.8)
+                )
+        );
+      xButton.onFalse(
+            new IntakeCommand(IntakeSubsystem).stopIntakeMotor()
+        );
     }
-    
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

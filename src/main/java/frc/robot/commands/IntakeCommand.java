@@ -5,10 +5,16 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeCommand {
-    IntakeSubsystem intake = new IntakeSubsystem();
+    private final IntakeSubsystem intake;
+
+    public IntakeCommand(IntakeSubsystem intake) {
+        this.intake = intake;
+    }
+
     public Command startIntakeMotor(double speed) {
         return new FunctionalCommand(
                 () -> {
+                    // Initialization code if needed
                 },
                 () -> {
                     intake.setSpeedPercentage(speed);
@@ -23,11 +29,14 @@ public class IntakeCommand {
 
     public Command stopIntakeMotor() {
         return new FunctionalCommand(
-                () -> {},
+                () -> {
+                    // Cleanup code if needed
+                },
                 () -> {
                     intake.stopMotor();
                 },
                 interrupted -> {
+                    // Interrupted code if needed
                 },
                 () -> false,
                 intake

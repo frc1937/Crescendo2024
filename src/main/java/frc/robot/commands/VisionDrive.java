@@ -9,6 +9,9 @@ import frc.robot.subsystems.Swerve;
 
 public class VisionDrive extends Command {
     
+    private static final int MAX_ZERO_DISTANCE_COUNT = 3;
+    private int zeroDistanceCounter = 0;
+
     private final Swerve swerve;
 
     private NetworkTable visionTable;
@@ -25,33 +28,36 @@ public class VisionDrive extends Command {
 
     @Override
     public void initialize() {
+
+    }
+
+    @Override
+    public void execute() {
         // Initialize the NetworkTable and entries here
         AngleEntry = visionTable.getEntry("Angle");
         DistanceEntry = visionTable.getEntry("Distance");
         Angle = AngleEntry.getDouble(0.0);
         Distance = DistanceEntry.getDouble(0.0);
-        
-        // Check if Distance is zero, and end the command if true
+        // Check if Distance is zero
         if (Distance == 0.0) {
-            end(false); // Ending the command with interrupted = false
-            return;
-        }
-        // Drive the robot
-        swerve.drive(new ChassisSpeeds(Distance, 0, Angle));
-    }
+            zeroDistanceCounter++;
 
-    @Override
-    public void execute() {
-        Angle = AngleEntry.getDouble(0.0);
-        Distance = DistanceEntry.getDouble(0.0);
-
-        // Check if Distance is zero, and end the command if true
-        if (Distance == 0.0) {
-            end(false); // Ending the command with interrupted = false
-            return;
+            // Check if zeroDistanceCounter exceeds the threshold
+            if (zeroDistanceCounter >= MAX_ZERO_DISTANCE_COUNT) {
+                end(false); // Ending the command with interrupted = false
+                return;
+            }
+        } else {
+            // Reset the counter if Distance is not zero
+            zeroDistanceCounter = 0;
         }
+
+        if (Angle > 0.15 || Angle < 0.15) {
+            swerve.drive(new ChassisSpeeds(0 , 0, Angle));
+            }
+
         // Drive the robot
-        swerve.drive(new ChassisSpeeds(Distance, 0, Angle));
+        swerve.drive(new ChassisSpeeds(Distance / 2 , 0, 0));
 
     }
 
@@ -59,5 +65,11 @@ public class VisionDrive extends Command {
     public void end(boolean interrupted) {
         // This method will be called once when the command ends
         swerve.stop();  // Stop the robot when the command ends
+    }
+
+    @Override
+    public boolean isFinished() {
+        Distance = DistanceEntry.getDouble(0.0);
+        return Distance < 0.01;
     }
 }
