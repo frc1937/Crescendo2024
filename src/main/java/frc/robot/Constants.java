@@ -19,14 +19,14 @@ public final class Constants {
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
         public static final Transform3d CAMERA_TO_ROBOT =
-                new Transform3d(new Translation3d(0.46, 0.37, 0), new Rotation3d());
+                new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d());
         public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     }
 
     public static final class ShooterConstants {
         public static final int
-                FLYWHEEL_LEFT_ID = 20,
-                FLYWHEEL_RIGHT_ID = 21,
+                FLYWHEEL_LEFT_ID = 17,
+                FLYWHEEL_RIGHT_ID = 18,
                 PIVOT_ID = 23,
                 KICKER_ID = 22;
 
@@ -34,7 +34,7 @@ public final class Constants {
                 PIVOT_KP = 0,
                 PIVOT_KI = 0,
                 PIVOT_KD = 0,
-                FLYWHEEL_KP = 0,
+                FLYWHEEL_KP = 0.01,
                 FLYWHEEL_KI = 0,
                 FLYWHEEL_KD = 0;
     }

@@ -7,10 +7,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Shooter;
 
 public class ShooterCommands {
-    private Shooter shooter;
+    private final Shooter shooter;
     public ShooterCommands(Shooter shooter) {
         this.shooter = shooter;
-    } //usage: new ShooterCommands(subsystem).shoot(angle, angle)
+    }
 
     public Command shoot(double pivotAngle, double flywheelAngle) {
         return startShooter(pivotAngle, flywheelAngle)

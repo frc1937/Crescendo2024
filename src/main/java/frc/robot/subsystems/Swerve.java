@@ -26,6 +26,7 @@ import java.util.Optional;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 import static frc.robot.Constants.VisionConstants.CAMERA_TO_ROBOT;
+import static frc.robot.Constants.VisionConstants.ROBOT_TO_CAMERA;
 
 public class Swerve extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -33,10 +34,10 @@ public class Swerve extends SubsystemBase {
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     private final AprilTagFieldLayout aprilTagFieldLayout;
     private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
-
     private double previousTimestamp = 0;
+    private Pose3d aprilTagPos = new Pose3d();
 
-    public Swerve()  {
+    public Swerve() {
         try {
             aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
         } catch (IOException e) {
@@ -57,6 +58,7 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();
 
         poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        resetOdometry(new Pose2d());
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
@@ -157,8 +159,13 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public Pose3d getTagPose() {
+        return aprilTagPos;
+    }
+
     @Override
     public void periodic() {
+        poseEstimator.update(getYaw(), getModulePositions());
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
         for (SwerveModule mod : swerveMods) {
@@ -170,16 +177,28 @@ public class Swerve extends SubsystemBase {
         PhotonPipelineResult result = photonCamera.getLatestResult();
         double currentTimestamp = result.getTimestampSeconds();
 
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            Transform3d cameraToTarget = target.getBestCameraToTarget();
+
+            Pose3d cameraPose = getPose3d().transformBy(ROBOT_TO_CAMERA);
+
+            aprilTagPos = cameraPose.transformBy(cameraToTarget.inverse());
+
+            SmartDashboard.putNumber("Target X: ", aprilTagPos.getX());
+            SmartDashboard.putNumber("Target Y: ", aprilTagPos.getY());
+
+            SmartDashboard.putNumber("CURR X: ", getPose().getX());
+            SmartDashboard.putNumber("CURR Y: ", getPose().getY());
+        }
+
         if (currentTimestamp != previousTimestamp && result.hasTargets()) {
             previousTimestamp = currentTimestamp;
 
             PhotonTrackedTarget target = result.getBestTarget();
             int fiducialId = target.getFiducialId();
 
-            // Get the tag pose from field layout - consider that the layout will be null if it failed to load
             Optional<Pose3d> tagPose = aprilTagFieldLayout == null ? Optional.empty() : aprilTagFieldLayout.getTagPose(fiducialId);
-
-            SmartDashboard.putNumber("currentTAGID", fiducialId);
 
             if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
                 Pose3d targetPose = tagPose.get();
@@ -187,17 +206,26 @@ public class Swerve extends SubsystemBase {
                 Pose3d cameraPose = targetPose.transformBy(cameraToTarget.inverse());
 
                 Pose3d visionMeasurement = cameraPose.transformBy(CAMERA_TO_ROBOT);
-                poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), currentTimestamp);
+               // poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), currentTimestamp);
             }
         }
-
-        poseEstimator.update(getYaw(), getModulePositions());
-
-        SmartDashboard.putNumber("currentPOS Y: ", poseEstimator.getEstimatedPosition().getY());
-        SmartDashboard.putNumber("currentPOS X: ", poseEstimator.getEstimatedPosition().getX());
     }
 
     public void stop() {
         drive(new Translation2d(), 0, false, false);
+    }
+
+    public Pose3d getPose3d() {
+        Pose2d robotPose2d = getPose();
+
+        return new Pose3d(
+                robotPose2d.getX(),
+                robotPose2d.getY(),
+                0.0,
+                new Rotation3d(0.0, 0.0, robotPose2d.getRotation().getRadians()));
+    }
+
+    public boolean hasTargets() {
+        return photonCamera.getLatestResult().hasTargets();
     }
 }
