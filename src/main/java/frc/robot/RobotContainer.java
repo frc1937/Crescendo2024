@@ -81,17 +81,20 @@ public class RobotContainer {
         new Thread(() -> {
             while (true) {
                 Distance = DistanceEntry.getDouble(0.0);
-                if (Distance > 0.01) {
-                    new VisionDrive(swerve).schedule();
-                    new IntakeCommand().startIntakeMotor(0.8).schedule();
-                else{
-                    new IntakeCommand().stopIntakeMotor().schedule();
-                }
-                try {
-                    Thread.sleep(100); // Adjust the sleep duration as needed
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                while (true) {
+                    Distance = DistanceEntry.getDouble(0.0);
+                    if (Distance > 0.01) {
+                        new VisionDrive(swerve).schedule();
+                        new IntakeCommand().startIntakeMotor(0.8).schedule();
+                    } else {
+                        new IntakeCommand().stopIntakeMotor().schedule();
+                    }
+                    try {
+                        Thread.sleep(100); // Adjust the sleep duration as needed
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }                
             }
         }).start();
     }
