@@ -1,19 +1,17 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
 
 public class VisionDrive extends Command {
-
-    private static final int MAX_ZERO_DISTANCE_COUNT = 3;
-    private static final double ANGLE_THRESHOLD = 30.0;
-    private static final double DISTANCE_THRESHOLD = 0.01;
-    private int zeroDistanceCounter = 0;
 
     private final Swerve swerve;
 
@@ -23,12 +21,15 @@ public class VisionDrive extends Command {
     private double Angle;
     private double Distance;
 
-    private Timer timer;
+    private ProfiledPIDController omegaController = new ProfiledPIDController(1.15, 0, 0, new Constraints(4, 4));
+    private ProfiledPIDController xSpeedController = new ProfiledPIDController(2.5, 0, 0, new Constraints(2, 3));
+
+    private Pose2d currentPosition;
+    private Pose2d targetPosition;
 
     public VisionDrive(Swerve swerve) {
         this.swerve = swerve;
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
-        timer = new Timer();
         addRequirements(swerve);
     }
 
@@ -37,57 +38,53 @@ public class VisionDrive extends Command {
         // Initialize the NetworkTable and entries here
         AngleEntry = visionTable.getEntry("Angle");
         DistanceEntry = visionTable.getEntry("Distance");
-        timer.reset();
-        timer.start();
+    
+        Angle = AngleEntry.getDouble(0.0) * 0.273;
+        Distance = DistanceEntry.getDouble(0.0);
+    
+        if (Distance != 0.0){
+            targetPosition = new Pose2d(
+                swerve.getPose().getX() + Distance, 
+                0, Rotation2d.fromDegrees(Angle));
+    
+            omegaController.setGoal(targetPosition.getRotation().getRadians());
+            xSpeedController.setGoal(targetPosition.getX());
+        }
     }
     
     @Override
     public void execute() {
-        Angle = convertToRadians(AngleEntry.getDouble(0.0));
+        Angle = AngleEntry.getDouble(0.0) * 0.273;
         Distance = DistanceEntry.getDouble(0.0);
+        if (Distance != 0.0) {
+            targetPosition = new Pose2d(
+                swerve.getPose().getX() + Distance, 
+                0, Rotation2d.fromDegrees(Angle));
+            omegaController.setGoal(targetPosition.getRotation().getRadians());
+            xSpeedController.setGoal(targetPosition.getX());
 
-        if (Distance > DISTANCE_THRESHOLD) {
-            if (Math.abs(Angle) < ANGLE_THRESHOLD) {
-                swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
-            } else {
-                if (timer.get() == 0.0) {
-                    timer.reset();
-                    timer.start();
-                }
+            currentPosition = swerve.getPose();
+            double omegaSpeed = omegaController.calculate(currentPosition.getRotation().getRadians());
+            double xSpeed = xSpeedController.calculate(currentPosition.getX());
 
-                if (timer.get() < 1.0) {
-                    swerve.drive(new ChassisSpeeds(0, 0, Angle));
-                } else {
-                    timer.stop();
-                    swerve.drive(new ChassisSpeeds(0, 0, 0));
-                }
+            if (omegaController.atGoal())
+                omegaSpeed = 0;
+            if (xSpeedController.atGoal())
+                xSpeed = 0;
 
-                if (Math.abs(Angle) < ANGLE_THRESHOLD) {
-                    // Reset the timer: you want to run the rotation command again
-                    timer.reset();
-                }
-            }
-        } else {
-            zeroDistanceCounter++;
-            if (zeroDistanceCounter >= MAX_ZERO_DISTANCE_COUNT) {
-                return;
-            }
-            zeroDistanceCounter = 0;
+            swerve.drive(new ChassisSpeeds(xSpeed, 0, omegaSpeed));
         }
-
-        swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
     }
 
     @Override
     public void end(boolean interrupted) {
         // This method will be called once when the command ends
         swerve.stop(); // Stop the robot when the command ends
-        timer.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return DistanceEntry.getDouble(0.0) < DISTANCE_THRESHOLD;
+        return DistanceEntry.getDouble(0.0) < 0.01;
     }
 
     double convertToRadians(double customUnitAngle) {
