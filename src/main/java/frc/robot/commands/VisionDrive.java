@@ -41,24 +41,10 @@ public class VisionDrive extends Command {
         // Initialize the NetworkTable and entries here
         AngleEntry = visionTable.getEntry("Angle");
         DistanceEntry = visionTable.getEntry("Distance");
-    
-        while (DistanceEntry.getDouble(0.0) != 0.0) {
-            // Update angle and distance
-            Angle = convertToRadians(AngleEntry.getDouble(0.0));
-            Distance = DistanceEntry.getDouble(0.0);
-    
-            // Check if Distance is zero
-            if (Distance == 0.0) {
-                zeroDistanceCounter++;
-    
-                // Check if zeroDistanceCounter exceeds the threshold
-                if (zeroDistanceCounter >= MAX_ZERO_DISTANCE_COUNT) {
-                    break; // Exit the loop if consecutive zero distances exceed the threshold
-                }
-            } else {
-                // Reset the counter if Distance is not zero
-                zeroDistanceCounter = 0;
-            }
+        Angle = convertToRadians(AngleEntry.getDouble(0.0));
+        Distance = DistanceEntry.getDouble(0.0);
+        
+        if (Distance > 0.01) {
     
             // Check if the angle is close to zero before rotating
             if (Math.abs(Angle) < 0.05) {
@@ -76,6 +62,20 @@ public class VisionDrive extends Command {
                     // Move forward if the angle is close to zero
                     swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
                 }
+            }
+        }
+        else{
+            // Check if Distance is zero
+            if (Distance == 0.0) {
+                zeroDistanceCounter++;
+    
+                // Check if zeroDistanceCounter exceeds the threshold
+                if (zeroDistanceCounter >= MAX_ZERO_DISTANCE_COUNT) {
+                    return;
+                }
+            } else {
+                // Reset the counter if Distance is not zero
+                zeroDistanceCounter = 0;
             }
         }
     
