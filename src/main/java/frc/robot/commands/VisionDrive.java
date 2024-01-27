@@ -32,7 +32,7 @@ public class VisionDrive extends Command {
 
     @Override
     public void initialize() {
-        // Initialize the NetworkTable and entries here
+        // Initialize the NetworkTable and timer here
         AngleEntry = visionTable.getEntry("Angle");
         DistanceEntry = visionTable.getEntry("Distance");
         timer.reset();
