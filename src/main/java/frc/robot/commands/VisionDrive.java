@@ -22,7 +22,6 @@ public class VisionDrive extends Command {
     private double Distance;
 
     private Timer timer;
-    private static final double DRIVE_DURATION = 1.0; // Set the duration in seconds
 
     public VisionDrive(Swerve swerve) {
         this.swerve = swerve;
@@ -65,9 +64,13 @@ public class VisionDrive extends Command {
             if (Math.abs(Angle) < 0.05) {
                 swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
             } else {
-                // Rotate to correct angle
-                swerve.drive(new ChassisSpeeds(0, 0, Angle));
-    
+                // Rotate to correct angle for one second
+                if (timer.get() < 1.0) {
+                    swerve.drive(new ChassisSpeeds(0, 0, Angle));
+                } else {
+                    // After one second, stop rotating
+                    swerve.drive(new ChassisSpeeds(0, 0, 0));
+                }
                 // Check if the angle is close to zero after correcting rotation (0-30 is a good balance)
                 if (Math.abs(Angle) < 30) {
                     // Move forward if the angle is close to zero
