@@ -36,6 +36,7 @@ public class RobotContainer {
     /* Driver Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton xButton = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton bButton = new JoystickButton(driver, XboxController.Button.kB.value);
 
     /* Subsystems */
     private final Swerve swerve = new Swerve();
@@ -76,8 +77,15 @@ public class RobotContainer {
                         new IntakeCommand(IntakeSubsystem).startIntakeMotor(0.8)
                 )
         );
-      xButton.onFalse(
+        xButton.onFalse(
             new IntakeCommand(IntakeSubsystem).stopIntakeMotor()
+        );
+
+        bButton.whileTrue(
+                new IntakeCommand(IntakeSubsystem).startIntakeMotor(-0.8)
+        );
+        bButton.onFalse(
+                new IntakeCommand(IntakeSubsystem).stopIntakeMotor()
         );
     }
 
