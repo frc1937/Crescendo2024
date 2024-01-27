@@ -69,7 +69,7 @@ public class VisionDrive extends Command {
                 swerve.drive(new ChassisSpeeds(0, 0, Angle));
     
                 // Check if the angle is close to zero after correcting rotation
-                if (Math.abs(Angle) < 0.05) {
+                if (Math.abs(Angle) < 35) {
                     // Move forward if the angle is close to zero
                     swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
                 }
