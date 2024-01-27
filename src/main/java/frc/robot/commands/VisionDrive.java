@@ -35,7 +35,6 @@ public class VisionDrive extends Command {
         timer.reset();
         timer.start();
     }
-
     @Override
     public void execute() {
         // Initialize the NetworkTable and entries here
@@ -45,7 +44,6 @@ public class VisionDrive extends Command {
         Distance = DistanceEntry.getDouble(0.0);
         
         if (Distance > 0.01) {
-    
             // Check if the angle is close to zero before rotating
             if (Math.abs(Angle) < 0.05) {
                 swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
@@ -63,20 +61,17 @@ public class VisionDrive extends Command {
                     swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
                 }
             }
-        }
-        else{
+        } else {
             // Check if Distance is zero
-            if (Distance == 0.0) {
-                zeroDistanceCounter++;
-    
-                // Check if zeroDistanceCounter exceeds the threshold
-                if (zeroDistanceCounter >= MAX_ZERO_DISTANCE_COUNT) {
-                    return;
-                }
-            } else {
-                // Reset the counter if Distance is not zero
-                zeroDistanceCounter = 0;
+            zeroDistanceCounter++;
+        
+            // Check if zeroDistanceCounter exceeds the threshold
+            if (zeroDistanceCounter >= MAX_ZERO_DISTANCE_COUNT) {
+                return;
             }
+            
+            // Reset the counter if Distance is not zero
+            zeroDistanceCounter = 0;
         }
     
         // Drive the robot forward
