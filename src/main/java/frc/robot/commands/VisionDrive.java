@@ -63,7 +63,7 @@ public class VisionDrive extends Command {
                 }
 
                 if (Math.abs(Angle) < ANGLE_THRESHOLD) {
-                    // Reset the timer if you want to run the rotation command again
+                    // Reset the timer: you want to run the rotation command again
                     timer.reset();
                 }
             }
