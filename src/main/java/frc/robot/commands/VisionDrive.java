@@ -77,8 +77,6 @@ public class VisionDrive extends Command {
                     swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
                 }
             }
-    
-            Timer.delay(0.03);
         }
     
         // Drive the robot forward
@@ -95,7 +93,7 @@ public class VisionDrive extends Command {
     @Override
     public boolean isFinished() {
         Distance = DistanceEntry.getDouble(0.0);
-        return Distance < 0.01
+        return Distance < 0.01;
     }
 
     double convertToRadians(double customUnitAngle) {
