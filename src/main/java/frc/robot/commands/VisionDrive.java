@@ -44,8 +44,8 @@ public class VisionDrive extends Command {
         Distance = DistanceEntry.getDouble(0.0);
         
         if (Distance > 0.01) {
-            // Check if the angle is close to zero before rotating
-            if (Math.abs(Angle) < 0.05) {
+            // Check if the angle is close to zero after correcting rotation (0-30 is a good balance)
+            if (Math.abs(Angle) < 30) {
                 swerve.drive(new ChassisSpeeds(Distance / 2, 0, 0));
             } else {
                 // Rotate to correct angle for one second
