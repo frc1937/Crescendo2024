@@ -82,11 +82,6 @@ public class VisionDrive extends Command {
         swerve.stop(); // Stop the robot when the command ends
     }
 
-    @Override
-    public boolean isFinished() {
-        return DistanceEntry.getDouble(0.0) < 0.01;
-    }
-
     double convertToRadians(double customUnitAngle) {
         return (customUnitAngle / 256.0) * Math.PI;
     }
