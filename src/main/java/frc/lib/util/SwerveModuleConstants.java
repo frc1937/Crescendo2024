@@ -9,7 +9,7 @@ public class SwerveModuleConstants {
     public final Rotation2d angleOffset;
 
     /**
-     * Swerve Module Constants to be used when creating swerve modules.
+     * SwerveSubsystem Module Constants to be used when creating swerve modules.
      * @param driveMotorID
      * @param angleMotorID
      * @param canCoderID

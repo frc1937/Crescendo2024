@@ -51,7 +51,7 @@ public final class Constants {
         public static final double WHEEL_BASE = 0.615;
         public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
 
-        /* Swerve Kinematics
+        /* SwerveSubsystem Kinematics
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
@@ -70,7 +70,7 @@ public final class Constants {
         /* Angle Encoder Invert */
         public static final boolean CAN_CODER_INVERT = CHOSEN_MODULE.canCoderInvert;
 
-        /* Swerve Current Limiting */
+        /* SwerveSubsystem Current Limiting */
         public static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 25;
         public static final int ANGLE_PEAK_CURRENT_LIMIT = 40;
         public static final double ANGLE_PEAK_CURRENT_DURATION = 0.1;
@@ -104,7 +104,7 @@ public final class Constants {
         public static final double DRIVE_KV = 0; //(1.51 / 12);
         public static final double DRIVE_KA = 0; // (0.27 / 12);
 
-        /* Swerve Profiling Values */
+        /* SwerveSubsystem Profiling Values */
         /**
          * Meters per Second
          */
@@ -120,7 +120,7 @@ public final class Constants {
 
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
-        public static final class Mod0 {
+        public static final class Module0 {
             public static final int DRIVE_MOTOR_ID = 7;
             public static final int ANGLE_MOTOR_ID = 8;
             public static final int CAN_CODER_ID = 9;
@@ -130,7 +130,7 @@ public final class Constants {
         }
 
         /* Front Right Module - Module 1 */
-        public static final class Mod1 {
+        public static final class Module1 {
             public static final int DRIVE_MOTOR_ID = 1;
             public static final int ANGLE_MOTOR_ID = 2;
             public static final int CAN_CODER_ID = 3;
@@ -140,7 +140,7 @@ public final class Constants {
         }
 
         /* Back Left Module - Module 2 */
-        public static final class Mod2 {
+        public static final class Module2 {
             public static final int DRIVE_MOTOR_ID = 10;
             public static final int ANGLE_MOTOR_ID = 11;
             public static final int CAN_CODER_ID = 12;
@@ -150,7 +150,7 @@ public final class Constants {
         }
 
         /* Back Right Module - Module 3 */
-        public static final class Mod3 {
+        public static final class Module3 {
             public static final int DRIVE_MOTOR_ID = 4;
             public static final int ANGLE_MOTOR_ID = 5;
             public static final int CAN_CODER_ID = 6;

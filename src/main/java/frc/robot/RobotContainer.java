@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChaseTagCommand;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.vision.VisionPoseEstimator;
 
 public class RobotContainer {
     private final Joystick driver = new Joystick(0);
@@ -30,16 +31,17 @@ public class RobotContainer {
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton chaseTagButton = new JoystickButton(driver, XboxController.Button.kB.value);
     /* Subsystems */
-    private final Swerve swerve = new Swerve();
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
     /* PhotonVision */
-    private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(swerve);
+    private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(swerveSubsystem, visionPoseEstimator);
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
-        swerve.setDefaultCommand(
+        swerveSubsystem.setDefaultCommand(
                 new TeleopSwerve(
-                        swerve,
+                        swerveSubsystem,
                         () -> -driver.getRawAxis(translationAxis),
                         () -> -driver.getRawAxis(strafeAxis),
                         () -> -driver.getRawAxis(rotationAxis),
@@ -56,7 +58,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro));
+        zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         chaseTagButton.whileTrue(chaseTagCommand);
     }
 

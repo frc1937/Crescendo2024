@@ -8,17 +8,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve.AutoConstants;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.List;
 
 public class exampleAuto extends SequentialCommandGroup {
-    public exampleAuto(Swerve swerve) {
+    public exampleAuto(SwerveSubsystem swerveSubsystem) {
         TrajectoryConfig config =
                 new TrajectoryConfig(
                         AutoConstants.MAX_SPEED_METERS_PER_SECOND,
@@ -36,15 +35,15 @@ public class exampleAuto extends SequentialCommandGroup {
                         new Pose2d(3, 0, new Rotation2d(0)),
                         config);
 
-        SwerveControllerCommand swerveControllerCommand = getSwerveControllerCommand(swerve, exampleTrajectory);
+        SwerveControllerCommand swerveControllerCommand = getSwerveControllerCommand(swerveSubsystem, exampleTrajectory);
 
         addCommands(
-                new InstantCommand(() -> swerve.resetOdometry(exampleTrajectory.getInitialPose())),
+                //new InstantCommand(() -> swerveSubsystem.resetOdometry(exampleTrajectory.getInitialPose())), WARNING
                 swerveControllerCommand
         );
     }
 
-    private static SwerveControllerCommand getSwerveControllerCommand(Swerve swerve, Trajectory exampleTrajectory) {
+    private static SwerveControllerCommand getSwerveControllerCommand(SwerveSubsystem swerveSubsystem, Trajectory exampleTrajectory) {
         var thetaController =
                 new ProfiledPIDController(
                         AutoConstants.P_THETA_CONTROLLER, 0, 0, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
@@ -52,13 +51,13 @@ public class exampleAuto extends SequentialCommandGroup {
 
         return new SwerveControllerCommand(
                 exampleTrajectory,
-                swerve::getPose,
+                swerveSubsystem::getPose,
                 Constants.Swerve.SWERVE_KINEMATICS,
                 new PIDController(AutoConstants.PX_CONTROLLER, 0, 0),
                 new PIDController(AutoConstants.PY_CONTROLLER, 0, 0),
                 thetaController,
-                swerve::setModuleStates,
-                swerve);
+                swerveSubsystem::setModuleStates,
+                swerveSubsystem);
 
     }
 }

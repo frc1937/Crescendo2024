@@ -19,17 +19,11 @@ public class Robot extends TimedRobot {
         ctreConfigs = new CTREConfigs();
         robotContainer = new RobotContainer();
     }
-    
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
     }
-
-    @Override
-    public void disabledInit() {
-    }
-
 
     @Override
     public void disabledPeriodic() {
@@ -49,7 +43,6 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
     }
 
-
     @Override
     public void teleopInit() {
         if (autonomousCommand != null) {
@@ -61,7 +54,6 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
     }
 
-
     @Override
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
@@ -69,10 +61,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-    }
-
-    @Override
-    public void simulationInit() {
     }
 
     @Override

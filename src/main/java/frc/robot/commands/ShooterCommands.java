@@ -4,18 +4,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommands {
-    private final Shooter shooter;
-    public ShooterCommands(Shooter shooter) {
-        this.shooter = shooter;
+    private final ShooterSubsystem shooterSubsystem;
+    public ShooterCommands(ShooterSubsystem shooterSubsystem) {
+        this.shooterSubsystem = shooterSubsystem;
     }
 
     public Command shoot(double pivotAngle, double flywheelAngle) {
         return startShooter(pivotAngle, flywheelAngle)
                 .andThen(new WaitCommand(0.5))
-                .andThen(() -> shooter.setKickerVoltage(4))
+                .andThen(() -> shooterSubsystem.setKickerVoltage(4))
                 .andThen(stopShooter());
     }
 
@@ -23,13 +23,13 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {},
                 () -> {
-                    shooter.stopFlywheel();
-                    shooter.stopKicker();
+                    shooterSubsystem.stopFlywheel();
+                    shooterSubsystem.stopKicker();
                 },
                 interrupted -> {
                 },
                 () -> false,
-                shooter
+                shooterSubsystem
         );
     }
 
@@ -38,13 +38,13 @@ public class ShooterCommands {
                 () -> {
                 },
                 () -> {
-                    shooter.rotatePivot(Rotation2d.fromDegrees(pivotAngle));
-                    shooter.rotateFlywheel(Rotation2d.fromDegrees(flywheelAngle));
+                    shooterSubsystem.rotatePivot(Rotation2d.fromDegrees(pivotAngle));
+                    shooterSubsystem.rotateFlywheel(Rotation2d.fromDegrees(flywheelAngle));
                 },
                 interrupted -> {
                 },
                 () -> false,
-                shooter
+                shooterSubsystem
         );
     }
 }
