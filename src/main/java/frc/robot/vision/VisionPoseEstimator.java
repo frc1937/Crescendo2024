@@ -12,11 +12,12 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.util.Optional;
 
+import static frc.robot.Constants.Transfroms.ROBOT_TO_CAMERA;
 import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
-import static frc.robot.Constants.VisionConstants.ROBOT_TO_CAMERA;
+import static frc.robot.Constants.VisionConstants.CAMERA_NAME;
 
 public class VisionPoseEstimator {
-    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
+    private final PhotonCamera photonCamera = new PhotonCamera(CAMERA_NAME);
     private final PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
             APRIL_TAG_FIELD_LAYOUT,
             PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
@@ -37,6 +38,7 @@ public class VisionPoseEstimator {
         return null;
     }
 
+    // FIXME (Amit Goren): Remove this
     public Pose3d getTargetTagPose(Pose3d robotPose) {
         PhotonPipelineResult result = photonCamera.getLatestResult();
         Pose3d tagPose = new Pose3d();

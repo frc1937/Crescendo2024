@@ -15,15 +15,17 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
     public static final double stickDeadband = 0.1;
 
-    public static class VisionConstants {
-
+    public final class Transfroms {
         /**
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
-        //AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-        public static final Transform3d CAMERA_TO_ROBOT =
-                new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d());
-        public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
+        public static final Transform3d
+                CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d()),
+                ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
+    }
+
+    public static class VisionConstants {
+        public static final String CAMERA_NAME = "Photon1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     }

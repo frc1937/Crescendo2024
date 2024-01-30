@@ -52,6 +52,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
         /*FIXME (Amit): Pose2d() should be initialised to be in the starting position in field coordinates
          * (this depends on the alliance) */
+
+        // The robot's position is at the centre of the field, which is immediately fixed by the camera.
         poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
 
         AutoBuilder.configureHolonomic(
