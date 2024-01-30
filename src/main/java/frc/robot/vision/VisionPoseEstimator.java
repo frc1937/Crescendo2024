@@ -1,7 +1,5 @@
 package frc.robot.vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -12,18 +10,17 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import java.io.IOException;
 import java.util.Optional;
 
+import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
 import static frc.robot.Constants.VisionConstants.ROBOT_TO_CAMERA;
 
 public class VisionPoseEstimator {
     private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
-    private final AprilTagFieldLayout aprilTagFieldLayout = getAprilTagFieldLayout();
     private final PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
-            aprilTagFieldLayout,
-            PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE
-            ,photonCamera,
+            APRIL_TAG_FIELD_LAYOUT,
+            PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
+            photonCamera,
             ROBOT_TO_CAMERA);
 
     public EstimatedRobotPose getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
@@ -65,15 +62,5 @@ public class VisionPoseEstimator {
 
     public boolean hasTargets() {
         return photonCamera.getLatestResult().hasTargets();
-    }
-
-    private AprilTagFieldLayout getAprilTagFieldLayout() {
-        AprilTagFieldLayout fieldLayout;
-        try {
-            fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return fieldLayout;
     }
 }
