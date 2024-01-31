@@ -14,9 +14,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChaseTagCommand;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.vision.VisionPoseEstimator;
+
+import java.util.function.BooleanSupplier;
 
 public class RobotContainer {
     private final Joystick driver = new Joystick(0);
@@ -30,9 +34,13 @@ public class RobotContainer {
     /* Driver Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton chaseTagButton = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final JoystickButton intakeButton = new JoystickButton(driver, XboxController.Button.kX.value);
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
+    private BooleanSupplier isIntakeInverted;
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(isIntakeInverted);
+    private final IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
     /* PhotonVision */
     private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(swerveSubsystem, visionPoseEstimator);
 
@@ -60,6 +68,7 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         chaseTagButton.whileTrue(chaseTagCommand);
+        intakeButton.whileTrue(intakeCommands.startIntake(0.8));
     }
 
 

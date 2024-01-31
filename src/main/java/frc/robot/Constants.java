@@ -30,6 +30,10 @@ public final class Constants {
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     }
 
+    public static class IntakeConstants {
+        public static final int INTAKE_MOTOR_ID = 13;
+    }
+
     public static final class ShooterConstants {
         public static final int
                 FLYWHEEL_LEFT_ID = 17,
