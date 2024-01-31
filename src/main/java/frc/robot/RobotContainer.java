@@ -15,33 +15,33 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChaseTagCommand;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.vision.VisionPoseEstimator;
 
-import java.util.function.BooleanSupplier;
+import static frc.robot.Constants.DriveConstants.*;
 
 public class RobotContainer {
     private final Joystick driver = new Joystick(0);
     private final SendableChooser<Command> autoChooser;
-
-    /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
-
-    /* Driver Buttons */
+    /* Drive Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton chaseTagButton = new JoystickButton(driver, XboxController.Button.kB.value);
-    private final JoystickButton intakeButton = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton inTakeButton = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton outTakeButton = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton shootButton = new JoystickButton(driver, XboxController.Button.kLeftStick.value);
+
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
-    private BooleanSupplier isIntakeInverted;
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(isIntakeInverted);
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    /* Commands */
+    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem);
     private final IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
-    /* PhotonVision */
     private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(swerveSubsystem, visionPoseEstimator);
 
     public RobotContainer() {
@@ -50,9 +50,9 @@ public class RobotContainer {
         swerveSubsystem.setDefaultCommand(
                 new TeleopSwerve(
                         swerveSubsystem,
-                        () -> -driver.getRawAxis(translationAxis),
-                        () -> -driver.getRawAxis(strafeAxis),
-                        () -> -driver.getRawAxis(rotationAxis),
+                        () -> -driver.getRawAxis(TRANSLATION_AXIS),
+                        () -> -driver.getRawAxis(STRAFE_AXIS),
+                        () -> -driver.getRawAxis(ROTATION_AXIS),
                         robotCentric
                 )
         );
@@ -68,7 +68,11 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
         chaseTagButton.whileTrue(chaseTagCommand);
-        intakeButton.whileTrue(intakeCommands.startIntake(0.8));
+
+        inTakeButton.whileTrue(intakeCommands.startIntake(0.8));
+        outTakeButton.whileTrue(intakeCommands.startIntake(-0.8));
+
+        shootButton.whileTrue(shooterCommands.startShooter(0));
     }
 
 

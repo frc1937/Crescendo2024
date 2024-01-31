@@ -9,13 +9,14 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
-    public static final double stickDeadband = 0.1;
+    public static final double STICK_DEADBAND = 0.1;
 
-    public final class Transfroms {
+    public static final class Transfroms {
         /**
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
@@ -28,6 +29,14 @@ public final class Constants {
         public static final String CAMERA_NAME = "Photon1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    }
+
+    public static class DriveConstants {
+        public static final int TRANSLATION_AXIS = XboxController.Axis.kLeftY.value;
+        public static final int STRAFE_AXIS = XboxController.Axis.kLeftX.value;
+        public static final int ROTATION_AXIS = XboxController.Axis.kRightX.value;
+
+        /* Driver Buttons */
     }
 
     public static class IntakeConstants {
@@ -47,7 +56,10 @@ public final class Constants {
                 PIVOT_KD = 0,
                 FLYWHEEL_KP = 0.01,
                 FLYWHEEL_KI = 0,
-                FLYWHEEL_KD = 0;
+                FLYWHEEL_KD = 0,
+                FLYWHEEL_KMAX_OUTPUT = 1,
+                FLYWHEEL_KMIN_OUTPUT = -1,
+                FLYWHEEL_MINIMUM_READY_SPEED = 0.7;
     }
 
     public static final class Swerve {
@@ -170,11 +182,11 @@ public final class Constants {
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
 
-        public static boolean ANGLE_INVERT = true;
-        public static double VOLTAGE_COMP = 12.0;
+        public static final boolean ANGLE_INVERT = true;
+        public static final double VOLTAGE_COMP = 12.0;
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
 
-        public static HolonomicPathFollowerConfig holomonicPathFollowerConfig = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+        public static final HolonomicPathFollowerConfig holomonicPathFollowerConfig = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                 new PIDConstants(1.10, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(1.18, 0.0, 0.0), // Rotation PID constants
                 Constants.Swerve.MAX_SPEED, // Max module speed, in m/s

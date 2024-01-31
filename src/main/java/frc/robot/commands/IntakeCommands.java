@@ -13,7 +13,7 @@ public class IntakeCommands {
         return new FunctionalCommand(
                 () -> {},
                 () -> intakeSubsystem.setSpeedPercentage(speed),
-                (interrupted) -> {},
+                interrupted -> stopIntake(),
                 () -> false,
                 intakeSubsystem
         );
@@ -23,7 +23,7 @@ public class IntakeCommands {
         return new FunctionalCommand(
                 () -> {},
                 intakeSubsystem::stopMotor,
-                (interrupted) -> {},
+                interrupted -> {},
                 () -> false,
                 intakeSubsystem
         );

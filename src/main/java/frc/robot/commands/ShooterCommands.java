@@ -12,11 +12,25 @@ public class ShooterCommands {
         this.shooterSubsystem = shooterSubsystem;
     }
 
-    public Command shoot(double pivotAngle, double flywheelAngle) {
-        return startShooter(pivotAngle, flywheelAngle)
+    public Command shoot(double pivotAngle) {
+        return startShooter(pivotAngle)
                 .andThen(new WaitCommand(0.5))
                 .andThen(() -> shooterSubsystem.setKickerVoltage(4))
                 .andThen(stopShooter());
+    } //To be used when every mechanism is working
+
+    public Command startShooter(double pivotAngle) {
+        return new FunctionalCommand(
+                () -> {
+                },
+                () -> {
+                    shooterSubsystem.setPivotSetpoint(Rotation2d.fromDegrees(pivotAngle));
+                    shooterSubsystem.startFlywheels();
+                },
+                interrupted -> stopShooter(),
+                () -> false,
+                shooterSubsystem
+        );
     }
 
     private Command stopShooter() {
@@ -25,21 +39,6 @@ public class ShooterCommands {
                 () -> {
                     shooterSubsystem.stopFlywheel();
                     shooterSubsystem.stopKicker();
-                },
-                interrupted -> {
-                },
-                () -> false,
-                shooterSubsystem
-        );
-    }
-
-    private Command startShooter(double pivotAngle, double flywheelAngle) {
-        return new FunctionalCommand(
-                () -> {
-                },
-                () -> {
-                    shooterSubsystem.rotatePivot(Rotation2d.fromDegrees(pivotAngle));
-                    shooterSubsystem.rotateFlywheel(Rotation2d.fromDegrees(flywheelAngle));
                 },
                 interrupted -> {
                 },
