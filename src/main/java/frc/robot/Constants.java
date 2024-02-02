@@ -6,9 +6,12 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
@@ -16,7 +19,21 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
     public static final double STICK_DEADBAND = 0.1;
 
-    public static final class Transfroms {
+    public static final class ChaseTagPIDConstants {
+        public static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(8, 8);
+        public static final PIDController X_CONTROLLER = new PIDController(2, 0, 0);
+        public static final PIDController Y_CONTROLLER = new PIDController(2, 0, 0);
+        public static final ProfiledPIDController OMEGA_CONTROLLER = new ProfiledPIDController(4, 0, 0, OMEGA_CONSTRAINTS);
+
+        static {
+            X_CONTROLLER.setTolerance(0.2);
+            Y_CONTROLLER.setTolerance(0.2);
+            OMEGA_CONTROLLER.setTolerance(Units.degreesToRadians(3));
+            OMEGA_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
+        }
+    }
+
+    public static final class Transforms {
         /**
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
@@ -35,8 +52,6 @@ public final class Constants {
         public static final int TRANSLATION_AXIS = XboxController.Axis.kLeftY.value;
         public static final int STRAFE_AXIS = XboxController.Axis.kLeftX.value;
         public static final int ROTATION_AXIS = XboxController.Axis.kRightX.value;
-
-        /* Driver Buttons */
     }
 
     public static class IntakeConstants {

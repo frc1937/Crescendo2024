@@ -1,37 +1,28 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.vision.VisionPoseEstimator;
 
+import static frc.robot.Constants.ChaseTagPIDConstants.*;
+
 
 public class ChaseTagCommand extends Command {
-    private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
-    private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
-    private static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(8, 8);
     private final SwerveSubsystem swerveSubsystem;
     private final VisionPoseEstimator visionPoseEstimator;
 
-    private final ProfiledPIDController xController = new ProfiledPIDController(2, 0, 0, X_CONSTRAINTS);
-    private final ProfiledPIDController yController = new ProfiledPIDController(2, 0, 0, Y_CONSTRAINTS);
-    private final ProfiledPIDController omegaController = new ProfiledPIDController(4, 0, 0, OMEGA_CONSTRAINTS);
+    private final HolonomicDriveController driveController = new HolonomicDriveController(X_CONTROLLER, Y_CONTROLLER, OMEGA_CONTROLLER);
+
 
     public ChaseTagCommand(SwerveSubsystem swerveSubsystem, VisionPoseEstimator visionPoseEstimator) {
         this.swerveSubsystem = swerveSubsystem;
         this.visionPoseEstimator = visionPoseEstimator;
-
-        xController.setTolerance(0.2);
-        yController.setTolerance(0.2);
-        omegaController.setTolerance(Units.degreesToRadians(3));
-        omegaController.enableContinuousInput(-Math.PI, Math.PI);
 
         addRequirements(swerveSubsystem);
     }
@@ -40,9 +31,9 @@ public class ChaseTagCommand extends Command {
     public void initialize() {
         Pose2d robotPose = swerveSubsystem.getPose();
 
-        omegaController.reset(robotPose.getRotation().getRadians());
-        xController.reset(robotPose.getX());
-        yController.reset(robotPose.getY());
+        driveController.getThetaController().reset(robotPose.getRotation().getRadians());
+        driveController.getXController().reset();
+        driveController.getYController().reset();
     }
 
     @Override
@@ -59,33 +50,33 @@ public class ChaseTagCommand extends Command {
             Pose2d goalPose = visionPoseEstimator.getTargetTagPose(robotPose).toPose2d();
             //.transformBy(TAG_TO_GOAL).toPose2d();
 
-            xController.setGoal(goalPose.getX());
-            yController.setGoal(goalPose.getY());
-            omegaController.setGoal(goalPose.getRotation().getRadians());
+            driveController.getXController().setSetpoint(goalPose.getX());
+            driveController.getYController().setSetpoint(goalPose.getY());
+            driveController.getThetaController().setGoal(goalPose.getRotation().getRadians());
         }
 
         // Drive to the target
-        double xSpeed = xController.calculate(robotPose.getX());
-        if (xController.atGoal()) {
+        double xSpeed = X_CONTROLLER.calculate(robotPose.getX());
+        if (X_CONTROLLER.atSetpoint()) {
             xSpeed = 0;
         }
 
-        double ySpeed = yController.calculate(robotPose.getY());
-        if (yController.atGoal()) {
+        double ySpeed = Y_CONTROLLER.calculate(robotPose.getY());
+        if (Y_CONTROLLER.atSetpoint()) {
             ySpeed = 0;
         }
 
-        double omegaSpeed = omegaController.calculate(robotPose2d.getRotation().getRadians());
-        if (omegaController.atGoal()) {
+        double omegaSpeed = OMEGA_CONTROLLER.calculate(robotPose2d.getRotation().getRadians());
+        if (OMEGA_CONTROLLER.atGoal()) {
             omegaSpeed = 0;
         }
 
         SmartDashboard.putNumber("xSpeed", xSpeed);
         SmartDashboard.putNumber("ySpeed", ySpeed);
         SmartDashboard.putNumber("omegaSpeed", omegaSpeed);
-
-        //swerveSubsystem.drive(new Translation2d(xController.getGoal().position, yController.getGoal().position), omegaController.getGoal().position, true, true);
-        swerveSubsystem.drive(new Translation2d(-xController.getGoal().position * 0.8, yController.getGoal().position * 0.8), 0.1 * robotPose2d.getRotation().getRotations(), true, true);
+        //todo: CHECK LOGIC, this method below might be completely inaccurate for getting to the target pose.
+        swerveSubsystem.drive(new Translation2d(X_CONTROLLER.getSetpoint(), Y_CONTROLLER.getSetpoint()), OMEGA_CONTROLLER.getGoal().position, true, false);
+        // swerveSubsystem.drive(new Translation2d(-X_CONTROLLER.getGoal().position * 0.8, yController.getGoal().position * 0.8), 0.1 * robotPose2d.getRotation().getRotations(), true, true);
         //swerveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeed, 0, omegaSpeed, robotPose2d.getRotation()));
         // swerveSubsystem.drive(new ChassisSpeeds(0, ySpeed, 0));
     }

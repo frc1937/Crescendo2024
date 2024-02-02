@@ -13,7 +13,7 @@ public class ShooterCommands {
     }
 
     public Command shoot(double pivotAngle) {
-        return startShooter(pivotAngle)
+        return startShooter(pivotAngle) //Wait until shooter has accelerated
                 .andThen(new WaitCommand(0.5))
                 .andThen(() -> shooterSubsystem.setKickerVoltage(4))
                 .andThen(stopShooter());
