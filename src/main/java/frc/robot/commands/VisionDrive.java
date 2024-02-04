@@ -53,7 +53,7 @@ public class VisionDrive extends Command {
     
     @Override
     public void execute() {
-        angle = angleEntry.getDouble(0.0) * 0.273; // 70 / 256 = 0.273 = degrees / customunit
+        angle = angleEntry.getDouble(0.0) * 0.273; // 70 / 256 = 0.273 = camera_degrees / custom_unit
         distance = distanceEntry.getDouble(0.0);
         if (distance != 0.0) {
             targetPosition = new Pose2d(
