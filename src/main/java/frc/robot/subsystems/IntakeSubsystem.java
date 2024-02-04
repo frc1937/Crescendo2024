@@ -11,6 +11,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         configureTalonMotor(talonSRX);
+
         talonSRX.setInverted(true);
     }
 

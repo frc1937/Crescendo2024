@@ -8,7 +8,11 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -56,6 +60,7 @@ public final class Constants {
 
     public static class IntakeConstants {
         public static final int INTAKE_MOTOR_ID = 13;
+        public static final double INTAKE_SPEED = 0.8;
     }
 
     public static final class ShooterConstants {
@@ -63,18 +68,18 @@ public final class Constants {
                 FLYWHEEL_LEFT_ID = 17,
                 FLYWHEEL_RIGHT_ID = 18,
                 PIVOT_ID = 23,
-                KICKER_ID = 22;
+                PIVOT_CAN_CODER = 22;
+        public static final double FLYWHEEL_MINIMUM_READY_SPEED = 0.7;
+        public static final double PIVOT_ENCODER_OFFSET = 40.78;
+        public final static double FLYWHEEL_P = 0.001_159;
+        public final static double FLYWHEEL_FF = 0.000_065_955;
+        public final static double FLYWHEEL_RANGE_MIN = -1;
+        public final static double FLYWHEEL_RANGE_MAX = 1;
+        public final static double PIVOT_P = 0.014_75;
+        public final static double PIVOT_FF = 0.001;
+        public final static double PIVOT_RANGE_MIN = -0.3;
+        public final static double PIVOT_RANGE_MAX = 0.3;
 
-        public static final double
-                PIVOT_KP = 0,
-                PIVOT_KI = 0,
-                PIVOT_KD = 0,
-                FLYWHEEL_KP = 0.01,
-                FLYWHEEL_KI = 0,
-                FLYWHEEL_KD = 0,
-                FLYWHEEL_KMAX_OUTPUT = 1,
-                FLYWHEEL_KMIN_OUTPUT = -1,
-                FLYWHEEL_MINIMUM_READY_SPEED = 0.7;
     }
 
     public static final class Swerve {

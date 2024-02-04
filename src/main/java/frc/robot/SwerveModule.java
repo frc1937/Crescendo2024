@@ -1,21 +1,22 @@
 package frc.robot;
 
-import com.revrobotics.*;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-
-import frc.lib.math.Conversions;
-import frc.lib.util.CANSparkMaxUtil;
-import frc.lib.util.CTREModuleState;
-import frc.lib.util.SwerveModuleConstants;
-import frc.lib.util.CANSparkMaxUtil.Usage;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.lib.math.Conversions;
+import frc.lib.util.CANSparkMaxUtil;
+import frc.lib.util.CANSparkMaxUtil.Usage;
+import frc.lib.util.CTREModuleState;
+import frc.lib.util.SwerveModuleConstants;
 
 public class SwerveModule {
 

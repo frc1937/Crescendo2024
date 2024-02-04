@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommands {
@@ -12,36 +11,22 @@ public class ShooterCommands {
         this.shooterSubsystem = shooterSubsystem;
     }
 
-    public Command shoot(double pivotAngle) {
-        return startShooter(pivotAngle) //Wait until shooter has accelerated
-                .andThen(new WaitCommand(0.5))
-                .andThen(() -> shooterSubsystem.setKickerVoltage(4))
-                .andThen(stopShooter());
-    } //To be used when every mechanism is working
-
-    public Command startShooter(double pivotAngle) {
+    public Command rotateFlywheels(double speed) {
         return new FunctionalCommand(
-                () -> {
-                },
-                () -> {
-                    shooterSubsystem.setPivotSetpoint(Rotation2d.fromDegrees(pivotAngle));
-                    shooterSubsystem.startFlywheels();
-                },
-                interrupted -> stopShooter(),
+                () -> {},
+                () -> shooterSubsystem.setFlywheelSpeed(speed),
+                interrupted -> shooterSubsystem.stopFlywheels(),
                 () -> false,
                 shooterSubsystem
         );
     }
 
-    private Command stopShooter() {
+    public Command rotatePivot(Rotation2d rotation) {
         return new FunctionalCommand(
-                () -> {},
                 () -> {
-                    shooterSubsystem.stopFlywheel();
-                    shooterSubsystem.stopKicker();
                 },
-                interrupted -> {
-                },
+                () -> shooterSubsystem.setPivotAngle(rotation),
+                interrupted -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0)),
                 () -> false,
                 shooterSubsystem
         );
