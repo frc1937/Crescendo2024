@@ -29,8 +29,8 @@ public class VisionDrive extends Command {
 
     public VisionDrive(Swerve swerve) {
         this.swerve = swerve;
-        visionTable = NetworkTableInstance.getDefault().getTable("Vision");
         // Initialize the NetworkTable and entries here
+        visionTable = NetworkTableInstance.getDefault().getTable("Vision");
         angleEntry = visionTable.getEntry("Angle");
         distanceEntry = visionTable.getEntry("Distance");
         addRequirements(swerve);
