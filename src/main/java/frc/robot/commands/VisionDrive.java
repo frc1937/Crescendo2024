@@ -19,7 +19,7 @@ public class VisionDrive extends Command {
     private NetworkTableEntry AngleEntry;
     private NetworkTableEntry DistanceEntry;
     private double Angle;
-    private double distance;
+    private double Distance;
 
     private ProfiledPIDController omegaController = new ProfiledPIDController(1.15, 0, 0, new Constraints(4, 4));
     private ProfiledPIDController xSpeedController = new ProfiledPIDController(2.5, 0, 0, new Constraints(2, 3));
