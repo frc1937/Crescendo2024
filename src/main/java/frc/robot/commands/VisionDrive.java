@@ -30,15 +30,14 @@ public class VisionDrive extends Command {
     public VisionDrive(Swerve swerve) {
         this.swerve = swerve;
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+        // Initialize the NetworkTable and entries here
+        angleEntry = visionTable.getEntry("Angle");
+        distanceEntry = visionTable.getEntry("Distance");
         addRequirements(swerve);
     }
 
     @Override
     public void initialize() {
-        // Initialize the NetworkTable and entries here
-        angleEntry = visionTable.getEntry("Angle");
-        distanceEntry = visionTable.getEntry("Distance");
-    
         angle = angleEntry.getDouble(0.0) * 0.273;
         distance = distanceEntry.getDouble(0.0);
     
@@ -54,7 +53,7 @@ public class VisionDrive extends Command {
     
     @Override
     public void execute() {
-        angle = angleEntry.getDouble(0.0) * 0.273;
+        angle = angleEntry.getDouble(0.0) * 0.273; // 70 / 256 = 0.273 = degrees / customunit
         distance = distanceEntry.getDouble(0.0);
         if (distance != 0.0) {
             targetPosition = new Pose2d(
