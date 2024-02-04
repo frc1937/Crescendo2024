@@ -16,10 +16,10 @@ public class VisionDrive extends Command {
     private final Swerve swerve;
 
     private NetworkTable visionTable;
-    private NetworkTableEntry AngleEntry;
-    private NetworkTableEntry DistanceEntry;
-    private double Angle;
-    private double Distance;
+    private NetworkTableEntry angleEntry;
+    private NetworkTableEntry distanceEntry;
+    private double angle;
+    private double distance;
 
     private ProfiledPIDController omegaController = new ProfiledPIDController(1.15, 0, 0, new Constraints(4, 4));
     private ProfiledPIDController xSpeedController = new ProfiledPIDController(2.5, 0, 0, new Constraints(2, 3));
@@ -36,16 +36,16 @@ public class VisionDrive extends Command {
     @Override
     public void initialize() {
         // Initialize the NetworkTable and entries here
-        AngleEntry = visionTable.getEntry("Angle");
-        DistanceEntry = visionTable.getEntry("Distance");
+        angleEntry = visionTable.getEntry("Angle");
+        distanceEntry = visionTable.getEntry("Distance");
     
-        Angle = AngleEntry.getDouble(0.0) * 0.273;
-        Distance = DistanceEntry.getDouble(0.0);
+        angle = angleEntry.getDouble(0.0) * 0.273;
+        distance = distanceEntry.getDouble(0.0);
     
-        if (Distance != 0.0){
+        if (distance != 0.0){
             targetPosition = new Pose2d(
-                swerve.getPose().getX() + Distance, 
-                0, Rotation2d.fromDegrees(Angle));
+                swerve.getPose().getX() + distance, 
+                0, Rotation2d.fromDegrees(angle));
     
             omegaController.setGoal(targetPosition.getRotation().getRadians());
             xSpeedController.setGoal(targetPosition.getX());
@@ -54,12 +54,12 @@ public class VisionDrive extends Command {
     
     @Override
     public void execute() {
-        Angle = AngleEntry.getDouble(0.0) * 0.273;
-        Distance = DistanceEntry.getDouble(0.0);
-        if (Distance != 0.0) {
+        angle = angleEntry.getDouble(0.0) * 0.273;
+        distance = distanceEntry.getDouble(0.0);
+        if (distance != 0.0) {
             targetPosition = new Pose2d(
-                swerve.getPose().getX() + Distance, 
-                0, Rotation2d.fromDegrees(Angle));
+                swerve.getPose().getX() + distance, 
+                0, Rotation2d.fromDegrees(angle));
             omegaController.setGoal(targetPosition.getRotation().getRadians());
             xSpeedController.setGoal(targetPosition.getX());
 
