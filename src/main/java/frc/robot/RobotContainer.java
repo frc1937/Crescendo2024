@@ -75,8 +75,14 @@ public class RobotContainer {
         chaseTagCommand.whileTrue(chaseTag);
     }
 
-
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+    }
+
+    /**
+     * A custom periodic function that should be call infrequenty compared to the regular periodic
+     */
+    public void infrequentPeriodic() {
+        swerve.infrequentPeriodic();
     }
 }

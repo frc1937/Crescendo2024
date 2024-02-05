@@ -17,6 +17,10 @@ public class Robot extends TimedRobot {
 //    private final PhotonCamera photonCamera = new PhotonCamera("Photon1937");
 //    private final PoseEstimator poseEstimator = new PoseEstimator(photonCamera);
 
+    public Robot() {
+        addPeriodic(robotCentric.infrequentPeriodic, INFREQUENT_PERIODIC_PERIOD);
+    }
+
     @Override
     public void robotInit() {
         ctreConfigs = new CTREConfigs();

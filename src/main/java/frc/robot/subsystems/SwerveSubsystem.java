@@ -23,6 +23,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public final SwerveModule[] swerveMods;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
 
+    private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer<Pose2d>.createBuffer(POSE_HISTORY_DURATION);
+
     public SwerveSubsystem() {
         gyro.configFactoryDefault();
         zeroGyro();
@@ -57,6 +59,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
                 this
         );
+    }
+
+    private void sampleRobotPose() {
+        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
+    }
+
+    public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
+        return this.poseHistory();
+    }
+
+    public void infrequentPeriodic() {
+        sampleRobotPose();
     }
 
     public ChassisSpeeds getRobotRelativeSpeed() {

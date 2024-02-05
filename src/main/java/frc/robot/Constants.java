@@ -11,6 +11,11 @@ import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
+    /**
+     * Once how much time, in seconds, to run the infrequent periodic procedure
+     */
+    public static final double INFREQUENT_PERIODIC_PERIOD = 0.1;
+
     public static final double stickDeadband = 0.1;
 
     public static class VisionConstants {
@@ -42,6 +47,35 @@ public final class Constants {
                 FLYWHEEL_KP = 0,
                 FLYWHEEL_KI = 0,
                 FLYWHEEL_KD = 0;
+    }
+
+    private static final class ShootingConstants {
+        /**
+         * This table maps theoretical (quasi) shooter slopes to shooter orientations that actually achieve
+         * the desired results, based on calibration and experimentation.
+         * 
+         * To obtain the samples, place the robot at some distance from the target, record the theoretical
+         * target slope given by the program as a key, and shoot with an arbitrary angle value. Shoot at an
+         * arbitrary angle and adjust it repeatedly until the robot consistently scores with the current slope(i.e.
+         * from its current position). Then move the robot to a different position and repeat until the table is
+         * complete. A good initial angle is the arc-tangent of the theoretical slope.
+         */
+        public static final var SLOPE_TO_SHOOTER_ROTATION_MAP = new InterpolatingTreeMap<Double, Rotation2d>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+        static {
+                // TODO Currently, the values here are the initial guesses and are yet
+                // to be calibrated
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.0, new Rotation2d.fromDegrees(0));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, new Rotation2d.fromDegrees(11));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, new Rotation2d.fromDegrees(21));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.6, new Rotation2d.fromDegrees(30));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.8, new Rotation2d.fromDegrees(38));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.0, new Rotation2d.fromDegrees(45));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.2, new Rotation2d.fromDegrees(50));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.4, new Rotation2d.fromDegrees(54));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.6, new Rotation2d.fromDegrees(57));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.8, new Rotation2d.fromDegrees(60));
+                SLOPE_TO_SHOOTER_ROTATION_MAP.put(2.0, new Rotation2d.fromDegrees(63));
+        }
     }
 
     public static final class Swerve {
@@ -196,5 +230,12 @@ public final class Constants {
              */
             public static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.1;
         }
+
+        /**
+         * For how long, in seconds, to store the robot pose history
+         * 
+         * This is used for predicting the robot's state, which is needed for shooting whilst moving.
+         */
+        public static final double POSE_HISTORY_DURATION = 0.5;
     }
 }
