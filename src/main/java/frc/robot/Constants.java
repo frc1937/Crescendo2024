@@ -16,7 +16,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -52,12 +51,6 @@ public final class Constants {
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     }
 
-    public static class DriveConstants {
-        public static final int TRANSLATION_AXIS = XboxController.Axis.kLeftY.value;
-        public static final int STRAFE_AXIS = XboxController.Axis.kLeftX.value;
-        public static final int ROTATION_AXIS = XboxController.Axis.kRightX.value;
-    }
-
     public static class IntakeConstants {
         public static final int INTAKE_MOTOR_ID = 13;
         public static final double INTAKE_SPEED = 0.8;
@@ -65,9 +58,9 @@ public final class Constants {
 
     public static final class ShooterConstants {
         public static final int
-                FLYWHEEL_LEFT_ID = 17,
-                FLYWHEEL_RIGHT_ID = 18,
-                PIVOT_ID = 23,
+                FLYWHEEL_LEFT_ID = 15,
+                FLYWHEEL_RIGHT_ID = 16,
+                PIVOT_ID = 1,
                 PIVOT_CAN_CODER = 22;
         public static final double FLYWHEEL_MINIMUM_READY_SPEED = 0.7;
         public static final double PIVOT_ENCODER_OFFSET = 40.78;
@@ -75,15 +68,15 @@ public final class Constants {
         public final static double FLYWHEEL_FF = 0.000_065_955;
         public final static double FLYWHEEL_RANGE_MIN = -1;
         public final static double FLYWHEEL_RANGE_MAX = 1;
-        public final static double PIVOT_P = 0.014_75;
-        public final static double PIVOT_FF = 0.001;
+        public final static double PIVOT_P = 0.0001;//0.014_75;
+        public final static double PIVOT_FF = 0.000;//0.001;
         public final static double PIVOT_RANGE_MIN = -0.3;
         public final static double PIVOT_RANGE_MAX = 0.3;
 
     }
 
     public static final class Swerve {
-        public static final int PIGEON_ID = 15;
+        public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
 
         public static final COTSFalconSwerveConstants CHOSEN_MODULE =
@@ -164,19 +157,19 @@ public final class Constants {
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
         public static final class Module0 {
-            public static final int DRIVE_MOTOR_ID = 7;
-            public static final int ANGLE_MOTOR_ID = 8;
-            public static final int CAN_CODER_ID = 9;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(181.56);
+            public static final int DRIVE_MOTOR_ID = 14;
+            public static final int ANGLE_MOTOR_ID = 11;
+            public static final int CAN_CODER_ID = 18;
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(243.55);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
 
         /* Front Right Module - Module 1 */
         public static final class Module1 {
-            public static final int DRIVE_MOTOR_ID = 1;
-            public static final int ANGLE_MOTOR_ID = 2;
-            public static final int CAN_CODER_ID = 3;
+            public static final int DRIVE_MOTOR_ID = 3;
+            public static final int ANGLE_MOTOR_ID = 10;
+            public static final int CAN_CODER_ID = 20;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.45);//281.51);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
@@ -184,9 +177,9 @@ public final class Constants {
 
         /* Back Left Module - Module 2 */
         public static final class Module2 {
-            public static final int DRIVE_MOTOR_ID = 10;
-            public static final int ANGLE_MOTOR_ID = 11;
-            public static final int CAN_CODER_ID = 12;
+            public static final int DRIVE_MOTOR_ID = 13;
+            public static final int ANGLE_MOTOR_ID = 6;
+            public static final int CAN_CODER_ID = 19;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(194.23);//196.78);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
@@ -194,9 +187,9 @@ public final class Constants {
 
         /* Back Right Module - Module 3 */
         public static final class Module3 {
-            public static final int DRIVE_MOTOR_ID = 4;
-            public static final int ANGLE_MOTOR_ID = 5;
-            public static final int CAN_CODER_ID = 6;
+            public static final int DRIVE_MOTOR_ID = 2;
+            public static final int ANGLE_MOTOR_ID = 9;
+            public static final int CAN_CODER_ID = 21;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(113.46);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);

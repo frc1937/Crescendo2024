@@ -4,18 +4,12 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_FF;
 import static frc.robot.Constants.ShooterConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_MINIMUM_READY_SPEED;
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_P;
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_RANGE_MAX;
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_RANGE_MIN;
 import static frc.robot.Constants.ShooterConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShooterConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShooterConstants.PIVOT_ENCODER_OFFSET;
@@ -29,11 +23,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANSparkFlex flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANSparkFlex pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder();
+    //private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder();
     private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
-    private final SparkPIDController pivotController, flywheelController;
-    private double pivotSetpoint = 0, flywheelSetpoint = 0;
-
+    private final SparkPIDController pivotController;//, flywheelController;
+    private double pivotSetpoint = 0;//, flywheelSetpoint = 0;
+    //TODO (Wihy): Uncomment code and calibrate flywheel PID
     public ShooterSubsystem() {
         configureSparkMotor(flywheelMaster);
         configureSparkMotor(flywheelSlave);
@@ -45,7 +39,7 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotController = pivotMotor.getPIDController();
         setupPivotController();
 
-        flywheelController = flywheelMaster.getPIDController();
+//        flywheelController = flywheelMaster.getPIDController();
         setupFlywheelController();
     }
 
@@ -55,19 +49,20 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotMotor.getEncoder().setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("CurrentSpeed", flywheelEncoder.getVelocity());
-        SmartDashboard.putNumber("TargetSpeed", flywheelSetpoint * 5600);
+//        SmartDashboard.putNumber("CurrentSpeed", flywheelEncoder.getVelocity());
+//        SmartDashboard.putNumber("TargetSpeed", flywheelSetpoint * 5600);
         SmartDashboard.putNumber("CurrentAngle ", currentAngle);
         SmartDashboard.putNumber("AbsolutePosition", pivotEncoder.getPosition());
         SmartDashboard.putNumber("CurrentPosition ", pivotMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("CurrentVelocity ", pivotMotor.getEncoder().getVelocity());
 
-        flywheelController.setReference(flywheelSetpoint * 5600, CANSparkBase.ControlType.kVelocity);
+//        flywheelController.setReference(flywheelSetpoint * 5600, CANSparkBase.ControlType.kVelocity);
         pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition);
     }
 
     public void setFlywheelSpeed(double speed) {
-        flywheelSetpoint = speed;
+//        flywheelSetpoint = speed;
+        flywheelMaster.set(speed);
     }
 
     public void stopFlywheels() {
@@ -75,7 +70,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean areFlywheelsReady() {
-        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_SPEED;
+//        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_SPEED;
+        return true;
     }
 
     public boolean hasPivotArrived() {
@@ -93,12 +89,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private void configureSparkMotor(CANSparkFlex motor) {
         motor.restoreFactoryDefaults();
+        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
     private void setupFlywheelController() {
-        flywheelController.setP(FLYWHEEL_P);
-        flywheelController.setFF(FLYWHEEL_FF);
-        flywheelController.setOutputRange(FLYWHEEL_RANGE_MIN, FLYWHEEL_RANGE_MAX);
+//        flywheelController.setP(FLYWHEEL_P);
+//        flywheelController.setFF(FLYWHEEL_FF);
+//        flywheelController.setOutputRange(FLYWHEEL_RANGE_MIN, FLYWHEEL_RANGE_MAX);
     }
 
     private void setupPivotController() {
