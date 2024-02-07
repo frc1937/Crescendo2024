@@ -18,7 +18,7 @@ public class ChaseTagCommand extends Command {
     private final SwerveSubsystem swerveSubsystem;
     private final VisionPoseEstimator visionPoseEstimator;
     private final HolonomicDriveController driveController = new HolonomicDriveController(X_CONTROLLER, Y_CONTROLLER, OMEGA_CONTROLLER);
-
+    //Todo (Wihy): Initialize at SwerveSubsystem instead.
     public ChaseTagCommand(SwerveSubsystem swerveSubsystem, VisionPoseEstimator visionPoseEstimator) {
         this.swerveSubsystem = swerveSubsystem;
         this.visionPoseEstimator = visionPoseEstimator;

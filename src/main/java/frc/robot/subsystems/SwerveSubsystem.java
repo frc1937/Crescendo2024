@@ -26,7 +26,7 @@ import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 public class SwerveSubsystem extends SubsystemBase {
 
     public final SwerveDrivePoseEstimator poseEstimator;
-    public final SwerveModule[] swerveMods;
+    public final SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     public final VisionPoseEstimator visionPoseEstimator = new  VisionPoseEstimator();
 
@@ -36,7 +36,7 @@ public class SwerveSubsystem extends SubsystemBase {
         gyro.configFactoryDefault();
         zeroGyro();
 
-        swerveMods = new SwerveModule[]{
+        swerveModules = new SwerveModule[]{
                 new SwerveModule(0, Constants.Swerve.Module0.CONSTANTS),
                 new SwerveModule(1, Constants.Swerve.Module1.CONSTANTS),
                 new SwerveModule(2, Constants.Swerve.Module2.CONSTANTS),
@@ -50,16 +50,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
-                (pose) -> poseEstimator.resetPosition(getYaw(), getModulePositions(), pose),
+                pose -> poseEstimator.resetPosition(getYaw(), getModulePositions(), pose),
                 () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
                 this::drive,
                 holomonicPathFollowerConfig,
 
                 () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
                     DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue);
                     return alliance == DriverStation.Alliance.Red;
                 },
@@ -78,8 +74,8 @@ public class SwerveSubsystem extends SubsystemBase {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
+        for (SwerveModule mod : swerveModules) {
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
         }
     }
 
@@ -87,8 +83,8 @@ public class SwerveSubsystem extends SubsystemBase {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(getChassisSpeedsFromValues(translation, rotation, fieldRelative));
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
+        for (SwerveModule mod : swerveModules) {
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
         }
     }
 
@@ -96,8 +92,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.MAX_SPEED);
 
-        for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+        for (SwerveModule mod : swerveModules) {
+            mod.setDesiredState(desiredStates[mod.moduleNumber]);
         }
     }
 
@@ -108,7 +104,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
 
-        for (SwerveModule mod : swerveMods) {
+        for (SwerveModule mod : swerveModules) {
             states[mod.moduleNumber] = mod.getState();
         }
 
@@ -118,7 +114,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
-        for (SwerveModule mod : swerveMods) {
+        for (SwerveModule mod : swerveModules) {
             positions[mod.moduleNumber] = mod.getPosition();
         }
 
@@ -134,7 +130,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetModulesToAbsolute() {
-        for (SwerveModule mod : swerveMods) {
+        for (SwerveModule mod : swerveModules) {
             mod.resetToAbsolute();
         }
     }
@@ -143,7 +139,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        for (SwerveModule mod : swerveMods) {
+        for (SwerveModule mod : swerveModules) {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);

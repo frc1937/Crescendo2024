@@ -17,7 +17,7 @@ public class ShooterCommands {
         this.intakeSubsystem = intakeSubsystem;
     }
 
-    public SequentialCommandGroup takeNoteAndPivotToPreset() {
+    public SequentialCommandGroup manualFloorIntake() {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0))),
                 new InstantCommand(() -> intakeSubsystem.setSpeedPercentage(0.5)),

@@ -22,8 +22,8 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
     public static final double STICK_DEADBAND = 0.1;
 
-    public static final class ChaseTagPIDConstants {
-        public static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(8, 8);
+    public static final class ChaseTagPIDConstants { //TODO (Wihy): Merge this with Swerve's PIDConstants
+        public static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(Swerve.MAX_ANGULAR_VELOCITY, 8);
         public static final PIDController X_CONTROLLER = new PIDController(2, 0, 0);
         public static final PIDController Y_CONTROLLER = new PIDController(2, 0, 0);
         public static final ProfiledPIDController OMEGA_CONTROLLER = new ProfiledPIDController(4, 0, 0, OMEGA_CONSTRAINTS);
@@ -72,6 +72,7 @@ public final class Constants {
         public final static double PIVOT_FF = 0.000;//0.001;
         public final static double PIVOT_RANGE_MIN = -0.3;
         public final static double PIVOT_RANGE_MAX = 0.3;
+        public static final double PIVOT_ANGLE_RANGE_TOLERANCE = 0.25;
 
     }
 

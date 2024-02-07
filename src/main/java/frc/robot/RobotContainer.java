@@ -64,7 +64,7 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
-        aButton.whileTrue(shooterCommands.takeNoteAndPivotToPreset());
+        aButton.whileTrue(shooterCommands.manualFloorIntake());
         bButton.whileTrue(shooterCommands.restPivotHighAndShootNote());
     }
 

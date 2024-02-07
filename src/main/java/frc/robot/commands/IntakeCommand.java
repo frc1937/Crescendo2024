@@ -17,13 +17,8 @@ public class IntakeCommand extends Command {
 
     @Override
     public void initialize() {
-    }
-
-    @Override
-    public void execute() {
         intakeSubsystem.setSpeedPercentage(speed);
     }
-
 
     @Override
     public void end(boolean interrupted) {
