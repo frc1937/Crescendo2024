@@ -33,8 +33,6 @@ public class ChaseTagCommand extends Command {
         driveController.getThetaController().reset(robotPose.getRotation().getRadians());
         driveController.getXController().reset();
         driveController.getYController().reset();
-
-        driveController.setEnabled();
     }
 
     @Override
