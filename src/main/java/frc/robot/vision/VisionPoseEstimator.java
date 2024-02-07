@@ -32,8 +32,10 @@ public class VisionPoseEstimator {
         Optional<EstimatedRobotPose> estimatedRobotPose = photonPoseEstimator.update();
         EstimatedRobotPose robotPose;
 
-        if (estimatedRobotPose.stream().findFirst().isPresent()) {
-            robotPose = estimatedRobotPose.stream().findFirst().get();
+        Optional<EstimatedRobotPose> estimatedNonNull = estimatedRobotPose.stream().findFirst();
+
+        if (estimatedNonNull.isPresent()) {
+            robotPose = estimatedNonNull.get();
             return robotPose;
         }
 

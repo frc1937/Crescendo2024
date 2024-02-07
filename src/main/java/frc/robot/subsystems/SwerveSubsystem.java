@@ -24,15 +24,15 @@ import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 
 public class SwerveSubsystem extends SubsystemBase {
-
     public final SwerveDrivePoseEstimator poseEstimator;
     public final SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
-    public final VisionPoseEstimator visionPoseEstimator = new  VisionPoseEstimator();
+    public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
 
     private double previousTimestamp = 0;
 
-    public SwerveSubsystem()  {
+
+    public SwerveSubsystem() {
         gyro.configFactoryDefault();
         zeroGyro();
 
@@ -64,11 +64,6 @@ public class SwerveSubsystem extends SubsystemBase {
         );
     }
 
-    public ChassisSpeeds getChassisSpeedsFromValues(Translation2d translation, double rotation, boolean fieldRelative) {
-        return fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYaw())
-                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
-    }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
@@ -80,7 +75,12 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(getChassisSpeedsFromValues(translation, rotation, fieldRelative));
+        SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(
+                fieldRelative
+                        ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYaw())
+                        : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
+        );
+
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
         for (SwerveModule mod : swerveModules) {
@@ -147,10 +147,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
         EstimatedRobotPose visionRobotPose;
 
-        if((visionRobotPose = visionPoseEstimator.getEstimatedGlobalPose(getPose())) != null) {
+        if ((visionRobotPose = visionPoseEstimator.getEstimatedGlobalPose(getPose())) != null) {
             double currentTimestamp = visionRobotPose.timestampSeconds;
 
-            if(previousTimestamp != currentTimestamp) {
+            if (previousTimestamp != currentTimestamp) {
                 previousTimestamp = currentTimestamp;
 
                 Pose3d visionPose = visionRobotPose.estimatedPose;

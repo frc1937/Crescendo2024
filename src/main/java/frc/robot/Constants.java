@@ -22,8 +22,8 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
     public static final double STICK_DEADBAND = 0.1;
 
-    public static final class ChaseTagPIDConstants { //TODO (Wihy): Merge this with Swerve's PIDConstants
-        public static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(Swerve.MAX_ANGULAR_VELOCITY, 8);
+    public static final class ChaseTagPIDConstants {
+        public static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(8, 8);
         public static final PIDController X_CONTROLLER = new PIDController(2, 0, 0);
         public static final PIDController Y_CONTROLLER = new PIDController(2, 0, 0);
         public static final ProfiledPIDController OMEGA_CONTROLLER = new ProfiledPIDController(4, 0, 0, OMEGA_CONSTRAINTS);
@@ -64,15 +64,14 @@ public final class Constants {
                 PIVOT_CAN_CODER = 22;
         public static final double FLYWHEEL_MINIMUM_READY_SPEED = 0.7;
         public static final double PIVOT_ENCODER_OFFSET = 40.78;
-        public final static double FLYWHEEL_P = 0.001_159;
-        public final static double FLYWHEEL_FF = 0.000_065_955;
-        public final static double FLYWHEEL_RANGE_MIN = -1;
-        public final static double FLYWHEEL_RANGE_MAX = 1;
-        public final static double PIVOT_P = 0.0001;//0.014_75;
-        public final static double PIVOT_FF = 0.000;//0.001;
-        public final static double PIVOT_RANGE_MIN = -0.3;
-        public final static double PIVOT_RANGE_MAX = 0.3;
-        public static final double PIVOT_ANGLE_RANGE_TOLERANCE = 0.25;
+        public static final double FLYWHEEL_P = 0.001_159;
+        public static final double FLYWHEEL_FF = 0.000_065_955;
+        public static final double FLYWHEEL_RANGE_MIN = -1;
+        public static final double FLYWHEEL_RANGE_MAX = 1;
+        public static final double PIVOT_P = 0.0001;//0.014_75;
+        public static final double PIVOT_FF = 0.000;//0.001;
+        public static final double PIVOT_RANGE_MIN = -0.3;
+        public static final double PIVOT_RANGE_MAX = 0.3;
 
     }
 
