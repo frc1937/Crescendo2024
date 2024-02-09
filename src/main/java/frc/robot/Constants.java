@@ -25,6 +25,10 @@ public final class Constants {
         public static final int cameraViewAngle = 170;
         public static final double cameraToDegrees = cameraViewAngle / 360;
     }
+    public static class IntakeConstants {
+
+        public static final int INTAKE_MOTOR_ID = 10; // JUST A PLACEHOLDER
+    }
     public static final class ShooterConstants {
         public static final int
                 FLYWHEEL_LEFT_ID = 20,
