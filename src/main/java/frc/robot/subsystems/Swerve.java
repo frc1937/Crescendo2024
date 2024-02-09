@@ -34,10 +34,10 @@ public class Swerve extends SubsystemBase {
         zeroGyro();
 
         swerveMods = new SwerveModule[]{
-                new SwerveModule(0, Constants.Swerve.Mod0.CONSTANTS),
-                new SwerveModule(1, Constants.Swerve.Mod1.CONSTANTS),
-                new SwerveModule(2, Constants.Swerve.Mod2.CONSTANTS),
-                new SwerveModule(3, Constants.Swerve.Mod3.CONSTANTS)
+                new SwerveModule(0, Constants.Swerve.Module0.CONSTANTS),
+                new SwerveModule(1, Constants.Swerve.Module1.CONSTANTS),
+                new SwerveModule(2, Constants.Swerve.Module2.CONSTANTS),
+                new SwerveModule(3, Constants.Swerve.Module3.CONSTANTS)
         };
 
         Timer.delay(1.0);
