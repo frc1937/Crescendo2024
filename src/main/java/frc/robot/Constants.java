@@ -21,10 +21,9 @@ public final class Constants {
         public static final Transform3d CAMERA_TO_ROBOT =
                 new Transform3d(new Translation3d(0.46, 0.37, 0), new Rotation3d());
         public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
-    }
-    public static final class IntakeConstants {
-        public static final int
-                INTAKE_MOTOR_ID = 13;
+        
+        public static final int cameraViewAngle = 170;
+        public static final double cameraToDegrees = cameraViewAngle / 360;
     }
     public static final class ShooterConstants {
         public static final int
