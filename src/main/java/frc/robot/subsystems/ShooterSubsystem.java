@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -27,6 +28,7 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MAX;
 import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
 
 public class ShooterSubsystem extends SubsystemBase {
+    private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
     private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless),
             flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless),
@@ -53,8 +55,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("doesSeeNote", doesSeeNote());
+
         double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
         pivotMotor.getEncoder().setPosition(currentAngle);
+
+        SmartDashboard.putNumber("Flywheel Vel ", flywheelEncoder.getVelocity());
 
         /* FOR DEBUGGING, REMOVE */
         SmartDashboard.putNumber("CurrentAngle ", currentAngle);
@@ -65,8 +71,16 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition);
     }
 
-    public void startKicker(double speed) {
+    public boolean doesSeeNote() {
+        return !beamBreaker.get();
+    }
+
+    public void setKickerSpeed(double speed) {
         kickerMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    public void stopKicker() {
+        kickerMotor.stopMotor();
     }
 
     public void startFlywheels() {
@@ -82,11 +96,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean areFlywheelsReady() {
-        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_SPEED;
+        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_SPEED*5600;
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 0.25;
+        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 2;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {

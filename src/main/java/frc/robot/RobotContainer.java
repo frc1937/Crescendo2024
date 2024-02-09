@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.TriggerButton;
 
 import static frc.robot.Constants.IntakeConstants.INTAKE_SPEED;
 
@@ -28,8 +30,11 @@ public class RobotContainer {
 
     /* Drive Buttons */
     private final JoystickButton zeroGyroButton = new JoystickButton(driver, XboxController.Button.kY.value);
-    private final JoystickButton aButton = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final TriggerButton intakeButton = new TriggerButton(new XboxController(0), XboxController.Axis.kLeftTrigger);
+    private final JoystickButton aButton = new JoystickButton(driver,  XboxController.Button.kA.value);
     private final JoystickButton bButton = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final JoystickButton xButton = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton yButton = new JoystickButton(driver, XboxController.Button.kY.value);
 
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -42,15 +47,15 @@ public class RobotContainer {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 //TODO: Commented out so robot doesn't yeet itself
 
-//        swerveSubsystem.setDefaultCommand(
-//                new TeleopSwerve(
-//                        swerveSubsystem,
-//                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-//                        () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
-//                        () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
-//                        robotCentric
-//                )
-//        );
+        swerveSubsystem.setDefaultCommand(
+                new TeleopSwerve(
+                        swerveSubsystem,
+                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+                        () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
+                        () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
+                        robotCentric
+                )
+        );
 
         NamedCommands.registerCommand("pickupIntake", new IntakeCommand(intakeSubsystem, INTAKE_SPEED));
 
@@ -64,8 +69,11 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
-        aButton.whileTrue(shooterCommands.manualFloorIntake());
-        bButton.whileTrue(shooterCommands.restPivotHighAndShootNote());
+        intakeButton.whileTrue(shooterCommands.floorIntake()
+                .andThen(shooterCommands.setKickerSpeed(-0.8)
+                        .withTimeout(0.3)));
+
+        bButton.whileTrue(shooterCommands.shootNote(70));
     }
 
 
