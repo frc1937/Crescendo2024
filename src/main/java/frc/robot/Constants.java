@@ -68,10 +68,6 @@ public final class Constants {
         public static final double cameraToDegrees = cameraViewAngle / 360;
     }
     public static class IntakeConstants {
-
-        public static final int INTAKE_MOTOR_ID = 10; // JUST A PLACEHOLDER
-    }
-    public static class IntakeConstants {
         public static final int INTAKE_MOTOR_ID = 13;
         public static final double INTAKE_SPEED = 0.8;
     }
