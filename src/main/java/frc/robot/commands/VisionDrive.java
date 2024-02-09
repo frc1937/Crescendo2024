@@ -80,7 +80,4 @@ public class VisionDrive extends Command {
         swerve.stop(); // Stop the robot when the command ends
     }
 
-    double convertToRadians(double customUnitAngle) {
-        return (customUnitAngle / 256.0) * Math.PI;
-    }
 }
