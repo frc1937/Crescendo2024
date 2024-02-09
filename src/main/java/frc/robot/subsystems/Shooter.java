@@ -9,13 +9,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-import static frc.robot.Constants.ShooterConstants.*;
+import static frc.robot.Constants.ShootingConstants.*;
 
 public class Shooter extends SubsystemBase {
-    private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(Constants.ShooterConstants.KICKER_ID);
-    private final CANSparkFlex pivotMotor = new CANSparkFlex(Constants.ShooterConstants.PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final CANSparkFlex flywheelMaster = new CANSparkFlex(Constants.ShooterConstants.FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final CANSparkFlex flywheelSlave = new CANSparkFlex(Constants.ShooterConstants.FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(Constants.ShootingConstants.KICKER_ID);
+    private final CANSparkFlex pivotMotor = new CANSparkFlex(Constants.ShootingConstants.PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final CANSparkFlex flywheelMaster = new CANSparkFlex(Constants.ShootingConstants.FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final CANSparkFlex flywheelSlave = new CANSparkFlex(Constants.ShootingConstants.FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder();
     private final RelativeEncoder pivotEncoder = pivotMotor.getEncoder();
 
@@ -23,10 +23,10 @@ public class Shooter extends SubsystemBase {
     private final PIDController flywheelPIDController;
 
     public Shooter() { //todo: calibrate PID values
-        pivotPIDController = new PIDController(PIVOT_KP, PIVOT_KI, PIVOT_KD);
+        pivotPIDController = new PIDController(PIVOT_P, 0, 0);
         pivotPIDController.enableContinuousInput(-180, 180);
 
-        flywheelPIDController = new PIDController(FLYWHEEL_KP, FLYWHEEL_KI, FLYWHEEL_KD);
+        flywheelPIDController = new PIDController(FLYWHEEL_P, 0, 0);
         flywheelPIDController.enableContinuousInput(-180, 180);
 
         configureTalonMotor(kickerMotor);
