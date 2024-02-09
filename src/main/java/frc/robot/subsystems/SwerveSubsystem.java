@@ -24,13 +24,12 @@ import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 
 public class SwerveSubsystem extends SubsystemBase {
-    public final SwerveDrivePoseEstimator poseEstimator;
-    public final SwerveModule[] swerveModules;
+    public SwerveDrivePoseEstimator poseEstimator;
+    public SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
 
     private double previousTimestamp = 0;
-
 
     public SwerveSubsystem() {
         gyro.configFactoryDefault();
@@ -63,7 +62,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 this
         );
     }
-
 
     public void drive(ChassisSpeeds chassisSpeeds) {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
@@ -165,3 +163,20 @@ public class SwerveSubsystem extends SubsystemBase {
         drive(new Translation2d(), 0, false);
     }
 }
+
+
+
+//    private void sampleRobotPose() {
+//        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
+//    }
+//
+//    public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
+//        return poseHistory;
+//    }
+//
+//    public void infrequentPeriodic() {
+//        sampleRobotPose();
+//    }
+
+//    private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer<Pose2d>.createBuffer(POSE_HISTORY_DURATION);
+

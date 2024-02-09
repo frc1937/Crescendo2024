@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
@@ -10,31 +13,36 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_MINIMUM_READY_SPEED;
-import static frc.robot.Constants.ShooterConstants.FLYWHEEL_RIGHT_ID;
-import static frc.robot.Constants.ShooterConstants.PIVOT_CAN_CODER;
-import static frc.robot.Constants.ShooterConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.Constants.ShooterConstants.PIVOT_FF;
-import static frc.robot.Constants.ShooterConstants.PIVOT_ID;
-import static frc.robot.Constants.ShooterConstants.PIVOT_P;
-import static frc.robot.Constants.ShooterConstants.PIVOT_RANGE_MAX;
-import static frc.robot.Constants.ShooterConstants.PIVOT_RANGE_MIN;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MINIMUM_READY_SPEED;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_SPEED;
+import static frc.robot.Constants.ShootingConstants.KICKER_ID;
+import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
+import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
+import static frc.robot.Constants.ShootingConstants.PIVOT_FF;
+import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
+import static frc.robot.Constants.ShootingConstants.PIVOT_P;
+import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MAX;
+import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
 
 public class ShooterSubsystem extends SubsystemBase {
-    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final CANSparkFlex flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final CANSparkFlex pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
+    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless),
+            flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless),
+            pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder();
-
     private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
     private final SparkPIDController pivotController;
     private double pivotSetpoint = 0;
 
     public ShooterSubsystem() {
+        configureSRXMotor(kickerMotor);
+
         configureSparkMotor(flywheelMaster);
         configureSparkMotor(flywheelSlave);
         configureSparkMotor(pivotMotor);
+
         configureCanCoder(pivotEncoder);
 
         flywheelSlave.follow(flywheelMaster, true);
@@ -55,6 +63,14 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("CurrentVelocity ", pivotMotor.getEncoder().getVelocity());
 
         pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition);
+    }
+
+    public void startKicker(double speed) {
+        kickerMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    public void startFlywheels() {
+        flywheelMaster.set(FLYWHEEL_SPEED);
     }
 
     public void setFlywheelSpeed(double speed) {
@@ -85,6 +101,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private void configureSparkMotor(CANSparkFlex motor) {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+    }
+
+    private void configureSRXMotor(WPI_TalonSRX motor) {
+        motor.configFactoryDefault();
+        motor.setNeutralMode(NeutralMode.Brake);
     }
 
     private void setupPivotController() {

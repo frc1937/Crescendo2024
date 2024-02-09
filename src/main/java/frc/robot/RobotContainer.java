@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -41,16 +40,17 @@ public class RobotContainer {
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+//TODO: Commented out so robot doesn't yeet itself
 
-        swerveSubsystem.setDefaultCommand(
-                new TeleopSwerve(
-                        swerveSubsystem,
-                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-                        () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
-                        () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
-                        robotCentric
-                )
-        );
+//        swerveSubsystem.setDefaultCommand(
+//                new TeleopSwerve(
+//                        swerveSubsystem,
+//                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+//                        () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
+//                        () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
+//                        robotCentric
+//                )
+//        );
 
         NamedCommands.registerCommand("pickupIntake", new IntakeCommand(intakeSubsystem, INTAKE_SPEED));
 

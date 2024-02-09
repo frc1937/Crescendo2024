@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -21,14 +22,17 @@ public class ShooterCommands {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0))),
                 new InstantCommand(() -> intakeSubsystem.setSpeedPercentage(0.5)),
-                new InstantCommand(() -> shooterSubsystem.setFlywheelSpeed(-0.5))
+                new InstantCommand(() -> shooterSubsystem.setFlywheelSpeed(-0.5)),
+                new InstantCommand(() -> shooterSubsystem.startKicker(-0.5))
         );
     }
 
     public SequentialCommandGroup restPivotHighAndShootNote() {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(30))),
-                new InstantCommand(() -> shooterSubsystem.setFlywheelSpeed(0.8))
+                new InstantCommand(() -> shooterSubsystem.setFlywheelSpeed(0.8)),
+                new InstantCommand(() -> new WaitUntilCommand(shooterSubsystem::areFlywheelsReady)), //todo: So many things could go wrong. Please test.
+                new InstantCommand(() -> shooterSubsystem.startKicker(0.3))
         );
     }
 

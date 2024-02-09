@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -20,6 +22,10 @@ import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
+    /**
+     * Once how much time, in seconds, to run the infrequent periodic procedure
+     */
+    public static final double INFREQUENT_PERIODIC_PERIOD = 0.1;
     public static final double STICK_DEADBAND = 0.1;
 
     public static final class ChaseTagPIDConstants {
@@ -42,7 +48,8 @@ public final class Constants {
          */
         public static final Transform3d
                 CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d()),
-                ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
+                ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse(),
+                ROBOT_TO_PIVOT = new Transform3d(new Translation3d(-0.4, 0.1, -0.44), new Rotation3d());
     }
 
     public static class VisionConstants {
@@ -56,12 +63,41 @@ public final class Constants {
         public static final double INTAKE_SPEED = 0.8;
     }
 
-    public static final class ShooterConstants {
+    public static final class ShootingConstants {
+        /**
+         * This table maps theoretical (quasi) shooter slopes to shooter orientations that actually achieve
+         * the desired results, based on calibration and experimentation.
+         * <p>
+         * To obtain the samples, place the robot at some distance from the target, record the theoretical
+         * target slope given by the program as a key, and shoot with an arbitrary angle value. Shoot at an
+         * arbitrary angle and adjust it repeatedly until the robot consistently scores with the current slope(i.e.
+         * from its current position). Then move the robot to a different position and repeat until the table is
+         * complete. A good initial angle is the arc-tangent of the theoretical slope.
+         */
+        public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_SHOOTER_ROTATION_MAP = new InterpolatingTreeMap<Double, Rotation2d>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+
+        static {
+            // TODO Currently, the values here are the initial guesses and are yet
+            // to be calibrated
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.0, Rotation2d.fromDegrees(0));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(11));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, Rotation2d.fromDegrees(21));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.6, Rotation2d.fromDegrees(30));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.8, Rotation2d.fromDegrees(38));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.0, Rotation2d.fromDegrees(45));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.2, Rotation2d.fromDegrees(50));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.4, Rotation2d.fromDegrees(54));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.6, Rotation2d.fromDegrees(57));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.8, Rotation2d.fromDegrees(60));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(2.0, Rotation2d.fromDegrees(63));
+        }
+
         public static final int
                 FLYWHEEL_LEFT_ID = 15,
                 FLYWHEEL_RIGHT_ID = 16,
                 PIVOT_ID = 1,
-                PIVOT_CAN_CODER = 22;
+                PIVOT_CAN_CODER = 22,
+                KICKER_ID = 8;
         public static final double FLYWHEEL_MINIMUM_READY_SPEED = 0.7;
         public static final double PIVOT_ENCODER_OFFSET = 40.78;
         public static final double FLYWHEEL_P = 0.001_159;
@@ -72,6 +108,15 @@ public final class Constants {
         public static final double PIVOT_FF = 0.000;//0.001;
         public static final double PIVOT_RANGE_MIN = -0.3;
         public static final double PIVOT_RANGE_MAX = 0.3;
+
+        public static final double FLYWHEEL_SPEED = 0.7;
+        /** In seconds */
+        public static final double SHOOTING_DELAY = 0.5;
+        /** In seconds */
+        public static final double POST_SHOOTING_DELAY = 0.4;
+
+        public static final double NOTE_RELEASE_VELOCITY = 0.5; //todo: CONFIGURE
+        public static final Translation3d TARGET_POSITION = new Translation3d();
 
     }
 
