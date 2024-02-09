@@ -40,7 +40,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve swerve = new Swerve();
-    private final IntakeSubsystem IntakeSubsystem = new IntakeSubsystem();
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
     private final NetworkTable visionTable;
     private NetworkTableEntry DistanceEntry;
@@ -74,18 +74,18 @@ public class RobotContainer {
         xButton.whileTrue(
                 new ParallelCommandGroup(
                         new VisionDrive(swerve),
-                        new IntakeCommand(IntakeSubsystem).startIntakeMotor(0.8)
+                        new IntakeCommand(intakeSubsystem).startIntakeMotor(0.8)
                 )
         );
         xButton.onFalse(
-            new IntakeCommand(IntakeSubsystem).stopIntakeMotor()
+            new IntakeCommand(intakeSubsystem).stopIntakeMotor()
         );
 
         bButton.whileTrue(
-                new IntakeCommand(IntakeSubsystem).startIntakeMotor(-0.8)
+                new IntakeCommand(intakeSubsystem).startIntakeMotor(-0.8)
         );
         bButton.onFalse(
-                new IntakeCommand(IntakeSubsystem).stopIntakeMotor()
+                new IntakeCommand(intakeSubsystem).stopIntakeMotor()
         );
     }
 
