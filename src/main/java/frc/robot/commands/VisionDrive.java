@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
+import frc.robot.Constants;
 
 public class VisionDrive extends Command {
 
@@ -38,7 +39,7 @@ public class VisionDrive extends Command {
 
     @Override
     public void initialize() {
-        angle = angleEntry.getDouble(0.0) * 0.273;
+        angle = angleEntry.getDouble(0.0) * Constants.VisionConstants.cameraToDegrees; // 170 / 360 = 0.47222 = camera_degrees / 360
         distance = distanceEntry.getDouble(0.0);
     
         if (distance != 0.0){
@@ -53,7 +54,7 @@ public class VisionDrive extends Command {
     
     @Override
     public void execute() {
-        angle = angleEntry.getDouble(0.0) * 0.273; // 70 / 256 = 0.273 = camera_degrees / custom_unit
+        angle = angleEntry.getDouble(0.0) * Constants.VisionConstants.cameraToDegrees; // 170 / 360 = 0.47222 = camera_degrees / 360
         distance = distanceEntry.getDouble(0.0);
         if (distance != 0.0) {
             targetPosition = new Pose2d(
