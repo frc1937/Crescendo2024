@@ -39,7 +39,7 @@ public class VisionDrive extends Command {
 
     @Override
     public void initialize() {
-        angle = angleEntry.getDouble(0.0) * Constants.VisionConstants.cameraToDegrees; // 170 / 360 = 0.47222 = camera_degrees / 360
+        angle = angleEntry.getDouble(0.0) * Constants.VisionConstants.cameraToDegrees; // 170 / 360 = 0.47222 = cameraViewDegrees / 360
         distance = distanceEntry.getDouble(0.0);
     
         if (distance != 0.0){
@@ -54,7 +54,7 @@ public class VisionDrive extends Command {
     
     @Override
     public void execute() {
-        angle = angleEntry.getDouble(0.0) * Constants.VisionConstants.cameraToDegrees; // 170 / 360 = 0.47222 = camera_degrees / 360
+        angle = angleEntry.getDouble(0.0) * Constants.VisionConstants.cameraToDegrees; // 170 / 360 = 0.47222 = cameraViewDegrees / 360
         distance = distanceEntry.getDouble(0.0);
         if (distance != 0.0) {
             targetPosition = new Pose2d(
