@@ -49,7 +49,7 @@ public final class Constants {
         public static final Transform3d
                 CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d()),
                 ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse(),
-                ROBOT_TO_PIVOT = new Transform3d(new Translation3d(-0.4, 0.1, -0.44), new Rotation3d());
+                ROBOT_TO_PIVOT = new Transform3d(new Translation3d(-0.275, 0, 0.15), new Rotation3d());
     }
 
     public static class VisionConstants {
@@ -79,18 +79,13 @@ public final class Constants {
         static {
             // TODO Currently, the values here are the initial guesses and are yet
             // to be calibrated
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.0, Rotation2d.fromDegrees(0));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(11));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, Rotation2d.fromDegrees(21));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.6, Rotation2d.fromDegrees(30));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.8, Rotation2d.fromDegrees(38));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.0, Rotation2d.fromDegrees(45));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.2, Rotation2d.fromDegrees(50));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.4, Rotation2d.fromDegrees(54));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.6, Rotation2d.fromDegrees(57));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(1.8, Rotation2d.fromDegrees(60));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(2.0, Rotation2d.fromDegrees(63));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(15 + 11));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.37, Rotation2d.fromDegrees(60));
+            //SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, Rotation2d.fromDegrees(70)); //
+
         }
+
+        public static final double POSE_HISTORY_DURATION = 0.5;
 
         public static final int
                 FLYWHEEL_LEFT_ID = 15,
@@ -116,7 +111,7 @@ public final class Constants {
         public static final double POST_SHOOTING_DELAY = 0.4;
 
         public static final double NOTE_RELEASE_VELOCITY = 0.5; //todo: CONFIGURE
-        public static final Translation3d TARGET_POSITION = new Translation3d();
+        public static final Translation3d TARGET_POSITION = new Translation3d(0.9, 0, 2);
 
     }
 
@@ -215,7 +210,7 @@ public final class Constants {
             public static final int DRIVE_MOTOR_ID = 3;
             public static final int ANGLE_MOTOR_ID = 10;
             public static final int CAN_CODER_ID = 20;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.45);//281.51);
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(105.45);//281.51);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -225,7 +220,7 @@ public final class Constants {
             public static final int DRIVE_MOTOR_ID = 13;
             public static final int ANGLE_MOTOR_ID = 6;
             public static final int CAN_CODER_ID = 19;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(194.23);//196.78);
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(188.23);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }

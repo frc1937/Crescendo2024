@@ -18,13 +18,15 @@ public class ShooterCommands {
     public Command shootNote(double angle) {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.stopKicker();
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
-                    shooterSubsystem.setFlywheelSpeed(0.9);
+                    if(shooterSubsystem.doesSeeNote()) {
+                        shooterSubsystem.stopKicker();
+                        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
+                        shooterSubsystem.setFlywheelSpeed(0.9);
+                    }
                 },
 
                 () -> {
-                    if (shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
+                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(0.9);
                     }
                 },
@@ -46,11 +48,12 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(2.5));
 
                     intakeSubsystem.setSpeedPercentage(0.9);
                     shooterSubsystem.setFlywheelSpeed(-0.7);
                     shooterSubsystem.setKickerSpeed(-0.8);
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1.5));
+//todo faster pitch
                 },
                 () -> {
                 },
@@ -64,52 +67,12 @@ public class ShooterCommands {
         );
     }
 
-//    public SequentialCommandGroup restPivotHighAndShootNote() {
-//        return setPivotAngle(Rotation2d.fromDegrees(30))
-//                .andThen(setFlywheelSpeed(0.8, true))
-//                .andThen(new WaitUntilCommand(shooterSubsystem::areFlywheelsReady))
-//                .andThen(setKickerSpeed(0.3));
-//
-////        return new SequentialCommandGroup(
-////                setPivotAngle(Rotation2d.fromDegrees(30)),
-////                // new InstantCommand(() -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(30))),
-////                setFlywheelSpeed(0.8, false),
-////                new WaitUntilCommand(shooterSubsystem::areFlywheelsReady),
-////                //new InstantCommand(() -> new WaitUntilCommand(shooterSubsystem::areFlywheelsReady)),
-////                // todo: So many things could go wrong. Please test.
-////                // new InstantCommand(() -> shooterSubsystem.setKickerSpeed(0.3))
-////                setKickerSpeed(0.3)
-////        );
-//    }
-
     public Command setKickerSpeed(double speed) {
         return new FunctionalCommand(
                 () -> shooterSubsystem.setKickerSpeed(speed),
                 () -> {
                 },
                 interrupted -> shooterSubsystem.stopKicker(),
-                () -> false,
-                shooterSubsystem
-        );
-    }
-
-    public Command setFlywheelSpeed(double speed, boolean toCompare) {
-        return new FunctionalCommand(
-                () -> shooterSubsystem.setFlywheelSpeed(speed),
-                () -> {
-                },
-                interrupted -> shooterSubsystem.stopFlywheels(),
-                () -> shooterSubsystem.doesSeeNote() == toCompare,
-                shooterSubsystem
-        );
-    }
-
-    public Command setPivotAngle(Rotation2d rotation) {
-        return new FunctionalCommand(
-                () -> {
-                },
-                () -> shooterSubsystem.setPivotAngle(rotation),
-                interrupted -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0)),
                 () -> false,
                 shooterSubsystem
         );

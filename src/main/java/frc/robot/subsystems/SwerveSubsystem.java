@@ -7,12 +7,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -20,6 +22,7 @@ import frc.robot.SwerveModule;
 import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
+import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 
@@ -28,10 +31,14 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
+    private final Field2d field2d = new Field2d();
+    private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);
 
     private double previousTimestamp = 0;
 
     public SwerveSubsystem() {
+
+        SmartDashboard.putData("Field", field2d);
         gyro.configFactoryDefault();
         zeroGyro();
 
@@ -157,26 +164,24 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         poseEstimator.update(getYaw(), getModulePositions());
+        field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+        SmartDashboard.putData("Field", field2d);
     }
 
     public void stop() {
         drive(new Translation2d(), 0, false);
     }
+
+
+    private void sampleRobotPose() {
+        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
+    }
+
+    public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
+        return poseHistory;
+    }
+
+    public void infrequentPeriodic() {
+        sampleRobotPose();
+    }
 }
-
-
-
-//    private void sampleRobotPose() {
-//        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
-//    }
-//
-//    public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
-//        return poseHistory;
-//    }
-//
-//    public void infrequentPeriodic() {
-//        sampleRobotPose();
-//    }
-
-//    private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer<Pose2d>.createBuffer(POSE_HISTORY_DURATION);
-

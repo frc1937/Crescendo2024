@@ -15,9 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MINIMUM_READY_SPEED;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_SPEED;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
@@ -55,12 +53,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("doesSeeNote", doesSeeNote());
-
         double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
         pivotMotor.getEncoder().setPosition(currentAngle);
-
-        SmartDashboard.putNumber("Flywheel Vel ", flywheelEncoder.getVelocity());
 
         /* FOR DEBUGGING, REMOVE */
         SmartDashboard.putNumber("CurrentAngle ", currentAngle);
@@ -83,10 +77,6 @@ public class ShooterSubsystem extends SubsystemBase {
         kickerMotor.stopMotor();
     }
 
-    public void startFlywheels() {
-        flywheelMaster.set(FLYWHEEL_SPEED);
-    }
-
     public void setFlywheelSpeed(double speed) {
         flywheelMaster.set(speed);
     }
@@ -96,11 +86,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean areFlywheelsReady() {
-        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_SPEED*5600;
+        return Math.abs(flywheelEncoder.getVelocity()) > 4000;  // FIXME this should be a constant!
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 2;
+        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 3;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {
