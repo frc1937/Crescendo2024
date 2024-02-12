@@ -60,7 +60,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         @Override
         public void initialize() {
             // Start the shooter's flywheels at near-maximal speed
-            shooter.setFlywheelSpeed(1);
+            shooter.setFlywheelSpeed(0.8);
         }
 
         @Override
@@ -71,7 +71,8 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             // Predict the position the robot will be in when the NOTE is released
             //RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-            RobotState predictedState = new RobotState(swerve.getPose(), new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
+            RobotState predictedState = new RobotState(swerve.getPose(),
+                    new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
                     , 0));
 
 
@@ -95,7 +96,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             );
             // Translation2d predictedVel = predictedState.getPose().getTranslation().minus(swerve.getPose().getTranslation()).div(SHOOTING_DELAY);
             // Translation3d predictedVelocity = new Translation3d(targetTranslation, targetStrafe, 0);
-            SmartDashboard.putNumberArray("predictedVelocity", new double[] { predictedVelocity.getX(), predictedVelocity.getY() });
+            SmartDashboard.putNumberArray("predictedVelocity", new double[]{predictedVelocity.getX(), predictedVelocity.getY()});
             Translation3d throwVelocity = targetNoteVelocity.minus(predictedVelocity);
 
             // Determine the intended release direction based on the throwVelocity, disregarding its
@@ -122,7 +123,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            SmartDashboard.putBooleanArray("flywheels | pitch | yaw", new boolean[] {shooter.areFlywheelsReady(), shooter.hasPivotArrived(), yawController.atSetpoint() });
+            SmartDashboard.putBooleanArray("flywheels | pitch | yaw", new boolean[]{shooter.areFlywheelsReady(), shooter.hasPivotArrived(), yawController.atSetpoint()});
             return shooter.areFlywheelsReady() && shooter.hasPivotArrived() && yawController.atSetpoint();
         }
 

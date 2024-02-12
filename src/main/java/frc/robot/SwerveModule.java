@@ -18,7 +18,6 @@ import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
 
 public class SwerveModule {
-
     // Number values
     public final int moduleNumber;
     private final Rotation2d angleOffset;

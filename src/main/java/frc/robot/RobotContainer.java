@@ -82,9 +82,10 @@ public class RobotContainer {
         yButton.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8)
                 .withTimeout(0.7)));
 
-        bButton.whileTrue(shooterCommands.shootNote(80));
+        bButton.whileTrue(shooterCommands.shootNote(135));
 
-        xButton.whileTrue(shooterCommands.setAngle(60));
+       // xButton.whileTrue(shooterCommands.setAngle(120));
+
     }
 
     //todo:

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MINIMUM_READY_RPM;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
@@ -108,7 +109,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean areFlywheelsReady() {
-        return Math.abs(flywheelEncoder.getVelocity()) > 4000;  // FIXME this should be a constant!
+        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_RPM;
     }
 
     public boolean hasPivotArrived() {

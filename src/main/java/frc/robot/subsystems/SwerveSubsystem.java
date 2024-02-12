@@ -52,7 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();
 
-        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d(new Translation2d(6, 9), new Rotation2d()));
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
@@ -153,6 +153,8 @@ public class SwerveSubsystem extends SubsystemBase {
         EstimatedRobotPose visionRobotPose;
 
         if ((visionRobotPose = visionPoseEstimator.getEstimatedGlobalPose(getPose())) != null) {
+            SmartDashboard.putBoolean("doesSeeTag", true);
+
             double currentTimestamp = visionRobotPose.timestampSeconds;
 
             if (previousTimestamp != currentTimestamp) {
@@ -161,6 +163,8 @@ public class SwerveSubsystem extends SubsystemBase {
                 Pose3d visionPose = visionRobotPose.estimatedPose;
                 poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Timer.getFPGATimestamp());
             }
+        } else {
+            SmartDashboard.putBoolean("doesSeeTag", false);
         }
 
         poseEstimator.update(getYaw(), getModulePositions());
