@@ -25,10 +25,7 @@ public class VisionPoseEstimator {
             ROBOT_TO_CAMERA);
 
     public EstimatedRobotPose getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-
-        if(!photonCamera.isConnected()) {
-            return null;
-        }
+        if (!photonCamera.isConnected()) return null;
 
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
 
