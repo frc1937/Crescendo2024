@@ -18,12 +18,16 @@ import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
+import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
+import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
+import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_FF;
+import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_P;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.Constants.ShootingConstants.PIVOT_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
-import static frc.robot.Constants.ShootingConstants.PIVOT_P;
 import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MAX;
 import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
+import static frc.robot.Constants.ShootingConstants.PIVOT_UP_FF;
+import static frc.robot.Constants.ShootingConstants.PIVOT_UP_P;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -36,12 +40,26 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SparkPIDController pivotController;
     private double pivotSetpoint = 0;
 
+//    private SysIdRoutine sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(
+//            new SysIdRoutineLog("f").motor("bozo")
+//                    .voltage(Units.Volts.of(pivotMotor.get()))
+//
+//                        ));
+//
+//    private void updateLog(SysIdRoutineLog log, String motorName, CANSparkFlex sparkFlex, CANCoder canCoder) {
+//        log.motor(motorName)
+//                .voltage(Volts.of(sparkFlex.getBusVoltage()))
+//                .angularPosition(Units.Degrees.of(-(canCoder.getPosition() - PIVOT_ENCODER_OFFSET)))
+//                .angularVelocity(Units.DegreesPerSecond.of(canCoder.getVelocity()))
+//    }
+
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
 
         configureSparkMotor(flywheelMaster);
         configureSparkMotor(flywheelSlave);
-        configureSparkMotor(pivotMotor);
+
+        configurePivotMotor(pivotMotor);
 
         configureCanCoder(pivotEncoder);
 
@@ -62,7 +80,11 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("CurrentPosition ", pivotMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("CurrentVelocity ", pivotMotor.getEncoder().getVelocity());
 
-        pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition);
+        if(pivotSetpoint >= currentAngle) {
+            pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
+        } else {
+            pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
+        }
     }
 
     public boolean doesSeeNote() {
@@ -112,9 +134,20 @@ public class ShooterSubsystem extends SubsystemBase {
         motor.setNeutralMode(NeutralMode.Brake);
     }
 
+    private void configurePivotMotor(CANSparkFlex motor) {
+        configureSparkMotor(motor);
+
+        pivotMotor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
+        pivotMotor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
+    }
+
     private void setupPivotController() {
-        pivotController.setP(PIVOT_P);
-        pivotController.setFF(PIVOT_FF);
+        pivotController.setP(PIVOT_UP_P, 0);
+        pivotController.setFF(PIVOT_UP_FF, 0);
+
+        pivotController.setP(PIVOT_DOWN_P, 1);
+        pivotController.setFF(PIVOT_DOWN_FF, 1);
+
         pivotController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);
 
         pivotMotor.getEncoder().setPosition(pivotEncoder.getAbsolutePosition());

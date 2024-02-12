@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.CANSparkBase;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
@@ -95,14 +96,20 @@ public final class Constants {
                 KICKER_ID = 8;
         public static final double FLYWHEEL_MINIMUM_READY_SPEED = 0.8;
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
+        public static final double PIVOT_UP_P = 0.0145;
+        public static final double PIVOT_UP_FF = 0.002_41;
+        public static final float PIVOT_CONSTRAINT_DEGREES = 120;
+        public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
+
+        public static final double PIVOT_DOWN_P = 0.013_94;
+        public static final double PIVOT_DOWN_FF = 0.00121;
         public static final double FLYWHEEL_FF = 0.000_065_955;
         public static final double FLYWHEEL_RANGE_MIN = -1;
         public static final double FLYWHEEL_RANGE_MAX = 1;
         public static final double FLYWHEEL_P = 0.001_159;
-        public static final double PIVOT_P = 0.014_75;
-        public static final double PIVOT_FF = 0.00105;
-        public static final double PIVOT_RANGE_MIN = -0.3;
-        public static final double PIVOT_RANGE_MAX = 0.3;
+
+        public static final double PIVOT_RANGE_MIN = -0.9;
+        public static final double PIVOT_RANGE_MAX = 0.9;
 
         public static final double FLYWHEEL_SPEED = 0.7;
         /** In seconds */

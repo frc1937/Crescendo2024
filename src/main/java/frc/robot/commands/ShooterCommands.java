@@ -15,10 +15,33 @@ public class ShooterCommands {
         this.intakeSubsystem = intakeSubsystem;
     }
 
+    public Command receiveFromFeeder() {
+        return new FunctionalCommand(
+                () -> {
+                    shooterSubsystem.setFlywheelSpeed(-0.55);
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(49.3));
+                    shooterSubsystem.setKickerSpeed(-0.5);
+                },
+
+                () -> {
+                },
+
+                interrupted -> {
+                    shooterSubsystem.stopFlywheels();
+                    shooterSubsystem.stopKicker();
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
+                },
+
+                shooterSubsystem::doesSeeNote,
+
+                shooterSubsystem
+        );
+    }
+
     public Command shootNote(double angle) {
         return new FunctionalCommand(
                 () -> {
-                    if(shooterSubsystem.doesSeeNote()) {
+                    if (shooterSubsystem.doesSeeNote()) {
                         shooterSubsystem.stopKicker();
                         shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
                         shooterSubsystem.setFlywheelSpeed(0.9);
@@ -41,7 +64,6 @@ public class ShooterCommands {
 
                 shooterSubsystem
         );
-
     }
 
     public FunctionalCommand floorIntake() {
@@ -53,8 +75,8 @@ public class ShooterCommands {
                     shooterSubsystem.setFlywheelSpeed(-0.7);
                     shooterSubsystem.setKickerSpeed(-0.8);
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1.5));
-//todo faster pitch
                 },
+
                 () -> {
                 },
                 interrupted -> {
@@ -63,6 +85,17 @@ public class ShooterCommands {
                     shooterSubsystem.stopKicker();
                 },
                 shooterSubsystem::doesSeeNote,
+                shooterSubsystem
+        );
+    }
+
+    public Command setAngle(double angle) {
+        return new FunctionalCommand(
+                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
+                () -> {
+                },
+                interrupted -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0)),
+                () -> false,
                 shooterSubsystem
         );
     }

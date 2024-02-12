@@ -20,7 +20,7 @@ public class VisionPoseEstimator {
     private final PhotonCamera photonCamera = new PhotonCamera(CAMERA_NAME);
     private final PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
             APRIL_TAG_FIELD_LAYOUT,
-            PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
+            PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             photonCamera,
             ROBOT_TO_CAMERA);
 

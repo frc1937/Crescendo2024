@@ -27,8 +27,8 @@ import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 
 public class SwerveSubsystem extends SubsystemBase {
-    public SwerveDrivePoseEstimator poseEstimator;
-    public SwerveModule[] swerveModules;
+    public final SwerveDrivePoseEstimator poseEstimator;
+    public final SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
     private final Field2d field2d = new Field2d();
@@ -37,8 +37,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private double previousTimestamp = 0;
 
     public SwerveSubsystem() {
-
         SmartDashboard.putData("Field", field2d);
+
         gyro.configFactoryDefault();
         zeroGyro();
 
@@ -165,6 +165,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         poseEstimator.update(getYaw(), getModulePositions());
         field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+
         SmartDashboard.putData("Field", field2d);
     }
 

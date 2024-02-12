@@ -33,6 +33,8 @@ public class RobotContainer {
     private final TriggerButton intakeButton = new TriggerButton(driver, XboxController.Axis.kLeftTrigger);
     private final JoystickButton bButton = new JoystickButton(driver, XboxController.Button.kB.value);
     private final JoystickButton aButton = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton yButton = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton xButton = new JoystickButton(driver, XboxController.Button.kX.value);
 
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -68,18 +70,24 @@ public class RobotContainer {
 
         intakeButton.whileTrue(shooterCommands.floorIntake()
                 .andThen(shooterCommands.setKickerSpeed(-0.8)
-                        .withTimeout(0.3)));
+                        .withTimeout(0.7)));
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
                         () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
                         () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value))
+
         );
 
-        bButton.whileTrue(shooterCommands.shootNote(70));
+        yButton.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8)
+                .withTimeout(0.7)));
+
+        bButton.whileTrue(shooterCommands.shootNote(80));
+
+        xButton.whileTrue(shooterCommands.setAngle(60));
     }
+
     //todo:
-    // Tags odometry working. (MULTI_PNP)
     // Faster pitch
     // quasistatic table of values
     // max acc, max speed, (Ask CAD people), all these goofy constants
