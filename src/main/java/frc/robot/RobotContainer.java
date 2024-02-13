@@ -46,15 +46,15 @@ public class RobotContainer {
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
-        swerveSubsystem.setDefaultCommand(
-                new TeleopSwerve(
-                        swerveSubsystem,
-                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-                        () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
-                        () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
-                        robotCentric
-                )
-        );
+        // swerveSubsystem.setDefaultCommand(
+        //         new TeleopSwerve(
+        //                 swerveSubsystem,
+        //                 () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+        //                 () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
+        //                 () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
+        //                 robotCentric
+        //         )
+        // );
 
         NamedCommands.registerCommand("pickupIntake", new IntakeCommand(intakeSubsystem, INTAKE_SPEED));
 
@@ -74,7 +74,7 @@ public class RobotContainer {
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
-                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+                () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
                         () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value))
 
         );

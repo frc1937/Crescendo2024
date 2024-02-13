@@ -76,7 +76,6 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotMotor.getEncoder().setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("CurrentAngle ", currentAngle);
         SmartDashboard.putNumber("AbsolutePosition", pivotEncoder.getPosition());
         SmartDashboard.putNumber("CurrentPosition ", pivotMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("CurrentVelocity ", pivotMotor.getEncoder().getVelocity());
@@ -113,7 +112,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 3;
+        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 1;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {
