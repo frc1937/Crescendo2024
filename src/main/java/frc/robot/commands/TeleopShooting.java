@@ -75,7 +75,6 @@ public class TeleopShooting extends SequentialCommandGroup {
                     new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
                     , 0));
 
-
             // Use this to calculate the position the shooter will be in
             Translation3d pivotToShooter = new Translation3d(
                     targetShooterOrientation.getCos() * SHOOTER_ARM_LENGTH, 0, targetShooterOrientation.getSin() * SHOOTER_ARM_LENGTH);
