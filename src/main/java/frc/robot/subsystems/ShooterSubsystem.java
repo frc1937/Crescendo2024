@@ -85,10 +85,9 @@ public class ShooterSubsystem extends SubsystemBase {
         } else {
             pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
         }
-
-        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
-        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
-
+//
+//        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
+//        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
     }
 
     public boolean doesSeeNote() {

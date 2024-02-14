@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -80,9 +81,9 @@ public class RobotContainer {
 
 //        aButton.whileTrue(shooterCommands.setAngle(60));
 //
-//        aButton.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem,
-//                () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-//                () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value)));
+        aButton.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem,
+                () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+                () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value)));
 
         // xButton.whileTrue(shooterCommands.setAngle(120));
 //todo reverse intake

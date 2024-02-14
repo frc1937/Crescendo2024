@@ -85,8 +85,8 @@ public final class Constants {
 //            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(15 + 11));
 //            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.37, Rotation2d.fromDegrees(60));
             //SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, Rotation2d.fromDegrees(70)); //
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.d, Rotation2d.fromDegrees(80));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(3.d, Rotation2d.fromDegrees(80));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.d, Rotation2d.fromDegrees(68));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(3.d, Rotation2d.fromDegrees(68));
         }
 
         public static final double POSE_HISTORY_DURATION = 0.5;
@@ -97,7 +97,7 @@ public final class Constants {
                 PIVOT_ID = 1,
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
-        public static final double FLYWHEEL_MINIMUM_READY_RPM = 0.8*5600;
+        public static final double FLYWHEEL_MINIMUM_READY_RPM = 0.95*5600;
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
         public static final double PIVOT_UP_P = 0.035;
         public static final double PIVOT_UP_FF = 0.000085;

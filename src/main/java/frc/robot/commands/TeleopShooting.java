@@ -60,7 +60,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         @Override
         public void initialize() {
             // Start the shooter's flywheels at near-maximal speed
-            shooter.setFlywheelSpeed(0.8);
+            shooter.setFlywheelSpeed(0.95);
         }
 
         @Override
@@ -84,7 +84,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             // Calculate the total velocity vector at which the NOTE should be thrown
             Translation3d targetNoteTranslation = TARGET_POSITION.minus(predictedShooterPosition);
-            SmartDashboard.putNumber("Presumed distance from target [meters]", targetNoteTranslation.getNorm());
+            SmartDashboard.putNumber("Presumed distance from target [meters]", targetNoteTranslation.toTranslation2d().getNorm());
             Translation3d targetNoteDirection = targetNoteTranslation.div(targetNoteTranslation.getNorm());
             Translation3d targetNoteVelocity = targetNoteDirection.times(NOTE_RELEASE_VELOCITY);
 
