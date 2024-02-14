@@ -52,7 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();
 
-        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d(new Translation2d(6, 9), new Rotation2d()));
+        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d(new Translation2d(3, 3), new Rotation2d()));
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
@@ -100,6 +100,11 @@ public class SwerveSubsystem extends SubsystemBase {
         for (SwerveModule mod : swerveModules) {
             mod.setDesiredState(desiredStates[mod.moduleNumber]);
         }
+    }
+
+    public void resetPose() {
+        poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), new Pose2d());
+        //gyro.setYaw(0);
     }
 
     public Pose2d getPose() {

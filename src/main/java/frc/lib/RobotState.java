@@ -5,6 +5,7 @@
 package frc.lib;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,6 +24,10 @@ public class RobotState {
 
     public Pose2d getPose() {
         return pose;
+    }
+
+    public Pose3d getPose3d() {
+        return new Pose3d(pose);
     }
 
     public ChassisSpeeds getVelocity() {

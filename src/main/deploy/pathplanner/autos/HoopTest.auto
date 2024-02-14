@@ -14,7 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AsStraightAsItGets"
+            "pathName": "Go Forth"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go Back"
           }
         }
       ]

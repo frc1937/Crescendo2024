@@ -19,7 +19,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setFlywheelSpeed(-0.55);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(49.3));
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(51.5));
                     shooterSubsystem.setKickerSpeed(-0.5);
                 },
 
@@ -38,18 +38,18 @@ public class ShooterCommands {
         );
     }
 
-    public Command shootNote(double angle) {
+    public Command shootNote(double angle, double speed) {
         return new FunctionalCommand(
                 () -> {
                     if (shooterSubsystem.doesSeeNote()) {
                         shooterSubsystem.stopKicker();
                         shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
-                        shooterSubsystem.setFlywheelSpeed(0.9);
+                        shooterSubsystem.setFlywheelSpeed(speed);
                     }
                 },
 
                 () -> {
-                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
+                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady(speed) && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(0.9);
                     }
                 },
@@ -66,6 +66,32 @@ public class ShooterCommands {
         );
     }
 
+    public FunctionalCommand intakeGet() {
+        return new FunctionalCommand(
+                /* Initialize*/this::intakeStart,
+                /* Execute */() -> {},
+                /* When done do:*/interrupted -> intakeStop(),
+                /* Condition to be done at */ shooterSubsystem::doesSeeNote,
+
+                shooterSubsystem
+        );
+    }
+
+    private void intakeStart() {
+        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
+
+        intakeSubsystem.setSpeedPercentage(0.9);
+        shooterSubsystem.setFlywheelSpeed(-0.7);
+        shooterSubsystem.setKickerSpeed(-0.8);
+//        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1.5));
+    }
+
+    private void intakeStop() {
+        shooterSubsystem.stopFlywheels();
+        intakeSubsystem.stopMotor();
+        shooterSubsystem.stopKicker();
+    }
+
     public FunctionalCommand floorIntake() {
         return new FunctionalCommand(
                 () -> {
@@ -79,12 +105,15 @@ public class ShooterCommands {
 
                 () -> {
                 },
+
                 interrupted -> {
                     shooterSubsystem.stopFlywheels();
                     intakeSubsystem.stopMotor();
                     shooterSubsystem.stopKicker();
                 },
-                shooterSubsystem::doesSeeNote,
+
+                () -> !shooterSubsystem.doesSeeNote(),
+
                 shooterSubsystem
         );
     }
@@ -94,7 +123,8 @@ public class ShooterCommands {
                 () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
                 () -> {
                 },
-                interrupted -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0)),
+                interrupted -> {
+                },//shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0)),
                 () -> false,
                 shooterSubsystem
         );

@@ -49,8 +49,10 @@ public final class Constants {
          */
         public static final Transform3d
                 CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d()),
-                ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse(),
-                ROBOT_TO_PIVOT = new Transform3d(new Translation3d(-0.275, 0, 0.15), new Rotation3d());
+                ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
+        public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
+
+        public static final double SHOOTER_ARM_LENGTH = 0.49;
     }
 
     public static class VisionConstants {
@@ -80,10 +82,11 @@ public final class Constants {
         static {
             // TODO Currently, the values here are the initial guesses and are yet
             // to be calibrated
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(15 + 11));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.37, Rotation2d.fromDegrees(60));
+//            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(15 + 11));
+//            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.37, Rotation2d.fromDegrees(60));
             //SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, Rotation2d.fromDegrees(70)); //
-
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.d, Rotation2d.fromDegrees(80));
+            SLOPE_TO_SHOOTER_ROTATION_MAP.put(3.d, Rotation2d.fromDegrees(80));
         }
 
         public static final double POSE_HISTORY_DURATION = 0.5;
@@ -101,8 +104,8 @@ public final class Constants {
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
-        public static final double PIVOT_DOWN_P = 0.013_94;
-        public static final double PIVOT_DOWN_FF = 0.00121;
+        public static final double PIVOT_DOWN_P = 0.014_95;
+        public static final double PIVOT_DOWN_FF = 0.00141;
         public static final double FLYWHEEL_FF = 0.000_065_955;
         public static final double FLYWHEEL_RANGE_MIN = -1;
         public static final double FLYWHEEL_RANGE_MAX = 1;
@@ -111,14 +114,13 @@ public final class Constants {
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;
 
-        public static final double FLYWHEEL_SPEED = 0.7;
         /** In seconds */
         public static final double SHOOTING_DELAY = 0.5;
         /** In seconds */
         public static final double POST_SHOOTING_DELAY = 0.4;
 
         public static final double NOTE_RELEASE_VELOCITY = 0.5; //todo: CONFIGURE
-        public static final Translation3d TARGET_POSITION = new Translation3d(0.9, 0, 2);
+        public static final Translation3d TARGET_POSITION = new Translation3d(0.9, 0, 2.1);
 
     }
 
@@ -191,7 +193,7 @@ public final class Constants {
         /**
          * Meters per Second
          */
-        public static final double MAX_SPEED = 4.5; //TODO: This must be tuned to specific robot
+        public static final double MAX_SPEED = 5; //TODO: This must be tuned to specific robot
         /**
          * Radians per Second
          */
@@ -206,8 +208,8 @@ public final class Constants {
         public static final class Module0 {
             public static final int DRIVE_MOTOR_ID = 14;
             public static final int ANGLE_MOTOR_ID = 11;
-            public static final int CAN_CODER_ID = 18;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(243.55);
+            public static final int CAN_CODER_ID = 18;//178.594-247.140
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(247.140-178.594+180);//243.55);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -216,8 +218,8 @@ public final class Constants {
         public static final class Module1 {
             public static final int DRIVE_MOTOR_ID = 3;
             public static final int ANGLE_MOTOR_ID = 10;
-            public static final int CAN_CODER_ID = 20;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(105.45);//281.51);
+            public static final int CAN_CODER_ID = 20;//
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(283.799-358.24+180);//103.45);//;
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -226,8 +228,8 @@ public final class Constants {
         public static final class Module2 {
             public static final int DRIVE_MOTOR_ID = 13;
             public static final int ANGLE_MOTOR_ID = 6;
-            public static final int CAN_CODER_ID = 19;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(188.23);
+            public static final int CAN_CODER_ID = 19;//
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.283-359.209);//188.23);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -236,8 +238,8 @@ public final class Constants {
         public static final class Module3 {
             public static final int DRIVE_MOTOR_ID = 2;
             public static final int ANGLE_MOTOR_ID = 9;
-            public static final int CAN_CODER_ID = 21;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(113.46);
+            public static final int CAN_CODER_ID = 21; //179.385-294.609
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(294.609-179.385);//116.46);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -247,12 +249,12 @@ public final class Constants {
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
 
         public static final HolonomicPathFollowerConfig holomonicPathFollowerConfig = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                new PIDConstants(1.10, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(1.18, 0.0, 0.0), // Rotation PID constants
+                new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(0, 0.0, 0.0), // Rotation PID constants
                 Constants.Swerve.MAX_SPEED, // Max module speed, in m/s
                 0.4, // Drive base radius in meters. Distance from robot center to furthest module.
                 new ReplanningConfig());
-
+    //todo: shoot 60 angles. Joystick adjustable shooter angle
         public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
             public static final double MAX_SPEED_METERS_PER_SECOND = 3;
             public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;

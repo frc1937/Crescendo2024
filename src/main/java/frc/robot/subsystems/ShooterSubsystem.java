@@ -85,6 +85,10 @@ public class ShooterSubsystem extends SubsystemBase {
         } else {
             pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
         }
+
+        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
+        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
+
     }
 
     public boolean doesSeeNote() {
@@ -105,6 +109,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void stopFlywheels() {
         flywheelMaster.stopMotor();
+    }
+
+    public boolean areFlywheelsReady(double speed) {
+        return Math.abs(flywheelEncoder.getVelocity()) > 5600*speed;
     }
 
     public boolean areFlywheelsReady() {

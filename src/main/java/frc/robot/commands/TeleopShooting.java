@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -28,6 +27,7 @@ import static frc.robot.Constants.ShootingConstants.TARGET_POSITION;
 import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
+import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
 
 public class TeleopShooting extends SequentialCommandGroup {
     public TeleopShooting(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
@@ -77,13 +77,13 @@ public class TeleopShooting extends SequentialCommandGroup {
 
 
             // Use this to calculate the position the shooter will be in
-            Transform3d pivotToShooter = new Transform3d(
-                    0, targetShooterOrientation.getCos(), targetShooterOrientation.getSin(), new Rotation3d());
-            Transform3d robotToShooter = ROBOT_TO_PIVOT.plus(pivotToShooter);
-            Pose3d predictedShooterPosition = new Pose3d(predictedState.getPose()).transformBy(robotToShooter);
+            Translation3d pivotToShooter = new Translation3d(
+                    targetShooterOrientation.getCos() * SHOOTER_ARM_LENGTH, 0, targetShooterOrientation.getSin() * SHOOTER_ARM_LENGTH);
+            Transform3d robotToShooter = new Transform3d(ROBOT_TO_PIVOT.plus(pivotToShooter), new Rotation3d());
+            Translation3d predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
 
             // Calculate the total velocity vector at which the NOTE should be thrown
-            Translation3d targetNoteTranslation = TARGET_POSITION.minus(predictedShooterPosition.getTranslation());
+            Translation3d targetNoteTranslation = TARGET_POSITION.minus(predictedShooterPosition);
             SmartDashboard.putNumber("Presumed distance from target [meters]", targetNoteTranslation.getNorm());
             Translation3d targetNoteDirection = targetNoteTranslation.div(targetNoteTranslation.getNorm());
             Translation3d targetNoteVelocity = targetNoteDirection.times(NOTE_RELEASE_VELOCITY);
