@@ -49,7 +49,7 @@ public class ShooterCommands {
                 },
 
                 () -> {
-                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady(speed) && shooterSubsystem.hasPivotArrived()) {
+                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady(speed * 5600) && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(0.9);
                     }
                 },

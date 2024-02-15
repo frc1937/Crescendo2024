@@ -45,6 +45,7 @@ public class TeleopShooting extends SequentialCommandGroup {
                 new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
         // TODO Get from a HononomicDriveController in other branch
         private Rotation2d targetShooterOrientation = new Rotation2d();
+        private double minimumFlywheelsVelocity;
 
         public TeleopAim(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
@@ -59,8 +60,8 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            // Start the shooter's flywheels at near-maximal speed
-            shooter.setFlywheelSpeed(0.95);
+            // Start the shooter's flywheels at maximal speed
+            shooter.setFlywheelSpeed(1.d);
         }
 
         @Override
@@ -103,14 +104,15 @@ public class TeleopShooting extends SequentialCommandGroup {
             // the note in space to a straight line.
             Rotation2d targetOrientation = throwVelocity.toTranslation2d().getAngle();
             SmartDashboard.putNumber("targetOrientation", targetOrientation.getDegrees());
-            double quasiTargetSlope = throwVelocity.getZ() / throwVelocity.toTranslation2d().getNorm();
-            SmartDashboard.putNumber("Quasi target pitch [slope]", quasiTargetSlope);
+            double virtualTargetSlope = throwVelocity.getZ() / throwVelocity.toTranslation2d().getNorm();
+            SmartDashboard.putNumber("Virtual target pitch [slope]", virtualTargetSlope);
 
             // However, becasue we do not fully trust the straight-line model, we introduce
-            // a table that maps path slopes, quasiTargetSlope, to well-adjusted
+            // a table that maps path slopes, virtualTargetSlope, to well-adjusted
             // shooter orientations. We presume the shooter orientation will be steeper than
             // the path slope becasue of gravity.
-            targetShooterOrientation = SLOPE_TO_SHOOTER_ROTATION_MAP.get(quasiTargetSlope);
+            targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(virtualTargetSlope);
+            minimumFlywheelsVelocity = SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope);
 
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
@@ -122,8 +124,9 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            SmartDashboard.putBooleanArray("flywheels | pitch | yaw", new boolean[]{shooter.areFlywheelsReady(), shooter.hasPivotArrived(), yawController.atSetpoint()});
-            return shooter.areFlywheelsReady() && shooter.hasPivotArrived() && yawController.atSetpoint();
+            SmartDashboard.putBooleanArray("flywheels | pitch | yaw", new boolean[]{shooter.areFlywheelsReady(minimumFlywheelsVelocity), shooter.hasPivotArrived(), yawController.atSetpoint()});
+            return shooter.areFlywheelsReady(minimumFlywheelsVelocity) && shooter.hasPivotArrived()
+                   && yawController.atSetpoint();
         }
 
         @Override

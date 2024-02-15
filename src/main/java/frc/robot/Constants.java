@@ -68,25 +68,35 @@ public final class Constants {
 
     public static final class ShootingConstants {
         /**
-         * This table maps theoretical (quasi) shooter slopes to shooter orientations that actually achieve
+         * This table maps virtual shooter slopes to shooter orientations that actually achieve
          * the desired results, based on calibration and experimentation.
-         * <p>
-         * To obtain the samples, place the robot at some distance from the target, record the theoretical
-         * target slope given by the program as a key, and shoot with an arbitrary angle value. Shoot at an
-         * arbitrary angle and adjust it repeatedly until the robot consistently scores with the current slope(i.e.
-         * from its current position). Then move the robot to a different position and repeat until the table is
-         * complete. A good initial angle is the arc-tangent of the theoretical slope.
+         * 
+         * To obtain the samples, place the robot at some distance from the target, record the virtual
+         * target slope given by the program as a key, and at an arbitrary pitch angle. Adjust it repeatedly
+         * until the robot consistently scores with the current slope(i.e. from its current position). Then
+         * move the robot to a different position and repeat until the table is complete. A good initial
+         * angle is the arc-tangent of the virtual slope.
          */
-        public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_SHOOTER_ROTATION_MAP = new InterpolatingTreeMap<Double, Rotation2d>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+        public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<Double, Rotation2d>(
+            InverseInterpolator.forDouble(), Rotation2d::interpolate);
 
         static {
-            // TODO Currently, the values here are the initial guesses and are yet
-            // to be calibrated
-//            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.2, Rotation2d.fromDegrees(15 + 11));
-//            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.37, Rotation2d.fromDegrees(60));
-            //SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.4, Rotation2d.fromDegrees(70)); //
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(0.d, Rotation2d.fromDegrees(68));
-            SLOPE_TO_SHOOTER_ROTATION_MAP.put(3.d, Rotation2d.fromDegrees(68));
+            SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(80));
+            SLOPE_TO_PITCH_MAP.put(0.84, Rotation2d.fromDegrees(73));
+            SLOPE_TO_PITCH_MAP.put(0.66, Rotation2d.fromDegrees(71));
+            SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(68));
+            SLOPE_TO_PITCH_MAP.put(0.42, Rotation2d.fromDegrees(66));
+            SLOPE_TO_PITCH_MAP.put(0.38, Rotation2d.fromDegrees(68));
+        }
+
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
+            InverseInterpolator.forDouble(), interpolator.forDouble());
+
+        static {
+            SLOPE_TO_VELOCITY_MAP.put(1.22, 0.8 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.45, 0.8 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.42, 0.9 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.38, 0.95 * 5600);
         }
 
         public static final double POSE_HISTORY_DURATION = 0.5;

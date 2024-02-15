@@ -110,12 +110,8 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelMaster.stopMotor();
     }
 
-    public boolean areFlywheelsReady(double speed) {
-        return Math.abs(flywheelEncoder.getVelocity()) > 5600*speed;
-    }
-
-    public boolean areFlywheelsReady() {
-        return Math.abs(flywheelEncoder.getVelocity()) > FLYWHEEL_MINIMUM_READY_RPM;
+    public boolean areFlywheelsReady(double rpm) {
+        return Math.abs(flywheelEncoder.getVelocity()) >= rpm;
     }
 
     public boolean hasPivotArrived() {
