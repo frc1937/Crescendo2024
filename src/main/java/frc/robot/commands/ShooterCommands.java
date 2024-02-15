@@ -83,7 +83,6 @@ public class ShooterCommands {
         intakeSubsystem.setSpeedPercentage(0.9);
         shooterSubsystem.setFlywheelSpeed(-0.7);
         shooterSubsystem.setKickerSpeed(-0.8);
-//        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1.5));
     }
 
     private void intakeStop() {
