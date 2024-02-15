@@ -41,7 +41,7 @@ public class RobotContainer {
     private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
     private final JoystickButton opBButton = new JoystickButton(operatorController, XboxController.Button.kB.value);
     private final JoystickButton opYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
-
+    private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -76,7 +76,7 @@ public class RobotContainer {
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 //        zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::resetPose));
 
-        leftTrigger.onTrue(shooterCommands.intakeGet()
+        leftTrigger.whileTrue(shooterCommands.intakeGet()
                 .andThen(shooterCommands.setKickerSpeed(-0.8).withTimeout(0.7)));
         leftBumper.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8)
                 .withTimeout(0.7)));
@@ -84,11 +84,11 @@ public class RobotContainer {
         opBButton.whileTrue(shooterCommands.shootNote(80, 0.9));
 
         //for sagi:
-        reverseIntakeXButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.5));
-        opAButton.whileTrue(shooterCommands.shootNote(80, 0.9));
-        opBButton.whileTrue(shooterCommands.shootNote(132, 0.9));
-        opYButton.whileTrue(shooterCommands.shootNote(125, 0.08));
+        reverseIntakeXButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
+        opAButton.whileTrue(shooterCommands.shootNote(80, 0.6));
+        opBButton.whileTrue(shooterCommands.shootNote(132, 0.6));
+        opYButton.whileTrue(shooterCommands.shootNote(125, 0.08));
 
 //        aButton.whileTrue(shooterCommands.setAngle(60));
 //

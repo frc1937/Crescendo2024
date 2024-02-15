@@ -81,14 +81,30 @@ public class ShooterCommands {
         shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
 
         intakeSubsystem.setSpeedPercentage(0.9);
-        shooterSubsystem.setFlywheelSpeed(-0.7);
+        shooterSubsystem.setFlywheelSpeed(-1);
         shooterSubsystem.setKickerSpeed(-0.8);
     }
 
-    private void intakeStop() {
+    public void intakeStop() {
         shooterSubsystem.stopFlywheels();
         intakeSubsystem.stopMotor();
         shooterSubsystem.stopKicker();
+    }
+
+    public FunctionalCommand stopIntake() {
+        return new FunctionalCommand(
+                () -> {
+                    shooterSubsystem.stopFlywheels();
+                    intakeSubsystem.stopMotor();
+                    shooterSubsystem.stopKicker();
+                },
+
+                () -> {},
+                (interrupted) -> {},
+                () -> false,
+
+                intakeSubsystem
+        );
     }
 
     public FunctionalCommand floorIntake() {
