@@ -84,6 +84,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             Translation3d predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
 
             // Calculate the total velocity vector at which the NOTE should be thrown
+            Translation3d targetPosition =  DriverStation.getAlliance().get() == Alliance.RED ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
             Translation3d targetNoteTranslation = TARGET_POSITION.minus(predictedShooterPosition);
             SmartDashboard.putNumber("Presumed distance from target [meters]", targetNoteTranslation.toTranslation2d().getNorm());
             Translation3d targetNoteDirection = targetNoteTranslation.div(targetNoteTranslation.getNorm());
