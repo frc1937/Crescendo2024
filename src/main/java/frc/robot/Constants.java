@@ -100,6 +100,9 @@ public final class Constants {
             SLOPE_TO_VELOCITY_MAP.put(0.38, 0.95 * 5600);
         }
 
+        public static final double MINIMUM_VIABLE_SLOPE = 0.38;
+        public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
+
         public static final double POSE_HISTORY_DURATION = 0.5;
 
         public static final int
