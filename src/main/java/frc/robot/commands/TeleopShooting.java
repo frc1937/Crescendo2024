@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,10 +23,13 @@ import java.util.function.DoubleSupplier;
 
 import static frc.robot.Constants.ShootingConstants.NOTE_RELEASE_VELOCITY;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
-import static frc.robot.Constants.ShootingConstants.TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
+import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
@@ -84,8 +89,8 @@ public class TeleopShooting extends SequentialCommandGroup {
             Translation3d predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
 
             // Calculate the total velocity vector at which the NOTE should be thrown
-            Translation3d targetPosition =  DriverStation.getAlliance().get() == Alliance.RED ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
-            Translation3d targetNoteTranslation = TARGET_POSITION.minus(predictedShooterPosition);
+            Translation3d targetPosition =  DriverStation.getAlliance().get() == Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
+            Translation3d targetNoteTranslation = targetPosition.minus(predictedShooterPosition);
             SmartDashboard.putNumber("Presumed distance from target [meters]", targetNoteTranslation.toTranslation2d().getNorm());
             Translation3d targetNoteDirection = targetNoteTranslation.div(targetNoteTranslation.getNorm());
             Translation3d targetNoteVelocity = targetNoteDirection.times(NOTE_RELEASE_VELOCITY);
