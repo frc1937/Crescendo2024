@@ -7,6 +7,9 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +27,7 @@ import frc.robot.util.TriggerButton;
 import static frc.robot.Constants.IntakeConstants.INTAKE_SPEED;
 
 public class RobotContainer {
+    private Thread visionThread;
     private final XboxController driveController = new XboxController(0);
     private final XboxController operatorController = new XboxController(1);
     private final SendableChooser<Command> autoChooser;
@@ -49,6 +53,8 @@ public class RobotContainer {
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
 
+    UsbCamera driverCamera;
+    VideoSink server;
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
@@ -74,7 +80,6 @@ public class RobotContainer {
 
     private void configureBindings() {
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
-//        zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::resetPose));
 
         leftTrigger.whileTrue(shooterCommands.intakeGet()
                 .andThen(shooterCommands.setKickerSpeed(-0.8).withTimeout(0.7)));
@@ -86,8 +91,8 @@ public class RobotContainer {
         //for sagi:
         reverseIntakeXButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
-        opAButton.whileTrue(shooterCommands.shootNote(80, 0.6));
-        opBButton.whileTrue(shooterCommands.shootNote(132, 0.6));
+        opAButton.whileTrue(shooterCommands.shootNote(80, 0.4));
+        opBButton.whileTrue(shooterCommands.shootNote(132, 0.4));
         opYButton.whileTrue(shooterCommands.shootNote(125, 0.08));
 
 //        aButton.whileTrue(shooterCommands.setAngle(60));
@@ -97,8 +102,6 @@ public class RobotContainer {
 //                () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value)));
 
         // xButton.whileTrue(shooterCommands.setAngle(120));
-//todo reverse intake
-        // AMP shoot
     }
 
     //todo:
@@ -112,5 +115,17 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         swerveSubsystem.infrequentPeriodic();
+    }
+
+    public void robotInit() {
+        visionThread = new Thread(() -> {
+            UsbCamera camera = CameraServer.startAutomaticCapture(0);
+
+            camera.setResolution(480, 270);
+            camera.setFPS(30);
+        });
+
+        visionThread.setDaemon(true);
+        visionThread.start();
     }
 }

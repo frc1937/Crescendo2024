@@ -19,7 +19,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setFlywheelSpeed(-0.55);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(51.5));
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(49));
                     shooterSubsystem.setKickerSpeed(-0.5);
                 },
 
@@ -68,8 +68,19 @@ public class ShooterCommands {
 
     public FunctionalCommand intakeGet() {
         return new FunctionalCommand(
-                /* Initialize*/this::intakeStart,
-                /* Execute */() -> {},
+                /* Initialize*/() -> {
+                      //intakeStart();
+
+                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1));
+                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(-0.4));
+                },
+                /* Execute */() -> {
+                    if(shooterSubsystem.hasPivotArrived()) {
+                        intakeSubsystem.setSpeedPercentage(0.9);
+                        shooterSubsystem.setFlywheelSpeed(-1);
+                        shooterSubsystem.setKickerSpeed(-0.8);
+                    }
+                },
                 /* When done do:*/interrupted -> intakeStop(),
                 /* Condition to be done at */ shooterSubsystem::doesSeeNote,
 
@@ -99,8 +110,10 @@ public class ShooterCommands {
                     shooterSubsystem.stopKicker();
                 },
 
-                () -> {},
-                (interrupted) -> {},
+                () -> {
+                },
+                (interrupted) -> {
+                },
                 () -> false,
 
                 intakeSubsystem
