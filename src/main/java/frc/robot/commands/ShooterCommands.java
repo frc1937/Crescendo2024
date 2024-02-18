@@ -66,6 +66,25 @@ public class ShooterCommands {
         );
     }
 
+    public FunctionalCommand accelerateFlywheel() {
+        return new FunctionalCommand(
+            () -> {
+                    shooterSubsystem.setFlywheelSpeed(0.8);
+                },
+
+                () -> {
+                },
+
+                interrupted -> {
+                    shooterSubsystem.stopFlywheels();
+                },
+
+                () -> false,
+
+                shooterSubsystem
+        );
+    }
+
     public FunctionalCommand intakeGet() {
         return new FunctionalCommand(
                 /* Initialize*/this::intakeStart,

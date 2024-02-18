@@ -31,6 +31,7 @@ public class VisionPoseEstimator {
     }
 
     public EstimatedRobotPose getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+        SmartDashboard.putBoolean("Camera connected", photonCamera.isConnected());
         if (!photonCamera.isConnected()) return null;
 
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);

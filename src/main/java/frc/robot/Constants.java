@@ -49,7 +49,7 @@ public final class Constants {
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
         public static final Transform3d
-                CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.36, 0.39, 0.41), new Rotation3d()),
+                CAMERA_TO_ROBOT = new Transform3d(new Translation3d(-0.3, 0.15, 0.225), new Rotation3d(0, Units.degreesToRadians(-10), 0)),
                 ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
         public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
 
@@ -133,10 +133,10 @@ public final class Constants {
         /** In seconds */
         public static final double POST_SHOOTING_DELAY = 0.05;
 
-        public static final double NOTE_RELEASE_VELOCITY = 11.5; //todo: CONFIGURE
+        public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         //public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.9, 0.53, 2.1);
-        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);
-        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31, 5.5, 2.05);
+        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0, 5.5, 2.05);
+        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31 + 0.234, 5.5, 2.05);
     }
 
     public static final class Swerve {

@@ -52,11 +52,11 @@ public class SwerveSubsystem extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();
 
-        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d(new Translation2d(3, 3), new Rotation2d()));
+        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getGyroYaw(), getModulePositions(), new Pose2d(new Translation2d(3, 3), new Rotation2d()));
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
-                pose -> poseEstimator.resetPosition(getYaw(), getModulePositions(), pose),
+                pose -> poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose),
                 () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
                 this::drive,
                 holomonicPathFollowerConfig,
@@ -82,7 +82,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYaw())
+                        ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, poseEstimator.getEstimatedPosition().getRotation())
                         : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
         );
 
@@ -135,8 +135,8 @@ public class SwerveSubsystem extends SubsystemBase {
         gyro.setYaw(0);
     }
 
-    public Rotation2d getYaw() {
-        return (Constants.Swerve.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+    public Rotation2d getGyroYaw() {
+        return Constants.Swerve.INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
     public void resetModulesToAbsolute() {
@@ -149,11 +149,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        for (SwerveModule mod : swerveModules) {
+        /*for (SwerveModule mod : swerveModules) {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-        }
+        }*/
 
         EstimatedRobotPose visionRobotPose;
 
@@ -168,7 +168,7 @@ public class SwerveSubsystem extends SubsystemBase {
             }
         }
 
-        poseEstimator.update(getYaw(), getModulePositions());
+        poseEstimator.update(getGyroYaw(), getModulePositions());
         field2d.setRobotPose(poseEstimator.getEstimatedPosition());
 
         SmartDashboard.putData("Field", field2d);

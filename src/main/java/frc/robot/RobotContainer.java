@@ -26,6 +26,7 @@ import static frc.robot.Constants.IntakeConstants.INTAKE_SPEED;
 
 public class RobotContainer {
     private final XboxController driver = new XboxController(0);
+    private final XboxController controller = new XboxController(1);
     private final SendableChooser<Command> autoChooser;
 
     /* Drive Buttons */
@@ -35,6 +36,9 @@ public class RobotContainer {
     private final JoystickButton aButton = new JoystickButton(driver, XboxController.Button.kA.value);
     private final JoystickButton yButton = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton xButton = new JoystickButton(driver, XboxController.Button.kX.value);
+
+    /* Operator buttons */
+    private final TriggerButton accelerateFlywheel = new TriggerButton(controller, XboxController.Axis.kRightTrigger);
 
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -46,15 +50,15 @@ public class RobotContainer {
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
-        // swerveSubsystem.setDefaultCommand(
-        //         new TeleopSwerve(
-        //                 swerveSubsystem,
-        //                 () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-        //                 () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
-        //                 () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
-        //                 robotCentric
-        //         )
-        // );
+        swerveSubsystem.setDefaultCommand(
+                new TeleopSwerve(
+                        swerveSubsystem,
+                        () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+                        () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value),
+                        () -> -driver.getRawAxis(XboxController.Axis.kRightX.value),
+                        robotCentric
+                )
+        );
 
         NamedCommands.registerCommand("pickupIntake", new IntakeCommand(intakeSubsystem, INTAKE_SPEED));
 
@@ -68,9 +72,7 @@ public class RobotContainer {
     private void configureBindings() {
         zeroGyroButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
-        intakeButton.whileTrue(shooterCommands.floorIntake()
-                .andThen(shooterCommands.setKickerSpeed(-0.8)
-                        .withTimeout(0.7)));
+        intakeButton.whileTrue(shooterCommands.intakeGet());
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
@@ -82,7 +84,9 @@ public class RobotContainer {
         yButton.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8)
                 .withTimeout(0.7)));
 
-        // bButton.whileTrue(shooterCommands.shootNote(135));
+        bButton.whileTrue(shooterCommands.shootNote(80, 0.8 * 5600));
+
+        accelerateFlywheel.whileTrue(shooterCommands.accelerateFlywheel());
 
        // xButton.whileTrue(shooterCommands.setAngle(120));
 
