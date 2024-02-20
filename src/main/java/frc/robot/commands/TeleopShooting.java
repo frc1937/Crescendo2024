@@ -51,6 +51,7 @@ public class TeleopShooting extends SequentialCommandGroup {
                 new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
         // TODO Get from a HononomicDriveController in other branch
         private Rotation2d targetShooterOrientation = new Rotation2d();
+        private Rotation2d targetOrientation;
         private double virtualTargetSlope;
 
         public TeleopAim(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
@@ -78,15 +79,26 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             // Predict the position the robot will be in when the NOTE is released
             RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+
+            Translation3d predictedShooterPosition;
+            if (targetOrientation != null) {
+                predictedState.setPose(new Pose2d(predictedState.getPose().getTranslation(), targetOrientation));
+
+                // Use this to calculate the position the shooter will be in
+                Translation3d pivotToShooter = new Translation3d(
+                        targetShooterOrientation.getCos() * SHOOTER_ARM_LENGTH, 0, targetShooterOrientation.getSin() * SHOOTER_ARM_LENGTH);
+                Transform3d robotToShooter = new Transform3d(ROBOT_TO_PIVOT.plus(pivotToShooter), new Rotation3d());
+                predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
+            } else {
+                // We cannot trust the predicted yaw. Thus, using it to predict the shooter position
+                // is unviable. Using the centre of the robot is good enough. In the next time execute()
+                // is called, targetOrientation will have a value and this won't be needed.
+                predictedShooterPosition = predictedState.getPose3d().getTranslation();
+            }
             // RobotState predictedState = new RobotState(swerve.getPose(),
             //         new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
             //         , 0));
 
-            // Use this to calculate the position the shooter will be in
-            Translation3d pivotToShooter = new Translation3d(
-                    targetShooterOrientation.getCos() * SHOOTER_ARM_LENGTH, 0, targetShooterOrientation.getSin() * SHOOTER_ARM_LENGTH);
-            Transform3d robotToShooter = new Transform3d(ROBOT_TO_PIVOT.plus(pivotToShooter), new Rotation3d());
-            Translation3d predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
 
             // Calculate the total velocity vector at which the NOTE should be thrown
             Translation3d targetPosition =  DriverStation.getAlliance().get() == Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
@@ -109,7 +121,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             // Determine the intended release direction based on the throwVelocity, disregarding its
             // magnitude. As we consistently throw the ball at high speeds, we can simplify the path of
             // the note in space to a straight line.
-            Rotation2d targetOrientation = throwVelocity.toTranslation2d().getAngle();
+            targetOrientation = throwVelocity.toTranslation2d().getAngle();
             SmartDashboard.putNumber("targetOrientation", targetOrientation.getDegrees());
             virtualTargetSlope = throwVelocity.getZ() / throwVelocity.toTranslation2d().getNorm();
             SmartDashboard.putNumber("Virtual target pitch [slope]", virtualTargetSlope);

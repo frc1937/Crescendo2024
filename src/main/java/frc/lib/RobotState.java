@@ -22,6 +22,10 @@ public class RobotState {
         this.velocity = fieldRelativeVelocity;
     }
 
+    public void setPose(Pose2d pose) {
+        this.pose = pose;
+    }
+
     public Pose2d getPose() {
         return pose;
     }
@@ -41,6 +45,9 @@ public class RobotState {
      *                     at
      */
     public static RobotState predict(TimeInterpolatableBuffer<Pose2d> poseHistory, double futureTime) {
+        // WARNING: The yaw this code predicts is bullshit, but it doesn't matter for we don't need
+        // it throughout the code.
+
         // Assume the robot moves and continues moving in an arc with a constant magnitude of acceleration. We believe
         // the main use case of this command is when driving in an arc near
         // the speaker.
@@ -67,7 +74,6 @@ public class RobotState {
         // To avoid division by zero, assure lastTwist dx != 0 or dy != 0
         if (lastTwist.dx == 0 || lastTwist.dy == 0) {
             // Assume the robot continues not to move
-            // WARNING: In this case, the yaw is also assumed to be static, even though the robot might be rotating
             return new RobotState(lastPoseSample.getValue(), ChassisSpeeds(0, 0, 0));
         }
 
@@ -81,7 +87,7 @@ public class RobotState {
         // whilst linear extrapolation predicts f(3) = -1/3 given f(1) = 1 and f(2) = 1/3,
         // logarithmic extrapolation predicts f(3) = 1/9.
 
-        // We exploit the fact that log(sqrt(x)) = log(x) / 2 to optimise computations. ALso, we ignore
+        // We exploit the fact that log(sqrt(x)) = log(x) / 2 to optimise computations. Also, we ignore
         // the division by 2 for now because we use linear extrapolation
         double firstTwist2LogSize = Math.log(firstTwist.dx * firstTwist.dx + firstTwist.dy * firstTwist.dy);
         double secondTwist2LogSize = Math.log(secondTwist.dx * secondTwist.dx + secondTwist.dy * secondTwist.dy);
