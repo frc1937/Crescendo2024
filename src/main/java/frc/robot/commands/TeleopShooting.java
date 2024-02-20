@@ -2,15 +2,16 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,15 +22,15 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
+import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.NOTE_RELEASE_VELOCITY;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
-import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
-import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
-import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
@@ -144,12 +145,13 @@ public class TeleopShooting extends SequentialCommandGroup {
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope));
             boolean pitchReady = shooter.hasPivotArrived();
+            boolean shooterNonOccluded = !shooter.isOccluded();
             boolean yawReady = yawController.atSetpoint();
             boolean slopeViable = virtualTargetSlope >= MINIMUM_VIABLE_SLOPE && virtualTargetSlope <= MAXIMUM_VIABLE_SLOPE;
 
-            SmartDashboard.putBooleanArray("flywheels | pitch | yaw | slope", new boolean[]{flywheelsReady, pitchReady, yawReady, slopeViable});
+            SmartDashboard.putBooleanArray("flywheels | pitch | occluded | yaw | slope", new boolean[]{flywheelsReady, pitchReady, shooterNonOccluded, yawReady, slopeViable});
 
-            return flywheelsReady && pitchReady && yawReady && slopeViable;
+            return flywheelsReady && pitchReady && shooterNonOccluded && yawReady && slopeViable;
         }
 
         @Override

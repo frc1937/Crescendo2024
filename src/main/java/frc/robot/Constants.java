@@ -103,6 +103,9 @@ public final class Constants {
         public static final double MINIMUM_VIABLE_SLOPE = 0.38;
         public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
 
+        public static final double MINIMUM_OCCLUDED_PITCH = -2;  // FIXME calibrate
+        public static final double MAXIMUM_OCCLUDED_PITCH = -2;
+
         public static final double POSE_HISTORY_DURATION = 0.5;
 
         public static final int

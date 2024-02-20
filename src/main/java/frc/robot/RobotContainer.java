@@ -9,7 +9,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,12 +40,12 @@ public class RobotContainer {
     private final JoystickButton leftBumper = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
 
     /* OPERATOR */
-    private final JoystickButton reverseIntakeXButton = new JoystickButton(operatorController, XboxController.Button.kX.value);
     private final TriggerButton accelerateFlywheelButton = new TriggerButton(operatorController, XboxController.Axis.kRightTrigger);
     private final JoystickButton randomPitchYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
     private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
     private final JoystickButton opBButton = new JoystickButton(operatorController, XboxController.Button.kB.value);
     private final JoystickButton opYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
+    private final JoystickButton opXButton = new JoystickButton(operatorController, XboxController.Button.kX.value);
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -54,9 +53,6 @@ public class RobotContainer {
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-
-    UsbCamera driverCamera;
-    VideoSink server;
 
     public RobotContainer() {
         JoystickButton robotCentric = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
@@ -81,8 +77,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-
-        //TODO: Oriel define this commands to whichever buttons you want
+        //TODO: Uriel define this commands to whichever buttons you want
         // Teleop shooting automaticy audujsts itself based on april tag for shooting
         // accelerate flywheel is the command that was asked by Ofir
 
@@ -102,9 +97,12 @@ public class RobotContainer {
 
         accelerateFlywheelButton.whileTrue(shooterCommands.accelerateFlywheel());
 
+        //sagi:
         opAButton.whileTrue(shooterCommands.shootNote(80, 0.4));
         opBButton.whileTrue(shooterCommands.shootNote(132, 0.4));
         opYButton.whileTrue(shooterCommands.shootNote(125, 0.08));
+
+        opXButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
 //        aButton.whileTrue(shooterCommands.setAngle(60));
 //

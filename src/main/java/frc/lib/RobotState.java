@@ -67,14 +67,13 @@ public class RobotState {
         Map.Entry<Double, Pose2d> middlePoseSample = actualPoseSamples.ceilingEntry(middleTime);
 
         // Find the twists between them
-        Twist2d wholeTwist = firstPoseSample.getValue().log(lastPoseSample.getValue());
         Twist2d firstTwist = firstPoseSample.getValue().log(middlePoseSample.getValue());
         Twist2d lastTwist = middlePoseSample.getValue().log(lastPoseSample.getValue());
 
         // To avoid division by zero, assure lastTwist dx != 0 or dy != 0
         if (lastTwist.dx == 0 || lastTwist.dy == 0) {
             // Assume the robot continues not to move
-            return new RobotState(lastPoseSample.getValue(), ChassisSpeeds(0, 0, 0));
+            return new RobotState(lastPoseSample.getValue(), new ChassisSpeeds(0, 0, 0));
         }
 
         // Find how grandiose were twists compared to one another
@@ -90,24 +89,24 @@ public class RobotState {
         // We exploit the fact that log(sqrt(x)) = log(x) / 2 to optimise computations. Also, we ignore
         // the division by 2 for now because we use linear extrapolation
         double firstTwist2LogSize = Math.log(firstTwist.dx * firstTwist.dx + firstTwist.dy * firstTwist.dy);
-        double secondTwist2LogSize = Math.log(secondTwist.dx * secondTwist.dx + secondTwist.dy * secondTwist.dy);
+        double lastTwist2LogSize = Math.log(lastTwist.dx * lastTwist.dx + lastTwist.dy * lastTwist.dy);
 
         // Extrapolate to predict the size of the future twist
         double predictedTwist2LogSize = predictLinearValue(
             futureTime,
-            secondTwistSize,
+            lastTwist2LogSize,
             lastPoseSample.getKey(),
-            firstTwist,
+            firstTwist2LogSize,
             middlePoseSample.getKey()
         );
         double predictedTwistSize = Math.exp(predictedTwist2LogSize / 2);
-        double predictedAndSecondTwistSizeRatio = predictedTwistSize / secondTwistSize;
+        double predictedAndSecondTwistSizeRatio = predictedTwistSize / lastTwist2LogSize;
 
         // Consider the last twist but with the predicted size
         Twist2d predictedTwist = new Twist2d(
             predictedAndSecondTwistSizeRatio * lastTwist.dx,
             predictedAndSecondTwistSizeRatio * lastTwist.dy,
-            predictedAndSecondTwistSizeRatio * lastTwist.theta
+            predictedAndSecondTwistSizeRatio * lastTwist.dtheta
         );
 
         // 'Apply' the predicted twist onto the last pose sample

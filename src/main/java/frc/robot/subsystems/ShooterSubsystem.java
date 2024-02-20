@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
+import static frc.robot.Constants.ShootingConstants.MAXIMUM_OCCLUDED_PITCH;
+import static frc.robot.Constants.ShootingConstants.MINIMUM_OCCLUDED_PITCH;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
@@ -88,6 +90,11 @@ public class ShooterSubsystem extends SubsystemBase {
 //
 //        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
 //        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
+    }
+
+    public boolean isOccluded() {
+        double pitch = pivotMotor.getEncoder().getPosition();
+        return pitch < MINIMUM_OCCLUDED_PITCH || pitch > MAXIMUM_OCCLUDED_PITCH;
     }
 
     public boolean doesSeeNote() {
