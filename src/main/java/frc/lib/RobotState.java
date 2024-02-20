@@ -59,52 +59,64 @@ public class RobotState {
         double middleTime = (firstPoseSample.getKey() + lastPoseSample.getKey()) / 2;
         Map.Entry<Double, Pose2d> middlePoseSample = actualPoseSamples.ceilingEntry(middleTime);
 
-        // Find the twist between the first and the last ones
-
         // Find the twists between them
         Twist2d wholeTwist = firstPoseSample.getValue().log(lastPoseSample.getValue());
         Twist2d firstTwist = firstPoseSample.getValue().log(middlePoseSample.getValue());
         Twist2d lastTwist = middlePoseSample.getValue().log(lastPoseSample.getValue());
 
-        // Find how grandiose were twists compared to one another
-        double firstTwistSize = Math.sqrt(firstTwist.dx * firstTwist.dx + firstTwist.dy * firstTwist.dy);
-        double secondTwistSize = Math.sqrt(secondTwist.dx * secondTwist.dx + secondTwist.dy * secondTwist.dy);
-
-        if (secondTwist != 0) {
-            // Extrapolate linearly to predict the size of the future twist
-            double predictedTwistSize = predictLinearValue(
-                futureTime,
-                secondTwistSize,
-                lastPoseSample.getKey(),
-                firstTwist,
-                middlePoseSample.getKey()
-            );
-            double predictedAndSecondTwistSizeRatio = predictedTwistSize / secondTwistSize;
-
-            Twist2d predictedTwist = new Twist2d(
-                predictedAndSecondTwistSizeRatio * lastTwist.dx,
-                predictedAndSecondTwistSizeRatio * lastTwist.dy,
-                predictedAndSecondTwistSizeRatio * lastTwist.theta
-            );
-
-            // 'Apply' the future twist onto the last pose sample
-            Pose2d predictedPose = lastPoseSample.getValue().exp(predictedTwist);
-
-            // Derive the speed prediction from the predicted twist
-            double predictedTwistDuration = futureTime - lastPoseSample.getKey();
-            ChassisSpeeds predictedVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(
-                    predictedTwist.dx / predictedTwistDuration,
-                    predictedTwist.dy / predictedTwistDuration,
-                    predictedTwist.dtheta / predictedTwistDuration,
-                    predictedPose.getRotation()
-            );
-
-            return new RobotState(predictedPose, predictedVelocity);
-        } else {
+        // To avoid division by zero, assure lastTwist dx != 0 or dy != 0
+        if (lastTwist.dx == 0 || lastTwist.dy == 0) {
             // Assume the robot continues not to move
             // WARNING: In this case, the yaw is also assumed to be static, even though the robot might be rotating
             return new RobotState(lastPoseSample.getValue(), ChassisSpeeds(0, 0, 0));
         }
+
+        // Find how grandiose were twists compared to one another
+        // We define the 'size' of an arc similarly to the Pythagorean theorem:
+        // size = sqrt(dx^2 + dy^2)
+
+        // Also, when the robot slows significatly, it makes more sense to predict
+        // that it will slow down even more, rather than change to the opposite direction.
+        // Thus, we use logarithmic extrapolation and not linear extrapolation. For example,
+        // whilst linear extrapolation predicts f(3) = -1/3 given f(1) = 1 and f(2) = 1/3,
+        // logarithmic extrapolation predicts f(3) = 1/9.
+
+        // We exploit the fact that log(sqrt(x)) = log(x) / 2 to optimise computations. ALso, we ignore
+        // the division by 2 for now because we use linear extrapolation
+        double firstTwist2LogSize = Math.log(firstTwist.dx * firstTwist.dx + firstTwist.dy * firstTwist.dy);
+        double secondTwist2LogSize = Math.log(secondTwist.dx * secondTwist.dx + secondTwist.dy * secondTwist.dy);
+
+        // Extrapolate to predict the size of the future twist
+        double predictedTwist2LogSize = predictLinearValue(
+            futureTime,
+            secondTwistSize,
+            lastPoseSample.getKey(),
+            firstTwist,
+            middlePoseSample.getKey()
+        );
+        double predictedTwistSize = Math.exp(predictedTwist2LogSize / 2);
+        double predictedAndSecondTwistSizeRatio = predictedTwistSize / secondTwistSize;
+
+        // Consider the last twist but with the predicted size
+        Twist2d predictedTwist = new Twist2d(
+            predictedAndSecondTwistSizeRatio * lastTwist.dx,
+            predictedAndSecondTwistSizeRatio * lastTwist.dy,
+            predictedAndSecondTwistSizeRatio * lastTwist.theta
+        );
+
+        // 'Apply' the predicted twist onto the last pose sample
+        Pose2d predictedPose = lastPoseSample.getValue().exp(predictedTwist);
+
+        // Derive the speed prediction from the predicted twist
+        double predictedTwistDuration = futureTime - lastPoseSample.getKey();
+        ChassisSpeeds predictedVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(
+                predictedTwist.dx / predictedTwistDuration,
+                predictedTwist.dy / predictedTwistDuration,
+                predictedTwist.dtheta / predictedTwistDuration,
+                predictedPose.getRotation()
+        );
+
+        return new RobotState(predictedPose, predictedVelocity);
     }
 
     private static double predictLinearValue(double futureTime, double last, double lastTime, double previous, double previousTime) {
