@@ -77,10 +77,10 @@ public class TeleopShooting extends SequentialCommandGroup {
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
             // Predict the position the robot will be in when the NOTE is released
-            //RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-            RobotState predictedState = new RobotState(swerve.getPose(),
-                    new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
-                    , 0));
+            RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+            // RobotState predictedState = new RobotState(swerve.getPose(),
+            //         new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
+            //         , 0));
 
             // Use this to calculate the position the shooter will be in
             Translation3d pivotToShooter = new Translation3d(
