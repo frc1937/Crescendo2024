@@ -24,8 +24,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.TriggerButton;
 
-import static frc.robot.Constants.IntakeConstants.INTAKE_SPEED;
-
 public class RobotContainer {
     private Thread visionThread;
     private final XboxController driveController = new XboxController(0);
@@ -67,9 +65,11 @@ public class RobotContainer {
                 )
         );
 
-        NamedCommands.registerCommand("pickupIntake", new IntakeCommand(intakeSubsystem, INTAKE_SPEED));
+        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet().withTimeout(5));
+        NamedCommands.registerCommand("TeleopShooting", new TeleopShooting(swerveSubsystem, shooterSubsystem, () -> 0, () -> 0).withTimeout(4));
+        //NamedCommands.registerCommand("TeleopShooting", new InstantCommand());
 
-        autoChooser = AutoBuilder.buildAutoChooser("HoopTest");
+        autoChooser = AutoBuilder.buildAutoChooser("Three Donuts");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();

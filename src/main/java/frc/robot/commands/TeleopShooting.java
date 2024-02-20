@@ -53,7 +53,6 @@ public class TeleopShooting extends SequentialCommandGroup {
         private final DoubleSupplier translationSup, strafeSup;
         private final ProfiledPIDController yawController = new ProfiledPIDController(YAW_CONTROLLER_P, YAW_CONTROLLER_I, YAW_CONTROLLER_D,
                 new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
-        // TODO Get from a HononomicDriveController in other branch
         private Rotation2d targetShooterOrientation = new Rotation2d();
         private Rotation2d targetOrientation;
         private double virtualTargetSlope;
@@ -64,7 +63,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
 
-            yawController.setTolerance(0.3); // TODO move to constants
+            yawController.setTolerance(0.1); // TODO move to constants
             yawController.enableContinuousInput(-Math.PI, Math.PI);
 
             addRequirements(swerve, shooter);
@@ -163,6 +162,10 @@ public class TeleopShooting extends SequentialCommandGroup {
             if (interrupted) {
                 shooter.stopFlywheels();
             }
+
+            yawController.reset(0);
+            //targetShooterOrientation = new Rotation2d();
+            //targetOrientation = new Rotation2d();
         }
     }
 
