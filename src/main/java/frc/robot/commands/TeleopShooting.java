@@ -33,6 +33,9 @@ import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
 import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
+import static frc.robot.Constants.Swerve.YAW_CONTROLLER_D;
+import static frc.robot.Constants.Swerve.YAW_CONTROLLER_I;
+import static frc.robot.Constants.Swerve.YAW_CONTROLLER_P;
 import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
 import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
 
@@ -48,7 +51,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         private final SwerveSubsystem swerve;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
-        private final ProfiledPIDController yawController = new ProfiledPIDController(7, 0, 0.75,
+        private final ProfiledPIDController yawController = new ProfiledPIDController(YAW_CONTROLLER_P, YAW_CONTROLLER_I, YAW_CONTROLLER_D,
                 new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
         // TODO Get from a HononomicDriveController in other branch
         private Rotation2d targetShooterOrientation = new Rotation2d();
@@ -62,6 +65,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             this.strafeSup = strafeSup;
 
             yawController.setTolerance(0.3); // TODO move to constants
+            yawController.enableContinuousInput(-Math.PI, Math.PI);
 
             addRequirements(swerve, shooter);
         }
@@ -145,13 +149,13 @@ public class TeleopShooting extends SequentialCommandGroup {
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope));
             boolean pitchReady = shooter.hasPivotArrived();
-            boolean shooterNonOccluded = !shooter.isOccluded();
+            boolean shooterNotOccluded = !shooter.isOccluded();
             boolean yawReady = yawController.atSetpoint();
             boolean slopeViable = virtualTargetSlope >= MINIMUM_VIABLE_SLOPE && virtualTargetSlope <= MAXIMUM_VIABLE_SLOPE;
 
-            SmartDashboard.putBooleanArray("flywheels | pitch | occluded | yaw | slope", new boolean[]{flywheelsReady, pitchReady, shooterNonOccluded, yawReady, slopeViable});
+            SmartDashboard.putBooleanArray("flywheels | pitch | not occluded | yaw | slope", new boolean[]{flywheelsReady, pitchReady, shooterNotOccluded, yawReady, slopeViable});
 
-            return flywheelsReady && pitchReady && shooterNonOccluded && yawReady && slopeViable;
+            return flywheelsReady && pitchReady && shooterNotOccluded && yawReady && slopeViable;
         }
 
         @Override

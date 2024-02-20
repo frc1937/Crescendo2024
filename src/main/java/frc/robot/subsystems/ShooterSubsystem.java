@@ -94,7 +94,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public boolean isOccluded() {
         double pitch = pivotMotor.getEncoder().getPosition();
-        return pitch < MINIMUM_OCCLUDED_PITCH || pitch > MAXIMUM_OCCLUDED_PITCH;
+        return pitch > MINIMUM_OCCLUDED_PITCH && pitch < MAXIMUM_OCCLUDED_PITCH;
     }
 
     public boolean doesSeeNote() {

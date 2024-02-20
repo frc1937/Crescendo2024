@@ -89,9 +89,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 /* Initialize*/() -> {
                       //intakeStart();
-
-                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1));
-                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(-0.4));
+                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(-0.7));
                 },
                 /* Execute */() -> {
                     if(shooterSubsystem.hasPivotArrived()) {
