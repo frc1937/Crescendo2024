@@ -25,6 +25,7 @@
 
 /*
  * TODO:
+ *  -0   check if all register macros work
  *  -1   make a routine for counting microseconds from rise to fall of signal.
  *  -2   check for race condition
  *  -3a  try fastLED or adafruit lib
@@ -38,13 +39,44 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+//register macros
+#ifndef OFFSET
+#define OFFSET 0x20
+#endif
+
+#ifndef REG
+#define REG(addr)*((volatile unsigned char*)(addr+OFFSET))
+#endif
+
+#ifndef DDRB
+#define DDRB REG(0x17)
+#endif
+
+#ifndef PORTB
+#define PORTB REG(0x18)
+#endif
+
+#ifndef SREG
+#define SREG REG(0x3F)
+#endif
+
+#ifndef GIMSK
+#define GIMSK REG(0x3B)
+#endif
+
+#ifndef MCUCR
+#define MCUCR REG(0x35)
+#endif
+
+
+
 #define F_CPU 8000000 //  CPU clk
 #define length 4  //  strip length
 #define cdiv  //  the divisor for the count
 
 volatile uint16_t count = 0;
 	
-int main(void){
+int main(){
 	// init
   DDRB |= (_BW(DDB1) | _BW(DDB0));
 
@@ -59,7 +91,11 @@ int main(void){
 
 	while(1){
 		//  loop
-    
+    if(count * 2 / F_CPU > 500){
+      PORTB &= ~(_BW(PORTB1));
+    } else {
+      PORTB |= (_BW(PORTB1));
+    }
 		}
 }
 
