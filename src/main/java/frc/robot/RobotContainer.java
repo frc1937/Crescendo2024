@@ -5,6 +5,9 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -14,9 +17,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -65,9 +71,13 @@ public class RobotContainer {
                 )
         );
 
-        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet().withTimeout(5));
-        NamedCommands.registerCommand("TeleopShooting", new TeleopShooting(swerveSubsystem, shooterSubsystem, () -> 0, () -> 0).withTimeout(4));
-        //NamedCommands.registerCommand("TeleopShooting", new InstantCommand());
+        NamedCommands.registerCommand("Shifra2", shooterCommands.intakeGet().withTimeout(5));
+        // NamedCommands.registerCommand("TeleopShooting", new TeleopShooting(swerveSubsystem, shooterSubsystem, () -> 0, () -> 0).withTimeout(4));
+        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, 1.15));
+        NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, 0.9));
+        NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 0.8));
+        NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, 0.9));
+        NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
         autoChooser = AutoBuilder.buildAutoChooser("Three Donuts");
         SmartDashboard.putData("Auto Chooser", autoChooser);

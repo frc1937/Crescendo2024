@@ -4,35 +4,35 @@
     {
       "anchor": {
         "x": 2.0,
-        "y": 7.0
+        "y": 5.55
       },
       "prevControl": null,
       "nextControl": {
         "x": 3.0,
-        "y": 7.0
+        "y": 5.55
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Centre"
     },
     {
       "anchor": {
-        "x": 2.5662746820989137,
-        "y": 5.1955231838391605
+        "x": 3.1,
+        "y": 5.55
       },
       "prevControl": {
-        "x": 2.335157102746638,
-        "y": 5.6022901234991656
+        "x": 2.1,
+        "y": 5.55
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Middle NOTE"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 0.9,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -45,8 +45,8 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -78.17252697891557,
+    "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3459738631188973,
-      "y": 5.54
+      "x": 1.3,
+      "y": 5.55
     },
-    "rotation": 0
+    "rotation": -2.536481259307009e-13
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "TeleopShooting"
+            "name": "AdjustShooter1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterKick"
           }
         },
         {
@@ -24,13 +30,32 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Subwoofer to middle NOTE"
+                  "pathName": "Base to top NOTE"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake"
+                  "name": "Shifra2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Top NOTE to centre"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AdjustShooter2"
                 }
               }
             ]
@@ -39,7 +64,7 @@
         {
           "type": "named",
           "data": {
-            "name": "TeleopShooting"
+            "name": "ShooterKick"
           }
         },
         {
@@ -49,28 +74,91 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Middle NOTE to top NOTE"
+                  "pathName": "Centre to middle NOTE"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake"
+                  "name": "Shifra2"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Middle NOTE to bottom"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AdjustShooter3"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterKick"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Bottom to bottom NOTE"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shifra2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Bottom NOTE to centre"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AdjustShooter4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterKick"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Rotate to amp from top NOTE"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TeleopShooting"
+            "pathName": "LAZI"
           }
         }
       ]

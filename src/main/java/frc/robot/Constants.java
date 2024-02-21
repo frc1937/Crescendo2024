@@ -132,7 +132,7 @@ public final class Constants {
         public static final double PIVOT_RANGE_MAX = 0.9;
 
         /** In seconds */
-        public static final double SHOOTING_DELAY = 0.1;
+        public static final double SHOOTING_DELAY = 0.5;
         /** In seconds */
         public static final double POST_SHOOTING_DELAY = 0.05;
 

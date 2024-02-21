@@ -122,13 +122,12 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 12;
+        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 7;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {
         pivotSetpoint = rotation2d.getDegrees();
     }
-
 
     private void configureCanCoder(CANCoder encoder) {
         encoder.configFactoryDefault();

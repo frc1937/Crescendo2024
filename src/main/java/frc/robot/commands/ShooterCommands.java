@@ -178,8 +178,7 @@ public class ShooterCommands {
     public Command setKickerSpeed(double speed) {
         return new FunctionalCommand(
                 () -> shooterSubsystem.setKickerSpeed(speed),
-                () -> {
-                },
+                () -> {},
                 interrupted -> shooterSubsystem.stopKicker(),
                 () -> false,
                 shooterSubsystem
