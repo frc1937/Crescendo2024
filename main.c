@@ -16,17 +16,9 @@
  */
 
 /*
- *  OPTIMIZATION:
- *  ffs, make sure you optimize reg writes
- *  operations with bitwise operators.
- *  for setting bit LOW:  REG &= ~(_BW(bit));
- *  for setting bit HIGH: REG |= (_BW(bit));
- */
-
-/*
  * TODO:
- *  -0   check if all register macros work
- *  -1   make a routine for counting microseconds from rise to fall of signal.
+ *  ~0   check if all register macros work
+ *  ~1   make a routine for counting microseconds from rise to fall of signal using timer.
  *  -2   check for race condition
  *  -3a  try fastLED or adafruit lib
  *  -3b  if that doesn't work make ur own(git gud son)
@@ -39,7 +31,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-//register macros
+//register adr macros
 #ifndef OFFSET
 #define OFFSET 0x20
 #endif
@@ -56,6 +48,14 @@
 #define PORTB REG(0x18)
 #endif
 
+#ifndef TCNT0
+#define TCNT0 0x32
+#endif
+
+#ifndef TCCR0B
+#define TCCR0B 0x33
+#endif
+
 #ifndef SREG
 #define SREG REG(0x3F)
 #endif
@@ -68,33 +68,32 @@
 #define MCUCR REG(0x35)
 #endif
 
-
-
 #define F_CPU 8000000 //  CPU clk
 #define length 4  //  strip length
-#define cdiv  //  the divisor for the count
 
-volatile uint16_t count = 0;
-	
+volatile uint8_t cmd;
+
 int main(){
 	// init
-  DDRB |= (_BW(DDB1) | _BW(DDB0));
+  DDRB |= (_BV(DDB1) | _BV(DDB0));
 
-  PORTB |= (_BW(PORTB1));
-  PORTB &= ~(_BW(PORTB0));
+  PORTB |= (_BV(PORTB1));
+  PORTB &= ~(_BV(PORTB0));
 
-  SREG |= (_BW(I));
+  TCCR0B &= ~((_BV(CS00)) | (_BV(CS01)) | (_BV(CS02)));  //  disables timer
 
-  GIMSK |= (_BW(INT0));
+  SREG = 128;  //  SREG |= (_BV(I));
 
-  MCUCR |= (_BW(ISC01) | _BW(ISC00)); //  sets INT0 trigger RISING
+  GIMSK |= (_BV(INT0));
+
+  MCUCR |= (_BV(ISC01) | _BV(ISC00)); //  sets INT0 trigger RISING
 
 	while(1){
 		//  loop
-    if(count * 2 / F_CPU > 500){
-      PORTB &= ~(_BW(PORTB1));
+    if(cmd > 3){
+      PORTB ^= (_BV(PORTB1));
     } else {
-      PORTB |= (_BW(PORTB1));
+      PORTB ^= (_BV(PORTB1));
     }
 		}
 }
@@ -105,7 +104,7 @@ int main(){
 *   wether the command has changed
 */
 ISR(INT0_vect, ISR_NOBLOCK){
-if((MCUCR & (1 << ISC00)) == (1 << ISC00)){
+if(MCUCR & ((1 << ISC00) == (1 << ISC00))){
   rising();
   } else {
   falling();
@@ -113,10 +112,13 @@ if((MCUCR & (1 << ISC00)) == (1 << ISC00)){
 }
 
 void rising(){
-  MCUCR &= ~(_BW(ISC00)); //  sets INT0 trigger FALLING
-  count++;
+  TCCR0B |= (_BV(CS00) | (_BV(CS01)));  //  enable timer, prescaler=clk/8  --> 1MHz; so each cycle is one microsecond
+  MCUCR &= ~(ISC00); //  sets INT0 trigger FALLING
 }
 
 void falling() {
-  MCUCR |= (_BW(ISC00));  // sets INT0 trigger RISING
+  cmd = TCNT0;
+  TCCR0B &= ~(_BV(CS00) | (_BV(CS01)));  //  disables timer
+  TCNT0 = 0;  //  clear timer register
+  MCUCR |= (ISC00);  // sets INT0 trigger RISING
 }
