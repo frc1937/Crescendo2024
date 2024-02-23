@@ -88,14 +88,14 @@ int main(){
 
   MCUCR |= (_BV(ISC01) | _BV(ISC00)); //  sets INT0 trigger RISING
 
-	while(1){
+  while(1){
 		//  loop
-    if(cmd > 3){
-      PORTB ^= (_BV(PORTB1));
-    } else {
-      PORTB ^= (_BV(PORTB1));
-    }
-		}
+      if(cmd > 3){
+          PORTB |= (_BV(PORTB1));
+       } else {
+          PORTB &= ~(_BV(PORTB1));
+       } 
+  }
 }
 
 /*
