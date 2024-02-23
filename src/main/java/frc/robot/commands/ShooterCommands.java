@@ -52,7 +52,6 @@ public class ShooterCommands {
                 },
 
                 () -> {
-
                     double finalSpeed = state.getRpmProportion() * state.getSpeedPercentage() * 6400;
 
                     SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady(finalSpeed));
@@ -75,16 +74,11 @@ public class ShooterCommands {
 
     public FunctionalCommand accelerateFlywheel() {
         return new FunctionalCommand(
-            () -> {
-                    shooterSubsystem.setFlywheelSpeed(0.8);
-                },
+            () -> shooterSubsystem.setFlywheelSpeed(0.8),
 
                 () -> {
                 },
-
-                interrupted -> {
-                    shooterSubsystem.stopFlywheels();
-                },
+                interrupted -> shooterSubsystem.stopFlywheels(),
 
                 () -> false,
 
@@ -94,10 +88,7 @@ public class ShooterCommands {
 
     public FunctionalCommand intakeGet() {
         return new FunctionalCommand(
-                /* Initialize*/() -> {
-                      //intakeStart();
-                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5));
-                },
+                /* Initialize*/() -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
                 /* Execute */() -> {
                     if(shooterSubsystem.hasPivotArrived()) {
                         intakeSubsystem.setSpeedPercentage(0.7);
@@ -105,66 +96,12 @@ public class ShooterCommands {
                         shooterSubsystem.setKickerSpeed(-0.8);
                     }
                 },
-                /* When done do:*/interrupted -> intakeStop(),
+                /* When done do:*/interrupted -> {
+                                    shooterSubsystem.stopFlywheels();
+                                    intakeSubsystem.stopMotor();
+                                    shooterSubsystem.stopKicker();
+                    },
                 /* Condition to be done at */ shooterSubsystem::doesSeeNote,
-
-                shooterSubsystem
-        );
-    }
-
-    private void intakeStart() {
-        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
-
-        intakeSubsystem.setSpeedPercentage(0.9);
-        shooterSubsystem.setFlywheelSpeed(-1);
-        shooterSubsystem.setKickerSpeed(-0.8);
-    }
-
-    public void intakeStop() {
-        shooterSubsystem.stopFlywheels();
-        intakeSubsystem.stopMotor();
-        shooterSubsystem.stopKicker();
-    }
-
-    public FunctionalCommand stopIntake() {
-        return new FunctionalCommand(
-                () -> {
-                    shooterSubsystem.stopFlywheels();
-                    intakeSubsystem.stopMotor();
-                    shooterSubsystem.stopKicker();
-                },
-
-                () -> {
-                },
-                (interrupted) -> {
-                },
-                () -> false,
-
-                intakeSubsystem
-        );
-    }
-
-    public FunctionalCommand floorIntake() {
-        return new FunctionalCommand(
-                () -> {
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
-
-                    intakeSubsystem.setSpeedPercentage(0.9);
-                    shooterSubsystem.setFlywheelSpeed(-0.7);
-                    shooterSubsystem.setKickerSpeed(-0.8);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1.5));
-                },
-
-                () -> {
-                },
-
-                interrupted -> {
-                    shooterSubsystem.stopFlywheels();
-                    intakeSubsystem.stopMotor();
-                    shooterSubsystem.stopKicker();
-                },
-
-                () -> !shooterSubsystem.doesSeeNote(),
 
                 shooterSubsystem
         );

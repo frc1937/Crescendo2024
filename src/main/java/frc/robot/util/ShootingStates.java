@@ -4,7 +4,7 @@ public enum ShootingStates {
     AMP(125, 0.1, 0.5),
     SPEAKER_FRONT(80, 0.75, 0.9),
     SPEAKER_BACK(140, 0.5, 0.7),
-    STAGE_FRONT(67, 0.96, 0.98);
+    STAGE_FRONT(64, 0.88, 0.98);
 
     private final double angle, speedPercentage, rpmProportion;
 
