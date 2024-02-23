@@ -88,8 +88,8 @@ public class ShooterSubsystem extends SubsystemBase {
             pivotController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
         }
 //
-//        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
-//        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
+        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
+        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
     }
 
     public boolean isOccluded() {
@@ -122,7 +122,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 7;
+        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 3;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {

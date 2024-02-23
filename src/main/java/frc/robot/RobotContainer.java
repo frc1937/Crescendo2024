@@ -5,9 +5,6 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -17,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
@@ -28,7 +24,10 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.ShootingStates;
 import frc.robot.util.TriggerButton;
+
+import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
     private Thread visionThread;
@@ -39,10 +38,10 @@ public class RobotContainer {
     /* MAIN-DRIVER */
     private final JoystickButton startButton = new JoystickButton(driveController, XboxController.Button.kStart.value);
     private final TriggerButton leftTrigger = new TriggerButton(driveController, XboxController.Axis.kLeftTrigger);
-    private final JoystickButton rightBumper = new JoystickButton(driveController, XboxController.Button.kRightBumper.value);
+    private final TriggerButton rightTrigger = new TriggerButton(driveController, XboxController.Axis.kRightTrigger);
     private final JoystickButton aButton = new JoystickButton(driveController, XboxController.Button.kA.value);
     private final JoystickButton leftBumper = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
-
+    private final JoystickButton backButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
     /* OPERATOR */
     private final TriggerButton accelerateFlywheelButton = new TriggerButton(operatorController, XboxController.Axis.kRightTrigger);
     private final JoystickButton randomPitchYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
@@ -79,7 +78,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, 0.9));
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
-        autoChooser = AutoBuilder.buildAutoChooser("Three Donuts");
+        autoChooser = AutoBuilder.buildAutoChooser("Eyal");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
@@ -92,8 +91,11 @@ public class RobotContainer {
         // accelerate flywheel is the command that was asked by Ofir
 
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
+//        backButton.onTrue(new InstantCommand(swerveSubsystem::resetModulesToAbsolute));
 
-        leftTrigger.whileTrue(shooterCommands.intakeGet());
+        leftTrigger.whileTrue(shooterCommands.intakeGet()
+                .andThen(shooterCommands.setKickerSpeed(-0.8)
+                .withTimeout(0.7)));
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
@@ -105,14 +107,15 @@ public class RobotContainer {
         leftBumper.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8)
                 .withTimeout(0.7)));
 
-        accelerateFlywheelButton.whileTrue(shooterCommands.accelerateFlywheel());
+       // accelerateFlywheelButton.whileTrue(shooterCommands.accelerateFlywheel());
+
+        rightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         //sagi:
-        opAButton.whileTrue(shooterCommands.shootNote(80, 0.4));
-        opBButton.whileTrue(shooterCommands.shootNote(132, 0.4));
-        opYButton.whileTrue(shooterCommands.shootNote(125, 0.08));
-
-        opXButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
+        opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
+        opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
+        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
 
 //        aButton.whileTrue(shooterCommands.setAngle(60));
 //

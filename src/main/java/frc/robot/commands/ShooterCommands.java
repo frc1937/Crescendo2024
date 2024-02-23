@@ -1,10 +1,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.util.ShootingStates;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -38,18 +40,23 @@ public class ShooterCommands {
         );
     }
 
-    public Command shootNote(double angle, double speed) {
+    public Command shootNote(ShootingStates state) {
         return new FunctionalCommand(
                 () -> {
                     if (shooterSubsystem.doesSeeNote()) {
                         shooterSubsystem.stopKicker();
-                        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
-                        shooterSubsystem.setFlywheelSpeed(speed);
+                        shooterSubsystem.setKickerSpeed(-0.3);
+                        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
+                        shooterSubsystem.setFlywheelSpeed(state.getSpeedPercentage());
                     }
                 },
 
                 () -> {
-                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady(speed * 5600) && shooterSubsystem.hasPivotArrived()) {
+
+                    double finalSpeed = state.getRpmProportion() * state.getSpeedPercentage() * 6400;
+
+                    SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady(finalSpeed));
+                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady(finalSpeed) && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(0.9);
                     }
                 },
@@ -89,11 +96,11 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 /* Initialize*/() -> {
                       //intakeStart();
-                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(-0.7));
+                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5));
                 },
                 /* Execute */() -> {
                     if(shooterSubsystem.hasPivotArrived()) {
-                        intakeSubsystem.setSpeedPercentage(0.9);
+                        intakeSubsystem.setSpeedPercentage(0.7);
                         shooterSubsystem.setFlywheelSpeed(-1);
                         shooterSubsystem.setKickerSpeed(-0.8);
                     }

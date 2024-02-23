@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.1394462788925597,
-        "y": 7.005529395674177
+        "x": 3.0221706157698036,
+        "y": 7.065858703145978
       },
       "prevControl": {
-        "x": 1.9258123131630895,
-        "y": 7.341005451241672
+        "x": 1.8085366500403335,
+        "y": 7.401334758713473
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 0.8,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Amit",
   "previewStartingState": {
     "rotation": 0.4422012627102203,
     "velocity": 0
