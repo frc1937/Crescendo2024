@@ -91,7 +91,8 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(0.84, Rotation2d.fromDegrees(73));
             SLOPE_TO_PITCH_MAP.put(0.66, Rotation2d.fromDegrees(71));
             // SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(70));
-            SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(65.7));
+            SLOPE_TO_PITCH_MAP.put(0.5, Rotation2d.fromDegrees(66));
+            SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(65));
             SLOPE_TO_PITCH_MAP.put(0.45, Rotation2d.fromDegrees(64));
         }
 
@@ -100,7 +101,8 @@ public final class Constants {
 
         static {
             SLOPE_TO_VELOCITY_MAP.put(1.22, 0.6 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.58, 0.73 * 5600)    ;
+            SLOPE_TO_VELOCITY_MAP.put(0.58, 0.73 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.51, 0.8 * 5600);
             SLOPE_TO_VELOCITY_MAP.put(0.45, 0.83 * 5600);
         }
 
@@ -127,10 +129,10 @@ public final class Constants {
 
         public static final double PIVOT_DOWN_P = 0.014_95;
         public static final double PIVOT_DOWN_FF = 0.00141;
-        public static final double FLYWHEEL_FF = 0.000_065_955;
+        public static final double FLYWHEEL_FF = 0.00015;
         public static final double FLYWHEEL_RANGE_MIN = -1;
         public static final double FLYWHEEL_RANGE_MAX = 1;
-        public static final double FLYWHEEL_P = 0.001_159;
+        public static final double FLYWHEEL_P = 0.001075;
         public static final double FLYWHEEL_VELOCITY_TOLERANCE = 200;
 
         public static final double PIVOT_RANGE_MIN = -0.9;

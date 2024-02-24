@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
@@ -85,10 +86,8 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotMotor.getEncoder().setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("AbsolutePosition", pivotEncoder.getPosition());
-        SmartDashboard.putNumber("CurrentPosition ", pivotMotor.getEncoder().getPosition());
-        SmartDashboard.putNumber("CurrentVelocity ", pivotMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("CurrentAngle", currentAngle);
+        SmartDashboard.putNumber("Velocity", flywheelEncoder.getVelocity());
+        SmartDashboard.putNumber("Target Velocity", targetFlywheelVelocity);
 
         if(pivotSetpoint >= currentAngle) {
             pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);

@@ -20,8 +20,8 @@ public class ShooterCommands {
     public Command receiveFromFeeder() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelSpeed(-0.55 * 5600);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(49));
+                    shooterSubsystem.setFlywheelSpeed(-0.65 * 5600);
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(50));
                     shooterSubsystem.setKickerSpeed(-0.5);
                 },
 
