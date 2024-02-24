@@ -145,7 +145,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private void configureFlywheelMotor(CANSparkFlex motor) {
         motor.restoreFactoryDefaults();
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        motor.setIdleMode(CANSparkBase.IdleMode.kCoast);
         flywheelsController.setP(FLYWHEEL_P);
         flywheelsController.setI(0);
         flywheelsController.setD(0);

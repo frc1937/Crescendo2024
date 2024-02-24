@@ -46,6 +46,7 @@ public class RobotContainer {
     private final JoystickButton aButton = new JoystickButton(driveController, XboxController.Button.kA.value);
     private final JoystickButton leftBumper = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton backButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
+    // private final JoystickButton povUp = new JoystickButton(driveController, XboxController.Button.);
     /* OPERATOR */
     private final TriggerButton accelerateFlywheelButton = new TriggerButton(operatorController, XboxController.Axis.kRightTrigger);
     private final JoystickButton randomPitchYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
@@ -82,6 +83,8 @@ public class RobotContainer {
         );
 
         NamedCommands.registerCommand("Shifra2", shooterCommands.intakeGet().withTimeout(5));
+        NamedCommands.registerCommand("AdjustShooter22", new AdjustShooter(shooterSubsystem, 0.8));
+        NamedCommands.registerCommand("AdjustShooter23", new AdjustShooter(shooterSubsystem, 0.8));
         // NamedCommands.registerCommand("TeleopShooting", new TeleopShooting(swerveSubsystem, shooterSubsystem, () -> 0, () -> 0).withTimeout(4));
         NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, 1.15));
         NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, 0.9));
@@ -129,6 +132,7 @@ public class RobotContainer {
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
         opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
         opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
+        
 
 //        aButton.whileTrue(shooterCommands.setAngle(60));
 //

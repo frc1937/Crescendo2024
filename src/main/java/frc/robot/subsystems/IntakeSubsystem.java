@@ -26,6 +26,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private void configureTalonMotor(WPI_TalonSRX motor) {
         motor.configFactoryDefault();
-        motor.setNeutralMode(NeutralMode.Brake);
+        motor.setNeutralMode(NeutralMode.Coast);
     }
 }

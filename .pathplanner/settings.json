@@ -3,10 +3,11 @@
   "robotLength": 0.69,
   "holonomicMode": true,
   "pathFolders": [
-    "Amit"
+    "Four Donuts",
+    "Five Donuts"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 0.8,
+  "defaultMaxVel": 3.5,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0221706157698036,
-        "y": 7.065858703145978
+        "x": 3.6,
+        "y": 7.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.396478844842751,
-        "y": 6.495107966780026
+        "x": 2.9743082290729475,
+        "y": 6.4292492636340475
       },
       "isLocked": false,
       "linkedName": "Top NOTE"
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.8,
+    "maxVelocity": 3.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Amit",
+  "folder": "Four Donuts",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

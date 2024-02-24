@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.1,
-        "y": 5.55
+        "x": 2.83,
+        "y": 4.084914323674802
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.045400210236503,
-        "y": 5.466221345452544
+        "x": 2.086934844340443,
+        "y": 4.906840512682451
       },
       "isLocked": false,
-      "linkedName": "Middle NOTE"
+      "linkedName": "Bottom NOTE"
     },
     {
       "anchor": {
-        "x": 1.9258123131630895,
-        "y": 4.568394521404429
+        "x": 3.65,
+        "y": 5.55
       },
       "prevControl": {
-        "x": 1.9705336727130853,
-        "y": 4.657837240504421
+        "x": 3.4072468671633906,
+        "y": 4.579911902712949
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Bottom"
+      "linkedName": "Inverted Middle NOTE"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -36.292629728479675,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Four Donuts",
+  "folder": "Five Donuts",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
