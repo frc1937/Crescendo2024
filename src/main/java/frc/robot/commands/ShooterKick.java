@@ -8,29 +8,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterKick extends Command {
-  private final ShooterSubsystem shooter;
-  public ShooterKick(ShooterSubsystem shooter) {
-    this.shooter = shooter;
+    private final ShooterSubsystem shooter;
 
-    addRequirements(shooter);
-  }
+    public ShooterKick(ShooterSubsystem shooter) {
+        this.shooter = shooter;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    shooter.setKickerSpeed(0.7);  // FIXME Move to Constants.java
-  }
+        addRequirements(shooter);
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    shooter.stopFlywheels();
-    shooter.stopKicker();
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        shooter.setKickerSpeed(0.7);  // FIXME Move to Constants.java
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        shooter.stopFlywheels();
+        shooter.stopKicker();
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

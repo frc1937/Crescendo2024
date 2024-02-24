@@ -60,6 +60,9 @@ public final class Constants {
         public static final String CAMERA_NAME = "Ph1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
+        public static final int cameraViewAngle = 170;
+        public static final double cameraToDegrees = cameraViewAngle / 360;
     }
 
     public static class IntakeConstants {

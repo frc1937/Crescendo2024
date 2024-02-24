@@ -9,6 +9,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -56,8 +59,13 @@ public class RobotContainer {
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
+    private final NetworkTable visionTable;
+    private NetworkTableEntry DistanceEntry;
 
     public RobotContainer() {
+        visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+        DistanceEntry = visionTable.getEntry("Distance");
+
         JoystickButton robotCentric = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
 
         swerveSubsystem.setDefaultCommand(
@@ -91,7 +99,6 @@ public class RobotContainer {
         // accelerate flywheel is the command that was asked by Ofir
 
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
-//        backButton.onTrue(new InstantCommand(swerveSubsystem::resetModulesToAbsolute));
 
         leftTrigger.whileTrue(shooterCommands.intakeGet()
                 .andThen(shooterCommands.setKickerSpeed(-0.8)
@@ -123,7 +130,18 @@ public class RobotContainer {
 //                () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
 //                () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value)));
 
-        // xButton.whileTrue(shooterCommands.setAngle(120));
+//
+//        DistanceEntry = visionTable.getEntry("Distance");
+//        DistanceEntry.getDouble(0.0);
+//
+////        accelerateFlywheelButton.whileTrue(
+////                new ParallelCommandGroup(
+////                        new VisionDrive(swerveSubsystem),
+////                        shooterCommands.intakeGet()
+////                )
+////        );
+//
+//      //  accelerateFlywheelButton.onFalse(new InstantCommand(intakeSubsystem::stopMotor));
     }
 
     //todo:

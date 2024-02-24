@@ -52,7 +52,6 @@ public class ShooterCommands {
                 },
 
                 () -> {
-
                     double finalSpeed = state.getRpmProportion() * state.getSpeedPercentage() * 6400;
 
                     SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady(finalSpeed));
@@ -75,16 +74,11 @@ public class ShooterCommands {
 
     public FunctionalCommand accelerateFlywheel() {
         return new FunctionalCommand(
-            () -> {
-                    shooterSubsystem.setFlywheelSpeed(0.8);
-                },
+            () -> shooterSubsystem.setFlywheelSpeed(0.8),
 
                 () -> {
                 },
-
-                interrupted -> {
-                    shooterSubsystem.stopFlywheels();
-                },
+                interrupted -> shooterSubsystem.stopFlywheels(),
 
                 () -> false,
 
@@ -94,10 +88,7 @@ public class ShooterCommands {
 
     public FunctionalCommand intakeGet() {
         return new FunctionalCommand(
-                /* Initialize*/() -> {
-                      //intakeStart();
-                      shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5));
-                },
+                /* Initialize*/() -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
                 /* Execute */() -> {
                     if(shooterSubsystem.hasPivotArrived()) {
                         intakeSubsystem.setSpeedPercentage(0.7);
@@ -105,66 +96,12 @@ public class ShooterCommands {
                         shooterSubsystem.setKickerSpeed(-0.8);
                     }
                 },
-                /* When done do:*/interrupted -> intakeStop(),
+                /* When done do:*/interrupted -> {
+                                    shooterSubsystem.stopFlywheels();
+                                    intakeSubsystem.stopMotor();
+                                    shooterSubsystem.stopKicker();
+                    },
                 /* Condition to be done at */ shooterSubsystem::doesSeeNote,
-
-                shooterSubsystem
-        );
-    }
-
-    private void intakeStart() {
-        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
-
-        intakeSubsystem.setSpeedPercentage(0.9);
-        shooterSubsystem.setFlywheelSpeed(-1);
-        shooterSubsystem.setKickerSpeed(-0.8);
-    }
-
-    public void intakeStop() {
-        shooterSubsystem.stopFlywheels();
-        intakeSubsystem.stopMotor();
-        shooterSubsystem.stopKicker();
-    }
-
-    public FunctionalCommand stopIntake() {
-        return new FunctionalCommand(
-                () -> {
-                    shooterSubsystem.stopFlywheels();
-                    intakeSubsystem.stopMotor();
-                    shooterSubsystem.stopKicker();
-                },
-
-                () -> {
-                },
-                (interrupted) -> {
-                },
-                () -> false,
-
-                intakeSubsystem
-        );
-    }
-
-    public FunctionalCommand floorIntake() {
-        return new FunctionalCommand(
-                () -> {
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
-
-                    intakeSubsystem.setSpeedPercentage(0.9);
-                    shooterSubsystem.setFlywheelSpeed(-0.7);
-                    shooterSubsystem.setKickerSpeed(-0.8);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(1.5));
-                },
-
-                () -> {
-                },
-
-                interrupted -> {
-                    shooterSubsystem.stopFlywheels();
-                    intakeSubsystem.stopMotor();
-                    shooterSubsystem.stopKicker();
-                },
-
-                () -> !shooterSubsystem.doesSeeNote(),
 
                 shooterSubsystem
         );
@@ -191,4 +128,80 @@ public class ShooterCommands {
                 shooterSubsystem
         );
     }
+ 
+
+    // Shoot into the trap in different speeds and angles
+    public Command ShootTrap() {
+        return new FunctionalCommand(
+                () -> {
+                    double angle = shooterSubsystem.getTrapAngle();
+                    double speed = shooterSubsystem.getTrapSpeed();
+
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
+                    shooterSubsystem.setFlywheelSpeed(speed);
+                },
+                () -> {
+                    double speed = shooterSubsystem.getTrapSpeed();
+                    double rpmProportion = shooterSubsystem.getTrapRPM();
+
+                    double finalSpeed = speed * rpmProportion * 6400;
+
+                    if (shooterSubsystem.areFlywheelsReady(finalSpeed) && shooterSubsystem.hasPivotArrived()) {
+                        shooterSubsystem.setKickerSpeed(0.9);
+                    }
+
+                },
+                interrupted -> {
+                    shooterSubsystem.stopKicker();
+                    shooterSubsystem.stopFlywheels();
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
+                },
+                () -> false,
+                shooterSubsystem
+        );
+    }
+
+
+    // Move the pitch towards the trap and shoot at the same time
+    public Command PitchShootTrap() {
+        
+        return new FunctionalCommand(
+                () -> {
+                    double speed = shooterSubsystem.getTrapSpeed();
+                    shooterSubsystem.setFlywheelSpeed(speed);
+                    shooterSubsystem.setFlag(false);
+                },
+                () -> {
+                    double angle = shooterSubsystem.getTrapAngle();
+                    double speed = shooterSubsystem.getTrapSpeed();
+                    double rpmProportion = shooterSubsystem.getTrapRPM();
+                    
+                    double finalSpeed = speed * rpmProportion * 6400;
+
+                    // The percent of the desired pitch angle to start to shoot at
+                    double angleShootVar = 0.7;
+
+                    if (shooterSubsystem.areFlywheelsReady(finalSpeed)) {
+                        if(!shooterSubsystem.getFlag()){
+                            shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
+                            shooterSubsystem.setFlag(true);
+                        }
+                    }
+
+                    if(shooterSubsystem.getFlag() && shooterSubsystem.getPivotAngle() >= angle * angleShootVar){
+                        shooterSubsystem.setKickerSpeed(0.9);
+                    }
+                    
+                },
+                interrupted -> {
+                    shooterSubsystem.stopKicker();
+                    shooterSubsystem.stopFlywheels();
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
+                },
+                () -> false,
+                shooterSubsystem
+        );
+    }
+
+
 }
