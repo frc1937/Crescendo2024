@@ -33,39 +33,39 @@
 
 //register adr macros
 #ifndef OFFSET
-#define OFFSET 0x20
+  #define OFFSET 0x20
 #endif
 
 #ifndef REG
-#define REG(addr)*((volatile unsigned char*)(addr+OFFSET))
+  #define REG(addr)*((volatile unsigned char*)(addr+OFFSET))
 #endif
 
 #ifndef DDRB
-#define DDRB REG(0x17)
+  #define DDRB REG(0x17)
 #endif
 
 #ifndef PORTB
-#define PORTB REG(0x18)
+  #define PORTB REG(0x18)
 #endif
 
 #ifndef TCNT0
-#define TCNT0 0x32
+  #define TCNT0 0x32
 #endif
 
 #ifndef TCCR0B
-#define TCCR0B 0x33
+  #define TCCR0B 0x33
 #endif
 
 #ifndef SREG
-#define SREG REG(0x3F)
+  #define SREG REG(0x3F)
 #endif
 
 #ifndef GIMSK
-#define GIMSK REG(0x3B)
+  #define GIMSK REG(0x3B)
 #endif
 
 #ifndef MCUCR
-#define MCUCR REG(0x35)
+  #define MCUCR REG(0x35)
 #endif
 
 #define F_CPU 8000000 //  CPU clk
@@ -89,36 +89,23 @@ int main(){
   MCUCR |= (_BV(ISC01) | _BV(ISC00)); //  sets INT0 trigger RISING
 
   while(1){
-		//  loop
-      if(cmd > 3){
-          PORTB |= (_BV(PORTB1));
-       } else {
-          PORTB &= ~(_BV(PORTB1));
-       } 
+    //  loop
+    if(cmd > 3){
+        PORTB |= (_BV(PORTB1));
+      } else {
+        PORTB &= ~(_BV(PORTB1));
+      } 
   }
 }
 
-/*
-*   changed boolean:
-*   consider using a boolean to indicate to the main loop
-*   wether the command has changed
-*/
 ISR(INT0_vect, ISR_NOBLOCK){
-if(MCUCR & ((1 << ISC00) == (1 << ISC00))){
-  rising();
+  if(MCUCR & ((1 << ISC00) == (1 << ISC00))){
+    TCCR0B |= (_BV(CS00) | (_BV(CS01)));  //  enable timer, prescaler=clk/8  --> 1MHz; so each cycle is one microsecond
+    MCUCR &= ~(ISC00); //  sets INT0 trigger FALLING
   } else {
-  falling();
+    cmd = TCNT0;
+    TCCR0B &= ~(_BV(CS00) | (_BV(CS01)));  //  disables timer
+    TCNT0 = 0;  //  clear timer register
+    MCUCR |= (ISC00);  // sets INT0 trigger RISING
   }
-}
-
-void rising(){
-  TCCR0B |= (_BV(CS00) | (_BV(CS01)));  //  enable timer, prescaler=clk/8  --> 1MHz; so each cycle is one microsecond
-  MCUCR &= ~(ISC00); //  sets INT0 trigger FALLING
-}
-
-void falling() {
-  cmd = TCNT0;
-  TCCR0B &= ~(_BV(CS00) | (_BV(CS01)));  //  disables timer
-  TCNT0 = 0;  //  clear timer register
-  MCUCR |= (ISC00);  // sets INT0 trigger RISING
 }
