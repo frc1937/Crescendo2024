@@ -88,19 +88,18 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(80));
             SLOPE_TO_PITCH_MAP.put(0.84, Rotation2d.fromDegrees(73));
             SLOPE_TO_PITCH_MAP.put(0.66, Rotation2d.fromDegrees(71));
-            SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(68));
-            SLOPE_TO_PITCH_MAP.put(0.42, Rotation2d.fromDegrees(66));
-            SLOPE_TO_PITCH_MAP.put(0.38, Rotation2d.fromDegrees(68));
+            // SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(70));
+            SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(65.7));
+            SLOPE_TO_PITCH_MAP.put(0.45, Rotation2d.fromDegrees(64));
         }
 
         public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
             InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_VELOCITY_MAP.put(1.22, 0.8 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.45, 0.8 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.42, 0.9 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.38, 0.95 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(1.22, 0.6 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.58, 0.73 * 5600)    ;
+            SLOPE_TO_VELOCITY_MAP.put(0.45, 0.83 * 5600);
         }
 
         public static final double MINIMUM_VIABLE_SLOPE = 0.38;
