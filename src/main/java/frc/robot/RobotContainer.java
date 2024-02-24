@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.Navigate;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
@@ -99,6 +100,7 @@ public class RobotContainer {
         //TODO: Uriel define this commands to whichever buttons you want
         // Teleop shooting automaticy audujsts itself based on april tag for shooting
         // accelerate flywheel is the command that was asked by Ofir
+        backButton.whileTrue(Navigate.navigateToAmplifier());
 
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
