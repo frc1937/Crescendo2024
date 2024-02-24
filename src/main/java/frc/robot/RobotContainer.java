@@ -52,6 +52,7 @@ public class RobotContainer {
     private final JoystickButton opBButton = new JoystickButton(operatorController, XboxController.Button.kB.value);
     private final JoystickButton opYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
     private final JoystickButton opXButton = new JoystickButton(operatorController, XboxController.Button.kX.value);
+    private final JoystickButton opAccelerateButton = new JoystickButton(operatorController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -61,6 +62,7 @@ public class RobotContainer {
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
     private final NetworkTable visionTable;
     private NetworkTableEntry DistanceEntry;
+    private boolean operatorShot = false;
 
     public RobotContainer() {
         visionTable = NetworkTableInstance.getDefault().getTable("Vision");
@@ -117,6 +119,8 @@ public class RobotContainer {
        // accelerateFlywheelButton.whileTrue(shooterCommands.accelerateFlywheel());
 
         rightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        opAccelerateButton.onTrue(!operatorShot ? new ShooterKick(shooterSubsystem) : new AdjustShooter(shooterSubsystem, 1.15));
+        
 
         //sagi:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
