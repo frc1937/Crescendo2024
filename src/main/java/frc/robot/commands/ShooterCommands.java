@@ -20,7 +20,7 @@ public class ShooterCommands {
     public Command receiveFromFeeder() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelSpeed(-0.55);
+                    shooterSubsystem.setFlywheelSpeed(-0.55 * 5600);
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(49));
                     shooterSubsystem.setKickerSpeed(-0.5);
                 },
@@ -47,15 +47,13 @@ public class ShooterCommands {
                         shooterSubsystem.stopKicker();
                         shooterSubsystem.setKickerSpeed(-0.3);
                         shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-                        shooterSubsystem.setFlywheelSpeed(state.getSpeedPercentage());
+                        shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * 6400);
                     }
                 },
 
                 () -> {
-                    double finalSpeed = state.getRpmProportion() * state.getSpeedPercentage() * 6400;
-
-                    SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady(finalSpeed));
-                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady(finalSpeed) && shooterSubsystem.hasPivotArrived()) {
+                    SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady());
+                    if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(0.9);
                     }
                 },
@@ -92,7 +90,7 @@ public class ShooterCommands {
                 /* Execute */() -> {
                     if(shooterSubsystem.hasPivotArrived()) {
                         intakeSubsystem.setSpeedPercentage(0.7);
-                        shooterSubsystem.setFlywheelSpeed(-1);
+                        shooterSubsystem.setFlywheelSpeed(-3000);
                         shooterSubsystem.setKickerSpeed(-0.8);
                     }
                 },

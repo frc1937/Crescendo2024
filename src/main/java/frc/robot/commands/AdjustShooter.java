@@ -19,13 +19,18 @@ public class AdjustShooter extends Command {
      * Creates a new AdjustShooter.
      *
      * @param distance the distance, in metres, from the centre of the robot to the target, all
-     *                 projected onto the field.
+     *                 projected onto the field. Negative slope will cause the shooter to adjust
+     *                 backwards.
      */
     public AdjustShooter(ShooterSubsystem shooter, double slope) {
         this.shooter = shooter;
 
-        // FIXME Move 200 to Constants.java
-        this.pitch = Rotation2d.fromDegrees(220).minus(ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope));
+        // FIXME Move 220 to Constants.java
+        if (slope > 0) {
+          this.pitch = ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope);
+        } else {
+          this.pitch = Rotation2d.fromDegrees(220).minus(ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope));
+        }
         this.velocity = ShootingConstants.SLOPE_TO_VELOCITY_MAP.get(slope);
 
         addRequirements(shooter);
@@ -34,7 +39,7 @@ public class AdjustShooter extends Command {
     @Override
     public void initialize() {
         shooter.setPivotAngle(pitch);
-        shooter.setFlywheelSpeed(1);
+        shooter.setFlywheelSpeed(velocity);
     }
 
     @Override
@@ -46,6 +51,6 @@ public class AdjustShooter extends Command {
 
     @Override
     public boolean isFinished() {
-        return shooter.areFlywheelsReady(velocity) && shooter.hasPivotArrived();
+        return shooter.areFlywheelsReady() && shooter.hasPivotArrived();
     }
 }

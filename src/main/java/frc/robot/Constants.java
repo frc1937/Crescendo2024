@@ -130,6 +130,7 @@ public final class Constants {
         public static final double FLYWHEEL_RANGE_MIN = -1;
         public static final double FLYWHEEL_RANGE_MAX = 1;
         public static final double FLYWHEEL_P = 0.001_159;
+        public static final double FLYWHEEL_VELOCITY_TOLERANCE = 200;
 
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;

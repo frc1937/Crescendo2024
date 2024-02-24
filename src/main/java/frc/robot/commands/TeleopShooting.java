@@ -70,10 +70,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         }
 
         @Override
-        public void initialize() {
-            // Start the shooter's flywheels at maximal speed
-            shooter.setFlywheelSpeed(1.d);
-        }
+        public void initialize() {}
 
         @Override
         public void execute() {
@@ -142,11 +139,12 @@ public class TeleopShooting extends SequentialCommandGroup {
                     true
             );
             shooter.setPivotAngle(targetShooterOrientation);
+            shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope));
         }
 
         @Override
         public boolean isFinished() {
-            boolean flywheelsReady = shooter.areFlywheelsReady(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope));
+            boolean flywheelsReady = shooter.areFlywheelsReady();
             boolean pitchReady = shooter.hasPivotArrived();
             boolean shooterNotOccluded = !shooter.isOccluded();
             boolean yawReady = yawController.atSetpoint();
