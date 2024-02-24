@@ -49,31 +49,21 @@ public class VisionPoseEstimator {
         return null;
     }
 
-    // FIXME (Amit Goren): Remove this
-    public Pose3d getTargetTagPose(Pose3d robotPose) {
+    public Pose3d getClosestTarget(Pose3d robotPose, int id) {
         PhotonPipelineResult result = photonCamera.getLatestResult();
-        Pose3d tagPose = new Pose3d();
+        Pose3d tagPose = null;
 
         if (result.hasTargets()) {
             PhotonTrackedTarget target = result.getBestTarget();
-            Transform3d cameraToTarget = target.getBestCameraToTarget();
 
+            if (target.getFiducialId() != id) return null;
+
+            Transform3d cameraToTarget = target.getBestCameraToTarget();
             Pose3d cameraPose = robotPose.transformBy(ROBOT_TO_CAMERA);
 
             tagPose = cameraPose.transformBy(cameraToTarget.inverse());
-
-            //todo: Remove debugging below.
-            SmartDashboard.putNumber("Target X: ", tagPose.getX());
-            SmartDashboard.putNumber("Target Y: ", tagPose.getY());
-
-            SmartDashboard.putNumber("CURR X: ", robotPose.getX());
-            SmartDashboard.putNumber("CURR Y: ", robotPose.getY());
         }
 
         return tagPose;
-    }
-
-    public boolean hasTargets() {
-        return photonCamera.getLatestResult().hasTargets();
     }
 }

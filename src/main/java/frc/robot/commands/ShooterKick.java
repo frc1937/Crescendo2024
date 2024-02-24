@@ -17,13 +17,11 @@ public class ShooterKick extends Command {
         addRequirements(shooter);
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         shooter.setKickerSpeed(0.7);  // FIXME Move to Constants.java
     }
 
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         shooter.stopFlywheels();
@@ -31,7 +29,6 @@ public class ShooterKick extends Command {
         shooter.setPivotAngle(Rotation2d.fromDegrees(0));
     }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;

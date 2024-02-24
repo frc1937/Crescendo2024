@@ -132,12 +132,13 @@ public final class Constants {
                 KICKER_ID = 8;
         public static final double FLYWHEEL_MINIMUM_READY_RPM = 0.95*5600;
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
-        public static final double PIVOT_UP_P = 0.035;
+        public static final double PIVOT_UP_P = 0.0425;
         public static final double PIVOT_UP_FF = 0.000085;
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
         public static final double PIVOT_DOWN_P = 0.014_95;
+        public static final double PIVOT_DOWN_D = 0.000;
         public static final double PIVOT_DOWN_FF = 0.00141;
         public static final double FLYWHEEL_FF = 0.000175;
         public static final double FLYWHEEL_RANGE_MIN = -1;

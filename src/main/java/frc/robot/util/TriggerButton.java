@@ -5,6 +5,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class TriggerButton extends Trigger {
     public TriggerButton(XboxController controller, XboxController.Axis axis) {
-        super(() -> controller.getRawAxis(axis.value) >= 0.5);
+        super(() -> controller.getRawAxis(axis.value) >= 0.1);
     }
 }

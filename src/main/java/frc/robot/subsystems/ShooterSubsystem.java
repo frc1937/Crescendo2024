@@ -5,16 +5,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
@@ -88,6 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
         /* FOR DEBUGGING, REMOVE */
         SmartDashboard.putNumber("Velocity", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Target Velocity", targetFlywheelVelocity);
+        SmartDashboard.putNumber("Current angle", currentAngle);
 
         if(pivotSetpoint >= currentAngle) {
             pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
@@ -165,6 +164,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         pivotMotor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
         pivotMotor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
+        pivotMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
     private void setupPivotController() {
@@ -172,6 +172,7 @@ public class ShooterSubsystem extends SubsystemBase {
         pitchController.setFF(PIVOT_UP_FF, 0);
 
         pitchController.setP(PIVOT_DOWN_P, 1);
+      //  pitchController.setD(PIVOT_DOWN_D, 1);
         pitchController.setFF(PIVOT_DOWN_FF, 1);
 
         pitchController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);

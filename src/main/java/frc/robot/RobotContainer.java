@@ -9,9 +9,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,12 +17,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.MountCommand;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.ShootingStates;
@@ -44,6 +43,7 @@ public class RobotContainer {
     private final TriggerButton leftTrigger = new TriggerButton(driveController, XboxController.Axis.kLeftTrigger);
     private final TriggerButton rightTrigger = new TriggerButton(driveController, XboxController.Axis.kRightTrigger);
     private final JoystickButton aButton = new JoystickButton(driveController, XboxController.Button.kA.value);
+    private final JoystickButton bButton = new JoystickButton(driveController, XboxController.Button.kB.value);
     private final JoystickButton leftBumper = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton backButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
     // private final JoystickButton povUp = new JoystickButton(driveController, XboxController.Button.);
@@ -60,25 +60,17 @@ public class RobotContainer {
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-    private final NetworkTable visionTable;
-    private NetworkTableEntry DistanceEntry;
-    private boolean operatorShot = false;
 
     public RobotContainer() {
-        visionTable = NetworkTableInstance.getDefault().getTable("Vision");
-        DistanceEntry = visionTable.getEntry("Distance");
-
-        JoystickButton robotCentric = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
-
         swerveSubsystem.setDefaultCommand(
                 new TeleopSwerve(
                         swerveSubsystem,
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value),
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value),
-                        () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value),
-                        robotCentric
+                        () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value)
                 )
         );
 
@@ -107,58 +99,35 @@ public class RobotContainer {
 
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
-        leftTrigger.whileTrue(shooterCommands.intakeGet()
-                .andThen(shooterCommands.setKickerSpeed(-0.8)
-                .withTimeout(0.7)));
+        leftTrigger.whileTrue(shooterCommands.intakeGet().andThen(shooterCommands.setKickerSpeed(-0.8).withTimeout(0.7)));
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
-                () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value),
+                        () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value),
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value))
-
         );
 
-        leftBumper.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8)
-                .withTimeout(0.7)));
+        bButton.whileTrue(new MountCommand(mountSubsystem));
 
-       // accelerateFlywheelButton.whileTrue(shooterCommands.accelerateFlywheel());
+        leftBumper.whileTrue(shooterCommands.receiveFromFeeder().andThen(shooterCommands.setKickerSpeed(-0.8).withTimeout(0.7)));
 
         rightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
-        opAccelerateButton.onTrue(!operatorShot ? new ShooterKick(shooterSubsystem) : new AdjustShooter(shooterSubsystem, 1.15));
-        
 
         //sagi:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
         opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
-        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
-        
 
-//        aButton.whileTrue(shooterCommands.setAngle(60));
-//
-//        aButton.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem,
-//                () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-//                () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value)));
+        opXButton.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
+        opXButton.toggleOnFalse(shooterCommands.stopShooter());
 
-//
-//        DistanceEntry = visionTable.getEntry("Distance");
-//        DistanceEntry.getDouble(0.0);
-//
-////        accelerateFlywheelButton.whileTrue(
-////                new ParallelCommandGroup(
-////                        new VisionDrive(swerveSubsystem),
-////                        shooterCommands.intakeGet()
-////                )
-////        );
-//
-//      //  accelerateFlywheelButton.onFalse(new InstantCommand(intakeSubsystem::stopMotor));
+        opAccelerateButton.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
+        opAccelerateButton.toggleOnFalse(shooterCommands.stopShooter());
     }
 
     //todo:
     // Faster pitch
     // quasistatic table of values
-    // max acc, max speed, (Ask CAD people), all these goofy constants
-    //
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

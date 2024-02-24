@@ -74,6 +74,8 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void execute() {
+            if(!shooter.doesSeeNote()) return;
+
             // Get values, deadband
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
@@ -163,8 +165,6 @@ public class TeleopShooting extends SequentialCommandGroup {
             }
 
             yawController.reset(0);
-            //targetShooterOrientation = new Rotation2d();
-            //targetOrientation = new Rotation2d();
         }
     }
 
@@ -204,6 +204,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         public void end(boolean interrupted) {
             shooter.stopKicker();
             shooter.stopFlywheels();
+            shooter.setPivotAngle(Rotation2d.fromDegrees(0));
         }
     }
 }

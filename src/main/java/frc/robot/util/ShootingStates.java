@@ -1,10 +1,10 @@
 package frc.robot.util;
 
 public enum ShootingStates {
-    AMP(125, 0.1, 0.5),
-    SPEAKER_FRONT(80, 0.75, 0.9),
-    SPEAKER_BACK(140, 0.5, 0.7),
-    STAGE_FRONT(64, 0.88, 0.98);
+    AMP(125, 0.08, 0.5),
+    SPEAKER_FRONT(74, 0.82, 0.9),
+    SPEAKER_BACK(135, 0.7, 0.7),
+    STAGE_FRONT(60, 0.88, 0.98);
 
     private final double angle, speedPercentage, rpmProportion;
 
@@ -26,9 +26,3 @@ public enum ShootingStates {
         return this.rpmProportion;
     }
 }
-/*
-        opAButton.whileTrue(shooterCommands.shootNote(79.7, 0.75));
-        opBButton.whileTrue(shooterCommands.shootNote(140, 0.5));
-        opYButton.whileTrue(shooterCommands.shootNote(125, 0.1));
-        opXButton.whileTrue(shooterCommands.shootNote(64, 1));
- */

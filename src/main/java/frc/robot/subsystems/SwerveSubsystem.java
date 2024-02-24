@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -16,12 +18,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
 import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
+import java.util.List;
+
+import static frc.robot.Constants.NavigationConstants.DEFAULT_PATH_CONSTRAINTS;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
@@ -33,7 +39,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
     private final Field2d field2d = new Field2d();
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);
-
     private double previousTimestamp = 0;
 
     public SwerveSubsystem() {
@@ -80,31 +85,25 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, poseEstimator.getEstimatedPosition().getRotation())
-                        : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
-        );
+        ChassisSpeeds chasesSpeeds = fieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, poseEstimator.getEstimatedPosition().getRotation())
+                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
-
-        for (SwerveModule mod : swerveModules) {
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
-        }
+        drive(chasesSpeeds);
     }
 
-    /* Used by SwerveControllerCommand in Auto */
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.MAX_SPEED);
+    public void drive(Translation2d translation, double rotation) {
+        Translation2d flippedTranslation = translation;
 
-        for (SwerveModule mod : swerveModules) {
-            mod.setDesiredState(desiredStates[mod.moduleNumber]);
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+            flippedTranslation = translation.unaryMinus();
         }
+
+        drive(flippedTranslation, rotation, true);
     }
 
     public void resetPose() {
         poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), new Pose2d());
-        //gyro.setYaw(0);
     }
 
     public Pose2d getPose() {
@@ -133,6 +132,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void zeroGyro() {
         gyro.setYaw(0);
+
     }
 
     public Rotation2d getGyroYaw() {
@@ -174,10 +174,6 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putData("Field", field2d);
     }
 
-    public void stop() {
-        drive(new Translation2d(), 0, false);
-    }
-
 
     private void sampleRobotPose() {
         poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
@@ -189,5 +185,21 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void infrequentPeriodic() {
         sampleRobotPose();
+    }
+
+    public void stop() {
+        drive(new ChassisSpeeds(0, 0, 0));
+    }
+
+    public Command pathPlanToPose(Pose2d endPose) {
+        List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(getPose(), endPose);
+
+        // Create the path using the bezier points created above
+        PathPlannerPath path = new PathPlannerPath(
+                bezierPoints,
+                DEFAULT_PATH_CONSTRAINTS, // The constraints for this path. If using a differential drivetrain, the angular constraints have no effect.
+                new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
+        );
+        return AutoBuilder.followPath(path);
     }
 }
