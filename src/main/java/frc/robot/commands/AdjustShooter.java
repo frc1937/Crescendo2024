@@ -39,7 +39,7 @@ public class AdjustShooter extends Command {
     @Override
     public void initialize() {
         shooter.setPivotAngle(pitch);
-        shooter.setFlywheelSpeed(velocity);
+        shooter.setFlywheelSpeed(velocity, true);
     }
 
     @Override

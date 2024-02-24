@@ -87,23 +87,33 @@ public final class Constants {
             InverseInterpolator.forDouble(), Rotation2d::interpolate);
 
         static {
-            SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(80));
-            SLOPE_TO_PITCH_MAP.put(0.84, Rotation2d.fromDegrees(73));
-            SLOPE_TO_PITCH_MAP.put(0.66, Rotation2d.fromDegrees(71));
-            // SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(70));
-            SLOPE_TO_PITCH_MAP.put(0.5, Rotation2d.fromDegrees(66));
-            SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(65));
-            SLOPE_TO_PITCH_MAP.put(0.45, Rotation2d.fromDegrees(64));
+            SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
+            SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
+            SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
+            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(57));
+
+            // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(57));
+            // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(82));
+            // SLOPE_TO_PITCH_MAP.put(0.84, Rotation2d.fromDegrees(78));
+            // SLOPE_TO_PITCH_MAP.put(0.66, Rotation2d.fromDegrees(72));
+            // SLOPE_TO_PITCH_MAP.put(0.57, Rotation2d.fromDegrees(70));
+            // SLOPE_TO_PITCH_MAP.put(0.5, Rotation2d.fromDegrees(68));
+            // SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(65));
+            // SLOPE_TO_PITCH_MAP.put(0.45, Rotation2d.fromDegrees(64));
         }
 
         public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
             InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_VELOCITY_MAP.put(1.22, 0.6 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.58, 0.73 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.51, 0.8 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.45, 0.83 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.74 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.95 * 5600);
+
+            // SLOPE_TO_VELOCITY_MAP.put(0.58, 0.95 * 5600);
+            // SLOPE_TO_VELOCITY_MAP.put(0.51, 0.94 * 5600);
+            // SLOPE_TO_VELOCITY_MAP.put(0.45, 0.98 * 5600);
         }
 
         public static final double MINIMUM_VIABLE_SLOPE = 0.38;
@@ -129,11 +139,11 @@ public final class Constants {
 
         public static final double PIVOT_DOWN_P = 0.014_95;
         public static final double PIVOT_DOWN_FF = 0.00141;
-        public static final double FLYWHEEL_FF = 0.00015;
+        public static final double FLYWHEEL_FF = 0.000175;
         public static final double FLYWHEEL_RANGE_MIN = -1;
         public static final double FLYWHEEL_RANGE_MAX = 1;
-        public static final double FLYWHEEL_P = 0.001075;
-        public static final double FLYWHEEL_VELOCITY_TOLERANCE = 200;
+        public static final double FLYWHEEL_P = 0.000919;
+        public static final double FLYWHEEL_VELOCITY_TOLERANCE = 150;
 
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;
@@ -141,12 +151,12 @@ public final class Constants {
         /** In seconds */
         public static final double SHOOTING_DELAY = 0.5;
         /** In seconds */
-        public static final double POST_SHOOTING_DELAY = 0.05;
+        public static final double POST_SHOOTING_DELAY = 0.25;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         //public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.9, 0.53, 2.1);
-        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0, 5.5, 2.05);
-        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31 + 0.234, 5.5, 2.05);
+        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);
+        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31, 5.5, 2.05);
     }
 
     public static final class Swerve {

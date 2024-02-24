@@ -129,7 +129,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             // However, becasue we do not fully trust the straight-line model, we introduce
             // a table that maps path slopes, virtualTargetSlope, to well-adjusted
-            // shooter orientations. We presume the shooter orientation will be steeper than
+            // shooter orientations. We presume the shooter orientation will be steeper than    
             // the path slope becasue of gravity.
             targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(virtualTargetSlope);
 
@@ -139,7 +139,8 @@ public class TeleopShooting extends SequentialCommandGroup {
                     true
             );
             shooter.setPivotAngle(targetShooterOrientation);
-            shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope));
+            shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope), true);
+            // shooter.setFlywheelSpeed(6300, false);
         }
 
         @Override
@@ -183,7 +184,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            shooter.setKickerSpeed(0.7);
+            shooter.setKickerSpeed(0.9);
         }
 
         @Override

@@ -20,8 +20,8 @@ public class ShooterCommands {
     public Command receiveFromFeeder() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelSpeed(-0.65 * 5600);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(50));
+                    shooterSubsystem.setFlywheelSpeed(-0.65 * 5600, true);
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(52));
                     shooterSubsystem.setKickerSpeed(-0.5);
                 },
 
@@ -47,7 +47,7 @@ public class ShooterCommands {
                         shooterSubsystem.stopKicker();
                         shooterSubsystem.setKickerSpeed(-0.3);
                         shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-                        shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * 6400);
+                        shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * 6400, true);
                     }
                 },
 
@@ -76,7 +76,7 @@ public class ShooterCommands {
                 /* Execute */() -> {
                     if(shooterSubsystem.hasPivotArrived()) {
                         intakeSubsystem.setSpeedPercentage(0.7);
-                        shooterSubsystem.setFlywheelSpeed(-3000);
+                        shooterSubsystem.setFlywheelSpeed(-3000, false);
                         shooterSubsystem.setKickerSpeed(-0.8);
                     }
                 },

@@ -116,9 +116,13 @@ public class ShooterSubsystem extends SubsystemBase {
         kickerMotor.stopMotor();
     }
 
-    public void setFlywheelSpeed(double targetFlywheelVelocity) {
+    public void setFlywheelSpeed(double targetFlywheelVelocity, boolean pid) {
         this.targetFlywheelVelocity = targetFlywheelVelocity;
-        flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
+        if (pid) {
+            flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
+        } else {
+            flywheelMaster.set(targetFlywheelVelocity / 5600);
+        }
     }
 
     public void stopFlywheels() {
@@ -127,7 +131,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }   
 
     public boolean areFlywheelsReady() {
-        return Math.abs(flywheelEncoder.getVelocity()) >= targetFlywheelVelocity - FLYWHEEL_VELOCITY_TOLERANCE;
+        return Math.abs(Math.abs(flywheelEncoder.getVelocity()) - Math.abs(targetFlywheelVelocity)) <= FLYWHEEL_VELOCITY_TOLERANCE;
     }
 
     public boolean hasPivotArrived() {
@@ -146,8 +150,8 @@ public class ShooterSubsystem extends SubsystemBase {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kCoast);
         flywheelsController.setP(FLYWHEEL_P);
-        flywheelsController.setI(0);
-        flywheelsController.setD(0);
+        // flywheelsController.setI(0.0000035);
+        flywheelsController.setD(0.000017);
         flywheelsController.setFF(FLYWHEEL_FF);
     }
 
