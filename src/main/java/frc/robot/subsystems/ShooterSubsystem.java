@@ -42,6 +42,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SparkPIDController pivotController;
     private double pivotSetpoint = 0;
 
+    // TRAP TESTS
+    private double angleTrap;
+    private double speedTrap;
+    private double rpmProportionTrap;
+    private boolean flag;
+
+
 //    private SysIdRoutine sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(
 //            new SysIdRoutineLog("f").motor("bozo")
 //                    .voltage(Units.Volts.of(pivotMotor.get()))
@@ -90,6 +97,12 @@ public class ShooterSubsystem extends SubsystemBase {
 //
         SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
+ 
+
+        // TRAP TESTS
+        angleTrap = SmartDashboard.getNumber("Angle-Trap", 130);
+        speedTrap = SmartDashboard.getNumber("Speed-Trap", 0.9);
+        rpmProportionTrap = SmartDashboard.getNumber("RPM-P-Trap", 130);
     }
 
     public boolean isOccluded() {
@@ -129,6 +142,11 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotSetpoint = rotation2d.getDegrees();
     }
 
+    public double getPivotAngle(){
+        return pivotMotor.getEncoder().getPosition();
+    }
+
+
     private void configureCanCoder(CANCoder encoder) {
         encoder.configFactoryDefault();
     }
@@ -161,5 +179,27 @@ public class ShooterSubsystem extends SubsystemBase {
 
         pivotMotor.getEncoder().setPosition(pivotEncoder.getAbsolutePosition());
         pivotEncoder.setPosition(pivotEncoder.getAbsolutePosition());
+    }
+
+
+    // TRAP TESTS
+    public double getTrapAngle(){
+        return angleTrap;
+    }
+
+    public double getTrapSpeed(){
+        return speedTrap;
+    }
+
+    public double getTrapRPM(){
+        return rpmProportionTrap;
+    }
+
+    public void setFlag(boolean value){
+        flag = value;
+    }
+
+    public boolean getFlag(){
+        return flag;
     }
 }
