@@ -17,14 +17,7 @@
 
 /*
  * TODO:
- *  ~0   check if all register macros work
- *  ~1   make a routine for counting microseconds from rise to fall of signal using timer.
- *  -2   check for race condition
- *  -3a  try fastLED or adafruit lib
- *  -3b  if that doesn't work make ur own(git gud son)
- *  -4   make code for leds using lib
- *  *    OPTIMIZE!!!
- *  **   due 28/2/2024
+ * finish ASM code
  */
 
 #include <stdint.h>
@@ -75,18 +68,21 @@ volatile uint8_t cmd;
 
 int main(){
 	// init
+  cli();
+
   DDRB |= (_BV(DDB1) | _BV(DDB0));
 
   PORTB |= (_BV(PORTB1));
-  PORTB &= ~(_BV(PORTB0));
 
   TCCR0B &= ~((_BV(CS00)) | (_BV(CS01)) | (_BV(CS02)));  //  disables timer
 
-  SREG = 128;  //  SREG |= (_BV(I));
+  SREG |= 0b10000000;  //  SREG |= (_BV(I));
 
   GIMSK |= (_BV(INT0));
 
   MCUCR |= (_BV(ISC01) | _BV(ISC00)); //  sets INT0 trigger RISING
+
+  sei();
 
   while(1){
     //  loop
@@ -100,12 +96,56 @@ int main(){
 
 ISR(INT0_vect, ISR_NOBLOCK){
   if(MCUCR & ((1 << ISC00) == (1 << ISC00))){
-    TCCR0B |= (_BV(CS00) | (_BV(CS01)));  //  enable timer, prescaler=clk/8  --> 1MHz; so each cycle is one microsecond
+    TCCR0B |= (_BV(CS01));  //  enable timer, prescaler=clk/8  --> 1MHz; so each cycle is one microsecond
     MCUCR &= ~(ISC00); //  sets INT0 trigger FALLING
   } else {
     cmd = TCNT0;
-    TCCR0B &= ~(_BV(CS00) | (_BV(CS01)));  //  disables timer
+    TCCR0B &= ~(_BV(CS01));  //  disables timer
     TCNT0 = 0;  //  clear timer register
     MCUCR |= (ISC00);  // sets INT0 trigger RISING
   }
 }
+
+/*
+* WS2812B PROTOCOL:
+* code 0: 0.4us HIGH, 0.85us LOW
+* code 1: 0.8us HIGH, 0.45us LOW
+*
+* time to clock cycles:
+* 0.4us = 3.2   --> 3 = 0.375us (err:+25ns)
+* 0.85us = 6.8  --> 7 = 0.875us (err:-25ns)
+* 0.8us = 6.4   --> 6 = 0.75us  (err:-50ns)
+* 0.45us = 3.6  --> 4 = 0.5us   (err:+50ns)
+*/
+
+__asm__(
+  ;r16 is for HIGH PB0
+  ;r17 is for LOW PB0
+  
+  init:
+    ldi r16, 0b00000001 ;consider using bit masks
+    ldi r17, 0
+    ret
+  LOW:
+    out PORTB, r16
+    nop
+    nop
+    out PORTB, r17
+    nop
+    nop
+    nop
+    nop
+    nop
+    ret
+  HIGH:
+    out PORTB, r16
+    nop
+    nop
+    nop
+    nop
+    nop
+    out PROTB, r17
+    nop
+    nop
+    ret
+);
