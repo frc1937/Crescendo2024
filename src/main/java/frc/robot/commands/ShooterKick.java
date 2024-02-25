@@ -19,7 +19,7 @@ public class ShooterKick extends Command {
 
     @Override
     public void initialize() {
-        shooter.setKickerSpeed(0.7);  // FIXME Move to Constants.java
+        shooter.setKickerSpeed(0.7);
     }
 
     @Override
@@ -27,10 +27,5 @@ public class ShooterKick extends Command {
         shooter.stopFlywheels();
         shooter.stopKicker();
         shooter.setPivotAngle(Rotation2d.fromDegrees(0));
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
     }
 }

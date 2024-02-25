@@ -24,11 +24,14 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         ctreConfigs = new CTREConfigs();
         robotContainer = new RobotContainer();
+
+        robotContainer.robotInit();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        robotContainer.robotPeriodic();
     }
 
     @Override

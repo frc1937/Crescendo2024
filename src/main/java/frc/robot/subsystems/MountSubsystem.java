@@ -30,7 +30,7 @@ public class MountSubsystem extends SubsystemBase {
         if(proxyValue == 1 && !isRunning) {
             startMount();
             isRunning = true;
-        } else if (proxyValue == 1) {
+        } else if (proxyValue == 1 && isRunning == true) {
             stopMount();
             isRunning = false;
         }

@@ -53,13 +53,12 @@ public class ShooterCommands {
         );
     }
 
-
-    public Command receiveFromFeeder() {
+    public SequentialCommandGroup receiveFromFeeder() {
         return new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setFlywheelSpeed(-0.55 * FLYWHEEL_MAX_RPM, false);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(48));
-                    shooterSubsystem.setKickerSpeed(-0.5);
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(48.65));
+                    shooterSubsystem.setKickerSpeed(-0.2);
                 },
                 () -> {
                 },
@@ -70,7 +69,7 @@ public class ShooterCommands {
                 },
                 shooterSubsystem::doesSeeNote,
                 shooterSubsystem
-        );
+        ).andThen(setKickerSpeed(-0.8).withTimeout(0.7));
     }
 
     public FunctionalCommand intakeGet() {

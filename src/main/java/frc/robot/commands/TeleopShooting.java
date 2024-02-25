@@ -23,13 +23,14 @@ import frc.robot.subsystems.SwerveSubsystem;
 import java.util.function.DoubleSupplier;
 
 import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
 import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
-import static frc.robot.Constants.ShootingConstants.NOTE_RELEASE_VELOCITY;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
+import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
 import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
@@ -54,8 +55,8 @@ public class TeleopShooting extends SequentialCommandGroup {
         private final ProfiledPIDController yawController = new ProfiledPIDController(YAW_CONTROLLER_P, YAW_CONTROLLER_I, YAW_CONTROLLER_D,
                 new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
         private Rotation2d targetShooterOrientation = new Rotation2d();
-        private Rotation2d targetOrientation;
-        private double virtualTargetSlope;
+        private Rotation2d orientationToVirtualTarget;
+        private double slopeToVirtualTarget = DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
 
         public TeleopAim(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
@@ -70,12 +71,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         }
 
         @Override
-        public void initialize() {}
-
-        @Override
         public void execute() {
-            if(!shooter.doesSeeNote()) return;
-
             // Get values, deadband
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
@@ -84,8 +80,8 @@ public class TeleopShooting extends SequentialCommandGroup {
             RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
 
             Translation3d predictedShooterPosition;
-            if (targetOrientation != null) {
-                predictedState.setPose(new Pose2d(predictedState.getPose().getTranslation(), targetOrientation));
+            if (orientationToVirtualTarget != null) {
+                predictedState.setPose(new Pose2d(predictedState.getPose().getTranslation(), orientationToVirtualTarget));
 
                 // Use this to calculate the position the shooter will be in
                 Translation3d pivotToShooter = new Translation3d(
@@ -94,74 +90,66 @@ public class TeleopShooting extends SequentialCommandGroup {
                 predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
             } else {
                 // We cannot trust the predicted yaw. Thus, using it to predict the shooter position
-                // is unviable. Using the centre of the robot is good enough. In the next time execute()
-                // is called, targetOrientation will have a value and this won't be needed.
+                // is enviable. Using the centre of the robot is good enough. In the next time execute()
+                // is called, orientationToVirtualTarget will have a value and this won't be needed.
                 predictedShooterPosition = predictedState.getPose3d().getTranslation();
             }
-            // RobotState predictedState = new RobotState(swerve.getPose(),
-            //         new ChassisSpeeds(targetTranslation * 1, targetStrafe * 1
-            //         , 0));
 
+            // Calculate the total translation vector from the shooter to the target
+            Translation3d targetPosition = DriverStation.getAlliance().get() == Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
+            Translation3d translationToTarget = targetPosition.minus(predictedShooterPosition);
+            SmartDashboard.putNumber("Presumed distance from target [meters]", translationToTarget.toTranslation2d().getNorm());
 
-            // Calculate the total velocity vector at which the NOTE should be thrown
-            Translation3d targetPosition =  DriverStation.getAlliance().get() == Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
-            Translation3d targetNoteTranslation = targetPosition.minus(predictedShooterPosition);
-            SmartDashboard.putNumber("Presumed distance from target [meters]", targetNoteTranslation.toTranslation2d().getNorm());
-            Translation3d targetNoteDirection = targetNoteTranslation.div(targetNoteTranslation.getNorm());
-            Translation3d targetNoteVelocity = targetNoteDirection.times(NOTE_RELEASE_VELOCITY);
-
-            // Factor in the robot's velocity to know how to aim the NOTE
-            Translation3d predictedVelocity = new Translation3d(
-                    predictedState.getVelocity().vxMetersPerSecond,
-                    predictedState.getVelocity().vyMetersPerSecond,
+            // Factor in the robot's velocity and the NOTE's time of flight
+            double timeOfFlight = SLOPE_TO_TIME_OF_FLIGHT_MAP.get(slopeToVirtualTarget);
+            Translation3d translationDueToRobotVelocity = new Translation3d(
+                    predictedState.getVelocity().vxMetersPerSecond * timeOfFlight,
+                    predictedState.getVelocity().vyMetersPerSecond * timeOfFlight,
                     0
             );
-            // Translation2d predictedVel = predictedState.getPose().getTranslation().minus(swerve.getPose().getTranslation()).div(SHOOTING_DELAY);
-            // Translation3d predictedVelocity = new Translation3d(targetTranslation, targetStrafe, 0);
-            SmartDashboard.putNumberArray("predictedVelocity", new double[]{predictedVelocity.getX(), predictedVelocity.getY()});
-            Translation3d throwVelocity = targetNoteVelocity.minus(predictedVelocity);
 
-            // Determine the intended release direction based on the throwVelocity, disregarding its
-            // magnitude. As we consistently throw the ball at high speeds, we can simplify the path of
-            // the note in space to a straight line.
-            targetOrientation = throwVelocity.toTranslation2d().getAngle();
-            SmartDashboard.putNumber("targetOrientation", targetOrientation.getDegrees());
-            virtualTargetSlope = throwVelocity.getZ() / throwVelocity.toTranslation2d().getNorm();
-            SmartDashboard.putNumber("Virtual target pitch [slope]", virtualTargetSlope);
+            // Find the virtual target, i.e., the target to which the robot should aim s.t.
+            // the NOTE enters the actual target
+            Translation3d translationToVirtualTarget = translationToTarget.minus(translationDueToRobotVelocity);
 
-            // However, becasue we do not fully trust the straight-line model, we introduce
-            // a table that maps path slopes, virtualTargetSlope, to well-adjusted
-            // shooter orientations. We presume the shooter orientation will be steeper than    
+            // Aim to the virtual target
+            slopeToVirtualTarget = translationToVirtualTarget.getZ() / translationToVirtualTarget.toTranslation2d().getNorm();
+            orientationToVirtualTarget = translationToVirtualTarget.toTranslation2d().getAngle();
+            SmartDashboard.putNumber("orientationToVirtuaorientationToVirtualTarget", orientationToVirtualTarget.getDegrees());
+            SmartDashboard.putNumber("Virtual target pitch [slope]", slopeToVirtualTarget);
+
+            // Introduce a table that maps path slopes, slopeToVirtualTarget, to well-adjusted
+            // shooter orientations. We presume the actual shooter orientation will be steeper than
             // the path slope becasue of gravity.
-            targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(virtualTargetSlope);
+            targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
 
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    yawController.calculate(swerve.getPose().getRotation().getRadians(), targetOrientation.getRadians()),
-                    true
+                    yawController.calculate(swerve.getPose().getRotation().getRadians(), orientationToVirtualTarget.getRadians())
             );
             shooter.setPivotAngle(targetShooterOrientation);
-            shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(virtualTargetSlope), true);
-            // shooter.setFlywheelSpeed(6300, false);
+            shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget), true);
         }
 
         @Override
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady();
             boolean pitchReady = shooter.hasPivotArrived();
-            boolean shooterNotOccluded = !shooter.isOccluded();
             boolean yawReady = yawController.atSetpoint();
-            boolean slopeViable = virtualTargetSlope >= MINIMUM_VIABLE_SLOPE && virtualTargetSlope <= MAXIMUM_VIABLE_SLOPE;
+            boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
 
-            SmartDashboard.putBooleanArray("flywheels | pitch | not occluded | yaw | slope", new boolean[]{flywheelsReady, pitchReady, shooterNotOccluded, yawReady, slopeViable});
+            boolean readyToKick = flywheelsReady && pitchReady && yawReady && slopeViable;
 
-            return flywheelsReady && pitchReady && shooterNotOccluded && yawReady && slopeViable;
+            SmartDashboard.putBooleanArray("flywheels | pitch | yaw | slope", new boolean[]{flywheelsReady, pitchReady, yawReady, slopeViable});
+
+            return readyToKick || !shooter.doesSeeNote();
         }
 
         @Override
         public void end(boolean interrupted) {
             if (interrupted) {
                 shooter.stopFlywheels();
+                shooter.setPivotAngle(Rotation2d.fromDegrees(0));
             }
 
             yawController.reset(0);
@@ -195,8 +183,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    0,
-                    true
+                    0
             );
         }
 

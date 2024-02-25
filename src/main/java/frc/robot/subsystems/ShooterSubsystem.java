@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,14 +23,14 @@ import static frc.robot.Constants.ShootingConstants.FLYWHEEL_P;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_VELOCITY_TOLERANCE;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
-import static frc.robot.Constants.ShootingConstants.MAXIMUM_OCCLUDED_PITCH;
-import static frc.robot.Constants.ShootingConstants.MINIMUM_OCCLUDED_PITCH;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
 import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_P;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
+import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_FF;
+import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_P;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MAX;
 import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
@@ -39,10 +40,10 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_UP_P;
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
-    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless),
-            flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless),
-            pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder();
+    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final CANSparkFlex pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
+    private final RelativeEncoder pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
     private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
     private final SparkPIDController pitchController;
     private final SparkPIDController flywheelsController;
@@ -54,6 +55,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
         flywheelsController = flywheelMaster.getPIDController();
         configureFlywheelMotor(flywheelMaster);
+
+        CANSparkFlex flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
         configureFlywheelMotor(flywheelSlave);
 
         configurePivotMotor(pivotMotor);
@@ -69,26 +72,24 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
-        pivotMotor.getEncoder().setPosition(currentAngle);
+        pivotInternalEncoder.setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
         SmartDashboard.putNumber("Velocity", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Target Velocity", targetFlywheelVelocity);
         SmartDashboard.putNumber("Current angle", currentAngle);
+        SmartDashboard.putBoolean("Is nigg", doesSeeNote());
 
-        if (pivotSetpoint >= currentAngle) {
+        if (currentAngle > 100) {
+            pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
+        } else if (pivotSetpoint >= currentAngle) {
             pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
-        } else {
+        } else if (pivotSetpoint < currentAngle) {
             pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
         }
 
         SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
-    }
-
-    public boolean isOccluded() {
-        double pitch = pivotMotor.getEncoder().getPosition();
-        return pitch > MINIMUM_OCCLUDED_PITCH && pitch < MAXIMUM_OCCLUDED_PITCH;
     }
 
     public boolean doesSeeNote() {
@@ -123,7 +124,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotMotor.getEncoder().getPosition()) < 1.5;
+        return Math.abs(pivotSetpoint - pivotInternalEncoder.getPosition()) < 1.5;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {
@@ -138,7 +139,6 @@ public class ShooterSubsystem extends SubsystemBase {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kCoast);
         flywheelsController.setP(FLYWHEEL_P);
-        // flywheelsController.setI(0.0000035);
         flywheelsController.setD(0.000017);
         flywheelsController.setFF(FLYWHEEL_FF);
     }
@@ -163,9 +163,12 @@ public class ShooterSubsystem extends SubsystemBase {
         pitchController.setP(PIVOT_DOWN_P, 1);
         pitchController.setFF(PIVOT_DOWN_FF, 1);
 
+        pitchController.setP(PIVOT_HIGH_P, 2);
+        pitchController.setFF(PIVOT_HIGH_FF, 2);
+
         pitchController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);
 
-        pivotMotor.getEncoder().setPosition(pivotEncoder.getAbsolutePosition());
+        pivotInternalEncoder.setPosition(pivotEncoder.getAbsolutePosition());
         pivotEncoder.setPosition(pivotEncoder.getAbsolutePosition());
     }
 }

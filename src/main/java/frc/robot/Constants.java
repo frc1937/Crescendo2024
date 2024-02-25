@@ -8,8 +8,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -32,20 +30,6 @@ public final class Constants {
     public static final double INFREQUENT_PERIODIC_PERIOD = 0.1;
     public static final double STICK_DEADBAND = 0.1;
 
-    public static final class ChaseTagPIDConstants {
-        public static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(8, 8);
-        public static final PIDController X_CONTROLLER = new PIDController(2, 0, 0);
-        public static final PIDController Y_CONTROLLER = new PIDController(2, 0, 0);
-        public static final ProfiledPIDController OMEGA_CONTROLLER = new ProfiledPIDController(4, 0, 0, OMEGA_CONSTRAINTS);
-
-        static {
-            X_CONTROLLER.setTolerance(0.2);
-            Y_CONTROLLER.setTolerance(0.2);
-            OMEGA_CONTROLLER.setTolerance(Units.degreesToRadians(3));
-            OMEGA_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
-        }
-    }
-
     public static final class Transforms {
         /**
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
@@ -62,17 +46,26 @@ public final class Constants {
         public static final String CAMERA_NAME = "Ph1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-
-        public static final int cameraViewAngle = 170;
-        public static final double cameraToDegrees = cameraViewAngle / 360;
     }
 
     public static class IntakeConstants {
         public static final int INTAKE_MOTOR_ID = 11;
-        public static final double INTAKE_SPEED = 0.8;
     }
 
     public static final class ShootingConstants {
+
+        /**
+         * An initial presumption to the slope of the path from the robot's
+         * shooter to the virtual target
+         *
+         * Since the slope to the virtual target depends on the time of flight,
+         * which itself depends on the slope to the virtual target, we provide
+         * an initial guess.
+         *
+         * The value hereby is arbitrary and it depicts a common value for the
+         * slope.
+         */
+        public static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
         public static final int FLYWHEEL_MAX_RPM = 6400;
         /**
          * This table maps virtual shooter slopes to shooter orientations that actually achieve
@@ -86,6 +79,16 @@ public final class Constants {
          */
         public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<Double, Rotation2d>(
             InverseInterpolator.forDouble(), Rotation2d::interpolate);
+
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
+                InverseInterpolator.forDouble(), Interpolator.forDouble());
+
+        static {
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
+        }
 
         static {
             SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
@@ -120,9 +123,6 @@ public final class Constants {
         public static final double MINIMUM_VIABLE_SLOPE = 0.38;
         public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
 
-        public static final double MINIMUM_OCCLUDED_PITCH = -2;  // FIXME calibrate
-        public static final double MAXIMUM_OCCLUDED_PITCH = -2;
-
         public static final double POSE_HISTORY_DURATION = 0.5;
 
         public static final int
@@ -134,10 +134,13 @@ public final class Constants {
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
         public static final double PIVOT_UP_P = 0.0425;
         public static final double PIVOT_UP_FF = 0.000085;
+        public static final double PIVOT_HIGH_P = 0.041;
+        public static final double PIVOT_HIGH_FF = 0.000085;
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
         public static final double PIVOT_DOWN_P = 0.014_95;
         public static final double PIVOT_DOWN_FF = 0.00141;
+
         public static final double FLYWHEEL_FF = 0.000175;
         public static final double FLYWHEEL_RANGE_MIN = -1;
         public static final double FLYWHEEL_RANGE_MAX = 1;
@@ -154,7 +157,6 @@ public final class Constants {
         public static final int SHOOTER_UTMOST_ANGLE = 220;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
-        //public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.9, 0.53, 2.1);
         public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);
         public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31, 5.5, 2.05);
     }
@@ -255,7 +257,7 @@ public final class Constants {
         public static final class Module1 {
             public static final int DRIVE_MOTOR_ID = 3;
             public static final int ANGLE_MOTOR_ID = 10;
-            public static final int CAN_CODER_ID = 20;//
+            public static final int CAN_CODER_ID = 20;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);//283.799-358.24+180);//103.45);//;
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
