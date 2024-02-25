@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.192332373252477,
-        "y": 5.000527205048704
+        "x": 1.6887664017838722,
+        "y": 4.953683858865578
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.192332373252477,
-        "y": 4.430527205048704
+        "x": 1.4387664017838722,
+        "y": 4.520671156973358
       },
       "isLocked": false,
       "linkedName": "Shooting position"
@@ -20,7 +20,7 @@
         "y": 4.084914323674802
       },
       "prevControl": {
-        "x": 2.4435423939892105,
+        "x": 0.7516380338668438,
         "y": 4.084914323674802
       },
       "nextControl": null,
@@ -28,7 +28,18 @@
       "linkedName": "Bottom NOTE"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.85,
+      "rotationDegrees": 0,
+      "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 0.35,
+      "rotationDegrees": 125.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -45,8 +56,8 @@
   "reversed": false,
   "folder": "Five Donuts",
   "previewStartingState": {
-    "rotation": 141.8615220309124,
-    "velocity": 0
+    "rotation": 125.0,
+    "velocity": 1.0
   },
   "useDefaultConstraints": true
 }

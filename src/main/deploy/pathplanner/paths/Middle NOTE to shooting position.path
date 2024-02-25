@@ -16,19 +16,25 @@
     },
     {
       "anchor": {
-        "x": 2.192332373252477,
-        "y": 5.000527205048704
+        "x": 1.6887664017838722,
+        "y": 4.953683858865578
       },
       "prevControl": {
-        "x": 2.192332373252477,
-        "y": 5.100527205048705
+        "x": 1.8986649755007898,
+        "y": 5.3172388529795205
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Shooting position"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.15,
+      "rotationDegrees": 180.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -38,9 +44,9 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 2.0,
-    "rotation": 138.19344927328333,
-    "rotateFast": false
+    "velocity": 1.0,
+    "rotation": 125.0,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Five Donuts",
