@@ -24,43 +24,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-//register adr macros
-#ifndef OFFSET
-  #define OFFSET 0x20
-#endif
-
-#ifndef REG
-  #define REG(addr)*((volatile unsigned char*)(addr+OFFSET))
-#endif
-
-#ifndef DDRB
-  #define DDRB REG(0x17)
-#endif
-
-#ifndef PORTB
-  #define PORTB REG(0x18)
-#endif
-
-#ifndef TCNT0
-  #define TCNT0 0x32
-#endif
-
-#ifndef TCCR0B
-  #define TCCR0B 0x33
-#endif
-
-#ifndef SREG
-  #define SREG REG(0x3F)
-#endif
-
-#ifndef GIMSK
-  #define GIMSK REG(0x3B)
-#endif
-
-#ifndef MCUCR
-  #define MCUCR REG(0x35)
-#endif
-
 #define F_CPU 8000000 //  CPU clk
 #define length 4  //  strip length
 
@@ -126,6 +89,7 @@ re: rol r30  ; set carry flag to MSB
     rcall LOW   ; else goto subruotine LOW
     dec r31     ; r31--
     brne re     ; if r31 != 0 repeat 
+    rcall RES   ; reste leds
     ret
   LOW:
     sbi PORTB, 0  ; 2clks
@@ -142,5 +106,12 @@ re: rol r30  ; set carry flag to MSB
     ;750ns: 6clks
     nop           ; 1clks
     nop           ; 1clks
+    nop           ; 1clks
+    nop           ; 1clks
+    cbi PORTB, 0  ; 2clks
     ret           ; 4clks
+  RES:
+    cbi PORTB, 0
+    ret
 );
+//please use timer for RES ffs
