@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_P;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_VELOCITY_TOLERANCE;
@@ -48,19 +49,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private double pivotSetpoint = 0;
     private double targetFlywheelVelocity = 0;
 
-//    private SysIdRoutine sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(
-//            new SysIdRoutineLog("f").motor("bozo")
-//                    .voltage(Units.Volts.of(pivotMotor.get()))
-//
-//                        ));
-//
-//    private void updateLog(SysIdRoutineLog log, String motorName, CANSparkFlex sparkFlex, CANCoder canCoder) {
-//        log.motor(motorName)
-//                .voltage(Volts.of(sparkFlex.getBusVoltage()))
-//                .angularPosition(Units.Degrees.of(-(canCoder.getPosition() - PIVOT_ENCODER_OFFSET)))
-//                .angularVelocity(Units.DegreesPerSecond.of(canCoder.getVelocity()))
-//    }
-
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
 
@@ -88,12 +76,12 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Target Velocity", targetFlywheelVelocity);
         SmartDashboard.putNumber("Current angle", currentAngle);
 
-        if(pivotSetpoint >= currentAngle) {
+        if (pivotSetpoint >= currentAngle) {
             pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
         } else {
             pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
         }
-//
+
         SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
     }
@@ -117,17 +105,18 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setFlywheelSpeed(double targetFlywheelVelocity, boolean pid) {
         this.targetFlywheelVelocity = targetFlywheelVelocity;
+
         if (pid) {
             flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
         } else {
-            flywheelMaster.set(targetFlywheelVelocity / 5600);
+            flywheelMaster.set(targetFlywheelVelocity / FLYWHEEL_MAX_RPM);
         }
     }
 
     public void stopFlywheels() {
         targetFlywheelVelocity = 0;
         flywheelMaster.stopMotor();
-    }   
+    }
 
     public boolean areFlywheelsReady() {
         return Math.abs(Math.abs(flywheelEncoder.getVelocity()) - Math.abs(targetFlywheelVelocity)) <= FLYWHEEL_VELOCITY_TOLERANCE;
@@ -172,7 +161,6 @@ public class ShooterSubsystem extends SubsystemBase {
         pitchController.setFF(PIVOT_UP_FF, 0);
 
         pitchController.setP(PIVOT_DOWN_P, 1);
-      //  pitchController.setD(PIVOT_DOWN_D, 1);
         pitchController.setFF(PIVOT_DOWN_FF, 1);
 
         pitchController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);

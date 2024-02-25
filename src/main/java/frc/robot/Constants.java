@@ -73,6 +73,7 @@ public final class Constants {
     }
 
     public static final class ShootingConstants {
+        public static final int FLYWHEEL_MAX_RPM = 6400;
         /**
          * This table maps virtual shooter slopes to shooter orientations that actually achieve
          * the desired results, based on calibration and experimentation.
@@ -106,10 +107,10 @@ public final class Constants {
             InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.74 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * 5600);
-            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.95 * 5600);
+            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.74 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.95 * FLYWHEEL_MAX_RPM);
 
             // SLOPE_TO_VELOCITY_MAP.put(0.58, 0.95 * 5600);
             // SLOPE_TO_VELOCITY_MAP.put(0.51, 0.94 * 5600);
@@ -130,15 +131,12 @@ public final class Constants {
                 PIVOT_ID = 1,
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
-        public static final double FLYWHEEL_MINIMUM_READY_RPM = 0.95*5600;
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
         public static final double PIVOT_UP_P = 0.0425;
         public static final double PIVOT_UP_FF = 0.000085;
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
-
         public static final double PIVOT_DOWN_P = 0.014_95;
-        public static final double PIVOT_DOWN_D = 0.000;
         public static final double PIVOT_DOWN_FF = 0.00141;
         public static final double FLYWHEEL_FF = 0.000175;
         public static final double FLYWHEEL_RANGE_MIN = -1;
@@ -153,6 +151,7 @@ public final class Constants {
         public static final double SHOOTING_DELAY = 0.5;
         /** In seconds */
         public static final double POST_SHOOTING_DELAY = 0.25;
+        public static final int SHOOTER_UTMOST_ANGLE = 220;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         //public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.9, 0.53, 2.1);

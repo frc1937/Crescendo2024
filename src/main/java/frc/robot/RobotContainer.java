@@ -7,8 +7,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,7 +31,6 @@ import frc.robot.util.TriggerButton;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
-    private Thread visionThread;
     private final XboxController driveController = new XboxController(0);
     private final XboxController operatorController = new XboxController(1);
     private final SendableChooser<Command> autoChooser;
@@ -46,7 +43,6 @@ public class RobotContainer {
     private final JoystickButton bButton = new JoystickButton(driveController, XboxController.Button.kB.value);
     private final JoystickButton leftBumper = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton backButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
-    // private final JoystickButton povUp = new JoystickButton(driveController, XboxController.Button.);
     /* OPERATOR */
     private final TriggerButton accelerateFlywheelButton = new TriggerButton(operatorController, XboxController.Axis.kRightTrigger);
     private final JoystickButton randomPitchYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
@@ -92,9 +88,6 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        //TODO: Uriel define this commands to whichever buttons you want
-        // Teleop shooting automaticy audujsts itself based on april tag for shooting
-        // accelerate flywheel is the command that was asked by Ofir
         backButton.whileTrue(Navigate.navigateToAmplifier());
 
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -135,17 +128,5 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         swerveSubsystem.infrequentPeriodic();
-    }
-
-    public void robotInit() {
-        visionThread = new Thread(() -> {
-            UsbCamera camera = CameraServer.startAutomaticCapture(0);
-
-            camera.setResolution(480, 270);
-            camera.setFPS(30);
-        });
-
-        visionThread.setDaemon(true);
-        visionThread.start();
     }
 }

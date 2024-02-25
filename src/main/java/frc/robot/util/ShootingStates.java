@@ -7,7 +7,6 @@ public enum ShootingStates {
     STAGE_FRONT(60, 0.88, 0.98);
 
     private final double angle, speedPercentage, rpmProportion;
-
     ShootingStates(double angle, double speedPercentage, double rpmProportion) {
         this.angle = angle;
         this.speedPercentage = speedPercentage;

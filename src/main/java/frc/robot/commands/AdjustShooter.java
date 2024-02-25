@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static frc.robot.Constants.ShootingConstants;
+import static frc.robot.Constants.ShootingConstants.SHOOTER_UTMOST_ANGLE;
 
 public class AdjustShooter extends Command {
     private final ShooterSubsystem shooter;
@@ -25,12 +26,12 @@ public class AdjustShooter extends Command {
     public AdjustShooter(ShooterSubsystem shooter, double slope) {
         this.shooter = shooter;
 
-        // FIXME Move 220 to Constants.java
         if (slope > 0) {
             this.pitch = ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope);
         } else {
-            this.pitch = Rotation2d.fromDegrees(220).minus(ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope));
+            this.pitch = Rotation2d.fromDegrees(SHOOTER_UTMOST_ANGLE).minus(ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope));
         }
+
         this.velocity = ShootingConstants.SLOPE_TO_VELOCITY_MAP.get(slope);
 
         addRequirements(shooter);

@@ -11,6 +11,8 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.ShootingStates;
 
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
+
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
     private final IntakeSubsystem intakeSubsystem;
@@ -22,21 +24,9 @@ public class ShooterCommands {
 
     public Command accelerateFlywheel(ShootingStates state) {
         return new FunctionalCommand(
-                () -> {
-                    if (shooterSubsystem.doesSeeNote()) {
-                        shooterSubsystem.setKickerSpeed(-0.3);
-                        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-                        shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * 6400, true);
-                    }
-                },
-
-                () -> {
-                },
-
-                interrupted -> {
-                    shooterSubsystem.setKickerSpeed(0.9);
-                },
-
+                () -> initializeShooterByState(state),
+                () -> {},
+                interrupted -> shooterSubsystem.setKickerSpeed(0.9),
                 () -> false,
 
                 shooterSubsystem
@@ -45,27 +35,18 @@ public class ShooterCommands {
 
     public Command shootNote(ShootingStates state) {
         return new FunctionalCommand(
-                () -> {
-                    if (shooterSubsystem.doesSeeNote()) {
-                        shooterSubsystem.setKickerSpeed(-0.3);
-                        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-                        shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * 6400, true);
-                    }
-                },
-
+                () -> initializeShooterByState(state),
                 () -> {
                     SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady());
                     if (shooterSubsystem.doesSeeNote() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(0.9);
                     }
                 },
-
                 interrupted -> {
                     shooterSubsystem.stopKicker();
                     shooterSubsystem.stopFlywheels();
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
                 },
-
                 () -> false,
 
                 shooterSubsystem
@@ -73,12 +54,10 @@ public class ShooterCommands {
     }
 
 
-
-
     public Command receiveFromFeeder() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelSpeed(-0.55 * 5600, false);
+                    shooterSubsystem.setFlywheelSpeed(-0.55 * FLYWHEEL_MAX_RPM, false);
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(48));
                     shooterSubsystem.setKickerSpeed(-0.5);
                 },
@@ -97,7 +76,6 @@ public class ShooterCommands {
     public FunctionalCommand intakeGet() {
         return new FunctionalCommand(
                 () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
-
                 () -> {
                     if (shooterSubsystem.hasPivotArrived()) {
                         intakeSubsystem.setSpeedPercentage(0.7);
@@ -105,7 +83,6 @@ public class ShooterCommands {
                         shooterSubsystem.setKickerSpeed(-0.8);
                     }
                 },
-
                 interrupted -> {
                     shooterSubsystem.stopFlywheels();
                     intakeSubsystem.stopMotor();
@@ -114,18 +91,6 @@ public class ShooterCommands {
 
                 shooterSubsystem::doesSeeNote,
 
-                shooterSubsystem
-        );
-    }
-
-    public Command setAngle(double angle) {
-        return new FunctionalCommand(
-                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
-                () -> {
-                },
-                interrupted -> {
-                },//shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0)),
-                () -> false,
                 shooterSubsystem
         );
     }
@@ -148,5 +113,13 @@ public class ShooterCommands {
                     shooterSubsystem.stopFlywheels();
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
                 }));
+    }
+
+    private void initializeShooterByState(ShootingStates state) {
+        if (shooterSubsystem.doesSeeNote()) {
+            shooterSubsystem.setKickerSpeed(-0.3);
+            shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
+            shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM, true);
+        }
     }
 }

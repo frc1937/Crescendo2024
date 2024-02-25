@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MountSubsystem extends SubsystemBase {
     private final DigitalInput proximitySwitch;
     private final WPI_TalonSRX mountMotor;
-    private boolean proxyWasEnabled;
+    private boolean isRunning;
 
     public MountSubsystem() {
         proximitySwitch = new DigitalInput(1);
         mountMotor  = new WPI_TalonSRX(4);
-        proxyWasEnabled = false;
+        isRunning = false;
 
         mountMotor.configFactoryDefault();
         mountMotor.setNeutralMode(NeutralMode.Brake);
@@ -22,25 +22,29 @@ public class MountSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("ProximityStatus", getProxyStatus());
-        SmartDashboard.putBoolean("WasProxyEnabled", !proxyWasEnabled);
+        int proxyValue = getProxyStatus();
+
+        SmartDashboard.putBoolean("ProximityStatus", getProxyStatus() == 1);
+        SmartDashboard.putBoolean("WasProxyEnabled", !isRunning);
+
+        if(proxyValue == 1 && !isRunning) {
+            startMount();
+            isRunning = true;
+        } else if (proxyValue == 1) {
+            stopMount();
+            isRunning = false;
+        }
     }
 
     public void startMount() {
-        if(getProxyStatus() && proxyWasEnabled == false) {
-            mountMotor.set(-0.1);
-            proxyWasEnabled = true;
-        } else if(getProxyStatus() && proxyWasEnabled) {
-            proxyWasEnabled = false;
-            stopMount();
-        }
+        mountMotor.set(-0.1);
     }
 
     public void stopMount() {
         mountMotor.stopMotor();
     }
 
-    public boolean getProxyStatus() {
-        return proximitySwitch.get();
+    public int getProxyStatus() {
+        return proximitySwitch.get() ? 1 : 0;
     }
 }
