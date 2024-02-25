@@ -1,0 +1,63 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.9845059690119385,
+        "y": 6.816647919010124
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.9750353786421826,
+        "y": 8.355890997496285
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.947748466925505,
+        "y": 7.403026234623898
+      },
+      "prevControl": {
+        "x": 5.3676838782248995,
+        "y": 7.388366776733554
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.05,
+      "rotationDegrees": -85.59521613216536,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 0.0,
+      "rotateFast": true
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Three Far Donuts",
+  "previewStartingState": {
+    "rotation": -115.15930191603168,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
