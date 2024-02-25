@@ -15,5 +15,5 @@ code|duty range|optimal duty
 4   |60% - 75% |67.5%
 5   |75% - 90% |82.5%
 6*  |90% - 100%|97.5%
-
+##### *DO NOT SET DUTY TO 100%!
 ##### *might be less stable

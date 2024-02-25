@@ -119,33 +119,28 @@ ISR(INT0_vect, ISR_NOBLOCK){
 */
 
 __asm__(
-  ;r16 is for HIGH PB0
-  ;r17 is for LOW PB0
-  
-  init:
-    ldi r16, 0b00000001 ;consider using bit masks
-    ldi r17, 0
+  sendByte:
+    ldi r31, 8  ; set counter to 8
+re: rol r30  ; set carry flag to MSB
+    brcs HIGH   ; if carry is 1 goto subruotine HIGH
+    rcall LOW   ; else goto subruotine LOW
+    dec r31     ; r31--
+    brne re     ; if r31 != 0 repeat 
     ret
   LOW:
-    out PORTB, r16
-    nop
-    nop
-    out PORTB, r17
-    nop
-    nop
-    nop
-    nop
-    nop
-    ret
+    sbi PORTB, 0  ; 2clks
+    ; 375ns HIGH: 3clks
+    nop           ; 1clks
+    cbi PORTB, 0  ; 2clks
+    ; 875ns LOW: 7clks
+    nop           ; 1clks
+    nop           ; 1clks
+    nop           ; 1clks
+    ret           ; 4clks
   HIGH:
-    out PORTB, r16
-    nop
-    nop
-    nop
-    nop
-    nop
-    out PROTB, r17
-    nop
-    nop
-    ret
+    sbi PORTB, 0  ; 2clks
+    ;750ns: 6clks
+    nop           ; 1clks
+    nop           ; 1clks
+    ret           ; 4clks
 );
