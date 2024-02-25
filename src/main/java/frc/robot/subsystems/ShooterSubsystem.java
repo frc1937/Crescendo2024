@@ -21,8 +21,6 @@ import static frc.robot.Constants.ShootingConstants.FLYWHEEL_P;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_VELOCITY_TOLERANCE;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
-import static frc.robot.Constants.ShootingConstants.MAXIMUM_OCCLUDED_PITCH;
-import static frc.robot.Constants.ShootingConstants.MINIMUM_OCCLUDED_PITCH;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;

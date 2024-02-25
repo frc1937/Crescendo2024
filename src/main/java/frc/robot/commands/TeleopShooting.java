@@ -23,6 +23,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import java.util.function.DoubleSupplier;
 
 import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
 import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.NOTE_RELEASE_VELOCITY;
@@ -30,6 +31,7 @@ import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
+import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
 import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
@@ -54,8 +56,8 @@ public class TeleopShooting extends SequentialCommandGroup {
         private final ProfiledPIDController yawController = new ProfiledPIDController(YAW_CONTROLLER_P, YAW_CONTROLLER_I, YAW_CONTROLLER_D,
                 new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
         private Rotation2d targetShooterOrientation = new Rotation2d();
-        private Rotation2dorientationToVirtualTarget;
-        private double slopeToVirtualTarget;
+        private Rotation2d orientationToVirtualTarget;
+        private double slopeToVirtualTarget = DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
 
         public TeleopAim(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
@@ -82,7 +84,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
 
             Translation3d predictedShooterPosition;
-            if (orientationToVirtuaorientationToVirtualTarget != null) {
+            if (orientationToVirtualTarget != null) {
                 predictedState.setPose(new Pose2d(predictedState.getPose().getTranslation(), orientationToVirtualTarget));
 
                 // Use this to calculate the position the shooter will be in
@@ -100,18 +102,20 @@ public class TeleopShooting extends SequentialCommandGroup {
             // Calculate the total translation vector from the shooter to the target
             Translation3d targetPosition =  DriverStation.getAlliance().get() == Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
             Translation3d translationToTarget = targetPosition.minus(predictedShooterPosition);
-            SmartDashboard.putNumber("Presumed distance from target [meters]", targetTranslation.toTranslation2d().getNorm());
+            SmartDashboard.putNumber("Presumed distance from target [meters]", translationToTarget.toTranslation2d().getNorm());
 
-            // Factor in the robot's velocity
+            
+            // Factor in the robot's velocity and the NOTE's time of flight
+            double timeOfFlight = SLOPE_TO_TIME_OF_FLIGHT_MAP.get(slopeToVirtualTarget);
             Translation3d translationDueToRobotVelocity = new Translation3d(
-                    predictedState.getVelocity().vxMetersPerSecond * NOTE_TIME_IN_AIR,
-                    predictedState.getVelocity().vyMetersPerSecond * NOTE_TIME_IN_AIR,
+                    predictedState.getVelocity().vxMetersPerSecond * timeOfFlight,
+                    predictedState.getVelocity().vyMetersPerSecond * timeOfFlight,
                     0
             );
 
             // Find the virtual target, i.e., the target to which the robot should aim s.t.
             // the NOTE enters the actual target
-            Tranlation3d translationToVirtualTarget = translationToTarget.minus(translationDueToRobotVelocity);
+            Translation3d translationToVirtualTarget = translationToTarget.minus(translationDueToRobotVelocity);
 
             // Aim to the virtual target
             slopeToVirtualTarget = translationToVirtualTarget.getZ() / translationToVirtualTarget.toTranslation2d().getNorm();
@@ -126,9 +130,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    yawController.calculate(swerve.getPose().getRotation().getRadians(), orientationToVirtualTarget.getRadians()),
-                    true,
-                    true
+                    yawController.calculate(swerve.getPose().getRotation().getRadians(), orientationToVirtualTarget.getRadians())
             );
             shooter.setPivotAngle(targetShooterOrientation);
             shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget), true);
@@ -186,9 +188,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    0,
-                    true,
-                    true
+                    0
             );
         }
 

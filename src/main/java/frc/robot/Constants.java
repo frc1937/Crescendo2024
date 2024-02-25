@@ -116,11 +116,32 @@ public final class Constants {
             // SLOPE_TO_VELOCITY_MAP.put(0.45, 0.98 * 5600);
         }
 
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
+            InverseInterpolator.forDouble(), Interpolator.forDouble());
+
+        static {
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
+        }
+
+
         public static final double MINIMUM_VIABLE_SLOPE = 0.38;
         public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
 
-        public static final double MINIMUM_OCCLUDED_PITCH = -2;  // FIXME calibrate
-        public static final double MAXIMUM_OCCLUDED_PITCH = -2;
+        /**
+         * An initial presumption to the slope of the path from the robot's
+         * shooter to the virtual target
+         * 
+         * Since the slope to the virtual target depends on the time of flight,
+         * which itself depends on the slope to the virtual target, we provide
+         * an initial guess.
+         * 
+         * The value hereby is arbitrary and it depicts a common value for the
+         * slope. 
+         */
+        public static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
 
         public static final double POSE_HISTORY_DURATION = 0.5;
 
