@@ -98,11 +98,6 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
     }
 
-    public boolean isOccluded() {
-        double pitch = pivotMotor.getEncoder().getPosition();
-        return pitch > MINIMUM_OCCLUDED_PITCH && pitch < MAXIMUM_OCCLUDED_PITCH;
-    }
-
     public boolean doesSeeNote() {
         return !beamBreaker.get();
     }
