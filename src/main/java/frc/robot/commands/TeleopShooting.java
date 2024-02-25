@@ -127,6 +127,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                     yawController.calculate(swerve.getPose().getRotation().getRadians(), orientationToVirtualTarget.getRadians()),
+                    true,
                     true
             );
             shooter.setPivotAngle(targetShooterOrientation);
@@ -186,6 +187,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             swerve.drive(
                     new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                     0,
+                    true,
                     true
             );
         }
