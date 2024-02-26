@@ -10,41 +10,33 @@ public class LedsSubsystem extends SubsystemBase {
     private String currentAnimation = "";
     private int rainbowFirstPixelHue = 0;
 
+    public LedsSubsystem() {
+        led.setLength(ledBuffer.getLength());
+    }
+
     @Override
     public void periodic() {
         if (currentAnimation.equals("rainbow")) {
             rainbow();
+            System.out.println("WOW");
+
         }
     }
 
     public void startLEDs(String animation) {
 
-        switch (animation) {
-            case "blue": {
-                animateBlueLight();
-                break;
-            }
-            case "red":
-                animateRedLight();
-                break;
 
-            case "rainbow": {
-                currentAnimation = "rainbow";
-                rainbow();
-                break;
-            }
-            default: {
-                return;
-            }
+        if (animation == "blue") animateBlueLight();
+        if (animation == "red") animateRedLight();
+        if(animation == "rainbow") {
+            currentAnimation = "rainbow";
+            rainbow();
         }
 
-        led.setLength(ledBuffer.getLength());
         led.setData(ledBuffer);
         led.start();
     }
 
-    public void stopLEDs() {
-    }
 
     private void animateBlueLight() {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
