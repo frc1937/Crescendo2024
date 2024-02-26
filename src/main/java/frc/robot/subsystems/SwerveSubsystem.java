@@ -4,6 +4,10 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -14,7 +18,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +37,10 @@ import java.util.List;
 import static frc.robot.Constants.NavigationConstants.DEFAULT_PATH_CONSTRAINTS;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_D;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -40,6 +51,11 @@ public class SwerveSubsystem extends SubsystemBase {
     private final Field2d field2d = new Field2d();
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);
     private double previousTimestamp = 0;
+
+
+    private final PIDController azimuthController = new PIDController(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D);
+
+    private double yawCorrection = 0;
 
     public SwerveSubsystem() {
         SmartDashboard.putData("Field", field2d);
@@ -73,6 +89,30 @@ public class SwerveSubsystem extends SubsystemBase {
 
                 this
         );
+
+        azimuthController.setTolerance(AZIMUTH_CONTROLLER_TOLERANCE);
+        azimuthController.enableContinuousInput(-Math.PI, Math.PI);
+
+        SmartDashboard.putNumber("Azimuth Error [rad]", azimuthController.getPositionError());
+    }
+
+    /**
+     * Publish the current PID gains so they can be modified
+     */
+    public void publishControllerGains() {
+        SmartDashboard.putNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P);
+        SmartDashboard.putNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I);
+        SmartDashboard.putNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D);
+    }
+
+    /**
+     * Re-read the PID gains without re-deploying the code.
+     */
+    public void rereadControllerGains() {
+        azimuthController.setPID(
+            SmartDashboard.getNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P),
+            SmartDashboard.getNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I),
+            SmartDashboard.getNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D));
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
@@ -100,6 +140,47 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         drive(flippedTranslation, rotation, true);
+    }
+
+    /**
+     * Set the azimuth setpoint.
+     * 
+     * @param azimuthSetpoint field-relative setpoint azimuth, not flipped by alliance
+     * 
+     * @see #driveWithAzimuth(Translation2d) 
+     */
+    public void setAzimuthSetpoint(Rotation2d azimuthSetpoint) {
+        SmartDashboard.putNumber("Azimuth Setpoint [deg]", azimuthSetpoint.getDegrees());
+        azimuthController.setSetpoint(azimuthSetpoint.getRadians());
+    }
+
+    /**
+     * Drive the robot whilst rotating it to achieve the goal azimuth
+     * 
+     * @param translation field-relative translation, like in {@link #drive(Translation2d, double) drive}
+     * 
+     * @see #setAzimuthGoal(Rotation2d)
+     */
+    public void driveWithAzimuth(Translation2d translation) {
+        drive(translation, yawCorrection);
+    }
+
+    /**
+     * Drive the robot whilst rotating it to achieve the goal azimuth
+     * 
+     * @param translation field-relative translation, like in {@link #drive(Translation2d, double) drive}
+     * @param azimuthGoal field-relative goal azimuth, not flipped by alliance
+     * 
+     * @see #setAzimuthGoal(Rotation2d)
+     * @see #driveWithAzimuth(Translation2d)
+     */
+    public void driveWithAzimuth(Translation2d translation, Rotation2d azimuthSetpoint) {
+        setAzimuthSetpoint(azimuthSetpoint);
+        driveWithAzimuth(translation);
+    }
+
+    public boolean azimuthAtSetpoint() {
+        return azimuthController.atSetpoint();
     }
 
     public void resetPose() {
@@ -135,6 +216,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     }
 
+    // TODO rename to getGyroAzimuth
     public Rotation2d getGyroYaw() {
         return Constants.Swerve.INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
@@ -149,12 +231,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        /*for (SwerveModule mod : swerveModules) {
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-        }*/
-
+        // Update the pose estimation
         EstimatedRobotPose visionRobotPose;
 
         if ((visionRobotPose = visionPoseEstimator.getEstimatedGlobalPose(getPose())) != null) {
@@ -172,8 +249,13 @@ public class SwerveSubsystem extends SubsystemBase {
         field2d.setRobotPose(poseEstimator.getEstimatedPosition());
 
         SmartDashboard.putData("Field", field2d);
-    }
 
+        // Calculate the azimuth control. Whilst it is always calculated, only
+        // {@link #driveWithAzimuth driveWithAzimuth} uses it.
+        SmartDashboard.putNumber("Azimuth [deg]", getPose().getRotation().getDegrees());
+        yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
+        // new LinearSystem<>(null, null, null, null)
+    }
 
     private void sampleRobotPose() {
         poseHistory.addSample(Timer.getFPGATimestamp(), getPose());

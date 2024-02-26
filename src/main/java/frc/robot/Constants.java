@@ -163,7 +163,9 @@ public final class Constants {
     }
 
     public static final class Swerve {
-        public static final double YAW_CONTROLLER_P = 7, YAW_CONTROLLER_I = 0, YAW_CONTROLLER_D = 0.75;
+        public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0.1,
+                                   AZIMUTH_CONTROLLER_D = 2,
+                                   AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(3.5);
 
         public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
@@ -290,7 +292,7 @@ public final class Constants {
 
         public static final HolonomicPathFollowerConfig holomonicPathFollowerConfig = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                 new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(YAW_CONTROLLER_P, YAW_CONTROLLER_I, YAW_CONTROLLER_D), // Rotation PID constants
+                new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                 Constants.Swerve.MAX_SPEED, // Max module speed, in m/s
                 0.4, // Drive base radius in meters. Distance from robot center to furthest module.
                 new ReplanningConfig());

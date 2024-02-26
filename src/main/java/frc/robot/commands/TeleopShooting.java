@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,11 +34,7 @@ import static frc.robot.Constants.ShootingConstants.SHOOTING_KICKER_SPEED;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
-import static frc.robot.Constants.Swerve.MAX_ANGULAR_VELOCITY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
-import static frc.robot.Constants.Swerve.YAW_CONTROLLER_D;
-import static frc.robot.Constants.Swerve.YAW_CONTROLLER_I;
-import static frc.robot.Constants.Swerve.YAW_CONTROLLER_P;
 import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
 import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
 
@@ -53,8 +50,6 @@ public class TeleopShooting extends SequentialCommandGroup {
         private final SwerveSubsystem swerve;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
-        private final ProfiledPIDController yawController = new ProfiledPIDController(YAW_CONTROLLER_P, YAW_CONTROLLER_I, YAW_CONTROLLER_D,
-                new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ANGULAR_VELOCITY));  // WARNING this is nuts.
         private Rotation2d targetShooterOrientation = new Rotation2d();
         private Rotation2d orientationToVirtualTarget;
         private double slopeToVirtualTarget = DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
@@ -64,9 +59,6 @@ public class TeleopShooting extends SequentialCommandGroup {
             this.shooter = shooter;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
-
-            yawController.setTolerance(0.1); // TODO move to constants
-            yawController.enableContinuousInput(-Math.PI, Math.PI);
 
             addRequirements(swerve, shooter);
         }
@@ -90,7 +82,7 @@ public class TeleopShooting extends SequentialCommandGroup {
                 Transform3d robotToShooter = new Transform3d(ROBOT_TO_PIVOT.plus(pivotToShooter), new Rotation3d());
                 predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
             } else {
-                // We cannot trust the predicted yaw. Thus, using it to predict the shooter position
+                // We cannot trust the predicted azimuth. Thus, using it to predict the shooter position
                 // is unviable. Using the centre of the robot is good enough. In the next time execute()
                 // is called, orientationToVirtualTarget will have a value and this won't be needed.
                 predictedShooterPosition = predictedState.getPose3d().getTranslation();
@@ -124,10 +116,9 @@ public class TeleopShooting extends SequentialCommandGroup {
             // the path slope becasue of gravity.
             targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
 
-            swerve.drive(
-                    new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    yawController.calculate(swerve.getPose().getRotation().getRadians(), orientationToVirtualTarget.getRadians())
-            );
+            swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
+                                    orientationToVirtualTarget);
+
             shooter.setPivotAngle(targetShooterOrientation);
             shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget), true);
         }
@@ -136,12 +127,12 @@ public class TeleopShooting extends SequentialCommandGroup {
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady();
             boolean pitchReady = shooter.hasPivotArrived();
-            boolean yawReady = yawController.atSetpoint();
+            boolean azimuthReady = swerve.azimuthAtSetpoint();
             boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
 
-            boolean readyToKick = flywheelsReady && pitchReady && yawReady && slopeViable;
+            boolean readyToKick = flywheelsReady && pitchReady && azimuthReady && slopeViable;
 
-            SmartDashboard.putBooleanArray("flywheels | pitch | yaw | slope", new boolean[]{flywheelsReady, pitchReady, yawReady, slopeViable});
+            SmartDashboard.putBooleanArray("flywheels | pitch | azimuth | slope", new boolean[]{flywheelsReady, pitchReady, azimuthReady, slopeViable});
 
             return readyToKick;
         }
@@ -153,7 +144,7 @@ public class TeleopShooting extends SequentialCommandGroup {
                 shooter.setPivotAngle(Rotation2d.fromDegrees(0));
             }
 
-            yawController.reset(0);
+            // yawController.reset(0);
         }
     }
 
@@ -162,7 +153,8 @@ public class TeleopShooting extends SequentialCommandGroup {
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
 
-        public TeleopThrow(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+        public TeleopThrow(SwerveSubsystem swerve, ShooterSubsystem shooter,
+                           DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
             this.shooter = shooter;
             this.translationSup = translationSup;
@@ -182,10 +174,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
-            swerve.drive(
-                    new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    0
-            );
+            swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
         }
 
         @Override
