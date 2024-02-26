@@ -164,7 +164,7 @@ public final class Constants {
     }
 
     public static final class Swerve {
-        public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0.1,
+        public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0,
                                    AZIMUTH_CONTROLLER_D = 2,
                                    AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(3.5);
 
