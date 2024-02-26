@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.LedsCommand;
 import frc.robot.commands.MountCommand;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.ShooterCommands;
@@ -23,7 +22,6 @@ import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.LedsSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -38,6 +36,10 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     /* MAIN-DRIVER */
+    private final JoystickButton driveAButton = new JoystickButton(driveController, XboxController.Button.kA.value);
+    private final JoystickButton driveBButton = new JoystickButton(driveController, XboxController.Button.kB.value);
+    private final JoystickButton driveYButton = new JoystickButton(driveController, XboxController.Button.kY.value);
+    private final JoystickButton driveXButton = new JoystickButton(driveController, XboxController.Button.kX.value);
     private final JoystickButton startButton = new JoystickButton(driveController, XboxController.Button.kStart.value);
     private final TriggerButton leftTrigger = new TriggerButton(driveController, XboxController.Axis.kLeftTrigger);
     private final TriggerButton rightTrigger = new TriggerButton(driveController, XboxController.Axis.kRightTrigger);
@@ -55,7 +57,7 @@ public class RobotContainer {
     private final JoystickButton opLeftBumper = new JoystickButton(operatorController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     /* Subsystems */
-    private final LedsSubsystem ledsSubsystem = new LedsSubsystem();
+//    private final LedsSubsystem ledsSubsystem = new LedsSubsystem();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -64,7 +66,7 @@ public class RobotContainer {
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
 
     public RobotContainer() {
-        ledsSubsystem.setDefaultCommand(new LedsCommand(ledsSubsystem, "blue"));
+//        ledsSubsystem.setDefaultCommand(new LedsCommand(ledsSubsystem, "blue").ignoringDisable(true));
 
         swerveSubsystem.setDefaultCommand(
                 new TeleopSwerve(
@@ -93,11 +95,12 @@ public class RobotContainer {
 
 
     private void configureBindings() {
+        driveXButton.whileTrue(shooterCommands.setAngle(0));
+        driveYButton.whileTrue(shooterCommands.setAngle(50));
+        driveBButton.whileTrue(shooterCommands.setAngle(90));
+
         backButton.whileTrue(Navigate.navigateToAmplifier());
-
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
-
-        leftTrigger.whileTrue(shooterCommands.intakeGet());
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
@@ -108,8 +111,8 @@ public class RobotContainer {
         bButton.whileTrue(new MountCommand(mountSubsystem));
 
         leftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-
         rightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        leftTrigger.whileTrue(shooterCommands.intakeGet());
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
@@ -134,6 +137,28 @@ public class RobotContainer {
     }
 
     public void robotInit() {
-        ledsSubsystem.startLEDs("rainbow");
+//
+//        AddressableLED led = new AddressableLED(0);
+//
+//            // Reuse buffer
+//            // Default to a length of 60, start empty output
+//            // Length is expensive to set, so only set it once, then just update data
+//        AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(105);
+//            led.setLength(m_ledBuffer.getLength());
+//
+//
+//        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+//            // Sets the specified LED to the RGB values for red
+//            m_ledBuffer.setRGB(i, 255, 0, 0);
+//        }
+//
+//        led.setData(m_ledBuffer);
+//        led.start();
+
+//        ledsSubsystem.startLEDs("blue");
+    }
+
+    public void robotPeriodic() {
+//        ledsSubsystem.periodic();
     }
 }

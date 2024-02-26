@@ -131,9 +131,9 @@ public final class Constants {
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
-        public static final double PIVOT_UP_P = 0.0425;
+        public static final double PIVOT_UP_P = 0.04;
         public static final double PIVOT_UP_FF = 0.000085;
-        public static final double PIVOT_HIGH_P = 0.041;
+        public static final double PIVOT_HIGH_P = 0.0395;
         public static final double PIVOT_HIGH_FF = 0.000085;
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;

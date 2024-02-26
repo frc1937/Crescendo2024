@@ -117,6 +117,17 @@ public class ShooterCommands {
                 }));
     }
 
+    public Command setAngle(double angle) {
+        return new FunctionalCommand(
+                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
+                () -> {
+                },
+                (interrupt) -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
+                () -> false,
+                shooterSubsystem
+        );
+    }
+
     private void initializeShooterByState(ShootingStates state) {
         if (shooterSubsystem.doesSeeNote()) {
             shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
