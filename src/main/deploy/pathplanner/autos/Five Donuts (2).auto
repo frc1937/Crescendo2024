@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Base to top and middle NOTEs (2)"
+                  "pathName": "Base to NOTEs 1 and 2 (2)"
                 }
               },
               {
@@ -68,7 +68,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Middle NOTE to shooting position (2)"
+                  "pathName": "NOTE 2 to shooting position (2)"
                 }
               },
               {
@@ -100,7 +100,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Shooting position to bottom NOTE (2)"
+                  "pathName": "Shooting position to NOTE 3 (2)"
                 }
               },
               {
@@ -132,7 +132,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Bottom NOTE to centre (2)"
+                  "pathName": "NOTE 3 to centre (2)"
                 }
               },
               {

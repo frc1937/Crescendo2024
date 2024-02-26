@@ -3,72 +3,72 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3,
-        "y": 5.55
+        "x": 2.3303569684062446,
+        "y": 3.404095269729002
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3499999999999999,
-        "y": 5.636602540378443
+        "x": 3.7117289619194636,
+        "y": 1.5984447353510094
       },
       "isLocked": false,
-      "linkedName": "Base"
+      "linkedName": "First shooting Position (1)"
     },
     {
       "anchor": {
-        "x": 2.7076091812668635,
-        "y": 7.014791090923124
+        "x": 8.299857368945508,
+        "y": 2.4075340458373238
       },
       "prevControl": {
-        "x": 1.4775206126933773,
-        "y": 6.981842289979191
+        "x": 7.784783895782808,
+        "y": 1.0983889682154588
       },
       "nextControl": {
-        "x": 4.0192228743943925,
-        "y": 7.049923600560469
+        "x": 9.247083878783142,
+        "y": 4.815068091674646
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NOTE 7 (1)"
     },
     {
       "anchor": {
-        "x": 3.65,
-        "y": 5.55
+        "x": 3.28745042105469,
+        "y": 2.920615071999376
       },
       "prevControl": {
-        "x": 3.65,
-        "y": 5.6499999999999995
+        "x": 3.66239424786542,
+        "y": 3.029151442918271
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Inverted Middle NOTE"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": 0.0,
+      "rotationDegrees": 48.14495746469794,
       "rotateFast": false
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
+    "maxAngularVelocity": 90.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -179.72144576592322,
+    "velocity": 0.0,
+    "rotation": 139.20898492417024,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Five Donuts",
+  "folder": "Three Donuts (1)",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
