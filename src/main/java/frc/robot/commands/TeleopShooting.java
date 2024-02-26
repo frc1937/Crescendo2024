@@ -143,7 +143,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             SmartDashboard.putBooleanArray("flywheels | pitch | yaw | slope", new boolean[]{flywheelsReady, pitchReady, yawReady, slopeViable});
 
-            return readyToKick || !shooter.doesSeeNote();
+            return readyToKick;
         }
 
         @Override
