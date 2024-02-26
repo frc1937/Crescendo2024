@@ -29,6 +29,7 @@ import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.SHOOTING_KICKER_SPEED;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
@@ -172,7 +173,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            shooter.setKickerSpeed(0.9);
+            shooter.setKickerSpeed(SHOOTING_KICKER_SPEED);
         }
 
         @Override
