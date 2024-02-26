@@ -29,6 +29,7 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
 import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_P;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
+import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_D;
 import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_P;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
@@ -165,6 +166,7 @@ public class ShooterSubsystem extends SubsystemBase {
         pitchController.setFF(PIVOT_DOWN_FF, 1);
 
         pitchController.setP(PIVOT_HIGH_P, 2);
+        pitchController.setD(PIVOT_HIGH_D, 2);
         pitchController.setFF(PIVOT_HIGH_FF, 2);
 
         pitchController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);

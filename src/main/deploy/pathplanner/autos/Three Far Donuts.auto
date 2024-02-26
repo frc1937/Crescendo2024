@@ -8,12 +8,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Subwoofer to start pos"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "Subwoofer to note"
           }
         }

@@ -119,10 +119,12 @@ public class ShooterCommands {
 
     public Command setAngle(double angle) {
         return new FunctionalCommand(
-                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
+                () -> {
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle));
+                },
                 () -> {
                 },
-                (interrupt) -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
+                interrupt -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
                 () -> false,
                 shooterSubsystem
         );

@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
@@ -125,21 +124,19 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        ChassisSpeeds chasesSpeeds = fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, poseEstimator.getEstimatedPosition().getRotation())
-                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+            translation = translation.unaryMinus();
+        }
 
-        drive(chasesSpeeds);
+        if (fieldRelative) {
+            drive(ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getGyroYaw()));
+        } else {
+            drive(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+        }
     }
 
     public void drive(Translation2d translation, double rotation) {
-        Translation2d flippedTranslation = translation;
-
-        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-            flippedTranslation = translation.unaryMinus();
-        }
-
-        drive(flippedTranslation, rotation, true);
+        drive(translation, rotation, true);
     }
 
     /**
@@ -273,7 +270,7 @@ public class SwerveSubsystem extends SubsystemBase {
         drive(new ChassisSpeeds(0, 0, 0));
     }
 
-    public Command pathPlanToPose(Pose2d endPose) {
+    public void pathPlanToPose(Pose2d endPose) {
         List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(getPose(), endPose);
 
         // Create the path using the bezier points created above
@@ -282,6 +279,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 DEFAULT_PATH_CONSTRAINTS, // The constraints for this path. If using a differential drivetrain, the angular constraints have no effect.
                 new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
         );
-        return AutoBuilder.followPath(path);
+        AutoBuilder.followPath(path);
     }
 }
