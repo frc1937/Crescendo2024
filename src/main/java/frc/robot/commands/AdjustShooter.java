@@ -18,10 +18,7 @@ public class AdjustShooter extends Command {
 
     /**
      * Creates a new AdjustShooter.
-     *
-     * @param distance the distance, in metres, from the centre of the robot to the target, all
-     *                 projected onto the field. Negative slope will cause the shooter to adjust
-     *                 backwards.
+     * @param slope the slope of the shooter
      */
     public AdjustShooter(ShooterSubsystem shooter, double slope) {
         this.shooter = shooter;

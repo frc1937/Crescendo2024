@@ -25,7 +25,8 @@ public class ShooterCommands {
     public Command accelerateFlywheel(ShootingStates state) {
         return new FunctionalCommand(
                 () -> initializeShooterByState(state),
-                () -> {},
+                () -> {
+                },
                 interrupted -> shooterSubsystem.setKickerSpeed(0.9),
                 () -> false,
 

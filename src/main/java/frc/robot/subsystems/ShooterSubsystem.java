@@ -78,7 +78,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Velocity", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Target Velocity", targetFlywheelVelocity);
         SmartDashboard.putNumber("Current angle", currentAngle);
-        SmartDashboard.putBoolean("Is nigg", doesSeeNote());
+        SmartDashboard.putBoolean("Does see note", doesSeeNote());
 
         if (currentAngle > 100) {
             pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);

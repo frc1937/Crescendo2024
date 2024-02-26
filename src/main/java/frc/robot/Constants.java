@@ -53,7 +53,6 @@ public final class Constants {
     }
 
     public static final class ShootingConstants {
-
         /**
          * An initial presumption to the slope of the path from the robot's
          * shooter to the virtual target

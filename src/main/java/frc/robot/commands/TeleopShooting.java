@@ -90,7 +90,7 @@ public class TeleopShooting extends SequentialCommandGroup {
                 predictedShooterPosition = predictedState.getPose3d().transformBy(robotToShooter).getTranslation();
             } else {
                 // We cannot trust the predicted yaw. Thus, using it to predict the shooter position
-                // is enviable. Using the centre of the robot is good enough. In the next time execute()
+                // is unviable. Using the centre of the robot is good enough. In the next time execute()
                 // is called, orientationToVirtualTarget will have a value and this won't be needed.
                 predictedShooterPosition = predictedState.getPose3d().getTranslation();
             }
