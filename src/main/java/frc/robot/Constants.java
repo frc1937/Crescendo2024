@@ -159,7 +159,8 @@ public final class Constants {
         public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);
         public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31, 5.5, 2.05);
 
-        public static final double SHOOTING_KICKER_SPEED = 0.9;
+        public static final double KICKER_SPEED_BACKWARDS = -0.5;
+        public static final double KICKER_SPEED_FORWARD = 0.8;
     }
 
     public static final class Swerve {

@@ -4,11 +4,11 @@
 
 package frc.robot.commands;
 
-import static frc.robot.Constants.ShootingConstants.SHOOTING_KICKER_SPEED;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
+
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 
 public class ShooterKick extends Command {
     private final ShooterSubsystem shooter;
@@ -21,7 +21,7 @@ public class ShooterKick extends Command {
 
     @Override
     public void initialize() {
-        shooter.setKickerSpeed(SHOOTING_KICKER_SPEED);
+        shooter.setKickerSpeed(KICKER_SPEED_FORWARD);
     }
 
     @Override

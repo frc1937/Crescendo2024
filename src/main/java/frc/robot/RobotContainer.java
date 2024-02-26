@@ -47,9 +47,7 @@ public class RobotContainer {
     private final JoystickButton rightBumper = new JoystickButton(driveController, XboxController.Button.kRightBumper.value);
     private final JoystickButton backButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
     /* OPERATOR */
-    private final TriggerButton accelerateFlywheelButton = new TriggerButton(operatorController, XboxController.Axis.kRightTrigger);
-    private final JoystickButton randomPitchYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
-    private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
+     private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
     private final JoystickButton opBButton = new JoystickButton(operatorController, XboxController.Button.kB.value);
     private final JoystickButton opYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
     private final JoystickButton opXButton = new JoystickButton(operatorController, XboxController.Button.kX.value);
@@ -99,7 +97,7 @@ public class RobotContainer {
 
         startButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
-        leftTrigger.whileTrue(shooterCommands.intakeGet().andThen(shooterCommands.setKickerSpeed(-0.8).withTimeout(0.7)));
+        leftTrigger.whileTrue(shooterCommands.intakeGet());
 
         aButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem,
@@ -113,7 +111,7 @@ public class RobotContainer {
 
         rightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
-        //sagi:
+        //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
         opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));

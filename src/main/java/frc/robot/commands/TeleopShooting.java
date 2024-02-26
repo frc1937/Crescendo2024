@@ -24,12 +24,12 @@ import java.util.function.DoubleSupplier;
 
 import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_KICKER_SPEED;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
@@ -143,7 +143,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             SmartDashboard.putBooleanArray("flywheels | pitch | yaw | slope", new boolean[]{flywheelsReady, pitchReady, yawReady, slopeViable});
 
-            return readyToKick;
+            return readyToKick || !shooter.doesSeeNote();
         }
 
         @Override
@@ -173,7 +173,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            shooter.setKickerSpeed(SHOOTING_KICKER_SPEED);
+            shooter.setKickerSpeed(KICKER_SPEED_FORWARD);
         }
 
         @Override
