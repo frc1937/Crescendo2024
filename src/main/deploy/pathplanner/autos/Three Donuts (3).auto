@@ -46,7 +46,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Shifra2"
+                        "name": "Intake"
                       }
                     }
                   ]
@@ -93,7 +93,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shifra2"
+                  "name": "Intake"
                 }
               }
             ]

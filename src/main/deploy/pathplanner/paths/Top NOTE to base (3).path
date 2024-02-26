@@ -65,7 +65,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Three Donuts",
+  "folder": null,
   "previewStartingState": {
     "rotation": -151.7457505383201,
     "velocity": 0

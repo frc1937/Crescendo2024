@@ -36,7 +36,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shifra2"
+                  "name": "Intake"
                 }
               }
             ]
@@ -55,7 +55,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter2"
+                  "name": "AdjustShooter12"
                 }
               }
             ]
@@ -80,7 +80,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shifra2"
+                  "name": "Intake"
                 }
               }
             ]
@@ -99,7 +99,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter3"
+                  "name": "AdjustShooter13"
                 }
               }
             ]
@@ -124,7 +124,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shifra2"
+                  "name": "Intake"
                 }
               }
             ]
@@ -143,7 +143,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter4"
+                  "name": "AdjustShooter14"
                 }
               }
             ]
