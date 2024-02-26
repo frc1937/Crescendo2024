@@ -3,9 +3,7 @@
   "robotLength": 0.69,
   "holonomicMode": true,
   "pathFolders": [
-    "Five Donuts",
-    "Four Donuts",
-    "Three Donuts"
+    "Five Donuts"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.5,
