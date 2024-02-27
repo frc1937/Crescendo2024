@@ -84,7 +84,7 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
             SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
             SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(60));
-            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(56.5));
+            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(58));
 
             // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(57));
             // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(82));

@@ -46,7 +46,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "AdjustShooter22"
+                        "name": "AdjustShooter2 (2)"
                       }
                     }
                   ]
@@ -72,9 +72,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Intake"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "AdjustShooter3 (2)"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -107,6 +120,88 @@
                       }
                     }
                   ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Bottom NOTE to base (2)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AdjustShooter1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterKick"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Base to NOTE 6 to shooting position (2)"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "AdjustShooter4 (2)"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Shooting position to resting position (2)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShooterKick"
                 }
               }
             ]

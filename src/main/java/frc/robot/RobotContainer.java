@@ -22,6 +22,7 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -75,16 +76,20 @@ public class RobotContainer {
                 )
         );
 
-        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet().withTimeout(5));
-        NamedCommands.registerCommand("AdjustShooter22", new AdjustShooter(shooterSubsystem, 0.8));
-        NamedCommands.registerCommand("AdjustShooter23", new AdjustShooter(shooterSubsystem, 0.8));
-        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, 1.15));
-        NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, 0.9));
-        NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 0.8));
-        NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, 0.9));
-        NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
+        // NamedCommands.registerCommand("BIntake", shooterCommands.receiveFromFeeder()/*shooterCommands.intakeGet().withTimeout(5)*/);
+        // NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
+        // NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.88));
+        // NamedCommands.registerCommand("AdjustShooter2 (2)", new AdjustShooter(shooterSubsystem, 0.365));
+        // NamedCommands.registerCommand("AdjustShooter3 (2)", new AdjustShooter(shooterSubsystem, 0.65));
 
-        autoChooser = AutoBuilder.buildAutoChooser("Eyal");
+        // NamedCommands.registerCommand("Intake", new FloorIntake(intakeSubsystem, shooterSubsystem));
+
+        // NamedCommands.registerCommand("AdjustShooter23", new AdjustShooter(shooterSubsystem, 0.8));
+        // NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, 0.9));
+        // NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 0.8));
+        // NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, 0.9));
+
+        autoChooser = AutoBuilder.buildAutoChooser("Copy of Five Donuts");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
