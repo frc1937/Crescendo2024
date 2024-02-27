@@ -97,6 +97,28 @@ public class ShooterCommands {
         ).andThen(setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7));
     }
 
+    public SequentialCommandGroup HipsterIntakeGet() {
+        return new FunctionalCommand(
+                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
+                () -> {
+                    if (shooterSubsystem.hasPivotArrived()) {
+                        intakeSubsystem.setSpeedPercentage(0.7);
+                        shooterSubsystem.setFlywheelSpeed(-3000, false);
+                        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+                    }
+                },
+                interrupted -> {
+                    shooterSubsystem.stopFlywheels();
+                    intakeSubsystem.stopMotor();
+                    shooterSubsystem.stopKicker();
+                },
+
+                () -> false,
+
+                shooterSubsystem
+        ).andThen(setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7));
+    }
+
     public Command setKickerSpeed(double speed) {
         return new FunctionalCommand(
                 () -> shooterSubsystem.setKickerSpeed(speed),

@@ -43,7 +43,7 @@ public final class Constants {
     }
 
     public static class VisionConstants {
-        public static final String CAMERA_NAME = "Upfacing Front Camera";
+        public static final String CAMERA_NAME = "Front1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     }
@@ -83,8 +83,8 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
             SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
-            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(60));
-            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(58));
+            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(61));
+            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(60));
 
             // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(57));
             // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(82));
@@ -104,7 +104,7 @@ public final class Constants {
             SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.41, 0.88 * FLYWHEEL_MAX_RPM);
-            SLOPE_TO_VELOCITY_MAP.put(0.36, 0.91 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.36, 0.92 * FLYWHEEL_MAX_RPM);
 
             // SLOPE_TO_VELOCITY_MAP.put(0.58, 0.95 * 5600);
             // SLOPE_TO_VELOCITY_MAP.put(0.51, 0.94 * 5600);

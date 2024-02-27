@@ -5,7 +5,7 @@
       "x": 1.3,
       "y": 5.55
     },
-    "rotation": 2.9568523835007356
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -24,19 +24,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Base to top NOTE"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Base to NOTE 1 (3)"
                 }
               }
             ]
@@ -49,7 +49,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Top NOTE to centre"
+                  "pathName": "NOTE 1 to centre (3)"
                 }
               },
               {
@@ -68,19 +68,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Centre to middle NOTE"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "centre to NOTE 2 (3)"
                 }
               }
             ]
@@ -93,13 +93,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Middle NOTE to bottom"
+                  "pathName": "NOTE 2 to centre (3)"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter3"
+                  "name": "AdjustShooter2"
                 }
               }
             ]
@@ -112,19 +112,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Bottom to bottom NOTE"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Centre to NOTE 3 (3)"
                 }
               }
             ]
@@ -137,13 +137,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Bottom NOTE to centre"
+                  "pathName": "NOTE 3 to centre (3)"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter4"
+                  "name": "AdjustShooter2"
                 }
               }
             ]
@@ -153,12 +153,6 @@
           "type": "named",
           "data": {
             "name": "ShooterKick"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LAZI"
           }
         }
       ]

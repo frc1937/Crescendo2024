@@ -5,10 +5,11 @@
   "pathFolders": [
     "Five Donuts",
     "Four Donuts",
+    "Crown",
     "Three Far Donuts"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 3.8,
+  "defaultMaxVel": 2.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

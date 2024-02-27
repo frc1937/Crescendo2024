@@ -76,20 +76,22 @@ public class RobotContainer {
                 )
         );
 
-        // NamedCommands.registerCommand("BIntake", shooterCommands.receiveFromFeeder()/*shooterCommands.intakeGet().withTimeout(5)*/);
-        // NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
-        // NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.88));
+        NamedCommands.registerCommand("Intake", new FloorIntake(intakeSubsystem, shooterSubsystem).withTimeout(2.7));
+        NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
+        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.94));
+        NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
         // NamedCommands.registerCommand("AdjustShooter2 (2)", new AdjustShooter(shooterSubsystem, 0.365));
-        // NamedCommands.registerCommand("AdjustShooter3 (2)", new AdjustShooter(shooterSubsystem, 0.65));
-
-        // NamedCommands.registerCommand("Intake", new FloorIntake(intakeSubsystem, shooterSubsystem));
-
+        // NamedCommands.registerCommand("AdjustShooter3 (2)", new AdjustShooter(shooterSubsystem, 0.60));        
+        // NamedCommands.registerCommand("AdjustShooter4 (2)", new AdjustShooter(shooterSubsystem, 0.5));
+        // NamedCommands.registerCommand("AdjustShooter5 (2)", new AdjustShooter(shooterSubsystem, 0.45));
+        
+        // NamedCommands.registerCommand("BIntake", shooterCommands.receiveFromFeeder()/*shooterCommands.intakeGet().withTimeout(5)*/);
         // NamedCommands.registerCommand("AdjustShooter23", new AdjustShooter(shooterSubsystem, 0.8));
         // NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, 0.9));
         // NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 0.8));
         // NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, 0.9));
 
-        autoChooser = AutoBuilder.buildAutoChooser("Copy of Five Donuts");
+        autoChooser = AutoBuilder.buildAutoChooser("Best Four Donuts");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
