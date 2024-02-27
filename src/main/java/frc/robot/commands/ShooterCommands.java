@@ -16,8 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
-import static frc.robot.RobotContainer.led;
-import static frc.robot.RobotContainer.ledBuffer;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;

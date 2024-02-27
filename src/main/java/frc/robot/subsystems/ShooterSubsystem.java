@@ -39,8 +39,6 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
 import static frc.robot.Constants.ShootingConstants.PIVOT_UP_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_UP_P;
 import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
-import static frc.robot.RobotContainer.led;
-import static frc.robot.RobotContainer.ledBuffer;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -110,24 +108,11 @@ public class ShooterSubsystem extends SubsystemBase {
             pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
         }
 
-        for (int j = 0; j < ledBuffer.getLength(); j++) {
-            ledBuffer.setRGB(j, 0, 0, 255);
-        }
-
         if(doesSeeNote()) {
             consecutiveNoteInsideSamples++;
-
-            if(consecutiveNoteInsideSamples > CONSIDERED_NOISELESS_THRESHOLD) {
-                for (int j = 0; j < ledBuffer.getLength(); j++) {
-                    ledBuffer.setRGB(j, 0, 255, 0);
-                }
-            }
-
         } else {
             consecutiveNoteInsideSamples = 0;
         }
-
-        led.setData(ledBuffer);
     }
 
     public boolean doesSeeNoteNoiseless() {

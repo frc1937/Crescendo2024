@@ -24,11 +24,6 @@ import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
-    public static class LedsConstants {
-        public static final int LEDS_PORT = 0; // pwm //TODO: find value
-        public static final int LENGTH = 99; //TODO: find value
-    }
-
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
      */

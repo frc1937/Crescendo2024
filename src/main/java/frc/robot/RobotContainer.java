@@ -7,8 +7,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,9 +31,6 @@ import frc.robot.util.TriggerButton;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
-    public static final AddressableLED led = new AddressableLED(0);
-    public static final AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(200);
-
     private final XboxController driveController = new XboxController(0);
     private final XboxController operatorController = new XboxController(1);
     private final SendableChooser<Command> autoChooser;
@@ -144,19 +139,5 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         swerveSubsystem.infrequentPeriodic();
-    }
-
-    public void robotInit() {
-
-        for (int i = 0; i < ledBuffer.getLength(); i++) {
-            ledBuffer.setRGB(i, 0, 0, 255);
-        }
-
-        led.setSyncTime(400);
-        led.setLength(ledBuffer.getLength());
-
-        led.start();
-
-        led.setData(ledBuffer);
     }
 }
