@@ -18,11 +18,5 @@ public class LedsCommand extends Command {
     @Override
     public void initialize() {
         ledsSubsystem.startLEDs(animation);
-        System.out.println("----- STARTED LEDS!!!");
-    }
-
-
-    @Override
-    public void end(boolean interrupted) {
     }
 }

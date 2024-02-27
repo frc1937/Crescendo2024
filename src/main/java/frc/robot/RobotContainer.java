@@ -17,12 +17,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.MountCommand;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.FloorIntake;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -33,6 +33,9 @@ import frc.robot.util.TriggerButton;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
+    public static final AddressableLED led = new AddressableLED(0);
+    public static final AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(200);
+
     private final XboxController driveController = new XboxController(0);
     private final XboxController operatorController = new XboxController(1);
     private final SendableChooser<Command> autoChooser;
@@ -49,7 +52,7 @@ public class RobotContainer {
     private final JoystickButton drRightBumper = new JoystickButton(driveController, XboxController.Button.kRightBumper.value);
     private final JoystickButton drBackButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
     /* OPERATOR */
-     private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
+    private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
     private final JoystickButton opBButton = new JoystickButton(operatorController, XboxController.Button.kB.value);
     private final JoystickButton opYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
     private final JoystickButton opXButton = new JoystickButton(operatorController, XboxController.Button.kX.value);
@@ -64,6 +67,7 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
+    private final MountCommand mountCommands = new MountCommand(mountSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(
@@ -76,15 +80,18 @@ public class RobotContainer {
                 )
         );
 
-        NamedCommands.registerCommand("Intake", new FloorIntake(intakeSubsystem, shooterSubsystem).withTimeout(2.7));
+        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet().withTimeout(2.7));
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
         NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.94));
         NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
+
+        NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 1.1));
+        NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, -0.99));
         // NamedCommands.registerCommand("AdjustShooter2 (2)", new AdjustShooter(shooterSubsystem, 0.365));
         // NamedCommands.registerCommand("AdjustShooter3 (2)", new AdjustShooter(shooterSubsystem, 0.60));        
         // NamedCommands.registerCommand("AdjustShooter4 (2)", new AdjustShooter(shooterSubsystem, 0.5));
         // NamedCommands.registerCommand("AdjustShooter5 (2)", new AdjustShooter(shooterSubsystem, 0.45));
-        
+
         // NamedCommands.registerCommand("BIntake", shooterCommands.receiveFromFeeder()/*shooterCommands.intakeGet().withTimeout(5)*/);
         // NamedCommands.registerCommand("AdjustShooter23", new AdjustShooter(shooterSubsystem, 0.8));
         // NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, 0.9));
@@ -99,9 +106,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        drXButton.whileTrue(shooterCommands.setAngle(0));
-        driveYButton.whileTrue(shooterCommands.setAngle(70));
-        drBButton.whileTrue(shooterCommands.setAngle(81));
+        driveYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
         drBackButton.whileTrue(Navigate.navigateToAmplifier());
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -112,7 +117,7 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value))
         );
 
-//        drBButton.whileTrue(new MountCommand(mountSubsystem));
+        drBButton.whileTrue(mountCommands.mountCommand());
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
@@ -121,7 +126,6 @@ public class RobotContainer {
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
-        opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
         opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
 
         opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
@@ -129,6 +133,8 @@ public class RobotContainer {
 
         opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
         opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
+
+        opStartButton.whileTrue(mountCommands.testMountCommand());
     }
 
 
@@ -141,16 +147,16 @@ public class RobotContainer {
     }
 
     public void robotInit() {
-        AddressableLED led = new AddressableLED(0);
-        AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(105);
 
         for (int i = 0; i < ledBuffer.getLength(); i++) {
-            ledBuffer.setRGB(i, 0, 0, 122);
+            ledBuffer.setRGB(i, 0, 0, 255);
         }
 
+        led.setSyncTime(400);
         led.setLength(ledBuffer.getLength());
-        led.setData(ledBuffer);
 
         led.start();
+
+        led.setData(ledBuffer);
     }
 }

@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MountSubsystem extends SubsystemBase {
     private final DigitalInput proximitySwitch;
     private final WPI_TalonSRX mountMotor;
-    private boolean isRunning;
+    private int isRunning;
 
     public MountSubsystem() {
         proximitySwitch = new DigitalInput(1);
         mountMotor  = new WPI_TalonSRX(4);
-        isRunning = false;
+        isRunning = 0;
 
         mountMotor.configFactoryDefault();
         mountMotor.setNeutralMode(NeutralMode.Brake);
@@ -25,19 +25,23 @@ public class MountSubsystem extends SubsystemBase {
         int proxyValue = getProxyStatus();
 
         SmartDashboard.putBoolean("ProximityStatus", getProxyStatus() == 1);
-        SmartDashboard.putBoolean("WasProxyEnabled", !isRunning);
+        SmartDashboard.putNumber("WasProxyEnabled", isRunning);
 
-        if(proxyValue == 1 && !isRunning) {
+        if(proxyValue == 1 && isRunning < 5) {
             startMount();
-            isRunning = true;
-        } else if (proxyValue == 1 && isRunning == true) {
+            isRunning++;
+        } else if (proxyValue == 1 && isRunning >= 5) {
             stopMount();
-            isRunning = false;
+            isRunning = 0;
         }
     }
 
     public void startMount() {
         mountMotor.set(-0.1);
+    }
+    //THIS METHOD IS FOR PIT RESET, DO NOT USE ON A REAL GAME.
+    public void startMountBackwards() {
+        mountMotor.set(0.1);
     }
 
     public void stopMount() {

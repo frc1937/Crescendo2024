@@ -12,42 +12,39 @@ public class LedsSubsystem extends SubsystemBase {
 
     public LedsSubsystem() {
         led.setLength(ledBuffer.getLength());
+        led.setSyncTime(400);
+        led.start();
     }
 
     @Override
     public void periodic() {
         if (currentAnimation.equals("rainbow")) {
             rainbow();
-            System.out.println("WOW");
-
         }
     }
 
     public void startLEDs(String animation) {
+        if ("blue".equals(animation)) {
+            animateBlueLight();
+            currentAnimation = "blue";
+        }
 
+        if ("red".equals(animation)) {
+            animateRedLight();
+            currentAnimation = "red";
+        }
 
-        if (animation == "blue") animateBlueLight();
-        if (animation == "red") animateRedLight();
-        if(animation == "rainbow") {
+        if("green".equals("animation")) {
+            animateGreenLight();
+            currentAnimation = "green";
+        }
+
+        if("rainbow".equals(animation)) {
             currentAnimation = "rainbow";
             rainbow();
         }
 
         led.setData(ledBuffer);
-        led.start();
-    }
-
-
-    private void animateBlueLight() {
-        for (int i = 0; i < ledBuffer.getLength(); i++) {
-            ledBuffer.setRGB(i, 0, 0, 122);
-        }
-    }
-
-    private void animateRedLight() {
-        for (int i = 0; i < ledBuffer.getLength(); i++) {
-            ledBuffer.setRGB(i, 122, 0, 0);
-        }
     }
 
     private void rainbow() {
@@ -60,5 +57,24 @@ public class LedsSubsystem extends SubsystemBase {
 
         rainbowFirstPixelHue += 3;
         rainbowFirstPixelHue %= 180;
+    }
+
+
+    private void animateBlueLight() {
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            ledBuffer.setRGB(i, 0, 0, 122);
+        }
+    }
+
+    private void animateGreenLight() {
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            ledBuffer.setRGB(i, 0, 122, 0);
+        }
+    }
+
+    private void animateRedLight() {
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            ledBuffer.setRGB(i, 122, 0, 0);
+        }
     }
 }

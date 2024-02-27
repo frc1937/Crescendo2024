@@ -35,7 +35,7 @@ public class TeleopSwerve extends Command {
         double rotationValue = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
 
         /* Drive */
-        swerveSubsystem.flippedDrive(
+        swerveSubsystem.drive(
                 new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED),
                 rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
                 !robotCentricSup.getAsBoolean()
