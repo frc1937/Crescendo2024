@@ -156,7 +156,7 @@ public final class Constants {
         public static final double SHOOTING_DELAY = 0.5;
         /** In seconds */
         public static final double POST_SHOOTING_DELAY = 0.25;
-        public static final int SHOOTER_VERTICAL_ANGLE = 220;
+        public static final int SHOOTER_VERTICAL_ANGLE = 110;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.2, 5.5, 2.05);
