@@ -79,16 +79,6 @@ public final class Constants {
         public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<Double, Rotation2d>(
             InverseInterpolator.forDouble(), Rotation2d::interpolate);
 
-        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
-                InverseInterpolator.forDouble(), Interpolator.forDouble());
-
-        static {
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
-        }
-
         static {
             SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
@@ -117,6 +107,16 @@ public final class Constants {
             // SLOPE_TO_VELOCITY_MAP.put(0.58, 0.95 * 5600);
             // SLOPE_TO_VELOCITY_MAP.put(0.51, 0.94 * 5600);
             // SLOPE_TO_VELOCITY_MAP.put(0.45, 0.98 * 5600);
+        }
+
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
+        InverseInterpolator.forDouble(), Interpolator.forDouble());
+
+        static {
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
         }
 
         public static final double MINIMUM_VIABLE_SLOPE = 0.38;
@@ -154,7 +154,7 @@ public final class Constants {
         public static final double SHOOTING_DELAY = 0.5;
         /** In seconds */
         public static final double POST_SHOOTING_DELAY = 0.25;
-        public static final int SHOOTER_UTMOST_ANGLE = 220;
+        public static final int SHOOTER_VERTICAL_ANGLE = 220;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);

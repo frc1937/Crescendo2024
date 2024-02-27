@@ -123,7 +123,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+    public void flippedDrive(Translation2d translation, double rotation, boolean fieldRelative) {
         if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
             translation = translation.unaryMinus();
         }
@@ -135,8 +135,8 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public void drive(Translation2d translation, double rotation) {
-        drive(translation, rotation, true);
+    public void flippedDrive(Translation2d translation, double rotation) {
+        flippedDrive(translation, rotation, true);
     }
 
     /**
@@ -154,18 +154,18 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      * 
-     * @param translation field-relative translation, like in {@link #drive(Translation2d, double) drive}
+     * @param translation field-relative translation, like in {@link #flippedDrive(Translation2d, double) drive}
      * 
      * @see #setAzimuthGoal(Rotation2d)
      */
     public void driveWithAzimuth(Translation2d translation) {
-        drive(translation, yawCorrection);
+        flippedDrive(translation, yawCorrection);
     }
 
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      * 
-     * @param translation field-relative translation, like in {@link #drive(Translation2d, double) drive}
+     * @param translation field-relative translation, like in {@link #flippedDrive(Translation2d, double) drive}
      * @param azimuthGoal field-relative goal azimuth, not flipped by alliance
      * 
      * @see #setAzimuthGoal(Rotation2d)

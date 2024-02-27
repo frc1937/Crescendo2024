@@ -37,6 +37,7 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MAX;
 import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
 import static frc.robot.Constants.ShootingConstants.PIVOT_UP_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_UP_P;
+import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -82,12 +83,27 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Pivot setpoint", pivotSetpoint);
         SmartDashboard.putBoolean("Does see note", doesSeeNote());
 
-        if(pivotSetpoint > 80) {
+        if (pivotSetpoint < 80) {
+            // Front region
+            if (pivotSetpoint >= currentAngle) {
+                // Up-moving PID
+                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
+            } else {
+                // Down-moving PID
+                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
+            }
+        } else if (pivotSetpoint > SHOOTER_VERTICAL_ANGLE * 2 - 80) {
+            // Rear region
+            if (pivotSetpoint <= currentAngle) {
+                // Up-moving PID
+                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
+            } else {
+                // Down-moving PID
+                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
+            }
+        } else {
+            // Top region
             pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
-        } else if (pivotSetpoint >= currentAngle) {
-            pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
-        } else if (pivotSetpoint < currentAngle) {
-            pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
         }
 
         SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
