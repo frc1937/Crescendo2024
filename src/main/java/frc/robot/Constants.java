@@ -43,7 +43,7 @@ public final class Constants {
     }
 
     public static class VisionConstants {
-        public static final String CAMERA_NAME = "Ph1937";
+        public static final String CAMERA_NAME = "Upfacing Front Camera";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     }
@@ -83,7 +83,8 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
             SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
-            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(57));
+            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(60));
+            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(56.5));
 
             // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(57));
             // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(82));
@@ -102,7 +103,8 @@ public final class Constants {
             SLOPE_TO_VELOCITY_MAP.put(0.87, 0.74 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * FLYWHEEL_MAX_RPM);
-            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.95 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.88 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.36, 0.91 * FLYWHEEL_MAX_RPM);
 
             // SLOPE_TO_VELOCITY_MAP.put(0.58, 0.95 * 5600);
             // SLOPE_TO_VELOCITY_MAP.put(0.51, 0.94 * 5600);
@@ -113,13 +115,13 @@ public final class Constants {
         InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.5);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.6);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.7);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.8);
         }
 
-        public static final double MINIMUM_VIABLE_SLOPE = 0.38;
+        public static final double MINIMUM_VIABLE_SLOPE = 0.345;
         public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
 
         public static final double POSE_HISTORY_DURATION = 0.5;
@@ -157,8 +159,8 @@ public final class Constants {
         public static final int SHOOTER_VERTICAL_ANGLE = 220;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
-        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);
-        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31, 5.5, 2.05);
+        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.2, 5.5, 2.05);
+        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.65, 5.5, 2.05);
 
         public static final double KICKER_SPEED_BACKWARDS = -0.5;
         public static final double KICKER_SPEED_FORWARD = 0.8;
