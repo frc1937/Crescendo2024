@@ -87,7 +87,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setFlywheelSpeed(-0.55 * FLYWHEEL_MAX_RPM, false);
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(50));
+                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(51));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {

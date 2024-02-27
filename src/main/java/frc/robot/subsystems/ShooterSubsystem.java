@@ -52,7 +52,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
     private int consecutiveNoteInsideSamples = 0;
 
-
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
 
