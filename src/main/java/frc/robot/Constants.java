@@ -83,6 +83,25 @@ public final class Constants {
          */
         public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<Double, Rotation2d>(
             InverseInterpolator.forDouble(), Rotation2d::interpolate);
+        
+        static {
+            SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
+            SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
+            SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
+            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(61));
+            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(60));
+        }
+
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
+            InverseInterpolator.forDouble(), Interpolator.forDouble());
+
+        static {
+            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.74 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.88 * FLYWHEEL_MAX_RPM);
+            SLOPE_TO_VELOCITY_MAP.put(0.436, 0.92 * FLYWHEEL_MAX_RPM);
+        }
 
         public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
@@ -94,37 +113,7 @@ public final class Constants {
             SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
         }
 
-        static {
-            SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
-            SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
-            SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
-            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(57));
-
-            // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(57));
-            // SLOPE_TO_PITCH_MAP.put(1.22, Rotation2d.fromDegrees(82));
-            // SLOPE_TO_PITCH_MAP.put(0.84, Rotation2d.fromDegrees(78));
-            // SLOPE_TO_PITCH_MAP.put(0.66, Rotation2d.fromDegrees(72));
-            // SLOPE_TO_PITCH_MAP.put(0.57, Rotation2d.fromDegrees(70));
-            // SLOPE_TO_PITCH_MAP.put(0.5, Rotation2d.fromDegrees(68));
-            // SLOPE_TO_PITCH_MAP.put(0.49, Rotation2d.fromDegrees(65));
-            // SLOPE_TO_PITCH_MAP.put(0.45, Rotation2d.fromDegrees(64));
-        }
-
-        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
-            InverseInterpolator.forDouble(), Interpolator.forDouble());
-
-        static {
-            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.74 * FLYWHEEL_MAX_RPM);
-            SLOPE_TO_VELOCITY_MAP.put(0.67, 0.78 * FLYWHEEL_MAX_RPM);
-            SLOPE_TO_VELOCITY_MAP.put(0.52, 0.82 * FLYWHEEL_MAX_RPM);
-            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.95 * FLYWHEEL_MAX_RPM);
-
-            // SLOPE_TO_VELOCITY_MAP.put(0.58, 0.95 * 5600);
-            // SLOPE_TO_VELOCITY_MAP.put(0.51, 0.94 * 5600);
-            // SLOPE_TO_VELOCITY_MAP.put(0.45, 0.98 * 5600);
-        }
-
-        public static final double MINIMUM_VIABLE_SLOPE = 0.38;
+        public static final double MINIMUM_VIABLE_SLOPE = 0.45;
         public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
 
         public static final double POSE_HISTORY_DURATION = 0.5;
@@ -163,8 +152,8 @@ public final class Constants {
         public static final int SHOOTER_VERTICAL_ANGLE = 112;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
-        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.234, 5.5, 2.05);
-        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.31, 5.5, 2.05);
+        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.2, 5.5, 2.05);
+        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.65, 5.5, 2.05);
 
         public static final double KICKER_SPEED_BACKWARDS = -0.5;
         public static final double KICKER_SPEED_FORWARD = 0.8;
