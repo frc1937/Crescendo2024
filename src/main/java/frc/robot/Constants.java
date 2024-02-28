@@ -90,8 +90,8 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(0.77, Rotation2d.fromDegrees(76));
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(73.5));
             SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64.5));
-            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(64));
-            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(63));
+            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(62));
+            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(61.2));
         }
 
         public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
