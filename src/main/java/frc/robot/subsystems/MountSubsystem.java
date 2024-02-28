@@ -21,35 +21,26 @@ public class MountSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        int proxyValue = getProxyStatus();
-
-        SmartDashboard.putBoolean("ProximityStatus", getProxyStatus() == 1); //THIS CONDITION IS FALSE AT TOP AND BOTTOM,
-        // ELSE TRUE
-
-        if(proxyValue == 0 && shouldMountRun) {
-            startMount();
-            shouldMountRun = false;
-        } else if (proxyValue == 0) {
-            stopMount();
-            shouldMountRun = true;
-        }
+        SmartDashboard.putNumber("ProximityStatus", getProximityStatus());
     }
 
     public void startMount() {
         mountMotor.set(-0.5);
-        shouldMountRun = true;
     }
-    //THIS METHOD IS FOR PIT RESET, DO NOT USE ON A REAL GAME.
+    // WARNING: THIS METHOD IS FOR PIT RESET, DO NOT USE ON A REAL GAME.
     public void startMountBackwards() {
         mountMotor.set(0.5);
-        shouldMountRun = false;
     }
 
     public void stopMount() {
         mountMotor.stopMotor();
     }
 
-    public int getProxyStatus() {
+    /**
+     * @return 0 if the mount subsystem is in a final state or 1 in an
+     * intermediate state
+     */
+    public int getProximityStatus() {
         return proximitySwitch.get() ? 1 : 0;
     }
 }

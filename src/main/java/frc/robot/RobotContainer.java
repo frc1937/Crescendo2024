@@ -55,7 +55,6 @@ public class RobotContainer {
     private final JoystickButton opLeftBumper = new JoystickButton(operatorController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     /* Subsystems */
-//    private final LedsSubsystem ledsSubsystem = new LedsSubsystem();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -111,7 +110,7 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value))
         );
 
-        drBButton.whileTrue(mountCommands.mountCommand());
+        drBButton.onTrue(mountCommands.mountCommand());
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
@@ -121,12 +120,13 @@ public class RobotContainer {
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
         opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
+        opYButton.whileTrue(shooterCommands.shootToAmp(ShootingStates.AMP));
 
         opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
         opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
 
-        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
-        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
+//        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
+//        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
 
         opStartButton.whileTrue(mountCommands.testMountCommand());
     }

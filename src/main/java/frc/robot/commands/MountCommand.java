@@ -15,8 +15,8 @@ public class MountCommand {
         return new FunctionalCommand(
                 mountSubsystem::startMount,
                 () -> {},
-                interrupt -> mountSubsystem.stopMount(),
-                () -> false,
+                interrupted -> mountSubsystem.stopMount(),
+                () -> mountSubsystem.getProximityStatus() == 0,
                 mountSubsystem
         );
     }
