@@ -15,14 +15,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.TestMountCommand;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.ShootingStates;
@@ -58,10 +55,10 @@ public class RobotContainer {
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final MountSubsystem mountSubsystem = new MountSubsystem();
+//    private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
+//    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(
@@ -101,7 +98,6 @@ public class RobotContainer {
     private void configureBindings() {
         driveYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
-//        drBackButton.whileTrue(Navigate.navigateToAmplifier());
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
         drAButton.whileTrue(
@@ -110,7 +106,6 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value))
         );
 
-        drBButton.onTrue(new Mount(mountSubsystem));
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
@@ -127,8 +122,10 @@ public class RobotContainer {
 
 //        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
 //        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
+//        opStartButton.whileTrue(mountCommands.testMountCommand());
 
-        opStartButton.whileTrue(mountCommands.testMountCommand());
+//        drBackButton.whileTrue(Navigate.navigateToAmplifier());
+//       drBButton.onTrue(new Mount(mountSubsystem));
     }
 
 
