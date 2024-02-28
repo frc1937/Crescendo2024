@@ -85,6 +85,7 @@ public final class Constants {
             InverseInterpolator.forDouble(), Rotation2d::interpolate);
         
         static {
+            SLOPE_TO_PITCH_MAP.put(0.94, Rotation2d.fromDegrees(80));
             SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(77.5));
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(70.5));
             SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64));
