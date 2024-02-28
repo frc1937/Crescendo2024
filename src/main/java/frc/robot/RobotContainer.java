@@ -25,6 +25,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.ShootingStates;
 import frc.robot.util.TriggerButton;
 
+import java.util.function.DoubleSupplier;
+
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
@@ -100,11 +102,11 @@ public class RobotContainer {
 
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
+        DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
+        DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
         drAButton.whileTrue(
-                new TeleopShooting(swerveSubsystem, shooterSubsystem,
-                        () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value),
-                        () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value))
-        );
+                new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
+        drAButton.onFalse(new TeleopShooting.TeleopThrow(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());

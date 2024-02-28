@@ -143,16 +143,16 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) {
-                shooter.stopFlywheels();
-                shooter.setPivotAngle(Rotation2d.fromDegrees(0));
-            }
+//            if (interrupted) {
+//                shooter.stopFlywheels();
+//                shooter.setPivotAngle(Rotation2d.fromDegrees(0));
+//            }
 
             // yawController.reset(0);
         }
     }
 
-    private static class TeleopThrow extends Command {
+    public static class TeleopThrow extends Command {
         private final SwerveSubsystem swerve;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
