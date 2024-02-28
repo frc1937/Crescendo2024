@@ -50,6 +50,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         private Rotation2d targetShooterOrientation = new Rotation2d();
         private Rotation2d orientationToVirtualTarget;
         private double slopeToVirtualTarget = DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
+        private final Timer deadlineTimer = new Timer();
 
         public TeleopAim(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
@@ -58,6 +59,11 @@ public class TeleopShooting extends SequentialCommandGroup {
             this.strafeSup = strafeSup;
 
             addRequirements(swerve, shooter);
+        }
+
+        @Override
+        public void initialize() {
+            deadlineTimer.reset();
         }
 
         @Override
@@ -126,12 +132,13 @@ public class TeleopShooting extends SequentialCommandGroup {
             boolean pitchReady = shooter.hasPivotArrived();
             boolean azimuthReady = swerve.azimuthAtSetpoint();
             boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
+            boolean reachedDeadline = deadlineTimer.hasElapsed(2.5);
 
-            boolean readyToKick = flywheelsReady && pitchReady && azimuthReady && slopeViable;
+            boolean readyToKick = flywheelsReady && pitchReady && azimuthReady && slopeViable && yetToReachDeadline;
 
             SmartDashboard.putBooleanArray("flywheels | pitch | azimuth | slope", new boolean[]{flywheelsReady, pitchReady, azimuthReady, slopeViable});
 
-            return readyToKick;
+            return readyToKick || reachedDeadline;
         }
 
         @Override
