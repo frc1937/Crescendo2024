@@ -194,7 +194,11 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void zeroGyro() {
-        gyro.setYaw(0);
+        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+            gyro.setYaw(0);
+        } else {
+            gyro.setYaw(180);
+        }
 
     }
 
