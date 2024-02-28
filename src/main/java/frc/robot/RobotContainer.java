@@ -92,7 +92,7 @@ public class RobotContainer {
         // NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 0.8));
         // NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, 0.9));
 
-        autoChooser = AutoBuilder.buildAutoChooser("Best Four Donuts");
+        autoChooser = AutoBuilder.buildAutoChooser("Crown (3)");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
