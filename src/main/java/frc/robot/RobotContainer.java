@@ -110,7 +110,7 @@ public class RobotContainer {
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
         drAButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
-        drAButton.onFalse(new TeleopShooting.TeleopThrow(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
+        drAButton.onFalse(new TeleopShooting.TeleopThrow(swerveSubsystem, shooterSubsystem, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY));
 
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
