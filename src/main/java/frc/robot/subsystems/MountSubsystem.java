@@ -25,11 +25,11 @@ public class MountSubsystem extends SubsystemBase {
     }
 
     public void startMount() {
-        mountMotor.set(-0.5);
+        mountMotor.set(0.5);
     }
     // WARNING: THIS METHOD IS FOR PIT RESET, DO NOT USE ON A REAL GAME.
     public void startMountBackwards() {
-        mountMotor.set(0.5);
+        mountMotor.set(-0.5);
     }
 
     public void stopMount() {
