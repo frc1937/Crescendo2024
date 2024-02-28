@@ -3,6 +3,7 @@
   "robotLength": 0.69,
   "holonomicMode": true,
   "pathFolders": [
+    "Cross the Line (5)",
     "Crown"
   ],
   "autoFolders": [],
