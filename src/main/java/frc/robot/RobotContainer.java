@@ -121,7 +121,7 @@ public class RobotContainer {
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
         opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
-        opYButton.whileTrue(shooterCommands.shootToAmp(ShootingStates.AMP));
+        opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
         opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
         opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
