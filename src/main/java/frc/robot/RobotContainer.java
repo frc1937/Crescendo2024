@@ -15,11 +15,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.TestMountCommand;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.ShootingStates;
@@ -27,6 +30,7 @@ import frc.robot.util.TriggerButton;
 
 import java.util.function.DoubleSupplier;
 
+import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
@@ -57,10 +61,10 @@ public class RobotContainer {
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-//    private final MountSubsystem mountSubsystem = new MountSubsystem();
+    private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-//    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
+    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(
@@ -122,12 +126,12 @@ public class RobotContainer {
         opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
         opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
 
-//        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
+        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
 //        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
-//        opStartButton.whileTrue(mountCommands.testMountCommand());
+        opStartButton.whileTrue(mountCommands.testMountCommand());
 
-//        drBackButton.whileTrue(Navigate.navigateToAmplifier());
-//       drBButton.onTrue(new Mount(mountSubsystem));
+       // drBackButton.whileTrue(Navigate.navigateToAmplifier());
+       drBButton.whileTrue(new Mount(mountSubsystem));
     }
 
 
