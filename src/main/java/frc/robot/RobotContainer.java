@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Mount;
-import frc.robot.commands.Navigate;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
@@ -102,7 +101,7 @@ public class RobotContainer {
     private void configureBindings() {
         driveYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
-        drBackButton.whileTrue(Navigate.navigateToAmplifier());
+//        drBackButton.whileTrue(Navigate.navigateToAmplifier());
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
         drAButton.whileTrue(
