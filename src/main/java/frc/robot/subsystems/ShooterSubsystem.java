@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static frc.robot.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
@@ -42,15 +43,14 @@ import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
-    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final CANSparkFlex pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
-    private final RelativeEncoder pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
+    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless),
+            pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168),
+            pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
     private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
-    private final SparkPIDController pitchController;
-    private final SparkPIDController flywheelsController;
-    private double pivotSetpoint = 0;
-    private double targetFlywheelVelocity = 0;
+    private final SparkPIDController pitchController, flywheelsController;
+    private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
+    private int consecutiveNoteInsideSamples = 0;
 
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
@@ -77,11 +77,12 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotInternalEncoder.setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("Velocity", flywheelEncoder.getVelocity());
-        SmartDashboard.putNumber("Target Velocity", targetFlywheelVelocity);
+        SmartDashboard.putNumber("Target Flywheel RPM", targetFlywheelVelocity);
         SmartDashboard.putNumber("Current angle", currentAngle);
         SmartDashboard.putNumber("Pivot setpoint", pivotSetpoint);
         SmartDashboard.putBoolean("Does see note", doesSeeNote());
+        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
+        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
 
         if (pivotSetpoint < 80) {
             // Front region
@@ -106,12 +107,15 @@ public class ShooterSubsystem extends SubsystemBase {
             pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
         }
 
-        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
-        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
+        if(doesSeeNote()) {
+            consecutiveNoteInsideSamples++;
+        } else {
+            consecutiveNoteInsideSamples = 0;
+        }
     }
 
-    public boolean doesSeeNote() {
-        return !beamBreaker.get();
+    public boolean doesSeeNoteNoiseless() {
+        return consecutiveNoteInsideSamples >= CONSIDERED_NOISELESS_THRESHOLD;
     }
 
     public void setKickerSpeed(double speed) {
@@ -156,6 +160,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private void configureFlywheelMotor(CANSparkFlex motor) {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kCoast);
+
         flywheelsController.setP(FLYWHEEL_P);
         flywheelsController.setD(0.000017);
         flywheelsController.setFF(FLYWHEEL_FF);
@@ -189,5 +194,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
         pivotInternalEncoder.setPosition(pivotEncoder.getAbsolutePosition());
         pivotEncoder.setPosition(pivotEncoder.getAbsolutePosition());
+    }
+
+    private boolean doesSeeNote() {
+        return !beamBreaker.get();
     }
 }

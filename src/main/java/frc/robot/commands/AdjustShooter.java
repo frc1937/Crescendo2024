@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import static frc.robot.Constants.ShootingConstants;
 import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
 
 public class AdjustShooter extends Command {
@@ -29,7 +28,7 @@ public class AdjustShooter extends Command {
             pitch = ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope);
         } else {
             slope = -slope;
-            pitch = Rotation2d.fromDegrees(SHOOTER_VERTICAL_ANGLE * 2).minus(ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope));
+            pitch = Rotation2d.fromDegrees(SHOOTER_VERTICAL_ANGLE * 2.0).minus(ShootingConstants.SLOPE_TO_PITCH_MAP.get(slope));
         }
 
         this.velocity = ShootingConstants.SLOPE_TO_VELOCITY_MAP.get(slope);
