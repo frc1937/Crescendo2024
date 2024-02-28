@@ -15,12 +15,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.MountCommand;
+import frc.robot.commands.Mount;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.TestMountCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -61,7 +62,7 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-    private final MountCommand mountCommands = new MountCommand(mountSubsystem);
+    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(
@@ -110,7 +111,7 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value))
         );
 
-        drBButton.onTrue(mountCommands.mountCommand());
+        drBButton.onTrue(new Mount(mountSubsystem));
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));

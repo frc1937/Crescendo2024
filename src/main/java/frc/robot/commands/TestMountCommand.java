@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.MountSubsystem;
 
 
-public class MountCommand {
+public class TestMountCommand {
     private final MountSubsystem mountSubsystem;
 
-    public MountCommand(MountSubsystem mountSubsystem) {
+    public TestMountCommand(MountSubsystem mountSubsystem) {
         this.mountSubsystem = mountSubsystem;
     }
 
