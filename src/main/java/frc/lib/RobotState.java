@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Map;
 import java.util.NavigableMap;
@@ -63,12 +64,20 @@ public class RobotState {
         // Use three pose samples
         Map.Entry<Double, Pose2d> firstPoseSample = actualPoseSamples.firstEntry();
         Map.Entry<Double, Pose2d> lastPoseSample = actualPoseSamples.lastEntry();
+
+        SmartDashboard.putNumber("last delta pos", translation(firstPoseSample, lastPoseSample));
+
         double middleTime = (firstPoseSample.getKey() + lastPoseSample.getKey()) / 2;
         Map.Entry<Double, Pose2d> middlePoseSample = actualPoseSamples.ceilingEntry(middleTime);
 
         // Find the twists between them
         Twist2d firstTwist = firstPoseSample.getValue().log(middlePoseSample.getValue());
         Twist2d lastTwist = middlePoseSample.getValue().log(lastPoseSample.getValue());
+
+        SmartDashboard.putNumber("firstTwist thingy", Math.sqrt(firstTwist.dx * firstTwist.dx + firstTwist.dy * firstTwist.dy));
+        SmartDashboard.putNumber("lastTwist thingy", Math.sqrt(lastTwist.dx * lastTwist.dx + lastTwist.dy * lastTwist.dy));
+        SmartDashboard.putNumber("first translation", translation(firstPoseSample, middlePoseSample));
+        SmartDashboard.putNumber("last translation", translation(middlePoseSample, lastPoseSample));
 
         // To avoid division by zero, assure lastTwist dx != 0 or dy != 0
         if (lastTwist.dx == 0 || lastTwist.dy == 0) {
@@ -122,6 +131,10 @@ public class RobotState {
         );
 
         return new RobotState(predictedPose, predictedVelocity);
+    }
+
+    private static double translation(Map.Entry<Double, Pose2d> firstPoseSample, Map.Entry<Double, Pose2d> lastPoseSample) {
+        return firstPoseSample.getValue().minus(lastPoseSample.getValue()).getTranslation().getNorm();
     }
 
     private static double predictLinearValue(double futureTime, double last, double lastTime, double previous, double previousTime) {

@@ -77,7 +77,7 @@ public class RobotContainer {
                 )
         );
 
-        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(0.4).withTimeout(2.7));
+        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(0.45).withTimeout(2.7));
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
         NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.94));
         NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));

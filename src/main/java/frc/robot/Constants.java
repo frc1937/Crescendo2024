@@ -27,7 +27,7 @@ public final class Constants {
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
      */
-    public static final double INFREQUENT_PERIODIC_PERIOD = 0.1;
+    public static final double INFREQUENT_PERIODIC_PERIOD = 0.03;
     public static final double STICK_DEADBAND = 0.1;
 
     public static final class Transforms {
@@ -109,10 +109,10 @@ public final class Constants {
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.55);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.6);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.7);
+            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.8);
         }
 
         public static final double MINIMUM_VIABLE_SLOPE = 0.45;

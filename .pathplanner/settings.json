@@ -7,8 +7,8 @@
     "Crown"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 3.1,
-  "defaultMaxAccel": 3.15,
+  "defaultMaxVel": 3.2,
+  "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "maxModuleSpeed": 4.5

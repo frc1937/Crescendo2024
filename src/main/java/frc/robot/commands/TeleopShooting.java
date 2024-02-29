@@ -106,12 +106,12 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             // Find the virtual target, i.e., the target to which the robot should aim s.t.
             // the NOTE enters the actual target
+            SmartDashboard.putNumber("translationDueToRobotVelocity [m]", translationDueToRobotVelocity.getNorm());
             Translation3d translationToVirtualTarget = translationToTarget.minus(translationDueToRobotVelocity);
 
             // Aim to the virtual target
             slopeToVirtualTarget = translationToVirtualTarget.getZ() / translationToVirtualTarget.toTranslation2d().getNorm();
             orientationToVirtualTarget = translationToVirtualTarget.toTranslation2d().getAngle();
-            SmartDashboard.putNumber("orientationToVirtuaorientationToVirtualTarget", orientationToVirtualTarget.getDegrees());
             SmartDashboard.putNumber("Virtual target pitch [slope]", slopeToVirtualTarget);
 
             // Introduce a table that maps path slopes, slopeToVirtualTarget, to well-adjusted
