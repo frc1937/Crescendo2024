@@ -63,7 +63,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            deadlineTimer.reset();
+            deadlineTimer.restart();
         }
 
         @Override
@@ -143,10 +143,10 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void end(boolean interrupted) {
-//            if (interrupted) {
-//                shooter.stopFlywheels();
-//                shooter.setPivotAngle(Rotation2d.fromDegrees(0));
-//            }
+            if (interrupted) {
+                shooter.stopFlywheels();
+                shooter.setPivotAngle(Rotation2d.fromDegrees(0));
+            }
 
             // yawController.reset(0);
         }

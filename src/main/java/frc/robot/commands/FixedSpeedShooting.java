@@ -60,7 +60,7 @@ public class FixedSpeedShooting extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            deadlineTimer.reset();
+            deadlineTimer.restart();
             shooter.setFlywheelSpeed(FLYWHEEL_MAX_RPM, false);
         }
 
