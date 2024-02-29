@@ -132,12 +132,11 @@ public class TeleopShooting extends SequentialCommandGroup {
             boolean pitchReady = shooter.hasPivotArrived();
             boolean azimuthReady = swerve.azimuthAtSetpoint();
             boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
-            boolean reachedDeadline = deadlineTimer.hasElapsed(2);
+            boolean reachedDeadline = deadlineTimer.hasElapsed(2.5);
 
             boolean readyToKick = flywheelsReady && pitchReady && azimuthReady && slopeViable;
 
             SmartDashboard.putBooleanArray("flywheels | pitch | azimuth | slope", new boolean[]{flywheelsReady, pitchReady, azimuthReady, slopeViable});
-            SmartDashboard.putBoolean("reachedDeadline", reachedDeadline);
 
             return readyToKick || reachedDeadline;
         }
