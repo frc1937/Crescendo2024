@@ -3,6 +3,7 @@ package frc.robot.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -51,7 +52,11 @@ public class VisionPoseEstimator {
     }
 
     private EstimatedRobotPose estimatePose(PhotonPoseEstimator poseEstimator, PhotonCamera camera, Pose2d prevEstimatedRobotPose) {
-        if (!camera.isConnected()) return null;
+        SmartDashboard.putBoolean("Vision-Based Odometry", camera.isConnected());
+
+        if (!camera.isConnected()) {
+            return null;
+        }
 
         poseEstimator.setReferencePose(prevEstimatedRobotPose);
 
