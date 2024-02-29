@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.8009808327308976,
+      "y": 6.541783083566167
+    },
+    "rotation": 60.10109816138541
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AdjustShooter1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterKick"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Cross the Line - Amp Side (5.1)"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

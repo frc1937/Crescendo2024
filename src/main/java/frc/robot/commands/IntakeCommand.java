@@ -1,45 +1,27 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 
-public class IntakeCommand {
-    private final IntakeSubsystem intake;
 
-    public IntakeCommand(IntakeSubsystem intake) {
-        this.intake = intake;
+public class IntakeCommand extends Command {
+    private final IntakeSubsystem intakeSubsystem;
+    private final double speed;
+
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, double speed) {
+        this.speed = speed;
+        this.intakeSubsystem = intakeSubsystem;
+
+        addRequirements(intakeSubsystem);
     }
 
-    public Command startIntakeMotor(double speed) {
-        return new FunctionalCommand(
-                () -> {
-                    // Initialization code if needed
-                },
-                () -> {
-                    intake.setSpeedPercentage(speed);
-                },
-                interrupted -> {
-                    stopIntakeMotor();
-                },
-                () -> false,
-                intake
-        );
+    @Override
+    public void execute() {
+        intakeSubsystem.setSpeedPercentage(speed);
     }
 
-    public Command stopIntakeMotor() {
-        return new FunctionalCommand(
-                () -> {
-                    // Cleanup code if needed
-                },
-                () -> {
-                    intake.stopMotor();
-                },
-                interrupted -> {
-                    // Interrupted code if needed
-                },
-                () -> false,
-                intake
-        );
+    @Override
+    public void end(boolean interrupted) {
+        intakeSubsystem.stopMotor();
     }
 }

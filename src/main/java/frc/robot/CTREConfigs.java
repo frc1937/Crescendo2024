@@ -15,7 +15,7 @@ public final class CTREConfigs {
         swerveDriveFXConfig = new TalonFXConfiguration();
         swerveCanCoderConfig = new CANCoderConfiguration();
 
-        /* Swerve Drive Motor Configuration */
+        /* SwerveSubsystem Drive Motor Configuration */
         SupplyCurrentLimitConfiguration driveSupplyLimit = new SupplyCurrentLimitConfiguration(
                 Constants.Swerve.DRIVE_ENABLE_CURRENT_LIMIT,
                 Constants.Swerve.DRIVE_CONTINUOUS_CURRENT_LIMIT,
@@ -30,7 +30,7 @@ public final class CTREConfigs {
         swerveDriveFXConfig.openloopRamp = Constants.Swerve.OPEN_LOOP_RAMP;
         swerveDriveFXConfig.closedloopRamp = Constants.Swerve.CLOSED_LOOP_RAMP;
 
-        /* Swerve CANCoder Configuration */
+        /* SwerveSubsystem CANCoder Configuration */
         swerveCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
         swerveCanCoderConfig.sensorDirection = Constants.Swerve.CAN_CODER_INVERT;
         swerveCanCoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
