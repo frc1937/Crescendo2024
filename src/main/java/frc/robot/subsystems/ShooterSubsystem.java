@@ -12,9 +12,17 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import static frc.robot.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
@@ -39,6 +47,12 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
 import static frc.robot.Constants.ShootingConstants.PIVOT_UP_FF;
 import static frc.robot.Constants.ShootingConstants.PIVOT_UP_P;
 import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.MutableMeasure.mutable;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -51,6 +65,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SparkPIDController pitchController, flywheelsController;
     private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
     private int consecutiveNoteInsideSamples = 0;
+
+        // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+    // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+    private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+    private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
 
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
@@ -151,6 +172,20 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setPivotAngle(Rotation2d rotation2d) {
         pivotSetpoint = rotation2d.getDegrees();
+    }
+
+    public void setFlywheelsVoltage(Measure<Voltage> volts) {
+        flywheelMaster.setVoltage(volts.in(Volts));
+    }
+
+    public void logFlywheels(SysIdRoutineLog log) {
+        log.motor("flywheel")
+            .voltage(
+                m_appliedVoltage.mut_replace(
+                    flywheelMaster.get() * RobotController.getBatteryVoltage(), Volts))
+            .angularPosition(m_angle.mut_replace(flywheelEncoder.getPosition(), Rotations))
+            .angularVelocity(
+                m_velocity.mut_replace(flywheelEncoder.getVelocity(), RPM));
     }
 
     private void configureCanCoder(CANCoder encoder) {
