@@ -112,7 +112,7 @@ public class FixedSpeedShooting extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            return deadlineTimer.hasElapsed(2.5);
+            return deadlineTimer.hasElapsed(1.5);
         }
 
         @Override
