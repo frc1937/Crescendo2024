@@ -14,12 +14,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
+import frc.robot.commands.FixedSpeedShooting;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
-import frc.robot.commands.TeleopShooting;
-import frc.robot.commands.FixedSpeedShooting;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TestMountCommand;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -31,7 +30,6 @@ import frc.robot.util.TriggerButton;
 
 import java.util.function.DoubleSupplier;
 
-import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class RobotContainer {
@@ -110,9 +108,9 @@ public class RobotContainer {
 
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
+//        drAButton.whileTrue(
+//                new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
         drAButton.whileTrue(
-                new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
-        opLeftTrigger.whileTrue(
                 new FixedSpeedShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
