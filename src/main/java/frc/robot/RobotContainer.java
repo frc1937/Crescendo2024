@@ -19,6 +19,7 @@ import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
+import frc.robot.commands.FixedSpeedShooting;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.TestMountCommand;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -57,6 +58,7 @@ public class RobotContainer {
     private final JoystickButton opRightBumper = new JoystickButton(operatorController, XboxController.Button.kRightBumper.value);
     private final JoystickButton opLeftBumper = new JoystickButton(operatorController, XboxController.Button.kLeftBumper.value);
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
+    private final TriggerButton opLeftTrigger = new TriggerButton(operatorController, XboxController.Axis.kLeftTrigger);
     /* Subsystems */
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -110,8 +112,8 @@ public class RobotContainer {
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
         drAButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
-        drAButton.onFalse(new TeleopShooting.TeleopThrow(swerveSubsystem, shooterSubsystem, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY));
-
+        opLeftTrigger.whileTrue(
+                new FixedSpeedShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
