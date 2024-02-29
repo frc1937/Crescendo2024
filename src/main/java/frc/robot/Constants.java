@@ -89,9 +89,9 @@ public final class Constants {
             SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(78.5));
             SLOPE_TO_PITCH_MAP.put(0.77, Rotation2d.fromDegrees(76));
             SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(73.5));
-            SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(64.5));
-            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(62));
-            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(61.2));
+            SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(65));
+            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(61));
+            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(58.8));
         }
 
         public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
@@ -101,8 +101,8 @@ public final class Constants {
             SLOPE_TO_VELOCITY_MAP.put(0.87, 0.85 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.67, 0.86 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.52, 0.88 * FLYWHEEL_MAX_RPM);
+            //SLOPE_TO_VELOCITY_MAP.put(0.436, 0.95 * FLYWHEEL_MAX_RPM);
             SLOPE_TO_VELOCITY_MAP.put(0.41, 0.90 * FLYWHEEL_MAX_RPM);
-            SLOPE_TO_VELOCITY_MAP.put(0.436, 0.95 * FLYWHEEL_MAX_RPM);
         }
 
         public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
