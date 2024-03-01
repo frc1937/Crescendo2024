@@ -99,14 +99,15 @@ public class RobotState {
             firstTwist2LogSize,
             middlePoseSample.getKey()
         );
-        double predictedTwistSize = Math.exp(predictedTwist2LogSize / 2);
-        double predictedAndSecondTwistSizeRatio = predictedTwistSize / lastTwist2LogSize;
+        double predictedAndLastTwistSizeRatio = Math.exp((predictedTwist2LogSize - lastTwist2LogSize) / 2);
+        // double predictedTwistSize = Math.exp(predictedTwist2LogSize / 2);
+        // double predictedAndLastTwistSizeRatio = predictedTwistSize / Math.sqrt(lastTwistSizeSquared);
 
         // Consider the last twist but with the predicted size
         Twist2d predictedTwist = new Twist2d(
-            predictedAndSecondTwistSizeRatio * lastTwist.dx,
-            predictedAndSecondTwistSizeRatio * lastTwist.dy,
-            predictedAndSecondTwistSizeRatio * lastTwist.dtheta
+            predictedAndLastTwistSizeRatio * lastTwist.dx,
+            predictedAndLastTwistSizeRatio * lastTwist.dy,
+            predictedAndLastTwistSizeRatio * lastTwist.dtheta
         );
 
         // 'Apply' the predicted twist onto the last pose sample
