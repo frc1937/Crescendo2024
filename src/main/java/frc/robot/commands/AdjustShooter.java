@@ -53,6 +53,10 @@ public class AdjustShooter extends Command {
     public boolean isFinished() {
         SmartDashboard.putBooleanArray("flywheels | pitch", new boolean[]{shooter.areFlywheelsReady(), shooter.hasPivotArrived() });
 
-        return shooter.areFlywheelsReady() && shooter.hasPivotArrived();
+        boolean isReady = shooter.areFlywheelsReady() && shooter.hasPivotArrived();
+
+        // Avoid adjusting the shooter without a present NOTE. This helps optimising the autonomous
+        // when a NOTE wasn't successfully collected.
+        return isReady || (!shooter.doesSeeNoteNoiseless());
     }
 }
