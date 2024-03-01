@@ -34,7 +34,7 @@ import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
-import static frc.robot.Constants.Swerve.holomonicPathFollowerConfig;
+import static frc.robot.Constants.Swerve.HOLONOMIC_PATH_FOLLOWER_CONFIG;
 
 public class SwerveSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -71,13 +71,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 pose -> poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose),
                 () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
                 this::drive,
-                holomonicPathFollowerConfig,
-
+                HOLONOMIC_PATH_FOLLOWER_CONFIG,
                 () -> {
                     DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue);
                     return alliance == DriverStation.Alliance.Red;
                 },
-
                 this
         );
 

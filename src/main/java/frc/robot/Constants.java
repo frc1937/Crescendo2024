@@ -300,12 +300,12 @@ public final class Constants {
         public static final double VOLTAGE_COMP = 12.0;
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
 
-        public static final HolonomicPathFollowerConfig holomonicPathFollowerConfig = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+        public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                 new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                 Constants.Swerve.MAX_SPEED, // Max module speed, in m/s
                 0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                new ReplanningConfig());
+                new ReplanningConfig(true, true));
     //todo: shoot 60 angles. Joystick adjustable shooter angle
         public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
             public static final double MAX_SPEED_METERS_PER_SECOND = 3;
