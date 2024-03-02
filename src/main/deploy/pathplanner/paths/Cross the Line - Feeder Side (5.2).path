@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7911138899200891,
+        "y": 4.54866063578281
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 0.7543128599770712,
+        "y": 0.5269480809231892
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.492129416691267,
+        "y": 0.7580656602754654
+      },
+      "prevControl": {
+        "x": 7.492129416691267,
+        "y": 0.7580656602754654
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.3,
+    "maxAcceleration": 3.3,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Cross the Line (5)",
+  "previewStartingState": {
+    "rotation": -59.688786773318384,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
