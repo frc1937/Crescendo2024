@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
+import static frc.robot.Constants.ShootingConstants.SHOOTING_SPIN;
 
 public class AdjustShooter extends Command {
     private final ShooterSubsystem shooter;
@@ -39,7 +41,7 @@ public class AdjustShooter extends Command {
     @Override
     public void initialize() {
         shooter.setPivotAngle(pitch);
-        shooter.setFlywheelSpeed(velocity, true);
+        shooter.setFlywheelsSpeed(RPM.of(velocity), SHOOTING_SPIN);
     }
 
     @Override

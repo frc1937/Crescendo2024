@@ -13,6 +13,10 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Dimensionless;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -119,15 +123,25 @@ public class ShooterSubsystem extends SubsystemBase {
         kickerMotor.stopMotor();
     }
 
-    public void setFlywheelSpeed(double targetFlywheelVelocity, boolean pid) {
-        leftFlywheel.setSpeed(RPM.of(targetFlywheelVelocity));
-        // this.targetFlywheelVelocity = targetFlywheelVelocity;
+    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed) {
+        rightFlywheel.setSpeed(speed);
+        leftFlywheel.setSpeed(speed);
+    }
 
-        // if (pid) {
-        //     flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
-        // } else {
-        //     leftFlywheel.set(targetFlywheelVelocity / FLYWHEEL_MAX_RPM);
-        // }
+    /**
+     * Rotate the flywheels to certain speeds s.t. NOTEs will be released with
+     * certain speed and rotation
+     * 
+     * @param speed the average target speed of both flywheels
+     * @param spin a value in range [0, 1] where (1 - spin) = (right speed / left speed). Thus,
+     *             the difference between the left and right speeds is proprtional to
+     *             {@code speed}.
+     */
+    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
+        var leftSpeed = speed.times(2).divide(2.d - spin);
+        var rightSpeed = leftSpeed.times(1.d - spin);
+        rightFlywheel.setSpeed(rightSpeed);
+        leftFlywheel.setSpeed(leftSpeed);
     }
 
     public void stopFlywheels() {

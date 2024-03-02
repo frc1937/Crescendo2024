@@ -13,6 +13,7 @@ import frc.robot.util.ShootingStates;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
@@ -61,7 +62,7 @@ public class ShooterCommands {
     public SequentialCommandGroup receiveFromFeeder() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelSpeed(-0.55 * FLYWHEEL_MAX_RPM, false);
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-0.55 * FLYWHEEL_MAX_RPM));
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(51));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
@@ -83,7 +84,7 @@ public class ShooterCommands {
                 () -> {
                     if (shooterSubsystem.hasPivotArrived()) {
                         intakeSubsystem.setSpeedPercentage(0.7);
-                        shooterSubsystem.setFlywheelSpeed(-3000, false);
+                        shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                     }
                 },
@@ -135,7 +136,7 @@ public class ShooterCommands {
         if (shooterSubsystem.doesSeeNoteNoiseless()) {
             shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
             shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-            shooterSubsystem.setFlywheelSpeed(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM, true);
+            shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM));
         }
     }
 }

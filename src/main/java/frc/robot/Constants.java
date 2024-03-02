@@ -130,6 +130,8 @@ public final class Constants {
 
         public static final double POSE_HISTORY_DURATION = 0.5;
 
+        public static final double SHOOTING_SPIN = 0.15;
+
         public static final int
                 FLYWHEEL_LEFT_ID = 15,
                 FLYWHEEL_RIGHT_ID = 16,

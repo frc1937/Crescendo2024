@@ -20,6 +20,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
@@ -28,6 +29,7 @@ import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.SHOOTING_SPIN;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
@@ -123,7 +125,7 @@ public class TeleopShooting extends SequentialCommandGroup {
                                     orientationToVirtualTarget);
 
             shooter.setPivotAngle(targetShooterOrientation);
-            shooter.setFlywheelSpeed(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget), true);
+            shooter.setFlywheelsSpeed(RPM.of(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget)), SHOOTING_SPIN);
         }
 
         @Override
