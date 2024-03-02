@@ -63,6 +63,8 @@ public final class Constants {
         public static final String REAR_CAMERA_NAME = "Rear1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+                
+        public static final Double cameraToDegrees = 0.47222;
     }
 
     public static class IntakeConstants {
