@@ -38,8 +38,8 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.3,
-    "maxAcceleration": 3.3,
+    "maxVelocity": 3.75,
+    "maxAcceleration": 3.21,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -49,7 +49,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Crown",
+  "folder": "Crown (3)",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

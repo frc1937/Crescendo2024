@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7911138899200891,
-        "y": 4.54866063578281
+        "x": 8.076117773857169,
+        "y": 2.3481546062191225
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.7543128599770712,
-        "y": 0.5269480809231892
+        "x": 6.097751294601688,
+        "y": 3.6978812696364134
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Bow First Note (7)"
     },
     {
       "anchor": {
-        "x": 8.492129416691267,
-        "y": 0.7580656602754654
+        "x": 3.9714695645607505,
+        "y": 4.807245650527338
       },
       "prevControl": {
-        "x": 7.492129416691267,
-        "y": 0.7580656602754654
+        "x": 6.310379467605782,
+        "y": 4.659330399741881
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,9 +30,9 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7,
-      "rotationDegrees": 0,
-      "rotateFast": false
+      "waypointRelativePos": 0.95,
+      "rotationDegrees": 180.0,
+      "rotateFast": true
     }
   ],
   "constraintZones": [],
@@ -45,13 +45,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 179.2701569359759,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Cross the Line (5)",
+  "folder": "Bow (7)",
   "previewStartingState": {
-    "rotation": -59.688786773318384,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true
