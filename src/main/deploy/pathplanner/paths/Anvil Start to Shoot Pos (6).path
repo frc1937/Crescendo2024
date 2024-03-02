@@ -3,35 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7911138899200891,
-        "y": 4.54866063578281
+        "x": 1.4476655980299076,
+        "y": 7.691593040840155
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.7543128599770712,
-        "y": 0.5269480809231892
+        "x": 4.489172942308777,
+        "y": 8.061381167809184
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.492129416691267,
-        "y": 0.7580656602754654
+        "x": 4.110140112172116,
+        "y": 5.556066607628711
       },
       "prevControl": {
-        "x": 7.492129416691267,
-        "y": 0.7580656602754654
+        "x": 4.110140112172116,
+        "y": 7.07219792817964
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Anvil Shoot Pos (6)"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7,
-      "rotationDegrees": 0,
+      "waypointRelativePos": 0.15,
+      "rotationDegrees": -90.0,
       "rotateFast": false
     }
   ],
@@ -45,13 +45,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Cross the Line (5)",
+  "folder": "Anvil 3 Note",
   "previewStartingState": {
-    "rotation": -59.688786773318384,
+    "rotation": -89.03832846872112,
     "velocity": 0
   },
   "useDefaultConstraints": true
