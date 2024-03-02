@@ -11,18 +11,17 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Flywheel;
 
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_P;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_VELOCITY_TOLERANCE;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
@@ -43,29 +42,21 @@ import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
-    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless),
-            pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168),
-            pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
+    private final CANSparkFlex pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final RelativeEncoder pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
     private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
-    private final SparkPIDController pitchController, flywheelsController;
+    private final SparkPIDController pitchController;
+
+    private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true);
+    private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false);
+
     private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
     private int consecutiveNoteInsideSamples = 0;
 
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
-
-        flywheelsController = flywheelMaster.getPIDController();
-        configureFlywheelMotor(flywheelMaster);
-
-        CANSparkFlex flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
-        configureFlywheelMotor(flywheelSlave);
-
         configurePivotMotor(pivotMotor);
-
-        configureCanCoder(pivotEncoder);
-
-        flywheelSlave.follow(flywheelMaster, true);
+        configureCANCoder(pivotEncoder);
 
         pitchController = pivotMotor.getPIDController();
         setupPivotController();
@@ -80,9 +71,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Target Flywheel RPM", targetFlywheelVelocity);
         SmartDashboard.putNumber("Current angle", currentAngle);
         SmartDashboard.putNumber("Pivot setpoint", pivotSetpoint);
+        SmartDashboard.putNumber("left flywheel rpm", leftFlywheel.getSpeed().in(RPM));
         SmartDashboard.putBoolean("Does see note", doesSeeNote());
-        SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
-        SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
 
         if (pivotSetpoint < 80) {
             // Front region
@@ -112,6 +102,9 @@ public class ShooterSubsystem extends SubsystemBase {
         } else {
             consecutiveNoteInsideSamples = 0;
         }
+
+        leftFlywheel.periodic();
+        rightFlywheel.periodic();
     }
 
     public boolean doesSeeNoteNoiseless() {
@@ -127,22 +120,25 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelSpeed(double targetFlywheelVelocity, boolean pid) {
-        this.targetFlywheelVelocity = targetFlywheelVelocity;
+        leftFlywheel.setSpeed(RPM.of(targetFlywheelVelocity));
+        // this.targetFlywheelVelocity = targetFlywheelVelocity;
 
-        if (pid) {
-            flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
-        } else {
-            flywheelMaster.set(targetFlywheelVelocity / FLYWHEEL_MAX_RPM);
-        }
+        // if (pid) {
+        //     flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
+        // } else {
+        //     leftFlywheel.set(targetFlywheelVelocity / FLYWHEEL_MAX_RPM);
+        // }
     }
 
     public void stopFlywheels() {
-        targetFlywheelVelocity = 0;
-        flywheelMaster.stopMotor();
+        // targetFlywheelVelocity = 0;
+        leftFlywheel.stopMotor();
+        rightFlywheel.stopMotor();
     }
 
     public boolean areFlywheelsReady() {
-        return Math.abs(Math.abs(flywheelEncoder.getVelocity()) - Math.abs(targetFlywheelVelocity)) <= FLYWHEEL_VELOCITY_TOLERANCE;
+        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
+        // return Math.abs(Math.abs(flywheelEncoder.getVelocity()) - Math.abs(targetFlywheelVelocity)) <= FLYWHEEL_VELOCITY_TOLERANCE;
     }
 
     public boolean hasPivotArrived() {
@@ -153,17 +149,13 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotSetpoint = rotation2d.getDegrees();
     }
 
-    private void configureCanCoder(CANCoder encoder) {
+    private void configureCANCoder(CANCoder encoder) {
         encoder.configFactoryDefault();
     }
 
     private void configureFlywheelMotor(CANSparkFlex motor) {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kCoast);
-
-        flywheelsController.setP(FLYWHEEL_P);
-        flywheelsController.setD(0.000017);
-        flywheelsController.setFF(FLYWHEEL_FF);
     }
 
     private void configureSRXMotor(WPI_TalonSRX motor) {

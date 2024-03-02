@@ -147,11 +147,17 @@ public final class Constants {
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
-        public static final double FLYWHEEL_FF = 0.000175;
-        public static final double FLYWHEEL_RANGE_MIN = -1;
-        public static final double FLYWHEEL_RANGE_MAX = 1;
-        public static final double FLYWHEEL_P = 0.000919;
-        public static final double FLYWHEEL_VELOCITY_TOLERANCE = 150;
+        public final class FlywheelControlConstants {
+            /**
+             * All in rotations per second and voltages
+             */
+            public static final double P = 0.66739 / 60,
+                                       D = 1,
+                                       S = 0.083607,
+                                       V = 0.10841,
+                                       A = 0.014571,
+                                       TOLERANCE = 1;
+        }
 
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;
