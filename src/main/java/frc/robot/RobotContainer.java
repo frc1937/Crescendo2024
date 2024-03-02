@@ -14,9 +14,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AdjustShooter;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Mount;
+import frc.robot.commands.PivotSysId;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
@@ -106,9 +107,11 @@ public class RobotContainer {
 //        opLeftTrigger.whileTrue(
 //                new FixedSpeedShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
-        drLeftTrigger.whileTrue(shooterCommands.intakeGet());
+        PivotSysId identi = new PivotSysId(shooterSubsystem);
+        drRightTrigger.whileTrue(identi.getQuasistaticTest(SysIdRoutine.Direction.kForward));
+        drLeftTrigger.whileTrue(identi.getDynamicTest(SysIdRoutine.Direction.kForward));
+        drRightBumper.whileTrue(identi.getQuasistaticTest(SysIdRoutine.Direction.kReverse));
+        drLeftBumper.whileTrue(identi.getDynamicTest(SysIdRoutine.Direction.kReverse));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
