@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -48,8 +50,8 @@ public final class Constants {
                 FRONT_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(-0.31, -0.13, 0.27), new Rotation3d(0, Units.degreesToRadians(-25), 0)),
                 ROBOT_TO_FRONT_CAMERA = FRONT_CAMERA_TO_ROBOT.inverse();
         public static final Transform3d
-                REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.11, Swerve.TRACK_WIDTH/2 - 0.05, 0.41),
-                new Rotation3d(0, Units.degreesToRadians(-25), 180)),
+                REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.355, 0.11, 0.41),
+                                                       new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
                 ROBOT_TO_REAR_CAMERA = REAR_CAMERA_TO_ROBOT.inverse();
         public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
 
