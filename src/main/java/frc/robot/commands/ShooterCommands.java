@@ -38,31 +38,6 @@ public class ShooterCommands {
         );
     }
 
-    public Command shootToAmp(ShootingStates state) {
-        AtomicInteger i = new AtomicInteger();
-        return new FunctionalCommand(
-                () -> {
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-                    shooterSubsystem.setFlywheelSpeed(500, false);
-                },
-                () -> {
-                    i.getAndIncrement();
-
-                    if (i.get() > 50) {
-                        shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
-                    }
-                },
-                interrupted -> {
-                    shooterSubsystem.stopFlywheels();
-                    shooterSubsystem.stopKicker();
-                    i.set(0);
-                },
-                () -> false,
-
-                shooterSubsystem
-        );
-    }
-
     public Command shootNote(ShootingStates state) {
         return new FunctionalCommand(
                 () -> initializeShooterByState(state),
