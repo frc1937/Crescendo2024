@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -141,13 +139,15 @@ public final class Constants {
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
         public static final double PIVOT_ENCODER_OFFSET = 283.184;
-        public static final double PIVOT_UP_P = 0.03;
+
+        public static final double PIVOT_TOLERANCE = 0.3;
+        public static final double PIVOT_P = 0.66739;
+        public static final double PIVOT_S = 0.17403;
+        public static final double PIVOT_V = 14.335;
+        public static final double PIVOT_A = 2.4662;
+        public static final double PIVOT_G = 12.176;
         public static final double PIVOT_UP_FF = 0.000055;
-        public static final double PIVOT_HIGH_P = 0.02;
-        public static final double PIVOT_HIGH_D = 0.02;
-        public static final double PIVOT_HIGH_FF = 0.000085;
-        public static final double PIVOT_DOWN_P = 0.025;
-        public static final double PIVOT_DOWN_FF = 0.0005;
+
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
