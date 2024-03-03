@@ -258,13 +258,13 @@ public final class Constants {
 
         /* SwerveSubsystem Profiling Values */
         /**
-         * Meters per Second
-         */
-        public static final double MAX_SPEED = 5; //TODO: This must be tuned to specific robot
-        /**
          * Radians per Second
          */
-        public static final double MAX_ANGULAR_VELOCITY = 10.0; //TODO: This must be tuned to specific robot
+        public static final double MAX_ANGULAR_VELOCITY = 9.2;  // up to 9.5 in the start of the match
+        /**
+         * Meters per Second
+         */
+        public static final double MAX_SPEED = MAX_ANGULAR_VELOCITY / DRIVE_BASE_RADIUS.in(Meters);
 
         /* Neutral Modes */
         public static final com.revrobotics.CANSparkBase.IdleMode ANGLE_NEUTRAL_MODE = CANSparkBase.IdleMode.kBrake;
