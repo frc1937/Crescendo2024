@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,6 +16,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
+import frc.robot.Constants.Swerve.AutoConstants;
 import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
@@ -34,7 +38,7 @@ import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
-import static frc.robot.Constants.Swerve.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
 
 public class SwerveSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -44,7 +48,9 @@ public class SwerveSubsystem extends SubsystemBase {
     private final Field2d field2d = new Field2d();
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);
     private double previousTimestamp = 0;
-    private final PIDController azimuthController = new PIDController(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D);
+    private final ProfiledPIDController azimuthController = new ProfiledPIDController(
+        AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
+        AZIMUTH_CONTROLLER_CONSTRAINTS);
 
     private double yawCorrection = 0;
 
@@ -71,7 +77,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 pose -> poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose),
                 () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
                 this::drive,
-                HOLONOMIC_PATH_FOLLOWER_CONFIG,
+                AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
                 () -> {
                     DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue);
                     return alliance == DriverStation.Alliance.Red;
@@ -126,21 +132,21 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Set the azimuth setpoint.
+     * Set the azimuth goal.
      *
-     * @param azimuthSetpoint field-relative setpoint azimuth, not flipped by alliance
+     * @param azimuthGoal field-relative goal azimuth, not flipped by alliance
      * @see #driveWithAzimuth(Translation2d)
      */
-    public void setAzimuthSetpoint(Rotation2d azimuthSetpoint) {
-        SmartDashboard.putNumber("Azimuth Setpoint [deg]", azimuthSetpoint.getDegrees());
-        azimuthController.setSetpoint(azimuthSetpoint.getRadians());
+    public void setAzimuthGoal(Rotation2d azimuthGoal) {
+        SmartDashboard.putNumber("Azimuth Goal [deg]", azimuthGoal.getDegrees());
+        azimuthController.setGoal(azimuthGoal.getRadians());
     }
 
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      *
      * @param translation field-relative translation, like in {@link #drive(Translation2d, double, boolean) drive}
-     * @see #setAzimuthSetpoint(Rotation2d)
+     * @see #setAzimuthGoal(Rotation2d)
      */
     public void driveWithAzimuth(Translation2d translation) {
         drive(translation, yawCorrection, true);
@@ -150,17 +156,17 @@ public class SwerveSubsystem extends SubsystemBase {
      * Drive the robot whilst rotating it to achieve the goal azimuth
      *
      * @param translation     field-relative translation, like in {@link #drive(Translation2d, double, boolean) drive}
-     * @param azimuthSetpoint field-relative goal azimuth, not flipped by alliance
-     * @see #setAzimuthSetpoint(Rotation2d)
+     * @param azimuthGoal field-relative goal azimuth, not flipped by alliance
+     * @see #setAzimuthGoal(Rotation2d)
      * @see #driveWithAzimuth(Translation2d)
      */
-    public void driveWithAzimuth(Translation2d translation, Rotation2d azimuthSetpoint) {
-        setAzimuthSetpoint(azimuthSetpoint);
+    public void driveWithAzimuth(Translation2d translation, Rotation2d azimuthGoal) {
+        setAzimuthGoal(azimuthGoal);
         driveWithAzimuth(translation);
     }
 
-    public boolean azimuthAtSetpoint() {
-        return azimuthController.atSetpoint();
+    public boolean azimuthAtGoal() {
+        return azimuthController.atGoal();
     }
 
     public void resetPose() {

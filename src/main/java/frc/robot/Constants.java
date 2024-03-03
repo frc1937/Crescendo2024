@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.path.PathConstraints;
@@ -22,6 +23,8 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -197,6 +200,8 @@ public final class Constants {
         public static final double TRACK_WIDTH = 0.565;
         public static final double WHEEL_BASE = 0.615;
         public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
+        public static final Measure<Distance> DRIVE_BASE_RADIUS =
+            Meters.of(new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm());
 
         /* SwerveSubsystem Kinematics
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
@@ -240,7 +245,7 @@ public final class Constants {
         public static final double ANGLE_KD = 0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 0.001;
+        public static final double DRIVE_KP = 0.001;  // TODO try the value 0.05
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
         public static final double DRIVE_KF = 0.0;
@@ -310,33 +315,35 @@ public final class Constants {
         public static final double VOLTAGE_COMP = 12.0;
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
 
-        public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
-                new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
-                Constants.Swerve.MAX_SPEED, // Max module speed, in m/s
-                0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                new ReplanningConfig(true, true));
-    //todo: shoot 60 angles. Joystick adjustable shooter angle
-        public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
+        
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final TrapezoidProfile.Constraints AZIMUTH_CONTROLLER_CONSTRAINTS =
+                new TrapezoidProfile.Constraints(
+                        MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+                        
+        /**
+         * We avoid steering the swerve wheels below a certain driving speed, for in-place turning
+         * causes them to jitter. Thus, we hereby define the maximum driving speed that is
+         * considered 'in-place'.
+         */
+        public static final double SWERVE_IN_PLACE_DRIVE_MPS = Swerve.MAX_SPEED * 0.01;
+        
+        public static final class AutoConstants {
+            public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
+                    new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
+                    Constants.Swerve.MAX_SPEED,
+                    DRIVE_BASE_RADIUS.in(Meters),
+                    new ReplanningConfig(true, true));
+
             public static final double MAX_SPEED_METERS_PER_SECOND = 3;
             public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
-            public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
-            public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
             public static final double PX_CONTROLLER = 1;
             public static final double PY_CONTROLLER = 1;
             public static final double P_THETA_CONTROLLER = 1;
 
-            public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
-                    new TrapezoidProfile.Constraints(
-                            MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
-
-            /**
-             * We avoid steering the swerve wheels below a certain driving speed, for in-place turning
-             * causes them to jitter. Thus, we hereby define the maximum driving speed that is
-             * considered 'in-place'.
-             */
-            public static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.1;
         }
     }
 
