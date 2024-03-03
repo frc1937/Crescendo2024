@@ -11,10 +11,8 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -56,6 +54,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
     private int consecutiveNoteInsideSamples = 0;
+    private final LedSubsystem ledSubsystem = new LedSubsystem();
 
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
@@ -68,6 +67,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if(doesSeeNoteNoiseless()) {
+//            new LedsCommand(ledSubsystem, 255, 80, 0);
+                    ledSubsystem.setLedColour(255, 80, 0);
+        } else {
+            ledSubsystem.setLedColour(0, 0, 255);
+//            new LedsCommand(ledSubsystem, 0, 0, 255);
+        }
+
         double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
         pivotInternalEncoder.setPosition(currentAngle);
 

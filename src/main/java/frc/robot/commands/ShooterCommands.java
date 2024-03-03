@@ -11,8 +11,6 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.ShootingStates;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
@@ -92,7 +90,6 @@ public class ShooterCommands {
                     shooterSubsystem.stopFlywheels();
                     intakeSubsystem.stopMotor();
                     shooterSubsystem.stopKicker();
-
                 },
 
                 shooterSubsystem::doesSeeNoteNoiseless,

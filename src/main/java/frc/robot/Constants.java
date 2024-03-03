@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -160,7 +158,7 @@ public final class Constants {
                                        S = 0.083607,
                                        V = 0.10841,
                                        A = 0.014571,
-                                       TOLERANCE = 1;
+                                       TOLERANCE = 3;
         }
 
         public static final double PIVOT_RANGE_MIN = -0.9;
@@ -183,7 +181,7 @@ public final class Constants {
     }
 
     public static final class Swerve {
-        public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0,
+        public static final double AZIMUTH_CONTROLLER_P = 14, AZIMUTH_CONTROLLER_I = 0,
                                    AZIMUTH_CONTROLLER_D = 2,
                                    AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(3.5);
 

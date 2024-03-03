@@ -31,8 +31,8 @@ import frc.robot.util.TriggerButton;
 
 import java.util.function.DoubleSupplier;
 
-import static frc.robot.Constants.TFILAT_HADERECH;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.TFILAT_HADERECH;
 
 public class RobotContainer {
     private final XboxController driveController = new XboxController(0);
@@ -134,5 +134,8 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         swerveSubsystem.infrequentPeriodic();
+    }
+
+    public void robotInit() {
     }
 }
