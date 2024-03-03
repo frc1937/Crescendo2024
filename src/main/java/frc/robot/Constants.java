@@ -176,8 +176,8 @@ public final class Constants {
         public static final int SHOOTER_VERTICAL_ANGLE = 112;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
-        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.2, 5.5, 2.05);
-        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.65, 5.5, 2.05);
+        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.0, 5.555, 2.05);
+        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.48, 5.555, 2.05);
 
         public static final double KICKER_SPEED_BACKWARDS = -0.5;
         public static final double KICKER_SPEED_FORWARD = 0.8;
