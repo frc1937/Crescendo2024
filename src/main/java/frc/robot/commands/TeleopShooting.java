@@ -155,6 +155,8 @@ public class TeleopShooting extends SequentialCommandGroup {
             if (interrupted) {
                 shooter.stopFlywheels();
                 shooter.setPivotAngle(Rotation2d.fromDegrees(0));
+            } else {
+                swerve.stop();
             }
 
             // yawController.reset(0);
@@ -187,7 +189,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
-            swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
+            //swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
         }
 
         @Override
