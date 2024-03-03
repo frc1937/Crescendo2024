@@ -80,9 +80,9 @@ public class RobotContainer {
         );
 
         NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
-        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(2.7));
+        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(3));
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
-        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.94));
+        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.98));
         NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
         NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 1.1));
         NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, -0.99));

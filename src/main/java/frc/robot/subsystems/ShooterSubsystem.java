@@ -68,11 +68,9 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (doesSeeNoteNoiseless()) {
-//            new LedsCommand(ledSubsystem, 255, 80, 0);
             ledSubsystem.setLedColour(255, 80, 0);
         } else {
             ledSubsystem.setLedColour(0, 0, 255);
-//            new LedsCommand(ledSubsystem, 0, 0, 255);
         }
 
         double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
