@@ -21,6 +21,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
@@ -43,6 +44,9 @@ public class TeleopShooting extends SequentialCommandGroup {
                 new TeleopAim(swerve, shooter, translationSup, strafeSup),
                 new TeleopThrow(swerve, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
+
+        SmartDashboard.putNumber("swerve/tele-op-shooting/velocity [rpm]", 3000);
+        SmartDashboard.putNumber("swerve/tele-op-shooting/orientation [deg]", 80);
     }
 
     private static class TeleopAim extends Command {
@@ -119,13 +123,16 @@ public class TeleopShooting extends SequentialCommandGroup {
             // Introduce a table that maps path slopes, slopeToVirtualTarget, to well-adjusted
             // shooter orientations. We presume the actual shooter orientation will be steeper than
             // the path slope becasue of gravity.
-            targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
+            //targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
+            targetShooterOrientation = Rotation2d.fromDegrees(SmartDashboard.getNumber("swerve/tele-op-shooting/orientation [deg]", 0));
 
             swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                                     orientationToVirtualTarget);
 
             shooter.setPivotAngle(targetShooterOrientation);
-            shooter.setFlywheelsSpeed(RPM.of(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget)), SHOOTING_SPIN);
+            var vel = RPM.of(SmartDashboard.getNumber("swerve/tele-op-shooting/velocity [rpm]", 0));
+
+            shooter.setFlywheelsSpeed(vel, SHOOTING_SPIN);
         }
 
         @Override

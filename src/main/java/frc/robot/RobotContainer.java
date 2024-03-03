@@ -69,6 +69,8 @@ public class RobotContainer {
     private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
+        swerveSubsystem.publishControllerGains();
+
         swerveSubsystem.setDefaultCommand(
                 new TeleopSwerve(
                         swerveSubsystem,
