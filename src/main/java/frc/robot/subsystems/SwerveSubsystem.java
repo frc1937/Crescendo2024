@@ -110,24 +110,30 @@ public class SwerveSubsystem extends SubsystemBase {
                 SmartDashboard.getNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D));
     }
 
-    public void drive(ChassisSpeeds chassisSpeeds) {
+    public void drive(ChassisSpeeds chassisSpeeds, boolean closedLoop) {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
         for (SwerveModule mod : swerveModules) {
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], closedLoop);
         }
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        drive(chassisSpeeds, true);
+    }
+
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean closedLoop) {
         if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
             translation = translation.unaryMinus();
         }
 
         if (fieldRelative) {
-            drive(ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getGyroYaw()));
+            ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                translation.getX(),translation.getY(), rotation, getGyroYaw());
+            drive(chassisSpeeds, closedLoop);
         } else {
-            drive(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+            drive(new ChassisSpeeds(translation.getX(), translation.getY(), rotation), closedLoop);
         }
     }
 
@@ -149,7 +155,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @see #setAzimuthGoal(Rotation2d)
      */
     public void driveWithAzimuth(Translation2d translation) {
-        drive(translation, yawCorrection, true);
+        drive(translation, yawCorrection, true, true);
     }
 
     /**
@@ -265,7 +271,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        drive(new ChassisSpeeds(0, 0, 0));
+        drive(new ChassisSpeeds(0, 0, 0), false);
     }
 
     public void pathPlanToPose(Pose2d endPose) {
