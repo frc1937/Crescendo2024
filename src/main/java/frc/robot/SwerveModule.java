@@ -1,6 +1,11 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.Constants.Swerve.SWERVE_IN_PLACE_DRIVE_MPS;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkLowLevel;
@@ -11,28 +16,30 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import frc.lib.math.Conversions;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CANSparkMaxUtil.Usage;
+import frc.robot.Constants.Swerve;
 import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
 
 public class SwerveModule {
-    // Number values
     public final int moduleNumber;
     private final Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
-    // Motor and encoder values
     private final RelativeEncoder integratedAngleEncoder;
     private final CANSparkMax mAngleMotor;
     private final TalonFX driveMotor;
     private final CANCoder angleEncoder;
 
-    // Speed control variables
     private final SparkPIDController angleController;
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Swerve.DRIVE_KS, Constants.Swerve.DRIVE_KV, Constants.Swerve.DRIVE_KA);
-//https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+
     /**
      * Every module of the swerve needs to be defined, here we define it.
      *
@@ -43,39 +50,48 @@ public class SwerveModule {
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
 
-        /* Angle Encoder Config */
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
         configAngleEncoder();
 
-        /* Angle Motor Config */
         mAngleMotor = new CANSparkMax(moduleConstants.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         integratedAngleEncoder = mAngleMotor.getEncoder();
         angleController = mAngleMotor.getPIDController();
         configAngleMotor();
 
-        /* Drive Motor Config */
         driveMotor = new TalonFX(moduleConstants.driveMotorID);
         configDriveMotor();
 
         lastAngle = getState().angle;
     }
 
-    public void setDesiredState(SwerveModuleState desiredState) {
-        /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
+    public void setDesiredState(SwerveModuleState desiredState, boolean closedLoop) {
+        // This is a custom optimize function, since default WPILib optimize assumes continuous
+        // controller which CTRE and Rev onboard is not
         desiredState = CTREModuleState.optimize(desiredState, getState().angle);
 
+        setSpeed(MetersPerSecond.of(desiredState.speedMetersPerSecond), closedLoop);
         setAngle(desiredState);
-        setSpeed(desiredState);
     }
 
-    private void setSpeed(SwerveModuleState desiredState) {
-        double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.MAX_SPEED;
-        driveMotor.set(ControlMode.PercentOutput, percentOutput);
+    public void setDesiredState(SwerveModuleState desiredState) {
+        setDesiredState(desiredState, false);
+    }
+
+    private void setSpeed(Measure<Velocity<Distance>> speed, boolean closedLoop) {
+        if (closedLoop) {
+            double targetMotorRPS = Conversions.MPSToFalcon(speed.in(MetersPerSecond), Swerve.WHEEL_CIRCUMFERENCE, Swerve.DRIVE_GEAR_RATIO);
+            driveMotor.set(ControlMode.Velocity, targetMotorRPS, DemandType.ArbitraryFeedForward,
+                           feedforward.calculate(targetMotorRPS));
+        } else {
+            double percentOutput = speed.in(MetersPerSecond) / Constants.Swerve.MAX_SPEED;
+            driveMotor.set(ControlMode.PercentOutput, percentOutput);
+        }
     }
 
     private void setAngle(SwerveModuleState desiredState) {
+        // Prevent jittering
         Rotation2d angle =
-                (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.MAX_SPEED * 0.01))
+                (Math.abs(desiredState.speedMetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS)
                         ? lastAngle
                         : desiredState.angle;
         angleController.setReference(angle.getDegrees(), com.revrobotics.CANSparkBase.ControlType.kPosition);

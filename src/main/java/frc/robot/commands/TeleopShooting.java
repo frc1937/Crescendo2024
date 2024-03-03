@@ -132,7 +132,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady();
             boolean pitchReady = shooter.hasPivotArrived();
-            boolean azimuthReady = swerve.azimuthAtSetpoint();
+            boolean azimuthReady = swerve.azimuthAtGoal();
             boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
             boolean reachedDeadline = deadlineTimer.hasElapsed(2.5);
 
