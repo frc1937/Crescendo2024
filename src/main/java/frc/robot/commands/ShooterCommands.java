@@ -76,7 +76,12 @@ public class ShooterCommands {
         ).andThen(setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7));
     }
 
-    public SequentialCommandGroup intakeGet() {
+    public SequentialCommandGroup intakeGet(boolean shouldTurnKicker) {
+        Command turnKicker = setKickerSpeed(0);
+
+        if(shouldTurnKicker)
+            turnKicker = setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7);
+
         return new FunctionalCommand(
                 () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
                 () -> {
@@ -95,7 +100,7 @@ public class ShooterCommands {
                 shooterSubsystem::doesSeeNoteNoiseless,
 
                 shooterSubsystem
-        ).andThen(setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7));
+        ).andThen(turnKicker);
     }
 
     public Command setKickerSpeed(double speed) {

@@ -11,6 +11,7 @@ import frc.robot.Constants.ShootingConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
 import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_SPIN;
 
@@ -40,6 +41,7 @@ public class AdjustShooter extends Command {
 
     @Override
     public void initialize() {
+        shooter.setKickerSpeed(KICKER_SPEED_BACKWARDS);
         shooter.setPivotAngle(pitch);
         shooter.setFlywheelsSpeed(RPM.of(velocity), SHOOTING_SPIN);
     }

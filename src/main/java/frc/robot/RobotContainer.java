@@ -80,7 +80,7 @@ public class RobotContainer {
         );
 
         NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
-        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet().withTimeout(2.7));
+        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(2.7));
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
         NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.94));
         NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
@@ -108,7 +108,7 @@ public class RobotContainer {
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
-        drLeftTrigger.whileTrue(shooterCommands.intakeGet());
+        drLeftTrigger.whileTrue(shooterCommands.intakeGet(true));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));

@@ -52,7 +52,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false);
 
-    private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
+    private double pivotSetpoint = 0;
     private int consecutiveNoteInsideSamples = 0;
     private final LedSubsystem ledSubsystem = new LedSubsystem();
 
@@ -67,9 +67,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(doesSeeNoteNoiseless()) {
+        if (doesSeeNoteNoiseless()) {
 //            new LedsCommand(ledSubsystem, 255, 80, 0);
-                    ledSubsystem.setLedColour(255, 80, 0);
+            ledSubsystem.setLedColour(255, 80, 0);
         } else {
             ledSubsystem.setLedColour(0, 0, 255);
 //            new LedsCommand(ledSubsystem, 0, 0, 255);
@@ -79,7 +79,6 @@ public class ShooterSubsystem extends SubsystemBase {
         pivotInternalEncoder.setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("Target Flywheel RPM", targetFlywheelVelocity);
         SmartDashboard.putNumber("Current angle", currentAngle);
         SmartDashboard.putNumber("Pivot setpoint", pivotSetpoint);
         SmartDashboard.putNumber("left flywheel rpm", leftFlywheel.getSpeed().in(RPM));
@@ -108,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
             pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
         }
 
-        if(doesSeeNote()) {
+        if (doesSeeNote()) {
             consecutiveNoteInsideSamples++;
         } else {
             consecutiveNoteInsideSamples = 0;
@@ -138,11 +137,11 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Rotate the flywheels to certain speeds s.t. NOTEs will be released with
      * certain speed and rotation
-     * 
+     *
      * @param speed the average target speed of both flywheels
-     * @param spin a value in range [0, 1] where (1 - spin) = (right speed / left speed). Thus,
-     *             the difference between the left and right speeds is proprtional to
-     *             {@code speed}.
+     * @param spin  a value in range [0, 1] where (1 - spin) = (right speed / left speed). Thus,
+     *              the difference between the left and right speeds is proprtional to
+     *              {@code speed}.
      */
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
         var leftSpeed = speed.times(2).divide(2.d - spin);
@@ -152,14 +151,12 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void stopFlywheels() {
-        // targetFlywheelVelocity = 0;
         leftFlywheel.stopMotor();
         rightFlywheel.stopMotor();
     }
 
     public boolean areFlywheelsReady() {
         return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
-        // return Math.abs(Math.abs(flywheelEncoder.getVelocity()) - Math.abs(targetFlywheelVelocity)) <= FLYWHEEL_VELOCITY_TOLERANCE;
     }
 
     public boolean hasPivotArrived() {
