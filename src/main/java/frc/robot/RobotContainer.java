@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IdentifySwerveDrive;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
@@ -68,6 +67,7 @@ public class RobotContainer {
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
     private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
+    private final IdentifySwerveDrive identifySwerveDrive = new IdentifySwerveDrive(swerveSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(
@@ -106,10 +106,14 @@ public class RobotContainer {
         drAButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+//        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         // drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
-        drRightTrigger.toggleOnTrue(new IdentifySwerveDrive(swerveSubsystem));
-        drLeftTrigger.whileTrue(shooterCommands.intakeGet());
+
+        drRightTrigger.toggleOnTrue(identifySwerveDrive.getQuastaticTest());
+        drLeftTrigger.toggleOnTrue(identifySwerveDrive.getQuastaticTestBackwards());
+        drLeftBumper.toggleOnTrue(identifySwerveDrive.getDynamicTest());
+        drRightBumper.toggleOnTrue(identifySwerveDrive.getDynamicTestBackwards());
+//        drLeftTrigger.whileTrue(shooterCommands.intakeGet());
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
