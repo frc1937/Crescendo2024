@@ -244,9 +244,13 @@ public class SwerveSubsystem extends SubsystemBase {
         // new LinearSystem<>(null, null, null, null)
     }
 
-    public void allModulesVoltageDrive(Measure<Voltage> voltage) {
+    public void rotateByVoltage(Measure<Voltage> voltage) {
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 1);
+        SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
+
         for (SwerveModule mod : swerveModules) {
-            mod.setDriveVoltage(voltage);
+            mod.setDriveVoltage(voltage, swerveModuleStates[mod.moduleNumber]);
         }
     }
 

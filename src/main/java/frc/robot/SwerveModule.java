@@ -175,7 +175,8 @@ public class SwerveModule {
         );
     }
 
-    public void setDriveVoltage(Measure<Voltage> voltage) {
+    public void setDriveVoltage(Measure<Voltage> voltage, SwerveModuleState state) {
+        setAngle(state);
         driveMotor.set(ControlMode.PercentOutput, voltage.in(Volts) / RobotController.getBatteryVoltage());
     }
 
