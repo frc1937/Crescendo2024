@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
+import frc.robot.commands.IdentifySwerveDrive;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
@@ -106,7 +107,8 @@ public class RobotContainer {
                 new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        // drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        drRightTrigger.toggleOnTrue(new IdentifySwerveDrive(swerveSubsystem));
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
 
         //Operator buttons:

@@ -18,6 +18,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -239,6 +241,12 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Azimuth [deg]", getPose().getRotation().getDegrees());
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
         // new LinearSystem<>(null, null, null, null)
+    }
+
+    public void allModulesVoltageDrive(Measure<Voltage> voltage) {
+        for (SwerveModule mod : swerveModules) {
+            mod.setDriveVoltage(voltage);
+        }
     }
 
     private void updateByEstimator(EstimatedRobotPose estimatedRobotPose) {

@@ -12,9 +12,14 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import frc.lib.math.Conversions;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CANSparkMaxUtil.Usage;
@@ -23,7 +28,11 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants.Swerve;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.Swerve.SWERVE_IN_PLACE_DRIVE_MPS;
+import static edu.wpi.first.units.MutableMeasure.mutable;
 
 public class SwerveModule {
     public final int moduleNumber;
@@ -37,6 +46,13 @@ public class SwerveModule {
 
     private final SparkPIDController angleController;
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Swerve.DRIVE_KS, Constants.Swerve.DRIVE_KV, Constants.Swerve.DRIVE_KA);
+
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+    // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+    private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+    private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
 
     /**
      * Every module of the swerve needs to be defined, here we define it.
@@ -157,5 +173,17 @@ public class SwerveModule {
                 Conversions.falconToMeters(driveMotor.getSelectedSensorPosition(), Constants.Swerve.WHEEL_CIRCUMFERENCE, Constants.Swerve.DRIVE_GEAR_RATIO),
                 getAngle()
         );
+    }
+
+    public void setDriveVoltage(Measure<Voltage> voltage) {
+        driveMotor.set(ControlMode.PercentOutput, voltage.in(Volts) / RobotController.getBatteryVoltage());
+    }
+
+    public void logDrive(SysIdRoutineLog log) {
+        log.motor("module-" + moduleNumber)
+            .voltage(
+                m_appliedVoltage.mut_replace(driveMotor.getMotorOutputVoltage(), Volts))
+            .angularPosition(m_angle.mut_replace(driveMotor.getSelectedSensorPosition() / 2048, Rotations))
+            .angularVelocity(m_velocity.mut_replace(driveMotor.getSelectedSensorVelocity() / 2048 * 10, RotationsPerSecond));
     }
 }
