@@ -76,31 +76,48 @@ public class ShooterCommands {
         ).andThen(setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7));
     }
 
-    public SequentialCommandGroup intakeGet(boolean shouldTurnKicker) {
-        Command turnKicker = setKickerSpeed(0);
+    public Command postIntake() {
+        return new FunctionalCommand(null, null,
+                interrupted -> shooterSubsystem.stopKicker(), null, shooterSubsystem)
+            .withTimeout(0.7);
+    }
 
-        if(shouldTurnKicker)
-            turnKicker = setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7);
+    public Command intakeGet(boolean includePostIntake) {
+        FunctionalCommand preparePivot = new FunctionalCommand(
+            () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
+            null,
+            null,
+            () -> shooterSubsystem.hasPivotArrived(),
+            shooterSubsystem);
+        FunctionalCommand operateIntake = new FunctionalCommand(
+            () -> {
+                intakeSubsystem.setSpeedPercentage(0.7);
+                shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
+                shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
+            },
+            null,
+            interrupted -> {
+                shooterSubsystem.stopFlywheels();
+                intakeSubsystem.stopMotor();
 
-        return new FunctionalCommand(
-                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
-                () -> {
-                    if (shooterSubsystem.hasPivotArrived()) {
-                        intakeSubsystem.setSpeedPercentage(0.7);
-                        shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
-                        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-                    }
-                },
-                interrupted -> {
-                    shooterSubsystem.stopFlywheels();
-                    intakeSubsystem.stopMotor();
+                if (interrupted) {
                     shooterSubsystem.stopKicker();
-                },
+                }
+            },
+            shooterSubsystem::doesSeeNoteNoiseless,
+            intakeSubsystem, shooterSubsystem);
+        
+        Command prepareAndOperateIntake = preparePivot.andThen(operateIntake);
 
-                shooterSubsystem::doesSeeNoteNoiseless,
+        if (includePostIntake) {
+            return prepareAndOperateIntake.andThen(postIntake());
+        } else {
+            return prepareAndOperateIntake;
+        }
+    }
 
-                shooterSubsystem
-        ).andThen(turnKicker);
+    public Command intakeGet() {
+        return intakeGet(true);
     }
 
     public Command setKickerSpeed(double speed) {

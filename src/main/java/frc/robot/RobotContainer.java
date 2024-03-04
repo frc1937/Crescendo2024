@@ -81,6 +81,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
         NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(3));
+        NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
         NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.98));
         NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
@@ -103,12 +104,10 @@ public class RobotContainer {
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
         drAButton.whileTrue(
                 new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
-//        opLeftTrigger.whileTrue(
-//                new FixedSpeedShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
-        drLeftTrigger.whileTrue(shooterCommands.intakeGet(true));
+        drLeftTrigger.whileTrue(shooterCommands.intakeGet());
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
