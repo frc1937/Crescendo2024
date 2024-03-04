@@ -143,8 +143,8 @@ public final class Constants {
             SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
         }
 
-        public static final double MINIMUM_VIABLE_SLOPE = 0.45;
-        public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
+        public static final double MINIMUM_VIABLE_SLOPE = 0.15;
+        public static final double MAXIMUM_VIABLE_SLOPE = 5;
 
         public static final double POSE_HISTORY_DURATION = 0.5;
 
