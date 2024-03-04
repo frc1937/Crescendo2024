@@ -20,7 +20,7 @@ public class IdentifySwerveDrive extends SequentialCommandGroup {
   public IdentifySwerveDrive(SwerveSubsystem swerve) {
     SysIdRoutine routine = new SysIdRoutine(
       new Config(Volts.per(Second).of(0.75), null, Seconds.of(50)),
-      new Mechanism(swerve::allModulesVoltageDrive, null, swerve));
+      new Mechanism(swerve::allModulesVoltageDrive, swerve::logAllModulesDrive, swerve));
     
       // Rotate the swerve s.t. the rest of the tests will be performed by rotation
       Command prepareSwerveModuleAngle = new TeleopSwerve(swerve, () -> 0, () -> 0, () -> 1, () -> false);
