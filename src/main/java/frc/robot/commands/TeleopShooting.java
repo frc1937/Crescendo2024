@@ -43,6 +43,9 @@ public class TeleopShooting extends SequentialCommandGroup {
                 new TeleopAim(swerve, shooter, translationSup, strafeSup),
                 new TeleopThrow(swerve, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
+
+        SmartDashboard.putNumber("swerve/velocity [rpm]", 3000);
+        SmartDashboard.putNumber("swerve/orientation [deg]", 70);
     }
 
     private static class TeleopAim extends Command {
@@ -113,19 +116,24 @@ public class TeleopShooting extends SequentialCommandGroup {
             // Aim to the virtual target
             slopeToVirtualTarget = translationToVirtualTarget.getZ() / translationToVirtualTarget.toTranslation2d().getNorm();
             orientationToVirtualTarget = translationToVirtualTarget.toTranslation2d().getAngle();
-            SmartDashboard.putNumber("orientationToVirtuaorientationToVirtualTarget", orientationToVirtualTarget.getDegrees());
-            SmartDashboard.putNumber("Virtual target pitch [slope]", slopeToVirtualTarget);
+//            SmartDashboard.putNumber("orientationToVirtuaorientationToVirtualTarget", orientationToVirtualTarget.getDegrees());
+            SmartDashboard.putNumber("swerve/Virtual target pitch [slope]", slopeToVirtualTarget);
 
             // Introduce a table that maps path slopes, slopeToVirtualTarget, to well-adjusted
             // shooter orientations. We presume the actual shooter orientation will be steeper than
             // the path slope becasue of gravity.
-            targetShooterOrientation = SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
+            targetShooterOrientation =
+//                    Rotation2d.fromDegrees(SmartDashboard.getNumber("swerve/orientation [deg]", 0));
+                    SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
 
             swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                                     orientationToVirtualTarget);
 
             shooter.setPivotAngle(targetShooterOrientation);
-            shooter.setFlywheelsSpeed(RPM.of(SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget)), SHOOTING_SPIN);
+            shooter.setFlywheelsSpeed(RPM.of(
+//                    SmartDashboard.getNumber("swerve/velocity [rpm]", 0))
+                    SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget))
+                    , SHOOTING_SPIN);
         }
 
         @Override

@@ -4,7 +4,6 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,16 +15,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.SwerveModule;
 import frc.robot.Constants.Swerve.AutoConstants;
+import frc.robot.SwerveModule;
 import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
@@ -33,12 +30,12 @@ import java.util.List;
 
 import static frc.robot.Constants.NavigationConstants.DEFAULT_PATH_CONSTRAINTS;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_D;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
 
 public class SwerveSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -172,7 +169,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public boolean azimuthAtGoal() {
-        return azimuthController.atGoal();
+        return Math.abs(azimuthController.getPositionError()) < AZIMUTH_CONTROLLER_TOLERANCE;
     }
 
     public void resetPose() {

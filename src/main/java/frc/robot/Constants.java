@@ -99,13 +99,20 @@ public final class Constants {
             InverseInterpolator.forDouble(), Rotation2d::interpolate);
         
         static {
-            SLOPE_TO_PITCH_MAP.put(0.38, Rotation2d.fromDegrees(60.2));
+            SLOPE_TO_PITCH_MAP.put(0.387, Rotation2d.fromDegrees(58.5));
+            SLOPE_TO_PITCH_MAP.put(0.393, Rotation2d.fromDegrees(59.7));
+            SLOPE_TO_PITCH_MAP.put(0.42, Rotation2d.fromDegrees(60.2));
+            SLOPE_TO_PITCH_MAP.put(0.433, Rotation2d.fromDegrees(61));
+            SLOPE_TO_PITCH_MAP.put(0.44, Rotation2d.fromDegrees(60.6));
+
+            //LATEST TODAY
+//            SLOPE_TO_PITCH_MAP.put(0.38, Rotation2d.fromDegrees(60.2));
             SLOPE_TO_PITCH_MAP.put(0.48, Rotation2d.fromDegrees(65));
             SLOPE_TO_PITCH_MAP.put(0.56, Rotation2d.fromDegrees(67));
             SLOPE_TO_PITCH_MAP.put(0.68, Rotation2d.fromDegrees(70));
             SLOPE_TO_PITCH_MAP.put(0.76, Rotation2d.fromDegrees(72.7));
             SLOPE_TO_PITCH_MAP.put(0.93, Rotation2d.fromDegrees(77));
-
+//DIS 2:
 //            SLOPE_TO_PITCH_MAP.put(0.94, Rotation2d.fromDegrees(84));
 //            SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(78.5));
 //            SLOPE_TO_PITCH_MAP.put(0.77, Rotation2d.fromDegrees(76));
@@ -119,7 +126,10 @@ public final class Constants {
             InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_VELOCITY_MAP.put(0.38, 5500.0);
+//            SLOPE_TO_VELOCITY_MAP.put(0.38, 5500.0);
+            SLOPE_TO_VELOCITY_MAP.put(0.393, 5500.0);
+            SLOPE_TO_VELOCITY_MAP.put(0.42, 5500.0);
+            SLOPE_TO_VELOCITY_MAP.put(0.44, 5500.0);
             SLOPE_TO_VELOCITY_MAP.put(0.48, 5000.0);
             SLOPE_TO_VELOCITY_MAP.put(0.56, 4500.0);
             SLOPE_TO_VELOCITY_MAP.put(0.68, 4000.0);
@@ -143,12 +153,12 @@ public final class Constants {
             SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
         }
 
-        public static final double MINIMUM_VIABLE_SLOPE = 0.45;
+        public static final double MINIMUM_VIABLE_SLOPE = 0.25;
         public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
 
         public static final double POSE_HISTORY_DURATION = 0.5;
 
-        public static final double SHOOTING_SPIN = 0.15;
+        public static final double SHOOTING_SPIN = 0.01f;
 
         public static final int
                 FLYWHEEL_LEFT_ID = 15,
@@ -199,9 +209,9 @@ public final class Constants {
     }
 
     public static final class Swerve {
-        public static final double AZIMUTH_CONTROLLER_P = 14, AZIMUTH_CONTROLLER_I = 0,
-                                   AZIMUTH_CONTROLLER_D = 2,
-                                   AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(3.5);
+        public static final double AZIMUTH_CONTROLLER_P = 12, AZIMUTH_CONTROLLER_I = 0,
+                                   AZIMUTH_CONTROLLER_D = 0,
+                                   AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(4);
 
         public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
@@ -258,15 +268,15 @@ public final class Constants {
         public static final double ANGLE_KD = 0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 0.03;  // TODO try the value 0.05
+        public static final double DRIVE_KP = 0.03;// 0.073456;  // TODO try the value 0.05
         public static final double DRIVE_KI = 0.0;
-        public static final double DRIVE_KD = 0.005;
+        public static final double DRIVE_KD = 0;
         public static final double DRIVE_KF = 0.0;
 
         /* Drive Motor Characterization Values
          * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
-        public static final double DRIVE_KS = 0; //(0.32 / 12); //TODO: This must be tuned to specific robot
-        public static final double DRIVE_KV = 0; //(1.51 / 12);
+        public static final double DRIVE_KS = 0;//0.16368; //(0.32 / 12); //TODO: This must be tuned to specific robot
+        public static final double DRIVE_KV = 0;//0.10915; //(1.51 / 12);
         public static final double DRIVE_KA = 0; // (0.27 / 12);
 
         /* SwerveSubsystem Profiling Values */
