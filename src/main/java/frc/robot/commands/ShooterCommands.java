@@ -77,36 +77,43 @@ public class ShooterCommands {
     }
 
     public Command postIntake() {
-        return new FunctionalCommand(null, null,
-                interrupted -> shooterSubsystem.stopKicker(), null, shooterSubsystem)
-            .withTimeout(0.7);
+        return new FunctionalCommand(
+                () -> {},
+                () -> {},
+                interrupted -> shooterSubsystem.stopKicker(),
+                () -> false,
+
+                shooterSubsystem).withTimeout(0.7);
     }
 
     public Command intakeGet(boolean includePostIntake) {
         FunctionalCommand preparePivot = new FunctionalCommand(
-            () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
-            null,
-            null,
-            () -> shooterSubsystem.hasPivotArrived(),
-            shooterSubsystem);
+                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0.5)),
+                () -> {
+                },
+                interrupt -> {
+                },
+                shooterSubsystem::hasPivotArrived,
+                shooterSubsystem);
         FunctionalCommand operateIntake = new FunctionalCommand(
-            () -> {
-                intakeSubsystem.setSpeedPercentage(0.7);
-                shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
-                shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
-            },
-            null,
-            interrupted -> {
-                shooterSubsystem.stopFlywheels();
-                intakeSubsystem.stopMotor();
+                () -> {
+                    intakeSubsystem.setSpeedPercentage(0.7);
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
+                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
+                },
+                () -> {
+                },
+                interrupted -> {
+                    shooterSubsystem.stopFlywheels();
+                    intakeSubsystem.stopMotor();
 
-                if (interrupted) {
-                    shooterSubsystem.stopKicker();
-                }
-            },
-            shooterSubsystem::doesSeeNoteNoiseless,
-            intakeSubsystem, shooterSubsystem);
-        
+                    if (Boolean.TRUE.equals(interrupted)) {
+                        shooterSubsystem.stopKicker();
+                    }
+                },
+                shooterSubsystem::doesSeeNoteNoiseless,
+                intakeSubsystem, shooterSubsystem);
+
         Command prepareAndOperateIntake = preparePivot.andThen(operateIntake);
 
         if (includePostIntake) {

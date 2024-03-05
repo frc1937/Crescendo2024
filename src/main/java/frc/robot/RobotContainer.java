@@ -109,6 +109,7 @@ public class RobotContainer {
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
 
+        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
