@@ -73,7 +73,7 @@ public class ShooterSubsystem extends SubsystemBase {
             ledSubsystem.setLedColour(0, 0, 255);
         }
 
-        double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
+        double currentAngle = PIVOT_ENCODER_OFFSET - pivotEncoder.getPosition();
         pivotInternalEncoder.setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
@@ -142,8 +142,9 @@ public class ShooterSubsystem extends SubsystemBase {
      *              {@code speed}.
      */
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
-        var leftSpeed = speed.times(2).divide(2.d - spin);
-        var rightSpeed = leftSpeed.times(1.d - spin);
+        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - spin);
+        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - spin);
+
         rightFlywheel.setSpeed(rightSpeed);
         leftFlywheel.setSpeed(leftSpeed);
     }

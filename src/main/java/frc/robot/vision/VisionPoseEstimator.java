@@ -52,11 +52,9 @@ public class VisionPoseEstimator {
     }
 
     private EstimatedRobotPose estimatePose(PhotonPoseEstimator poseEstimator, PhotonCamera camera, Pose2d prevEstimatedRobotPose) {
-        SmartDashboard.putBoolean("Vision-Based Odometry", camera.isConnected());
+        SmartDashboard.putBoolean("isCameraConnected", camera.isConnected());
 
-        if (!camera.isConnected()) {
-            return null;
-        }
+        if (!camera.isConnected()) return null;
 
         poseEstimator.setReferencePose(prevEstimatedRobotPose);
 

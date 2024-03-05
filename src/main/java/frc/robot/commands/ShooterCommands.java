@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -41,7 +40,6 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> initializeShooterByState(state),
                 () -> {
-                    SmartDashboard.putBoolean("isFlywheelReady", shooterSubsystem.areFlywheelsReady());
                     if (shooterSubsystem.doesSeeNoteNoiseless() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
                     }
@@ -78,8 +76,10 @@ public class ShooterCommands {
 
     public Command postIntake() {
         return new FunctionalCommand(
-                () -> {},
-                () -> {},
+                () -> {
+                },
+                () -> {
+                },
                 interrupted -> shooterSubsystem.stopKicker(),
                 () -> false,
 
@@ -145,17 +145,6 @@ public class ShooterCommands {
                     shooterSubsystem.stopFlywheels();
                     shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(0));
                 }));
-    }
-
-    public Command setAngle(double angle) {
-        return new FunctionalCommand(
-                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
-                () -> {
-                },
-                interrupt -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(angle)),
-                () -> false,
-                shooterSubsystem
-        );
     }
 
     private void initializeShooterByState(ShootingStates state) {

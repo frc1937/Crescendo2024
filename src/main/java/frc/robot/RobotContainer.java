@@ -96,8 +96,6 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        driveYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
-
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
@@ -110,6 +108,8 @@ public class RobotContainer {
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
 
         drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
+        drBButton.whileTrue(new Mount(mountSubsystem));
+
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
@@ -122,9 +122,6 @@ public class RobotContainer {
         opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
 //        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
         opStartButton.whileTrue(mountCommands.testMountCommand());
-
-       // drBackButton.whileTrue(Navigate.navigateToAmplifier());
-       drBButton.whileTrue(new Mount(mountSubsystem));
     }
 
 
@@ -134,8 +131,5 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         swerveSubsystem.infrequentPeriodic();
-    }
-
-    public void robotInit() {
     }
 }
