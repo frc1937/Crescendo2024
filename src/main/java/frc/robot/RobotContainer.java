@@ -96,19 +96,19 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
-
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
-        drAButton.whileTrue(
-                new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        drRightTrigger.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
 
-        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
+        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+        drAButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+
         drBButton.whileTrue(new Mount(mountSubsystem));
+        drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
+
+        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
@@ -117,7 +117,7 @@ public class RobotContainer {
         opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
         opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
-        opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
+//        opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
 
         opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
 //        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());

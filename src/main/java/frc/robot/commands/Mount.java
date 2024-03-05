@@ -4,33 +4,33 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.MountSubsystem;
 
 public class Mount extends Command {
-    private final MountSubsystem mount;
+    private final MountSubsystem mountSubsystem;
     private boolean reachedOutOfProximity;
 
-    public Mount(MountSubsystem mount) {
-        this.mount = mount;
+    public Mount(MountSubsystem mountSubsystem) {
+        this.mountSubsystem = mountSubsystem;
 
-        addRequirements(mount);
+        addRequirements(mountSubsystem);
     }
 
     @Override
     public void initialize() {
-        mount.startMount();
-        reachedOutOfProximity = mount.getProximityStatus() == 1;
+        mountSubsystem.startMount();
+        reachedOutOfProximity = mountSubsystem.getProximityStatus() == 1;
     }
 
     @Override
     public void execute() {
-        reachedOutOfProximity = reachedOutOfProximity || mount.getProximityStatus() == 1;
+        reachedOutOfProximity = reachedOutOfProximity || mountSubsystem.getProximityStatus() == 1;
     }
 
     @Override
     public void end(boolean interrupted) {
-        mount.stopMount();
+        mountSubsystem.stopMount();
     }
 
     @Override
     public boolean isFinished() {
-        return reachedOutOfProximity && mount.getProximityStatus() == 0;
+        return reachedOutOfProximity && mountSubsystem.getProximityStatus() == 0;
     }
 }
