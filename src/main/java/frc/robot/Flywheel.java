@@ -4,21 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkRelativeEncoder;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import frc.robot.Constants.ShootingConstants.FlywheelControlConstants;
+
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 public class Flywheel {
     private final CANSparkMax motor;
@@ -38,7 +37,6 @@ public class Flywheel {
         feedback.setTolerance(FlywheelControlConstants.TOLERANCE);
 
         encoder = motor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
-
     }
 
     public void periodic() {

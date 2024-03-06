@@ -121,13 +121,12 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean closedLoop) {
-        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red)
             translation = translation.unaryMinus();
-        }
 
         if (fieldRelative) {
             ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.getX(),translation.getY(), rotation, getGyroYaw());
+                    translation.getX(),translation.getY(), rotation, getGyroYaw());
             drive(chassisSpeeds, closedLoop);
         } else {
             drive(new ChassisSpeeds(translation.getX(), translation.getY(), rotation), closedLoop);
@@ -201,7 +200,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void zeroGyro() {
-        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
             gyro.setYaw(0);
         } else {
             gyro.setYaw(180);

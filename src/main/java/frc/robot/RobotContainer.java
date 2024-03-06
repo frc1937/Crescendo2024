@@ -16,12 +16,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AdjustShooter;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.Mount;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.TestMountCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -66,7 +64,7 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
+//    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
         swerveSubsystem.setDefaultCommand(
@@ -80,6 +78,7 @@ public class RobotContainer {
         );
 
         NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
+
         NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(3));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
@@ -99,29 +98,27 @@ public class RobotContainer {
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
 
-        drRightTrigger.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
+        drAButton.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
+
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
-
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drAButton.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
-        drBButton.whileTrue(new Mount(mountSubsystem));
+//        drBButton.whileTrue(new Mount(mountSubsystem));
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
-
-        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
-        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
-        opYButton.whileTrue(shooterCommands.shootNote(ShootingStates.AMP));
+        opYButton.whileTrue(shooterCommands.shootToAmp(ShootingStates.AMP));
 
-        opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
+//        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
+
+//        opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
 //        opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
-
-        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
+//        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
 //        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
-        opStartButton.whileTrue(mountCommands.testMountCommand());
+//        opStartButton.whileTrue(mountCommands.testMountCommand());
     }
 
 

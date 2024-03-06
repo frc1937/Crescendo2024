@@ -24,18 +24,6 @@ public class ShooterCommands {
         this.intakeSubsystem = intakeSubsystem;
     }
 
-    public Command accelerateFlywheel(ShootingStates state) {
-        return new FunctionalCommand(
-                () -> initializeShooterByState(state),
-                () -> {
-                },
-                interrupted -> shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD),
-                () -> false,
-
-                shooterSubsystem
-        );
-    }
-
     public Command shootNote(ShootingStates state) {
         return new FunctionalCommand(
                 () -> initializeShooterByState(state),
@@ -95,11 +83,12 @@ public class ShooterCommands {
                 },
                 shooterSubsystem::hasPivotArrived,
                 shooterSubsystem);
+
         FunctionalCommand operateIntake = new FunctionalCommand(
                 () -> {
                     intakeSubsystem.setSpeedPercentage(0.7);
                     shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
-                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
+                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {
                 },
@@ -147,11 +136,17 @@ public class ShooterCommands {
                 }));
     }
 
+    public SequentialCommandGroup shootToAmp(ShootingStates state) {
+        return shootNote(state)
+                .andThen(new InstantCommand(() -> shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD))
+                        .withTimeout(0.7));
+    }
+
     private void initializeShooterByState(ShootingStates state) {
-        if (shooterSubsystem.doesSeeNoteNoiseless()) {
-            shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-            shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
-            shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM));
-        }
+//        if (shooterSubsystem.doesSeeNoteNoiseless()) {
+        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
+        shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM));
+//        }
     }
 }

@@ -105,11 +105,8 @@ public class ShooterSubsystem extends SubsystemBase {
             pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
         }
 
-        if (doesSeeNote()) {
-            consecutiveNoteInsideSamples++;
-        } else {
-            consecutiveNoteInsideSamples = 0;
-        }
+        if (doesSeeNote()) consecutiveNoteInsideSamples++;
+        else consecutiveNoteInsideSamples = 0;
 
         leftFlywheel.periodic();
         rightFlywheel.periodic();
