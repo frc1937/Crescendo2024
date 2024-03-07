@@ -95,8 +95,8 @@ public final class Constants {
          * move the robot to a different position and repeat until the table is complete. A good initial
          * angle is the arc-tangent of the virtual slope.
          */
-        public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<Double, Rotation2d>(
-            InverseInterpolator.forDouble(), Rotation2d::interpolate);
+        public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<>(
+                InverseInterpolator.forDouble(), Rotation2d::interpolate);
         
         static {
             SLOPE_TO_PITCH_MAP.put(0.387, Rotation2d.fromDegrees(58.5));
@@ -108,9 +108,11 @@ public final class Constants {
             //LATEST TODAY
 //            SLOPE_TO_PITCH_MAP.put(0.38, Rotation2d.fromDegrees(60.2));
             SLOPE_TO_PITCH_MAP.put(0.48, Rotation2d.fromDegrees(65));
+            SLOPE_TO_PITCH_MAP.put(0.5, Rotation2d.fromDegrees(64));
             SLOPE_TO_PITCH_MAP.put(0.56, Rotation2d.fromDegrees(67));
             SLOPE_TO_PITCH_MAP.put(0.68, Rotation2d.fromDegrees(70));
             SLOPE_TO_PITCH_MAP.put(0.76, Rotation2d.fromDegrees(72.7));
+            SLOPE_TO_PITCH_MAP.put(0.81, Rotation2d.fromDegrees(72.5));
             SLOPE_TO_PITCH_MAP.put(0.93, Rotation2d.fromDegrees(77));
 //DIS 2:
 //            SLOPE_TO_PITCH_MAP.put(0.94, Rotation2d.fromDegrees(84));
@@ -122,8 +124,8 @@ public final class Constants {
 //            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(58.8));
         }
 
-        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<Double, Double>(
-            InverseInterpolator.forDouble(), Interpolator.forDouble());
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<>(
+                InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
 //            SLOPE_TO_VELOCITY_MAP.put(0.38, 5500.0);
@@ -134,6 +136,7 @@ public final class Constants {
             SLOPE_TO_VELOCITY_MAP.put(0.56, 4500.0);
             SLOPE_TO_VELOCITY_MAP.put(0.68, 4000.0);
             SLOPE_TO_VELOCITY_MAP.put(0.76, 3000.0);
+            SLOPE_TO_VELOCITY_MAP.put(0.81, 5000.0);
             SLOPE_TO_VELOCITY_MAP.put(0.93, 3000.0);
 
 //            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.85 * FLYWHEEL_MAX_RPM);
@@ -143,7 +146,7 @@ public final class Constants {
 //            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.90 * FLYWHEEL_MAX_RPM);
         }
 
-        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<Double, Double>(
+        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
@@ -177,7 +180,7 @@ public final class Constants {
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
-        public final class FlywheelControlConstants {
+        public static final class FlywheelControlConstants {
             /**
              * All in rotations per second and voltages
              */
@@ -209,9 +212,9 @@ public final class Constants {
     }
 
     public static final class Swerve {
-        public static final double AZIMUTH_CONTROLLER_P = 12, AZIMUTH_CONTROLLER_I = 0,
-                                   AZIMUTH_CONTROLLER_D = 0,
-                                   AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(4);
+        public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0,
+                                   AZIMUTH_CONTROLLER_D = 2,
+                                   AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(2);
 
         public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
@@ -358,8 +361,7 @@ public final class Constants {
                     new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                     Constants.Swerve.MAX_SPEED,
                     DRIVE_BASE_RADIUS.in(Meters),
-                    new ReplanningConfig(true, true));
-
+                    new ReplanningConfig());
         }
     }
 

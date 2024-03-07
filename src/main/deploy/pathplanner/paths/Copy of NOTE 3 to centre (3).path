@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.272016237726169,
-        "y": 5.556066607628711
+        "x": 2.904894952647049,
+        "y": 3.9873725461736647
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.372016237726169,
-        "y": 5.556066607628711
+        "x": 2.362495010704308,
+        "y": 3.87009688305091
       },
       "isLocked": false,
-      "linkedName": "Centre (3)"
+      "linkedName": "NOTE 3 (3)"
     },
     {
       "anchor": {
-        "x": 3.2274030262346245,
+        "x": 1.272016237726169,
         "y": 5.556066607628711
       },
       "prevControl": {
-        "x": 3.1274030262346244,
-        "y": 5.556066607628711
+        "x": 1.3427269158448236,
+        "y": 5.485355929510057
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NOTE 2 (3)"
+      "linkedName": "Centre (3)"
     }
   ],
   "rotationTargets": [],
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Crown (3)",
+  "folder": "Mirrored Crown (3.3)",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

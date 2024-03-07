@@ -36,50 +36,6 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Base to NOTE 1 (3)"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "NOTE 1 to centre (3)"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AdjustShooter1"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShooterKick"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
                   "pathName": "centre to NOTE 2 (3)"
                 }
               }
@@ -153,6 +109,25 @@
           "type": "named",
           "data": {
             "name": "ShooterKick"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Fuck Out (3.2)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         }
       ]

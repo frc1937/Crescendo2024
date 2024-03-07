@@ -5,8 +5,8 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,7 +20,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 public class Flywheel {
-    private final CANSparkMax motor;
+    private final CANSparkFlex motor;
     private final RelativeEncoder encoder;
     private final PIDController feedback = new PIDController(FlywheelControlConstants.P, 0, 0);
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
@@ -29,7 +29,7 @@ public class Flywheel {
     private double feedforwardCorrection = 0;
 
     public Flywheel(int motorId, boolean invert) {
-        motor = new CANSparkMax(motorId, MotorType.kBrushless);
+        motor = new CANSparkFlex(motorId, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);
         motor.setInverted(invert);

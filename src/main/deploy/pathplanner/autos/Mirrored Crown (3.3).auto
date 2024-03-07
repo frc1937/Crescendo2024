@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Base to NOTE 1 (3)"
+                  "pathName": "Copy of Centre to NOTE 3 (3)"
                 }
               }
             ]
@@ -49,7 +49,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "NOTE 1 to centre (3)"
+                  "pathName": "Copy of NOTE 3 to centre (3)"
                 }
               },
               {
@@ -124,7 +124,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Centre to NOTE 3 (3)"
+                  "pathName": "Base to NOTE 1 (3)"
                 }
               }
             ]
@@ -137,7 +137,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "NOTE 3 to centre (3)"
+                  "pathName": "NOTE 1 to centre (3)"
                 }
               },
               {

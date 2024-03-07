@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -136,10 +137,11 @@ public class ShooterCommands {
                 }));
     }
 
-    public SequentialCommandGroup shootToAmp(ShootingStates state) {
-        return shootNote(state)
-                .andThen(new InstantCommand(() -> shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD))
-                        .withTimeout(0.7));
+    public ParallelCommandGroup shootToAmp(ShootingStates state) {
+        return new ParallelCommandGroup(
+                shootNote(state).andThen(new InstantCommand(() -> shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD)).withTimeout(0.7))
+//                new InstantCommand(() -> intakeSubsystem.setSpeedPercentage(-1)).withTimeout(0.5)
+        );
     }
 
     private void initializeShooterByState(ShootingStates state) {

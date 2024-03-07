@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.372016237726169,
-        "y": 5.556066607628711
+        "x": 1.272016237726169,
+        "y": 4.4461790671557
       },
       "isLocked": false,
       "linkedName": "Centre (3)"
     },
     {
       "anchor": {
-        "x": 3.2274030262346245,
-        "y": 5.556066607628711
+        "x": 2.904894952647049,
+        "y": 3.9873725461736647
       },
       "prevControl": {
-        "x": 3.1274030262346244,
-        "y": 5.556066607628711
+        "x": 2.1448841151968923,
+        "y": 3.9873725461736647
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NOTE 2 (3)"
+      "linkedName": "NOTE 3 (3)"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Crown (3)",
+  "folder": "Mirrored Crown (3.3)",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

@@ -3,32 +3,38 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.272016237726169,
-        "y": 5.556066607628711
+        "x": 8.29957545629377,
+        "y": 0.7183134366268737
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.372016237726169,
-        "y": 5.556066607628711
+        "x": 3.592436734423018,
+        "y": 0.554682190445463
       },
       "isLocked": false,
-      "linkedName": "Centre (3)"
+      "linkedName": "NOTE 4 (8)"
     },
     {
       "anchor": {
-        "x": 3.2274030262346245,
-        "y": 5.556066607628711
+        "x": 0.7450681568028611,
+        "y": 4.529904555302044
       },
       "prevControl": {
-        "x": 3.1274030262346244,
-        "y": 5.556066607628711
+        "x": 2.6772111201878865,
+        "y": 2.3296651998683773
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NOTE 2 (3)"
+      "linkedName": "BASE (9)"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -39,11 +45,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -60.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Crown (3)",
+  "folder": "No Homo (9)",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

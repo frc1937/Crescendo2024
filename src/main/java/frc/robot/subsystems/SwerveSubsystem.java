@@ -117,7 +117,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
-        drive(chassisSpeeds, true);
+        drive(chassisSpeeds, false); //todo: CHECK WHICH VALUE's CORRECT, CHANGED THIS TO FALSE
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean closedLoop) {

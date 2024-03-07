@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.AdjustShooter;
+import frc.robot.commands.AutonomousShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
@@ -64,6 +64,7 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
+    private final AutonomousShooter autonomousShooter = new AutonomousShooter(shooterSubsystem);
 //    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
@@ -82,10 +83,15 @@ public class RobotContainer {
         NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(3));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
-        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -0.98));
-        NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
-        NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 1.1));
-        NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, -0.99));
+
+        NamedCommands.registerCommand("AdjustShooter1", autonomousShooter.adjustShooter(136, 3500));
+        NamedCommands.registerCommand("AdjustShooter2", autonomousShooter.adjustShooter(134.4, 4000));
+        NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(64, 4000));
+        NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(125, 4000));
+//        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -1.2));
+//        NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
+//        NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 1.1));
+//        NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, -0.99));
 
         autoChooser = AutoBuilder.buildAutoChooser("Crown (3)");
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -102,7 +108,7 @@ public class RobotContainer {
 
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
+        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, shooterSubsystem, -0.9));
 
 //        drBButton.whileTrue(new Mount(mountSubsystem));
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
@@ -111,6 +117,7 @@ public class RobotContainer {
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
         opYButton.whileTrue(shooterCommands.shootToAmp(ShootingStates.AMP));
+        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
 
 //        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
 

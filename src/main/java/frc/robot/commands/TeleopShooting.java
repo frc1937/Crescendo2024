@@ -157,8 +157,6 @@ public class TeleopShooting extends SequentialCommandGroup {
                 shooter.stopFlywheels();
                 shooter.setPivotAngle(Rotation2d.fromDegrees(0));
             }
-
-            // yawController.reset(0);
         }
     }
 

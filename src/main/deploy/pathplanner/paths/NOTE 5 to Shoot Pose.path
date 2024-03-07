@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.272016237726169,
-        "y": 5.556066607628711
+        "x": 8.29957545629377,
+        "y": 2.433470009797163
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.372016237726169,
-        "y": 5.556066607628711
+        "x": 5.690191951812475,
+        "y": 3.7967995935991876
       },
       "isLocked": false,
-      "linkedName": "Centre (3)"
+      "linkedName": "NOTE 5 (8)"
     },
     {
       "anchor": {
-        "x": 3.2274030262346245,
-        "y": 5.556066607628711
+        "x": 3.652527305054611,
+        "y": 5.570593998330854
       },
       "prevControl": {
-        "x": 3.1274030262346244,
-        "y": 5.556066607628711
+        "x": 5.03051634674698,
+        "y": 4.661707609129505
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NOTE 2 (3)"
+      "linkedName": "Shoot Pose (8)"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Crown (3)",
+  "folder": "Unicorn (8)",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
