@@ -1,14 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,18 +15,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
-import static frc.robot.Constants.ShootingConstants.DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
-import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
-import static frc.robot.Constants.ShootingConstants.MAXIMUM_VIABLE_SLOPE;
-import static frc.robot.Constants.ShootingConstants.MINIMUM_VIABLE_SLOPE;
-import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_SPIN;
-import static frc.robot.Constants.ShootingConstants.SLOPE_TO_PITCH_MAP;
-import static frc.robot.Constants.ShootingConstants.SLOPE_TO_TIME_OF_FLIGHT_MAP;
-import static frc.robot.Constants.ShootingConstants.SLOPE_TO_VELOCITY_MAP;
+import static frc.robot.Constants.ShootingConstants.*;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
 import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
@@ -97,7 +80,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             }
 
             // Calculate the total translation vector from the shooter to the target
-            Translation3d targetPosition = DriverStation.getAlliance().get() == Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
+            Translation3d targetPosition = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red ? RED_TARGET_POSITION : BLUE_TARGET_POSITION;
             Translation3d translationToTarget = targetPosition.minus(predictedShooterPosition);
             SmartDashboard.putNumber("Presumed distance from target [meters]", translationToTarget.toTranslation2d().getNorm());
 

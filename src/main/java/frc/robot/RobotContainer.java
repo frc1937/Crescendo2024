@@ -108,7 +108,7 @@ public class RobotContainer {
 
         drLeftTrigger.whileTrue(shooterCommands.intakeGet());
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, shooterSubsystem, -0.9));
+        drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
 //        drBButton.whileTrue(new Mount(mountSubsystem));
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));

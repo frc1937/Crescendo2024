@@ -36,7 +36,7 @@ public final class Constants {
         punishments that assemble to come to earth. May You send blessing in our handiwork, and
         grant us grace, kindness, and mercy in Your eyes and in the eyes of all who see us. May
         You hear the sound of our humble request because You are God Who hears prayer requests.
-        Blessed are You, Lord, Who hears prayer""";
+        Blessed are You, Lord, Who hears prayer"""; //god doesn't exist tho??
 
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
@@ -162,6 +162,10 @@ public final class Constants {
         public static final double POSE_HISTORY_DURATION = 0.5;
 
         public static final double SHOOTING_SPIN = 0.01f;
+        public static final double PITCH_INTAKE_FLOOR_ANGLE = 0.5;
+        public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
+        public static final double PITCH_DEFAULT_ANGLE = 20;
+
 
         public static final int
                 FLYWHEEL_LEFT_ID = 15,

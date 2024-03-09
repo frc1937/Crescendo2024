@@ -7,11 +7,9 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 public class IntakeCommand extends Command {
     private final IntakeSubsystem intakeSubsystem;
-    private final ShooterSubsystem shooterSubsystem;
     private final double speed;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, ShooterSubsystem shooterSubsystem, double speed) {
-        this.shooterSubsystem = shooterSubsystem;
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, double speed) {
         this.speed = speed;
         this.intakeSubsystem = intakeSubsystem;
 

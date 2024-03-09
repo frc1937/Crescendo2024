@@ -13,10 +13,6 @@ public class LedSubsystem extends SubsystemBase {
         led.start();
     }
 
-    public void startLeds(int r, int g, int b) {
-        setLedColour(r, g, b);
-    }
-
     public void setLedColour(int r, int g, int b) {
         for (int i = 0; i < buffer.getLength(); i++) {
             buffer.setRGB(i, r, g, b);

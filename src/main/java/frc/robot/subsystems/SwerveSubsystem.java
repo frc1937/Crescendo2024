@@ -234,7 +234,6 @@ public class SwerveSubsystem extends SubsystemBase {
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
         SmartDashboard.putNumber("Azimuth [deg]", getPose().getRotation().getDegrees());
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
-        // new LinearSystem<>(null, null, null, null)
     }
 
     private void updateByEstimator(EstimatedRobotPose estimatedRobotPose) {
