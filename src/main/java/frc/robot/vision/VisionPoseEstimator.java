@@ -57,18 +57,9 @@ public class VisionPoseEstimator {
         if (!camera.isConnected()) return null;
 
         poseEstimator.setReferencePose(prevEstimatedRobotPose);
-
         Optional<EstimatedRobotPose> estimatedRobotPose = poseEstimator.update();
-        EstimatedRobotPose robotPose;
 
-        Optional<EstimatedRobotPose> estimatedNonNull = estimatedRobotPose.stream().findFirst();
-
-        if (estimatedNonNull.isPresent()) {
-            robotPose = estimatedNonNull.get();
-            return robotPose;
-        }
-
-        return null;
+        return estimatedRobotPose.orElse(null);
     }
 
     public Pose3d getClosestTarget(Pose3d robotPose, int id) {
