@@ -35,7 +35,7 @@ public final class Constants {
             punishments that assemble to come to earth. May You send blessing in our handiwork, and
             grant us grace, kindness, and mercy in Your eyes and in the eyes of all who see us. May
             You hear the sound of our humble request because You are God Who hears prayer requests.
-            Blessed are You, Lord, Who hears prayer"""; //god doesn't exist tho??
+            Blessed are You, Lord, Who hears prayer""";
 
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
