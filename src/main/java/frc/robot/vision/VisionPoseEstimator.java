@@ -45,50 +45,19 @@ public class VisionPoseEstimator {
         rearPoseEstimator.setTagModel(TargetModel.kAprilTag36h11);
     }
 
-    public Optional<EstimatedRobotPose> estimateGlobalPoseFrontCam(Pose2d prevEstimatedRobotPose) {
-        return estimatePose(frontPoseEstimator, frontCamera, prevEstimatedRobotPose);
+    public Optional<EstimatedRobotPose> estimateGlobalPose(Pose2d prevEstimatedRobotPose, String camName) {
+        if(FRONT_CAMERA_NAME.equals(camName)) return estimatePose(frontPoseEstimator, frontCamera, prevEstimatedRobotPose);
+        if (REAR_CAMERA_NAME.equals(camName)) return estimatePose(rearPoseEstimator, rearCamera, prevEstimatedRobotPose);
+
+        return Optional.empty();
     }
 
-    public Optional<EstimatedRobotPose> estimateGlobalPoseRearCam(Pose2d prevEstimatedRobotPose) {
-        return estimatePose(rearPoseEstimator, rearCamera, prevEstimatedRobotPose);
-    }
-
-    private Optional<EstimatedRobotPose> estimatePose(PhotonPoseEstimator poseEstimator, PhotonCamera camera, Pose2d prevEstimatedRobotPose) {
-        SmartDashboard.putBoolean("isCameraConnected", camera.isConnected());
-
-        if (!camera.isConnected()) return Optional.empty();
-
-        poseEstimator.setReferencePose(prevEstimatedRobotPose);
-
-        return poseEstimator.update();
-    }
-
-    public Pose3d getClosestTarget(Pose3d robotPose, int id) {
-        PhotonPipelineResult result = frontCamera.getLatestResult();
-        Pose3d tagPose = null;
-
-        if (result.hasTargets()) {
-            PhotonTrackedTarget target = result.getBestTarget();
-
-            if (target.getFiducialId() != id) return null;
-
-            Transform3d cameraToTarget = target.getBestCameraToTarget();
-            Pose3d cameraPose = robotPose.transformBy(ROBOT_TO_FRONT_CAMERA);
-
-            tagPose = cameraPose.transformBy(cameraToTarget.inverse());
-        }
-
-        return tagPose;
-    }
-
-    public Matrix<N3, N1> confidenceCalculator(Optional<EstimatedRobotPose> estimation) {
-        if(estimation.isEmpty()) return null;
-
-        EstimatedRobotPose robotPose = estimation.get();
+    public Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
+        if(estimation == null) return null;
 
         double smallestDistance = Double.POSITIVE_INFINITY;
 
-        for (PhotonTrackedTarget target : robotPose.targetsUsed) {
+        for (PhotonTrackedTarget target : estimation.targetsUsed) {
             Transform3d t3d = target.getBestCameraToTarget();
             double distance = Math.sqrt(Math.pow(t3d.getX(), 2) + Math.pow(t3d.getY(), 2) + Math.pow(t3d.getZ(), 2));
 
@@ -96,7 +65,7 @@ public class VisionPoseEstimator {
                 smallestDistance = distance;
         }
 
-        double confidenceMultiplier = getConfidenceMultiplier(robotPose, smallestDistance);
+        double confidenceMultiplier = getConfidenceMultiplier(estimation, smallestDistance);
         return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
     }
 
@@ -117,5 +86,32 @@ public class VisionPoseEstimator {
                         * poseAmbiguityFactor)
                         / (1
                         + ((robotPose.targetsUsed.size() - 1) * Constants.VisionConstants.TAG_PRESENCE_WEIGHT)));
+    }
+
+    private Optional<EstimatedRobotPose> estimatePose(PhotonPoseEstimator poseEstimator, PhotonCamera camera, Pose2d prevEstimatedRobotPose) {
+        SmartDashboard.putBoolean("isCameraConnected", camera.isConnected());
+
+        if (!camera.isConnected()) return Optional.empty();
+
+        poseEstimator.setReferencePose(prevEstimatedRobotPose);
+        return poseEstimator.update();
+    }
+
+    private Pose3d getClosestTarget(Pose3d robotPose, int id) {
+        PhotonPipelineResult result = frontCamera.getLatestResult();
+        Pose3d tagPose = null;
+
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+
+            if (target.getFiducialId() != id) return null;
+
+            Transform3d cameraToTarget = target.getBestCameraToTarget();
+            Pose3d cameraPose = robotPose.transformBy(ROBOT_TO_FRONT_CAMERA);
+
+            tagPose = cameraPose.transformBy(cameraToTarget.inverse());
+        }
+
+        return tagPose;
     }
 }

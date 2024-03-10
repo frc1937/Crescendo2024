@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,22 +19,16 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Swerve.AutoConstants;
 import frc.robot.SwerveModule;
 import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
-import java.util.List;
 import java.util.Optional;
 
-import static frc.robot.Constants.NavigationConstants.DEFAULT_PATH_CONSTRAINTS;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_D;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
-import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
+import static frc.robot.Constants.Swerve.*;
+import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
+import static frc.robot.Constants.VisionConstants.REAR_CAMERA_NAME;
 
 public class SwerveSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -155,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      *
-     * @param translation field-relative translation, like in {@link #drive(Translation2d, double, boolean) drive}
+     * @param translation field-relative translation, like in {@link #drive(Translation2d, double, boolean, boolean) drive}
      * @see #setAzimuthGoal(Rotation2d)
      */
     public void driveWithAzimuth(Translation2d translation) {
@@ -165,7 +157,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      *
-     * @param translation field-relative translation, like in {@link #drive(Translation2d, double, boolean) drive}
+     * @param translation field-relative translation, like in {@link #drive(Translation2d, double, boolean, boolean) drive}
      * @param azimuthGoal field-relative goal azimuth, not flipped by alliance
      * @see #setAzimuthGoal(Rotation2d)
      * @see #driveWithAzimuth(Translation2d)
@@ -231,11 +223,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPoseFrontCam(poseEstimator.getEstimatedPosition());
-        Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPoseRearCam(poseEstimator.getEstimatedPosition());
+        Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
+        estimatedFrontPose.ifPresent(this::updateByEstimator);
 
-        updateByEstimator(estimatedFrontPose);
-        updateByEstimator(estimatedRearPose);
+        Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
+        estimatedRearPose.ifPresent(this::updateByEstimator);
 
         field2d.setRobotPose(poseEstimator.getEstimatedPosition());
 
@@ -245,26 +237,6 @@ public class SwerveSubsystem extends SubsystemBase {
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
         SmartDashboard.putNumber("Azimuth [deg]", getPose().getRotation().getDegrees());
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
-    }
-
-    private void updateByEstimator(Optional<EstimatedRobotPose> estimatedRobotPose) {
-        if (estimatedRobotPose.isEmpty()) return;
-
-        EstimatedRobotPose robotPose = estimatedRobotPose.get();
-        double currentTimestamp = robotPose.timestampSeconds;
-
-        if (previousTimestamp != currentTimestamp) {
-            previousTimestamp = currentTimestamp;
-
-            Pose3d visionPose = robotPose.estimatedPose;
-            poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Timer.getFPGATimestamp(), visionPoseEstimator.confidenceCalculator(estimatedRobotPose));
-        }
-
-        poseEstimator.update(getGyroYaw(), getModulePositions());
-    }
-
-    private void sampleRobotPose() {
-        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
     }
 
     public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
@@ -279,15 +251,25 @@ public class SwerveSubsystem extends SubsystemBase {
         drive(new ChassisSpeeds(0, 0, 0), false);
     }
 
-    public void pathPlanToPose(Pose2d endPose) {
-        List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(getPose(), endPose);
+    private void updateByEstimator(EstimatedRobotPose estimatedRobotPose) {
+        if (estimatedRobotPose == null) return;
 
-        // Create the path using the bezier points created above
-        PathPlannerPath path = new PathPlannerPath(
-                bezierPoints,
-                DEFAULT_PATH_CONSTRAINTS, // The constraints for this path. If using a differential drivetrain, the angular constraints have no effect.
-                new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
-        );
-        AutoBuilder.followPath(path);
+        double currentTimestamp = estimatedRobotPose.timestampSeconds;
+
+        if (previousTimestamp != currentTimestamp) {
+            previousTimestamp = currentTimestamp;
+
+            Pose3d visionPose = estimatedRobotPose.estimatedPose;
+            poseEstimator.addVisionMeasurement(visionPose.toPose2d(),
+                    Timer.getFPGATimestamp(),
+                    visionPoseEstimator.confidenceCalculator(estimatedRobotPose)
+            );
+        }
+
+        poseEstimator.update(getGyroYaw(), getModulePositions());
+    }
+
+    private void sampleRobotPose() {
+        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
     }
 }

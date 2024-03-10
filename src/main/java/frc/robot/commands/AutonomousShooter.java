@@ -22,12 +22,12 @@ public class AutonomousShooter {
                 },
                 () -> {
                 },
-                interrupted -> {},
+                interrupted -> {
+                },
                 () -> {
                     boolean isReady = shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived();
                     return isReady || (!shooterSubsystem.doesSeeNoteNoiseless());
                 },
-
                 shooterSubsystem);
     }
 }
