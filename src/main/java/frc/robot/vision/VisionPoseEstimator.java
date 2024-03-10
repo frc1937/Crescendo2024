@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import org.photonvision.EstimatedRobotPose;
@@ -17,9 +19,13 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.util.Optional;
 
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
 import static frc.robot.Constants.Transforms.ROBOT_TO_REAR_CAMERA;
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
+import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
+import static frc.robot.Constants.VisionConstants.REAR_CAMERA_NAME;
+import static frc.robot.Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS;
 
 public class VisionPoseEstimator {
     private final PhotonCamera frontCamera = new PhotonCamera(FRONT_CAMERA_NAME);
@@ -46,25 +52,30 @@ public class VisionPoseEstimator {
     }
 
     public Optional<EstimatedRobotPose> estimateGlobalPose(Pose2d prevEstimatedRobotPose, String camName) {
-        if(FRONT_CAMERA_NAME.equals(camName)) return estimatePose(frontPoseEstimator, frontCamera, prevEstimatedRobotPose);
-        if (REAR_CAMERA_NAME.equals(camName)) return estimatePose(rearPoseEstimator, rearCamera, prevEstimatedRobotPose);
+        if (FRONT_CAMERA_NAME.equals(camName))
+            return estimatePose(frontPoseEstimator, frontCamera, prevEstimatedRobotPose);
+        if (REAR_CAMERA_NAME.equals(camName))
+            return estimatePose(rearPoseEstimator, rearCamera, prevEstimatedRobotPose);
 
         return Optional.empty();
     }
 
     public Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
-        if (estimation != null) {
-            double closestTargetDistanceMeters = 
-                Arrays.stream(estimation.targetUsed)
-                .mapToDouble(t -> t.getBestCameraToTarget().norm())
-                .min();
-            Measure<Distance> closestTargetDistance = Meters.of(closestTargetDistanceMeters);
-            double confidenceMultiplier = getConfidenceMultiplier(estimation, closestTargetDistance);
-            return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
-        }
+        if (estimation == null) return VISION_MEASUREMENT_STANDARD_DEVIATIONS;
+
+        double closestTargetDistanceMeters =
+                estimation.targetsUsed.stream()
+                        .mapToDouble(t -> t.getBestCameraToTarget().getTranslation().getNorm())
+                        .min()
+                        .orElse(0);
+
+        Measure<Distance> closestTargetDistance = Meters.of(closestTargetDistanceMeters);
+
+        double confidenceMultiplier = getConfidenceMultiplier(estimation, closestTargetDistance);
+        return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
     }
 
-    private static double getConfidenceMultiplier(EstimatedRobotPose robotPose, Measure<Distance> closestTargetDistance) {
+    private static double getConfidenceMultiplier(EstimatedRobotPose robotPose, Measure<Distance> smallestDistance) {
         double poseAmbiguityFactor = robotPose.targetsUsed.size() != 1
                 ? 1
                 : Math.max(
@@ -76,8 +87,7 @@ public class VisionPoseEstimator {
                 1,
                 (Math.max(
                         1,
-                        Math.max(0, smallestDistance.in(Meters) - Constants.VisionConstants.NOISY_DISTANCE_METERS)
-                                * Constants.VisionConstants.DISTANCE_WEIGHT)
+                        Math.max(0, smallestDistance.in(Meters) - Constants.VisionConstants.NOISY_DISTANCE_METERS) * Constants.VisionConstants.DISTANCE_WEIGHT)
                         * poseAmbiguityFactor)
                         / (1
                         + ((robotPose.targetsUsed.size() - 1) * Constants.VisionConstants.TAG_PRESENCE_WEIGHT)));

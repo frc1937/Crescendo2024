@@ -22,13 +22,14 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 public class Flywheel {
     private final CANSparkFlex motor;
     private final RelativeEncoder encoder;
-    private final PIDController feedback = new PIDController(FlywheelControlConstants.P, 0, 0);
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
-        FlywheelControlConstants.S, FlywheelControlConstants.V, FlywheelControlConstants.A);
-
+    private final PIDController feedback;
+    private final SimpleMotorFeedforward feedforward;
     private double feedforwardCorrection = 0;
 
-    public Flywheel(int motorId, boolean invert) {
+    public Flywheel(int motorId, boolean invert, double p, double s, double v, double a) {
+        feedback = new PIDController(p, 0, 0);
+        feedforward = new SimpleMotorFeedforward(s, v, a);
+
         motor = new CANSparkFlex(motorId, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);

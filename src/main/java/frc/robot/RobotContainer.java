@@ -113,6 +113,8 @@ public class RobotContainer {
 //        drBButton.whileTrue(new Mount(mountSubsystem));
         drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
 
+        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.EMPTY));
+
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
