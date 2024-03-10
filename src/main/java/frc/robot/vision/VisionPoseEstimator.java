@@ -53,23 +53,18 @@ public class VisionPoseEstimator {
     }
 
     public Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
-        if(estimation == null) return null;
-
-        double smallestDistance = Double.POSITIVE_INFINITY;
-
-        for (PhotonTrackedTarget target : estimation.targetsUsed) {
-            Transform3d t3d = target.getBestCameraToTarget();
-            double distance = Math.sqrt(Math.pow(t3d.getX(), 2) + Math.pow(t3d.getY(), 2) + Math.pow(t3d.getZ(), 2));
-
-            if (distance < smallestDistance)
-                smallestDistance = distance;
+        if (estimation != null) {
+            double closestTargetDistanceMeters = 
+                Arrays.stream(estimation.targetUsed)
+                .mapToDouble(t -> t.getBestCameraToTarget().norm())
+                .min();
+            Measure<Distance> closestTargetDistance = Meters.of(closestTargetDistanceMeters);
+            double confidenceMultiplier = getConfidenceMultiplier(estimation, closestTargetDistance);
+            return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
         }
-
-        double confidenceMultiplier = getConfidenceMultiplier(estimation, smallestDistance);
-        return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
     }
 
-    private static double getConfidenceMultiplier(EstimatedRobotPose robotPose, double smallestDistance) {
+    private static double getConfidenceMultiplier(EstimatedRobotPose robotPose, Measure<Distance> closestTargetDistance) {
         double poseAmbiguityFactor = robotPose.targetsUsed.size() != 1
                 ? 1
                 : Math.max(
@@ -81,7 +76,7 @@ public class VisionPoseEstimator {
                 1,
                 (Math.max(
                         1,
-                        Math.max(0, smallestDistance - Constants.VisionConstants.NOISY_DISTANCE_METERS)
+                        Math.max(0, smallestDistance.in(Meters) - Constants.VisionConstants.NOISY_DISTANCE_METERS)
                                 * Constants.VisionConstants.DISTANCE_WEIGHT)
                         * poseAmbiguityFactor)
                         / (1
