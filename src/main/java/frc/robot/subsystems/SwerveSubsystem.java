@@ -27,6 +27,7 @@ import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
 import java.util.List;
+import java.util.Optional;
 
 import static frc.robot.Constants.NavigationConstants.DEFAULT_PATH_CONSTRAINTS;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
@@ -46,8 +47,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);
     private double previousTimestamp = 0;
     private final ProfiledPIDController azimuthController = new ProfiledPIDController(
-        AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
-        AZIMUTH_CONTROLLER_CONSTRAINTS);
+            AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
+            AZIMUTH_CONTROLLER_CONSTRAINTS);
 
     private double yawCorrection = 0;
 
@@ -67,7 +68,14 @@ public class SwerveSubsystem extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();
 
-        poseEstimator = new SwerveDrivePoseEstimator(SWERVE_KINEMATICS, getGyroYaw(), getModulePositions(), new Pose2d(new Translation2d(3, 3), new Rotation2d()));
+        poseEstimator = new SwerveDrivePoseEstimator(
+                SWERVE_KINEMATICS,
+                getGyroYaw(),
+                getModulePositions(),
+                new Pose2d(),
+                Constants.VisionConstants.STATE_STANDARD_DEVIATIONS,
+                Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS
+        );
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
@@ -126,7 +134,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         if (fieldRelative) {
             ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    translation.getX(),translation.getY(), rotation, getGyroYaw());
+                    translation.getX(), translation.getY(), rotation, getGyroYaw());
             drive(chassisSpeeds, closedLoop);
         } else {
             drive(new ChassisSpeeds(translation.getX(), translation.getY(), rotation), closedLoop);
@@ -157,7 +165,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      *
-     * @param translation     field-relative translation, like in {@link #drive(Translation2d, double, boolean) drive}
+     * @param translation field-relative translation, like in {@link #drive(Translation2d, double, boolean) drive}
      * @param azimuthGoal field-relative goal azimuth, not flipped by alliance
      * @see #setAzimuthGoal(Rotation2d)
      * @see #driveWithAzimuth(Translation2d)
@@ -223,8 +231,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        updateByEstimator(visionPoseEstimator.estimateGlobalPoseFrontCam(poseEstimator.getEstimatedPosition()));
-        updateByEstimator(visionPoseEstimator.estimateGlobalPoseRearCam(poseEstimator.getEstimatedPosition()));
+        Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPoseFrontCam(poseEstimator.getEstimatedPosition());
+        Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPoseRearCam(poseEstimator.getEstimatedPosition());
+
+        updateByEstimator(estimatedFrontPose);
+        updateByEstimator(estimatedRearPose);
 
         field2d.setRobotPose(poseEstimator.getEstimatedPosition());
 
@@ -236,18 +247,17 @@ public class SwerveSubsystem extends SubsystemBase {
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
     }
 
-    private void updateByEstimator(EstimatedRobotPose estimatedRobotPose) {
-        EstimatedRobotPose visionRobotPose;
+    private void updateByEstimator(Optional<EstimatedRobotPose> estimatedRobotPose) {
+        if (estimatedRobotPose.isEmpty()) return;
 
-        if ((visionRobotPose = estimatedRobotPose) != null) {
-            double currentTimestamp = visionRobotPose.timestampSeconds;
+        EstimatedRobotPose robotPose = estimatedRobotPose.get();
+        double currentTimestamp = robotPose.timestampSeconds;
 
-            if (previousTimestamp != currentTimestamp) {
-                previousTimestamp = currentTimestamp;
+        if (previousTimestamp != currentTimestamp) {
+            previousTimestamp = currentTimestamp;
 
-                Pose3d visionPose = visionRobotPose.estimatedPose;
-                poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Timer.getFPGATimestamp());
-            }
+            Pose3d visionPose = robotPose.estimatedPose;
+            poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Timer.getFPGATimestamp(), visionPoseEstimator.confidenceCalculator(estimatedRobotPose));
         }
 
         poseEstimator.update(getGyroYaw(), getModulePositions());

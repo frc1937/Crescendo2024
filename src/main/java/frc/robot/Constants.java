@@ -8,16 +8,15 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.Interpolator;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Distance;
@@ -29,14 +28,14 @@ import static edu.wpi.first.units.Units.Meters;
 
 public final class Constants {
     public static final String TFILAT_HADERECH = """
-        May it be Your will, Lord, our God and the God of our ancestors, that You lead us toward
-        peace, guide our footsteps toward peace, that we are supported in peace, and make us reach
-        our desired destination for life, gladness, and peace. May You rescue us from the hand of
-        every foe and ambush, from robbers and wild beasts on the trip, and from all manner of
-        punishments that assemble to come to earth. May You send blessing in our handiwork, and
-        grant us grace, kindness, and mercy in Your eyes and in the eyes of all who see us. May
-        You hear the sound of our humble request because You are God Who hears prayer requests.
-        Blessed are You, Lord, Who hears prayer"""; //god doesn't exist tho??
+            May it be Your will, Lord, our God and the God of our ancestors, that You lead us toward
+            peace, guide our footsteps toward peace, that we are supported in peace, and make us reach
+            our desired destination for life, gladness, and peace. May You rescue us from the hand of
+            every foe and ambush, from robbers and wild beasts on the trip, and from all manner of
+            punishments that assemble to come to earth. May You send blessing in our handiwork, and
+            grant us grace, kindness, and mercy in Your eyes and in the eyes of all who see us. May
+            You hear the sound of our humble request because You are God Who hears prayer requests.
+            Blessed are You, Lord, Who hears prayer"""; //god doesn't exist tho??
 
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
@@ -53,7 +52,7 @@ public final class Constants {
                 ROBOT_TO_FRONT_CAMERA = FRONT_CAMERA_TO_ROBOT.inverse();
         public static final Transform3d
                 REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.355, 0.11, 0.41),
-                                                       new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
+                new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
                 ROBOT_TO_REAR_CAMERA = REAR_CAMERA_TO_ROBOT.inverse();
         public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
 
@@ -65,6 +64,45 @@ public final class Constants {
         public static final String REAR_CAMERA_NAME = "Rear1937";
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
+        /**
+         * Minimum target ambiguity. Targets with higher ambiguity will be discarded
+         */
+        public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
+        public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
+        public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
+        public static final double NOISY_DISTANCE_METERS = 2.5;
+        public static final double DISTANCE_WEIGHT = 7;
+        public static final int TAG_PRESENCE_WEIGHT = 10;
+
+
+        /**
+         * Standard deviations of the vision measurements. Increase these numbers to
+         * trust global measurements from vision
+         * less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and
+         * radians.
+         */
+        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(), Nat.N1())
+                .fill(
+                        // if these numbers are less than one, multiplying will do bad things
+                        1, // x
+                        1, // y
+                        1 * Math.PI // theta
+                );
+
+        /**
+         * Standard deviations of model states. Increase these numbers to trust your
+         * model's state estimates less. This
+         * matrix is in the form [x, y, theta]ᵀ, with units in meters and radians, then
+         * meters.
+         */
+        public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(), Nat.N1())
+                .fill(
+                        // if these numbers are less than one, multiplying will do bad things
+                        .1, // x
+                        .1, // y
+                        .1);
+
     }
 
     public static class IntakeConstants {
@@ -75,11 +113,11 @@ public final class Constants {
         /**
          * An initial presumption to the slope of the path from the robot's
          * shooter to the virtual target
-         *
+         * <p>
          * Since the slope to the virtual target depends on the time of flight,
          * which itself depends on the slope to the virtual target, we provide
          * an initial guess.
-         *
+         * <p>
          * The value hereby is arbitrary and it depicts a common value for the
          * slope.
          */
@@ -88,7 +126,7 @@ public final class Constants {
         /**
          * This table maps virtual shooter slopes to shooter orientations that actually achieve
          * the desired results, based on calibration and experimentation.
-         * 
+         * <p>
          * To obtain the samples, place the robot at some distance from the target, record the virtual
          * target slope given by the program as a key, and at an arbitrary pitch angle. Adjust it repeatedly
          * until the robot consistently scores with the current slope(i.e. from its current position). Then
@@ -97,7 +135,7 @@ public final class Constants {
          */
         public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(), Rotation2d::interpolate);
-        
+
         static {
             SLOPE_TO_PITCH_MAP.put(0.387, Rotation2d.fromDegrees(58.5));
             SLOPE_TO_PITCH_MAP.put(0.393, Rotation2d.fromDegrees(59.7));
@@ -189,19 +227,23 @@ public final class Constants {
              * All in rotations per second and voltages
              */
             public static final double P = 0.66739 / 60,
-                                       D = 1,
-                                       S = 0.083607,
-                                       V = 0.10841,
-                                       A = 0.014571,
-                                       TOLERANCE = 3;
+                    D = 1,
+                    S = 0.083607,
+                    V = 0.10841,
+                    A = 0.014571,
+                    TOLERANCE = 3;
         }
 
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;
 
-        /** In seconds */
+        /**
+         * In seconds
+         */
         public static final double SHOOTING_DELAY = 0.5;
-        /** In seconds */
+        /**
+         * In seconds
+         */
         public static final double POST_SHOOTING_DELAY = 0.25;
         public static final int SHOOTER_UTMOST_ANGLE = 220;
         public static final int SHOOTER_VERTICAL_ANGLE = 112;
@@ -217,8 +259,8 @@ public final class Constants {
 
     public static final class Swerve {
         public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0,
-                                   AZIMUTH_CONTROLLER_D = 2,
-                                   AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(2);
+                AZIMUTH_CONTROLLER_D = 2,
+                AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(2);
 
         public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
@@ -231,7 +273,7 @@ public final class Constants {
         public static final double WHEEL_BASE = 0.615;
         public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
         public static final Measure<Distance> DRIVE_BASE_RADIUS =
-            Meters.of(new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm());
+                Meters.of(new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm());
 
         /* SwerveSubsystem Kinematics
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
@@ -345,20 +387,20 @@ public final class Constants {
         public static final double VOLTAGE_COMP = 12.0;
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
 
-        
+
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
         public static final TrapezoidProfile.Constraints AZIMUTH_CONTROLLER_CONSTRAINTS =
                 new TrapezoidProfile.Constraints(
                         MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
-                        
+
         /**
          * We avoid steering the swerve wheels below a certain driving speed, for in-place turning
          * causes them to jitter. Thus, we hereby define the maximum driving speed that is
          * considered 'in-place'.
          */
         public static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.01 * MAX_SPEED;
-        
+
         public static final class AutoConstants {
             public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                     new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
