@@ -29,7 +29,7 @@ public class ShooterCommands {
                 interrupted -> {
                     shooterSubsystem.stopKicker();
                     shooterSubsystem.stopFlywheels();
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE));
+                    shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE));
                 },
                 () -> false,
 
@@ -41,7 +41,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setFlywheelsSpeed(RPM.of(-0.55 * FLYWHEEL_MAX_RPM));
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(PITCH_INTAKE_FEEDER_ANGLE));
+                    shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(PITCH_INTAKE_FEEDER_ANGLE));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {
@@ -49,7 +49,7 @@ public class ShooterCommands {
                 interrupted -> {
                     shooterSubsystem.stopFlywheels();
                     shooterSubsystem.stopKicker();
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
+                    shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
                 },
                 shooterSubsystem::doesSeeNoteNoiseless,
                 shooterSubsystem
@@ -65,7 +65,7 @@ public class ShooterCommands {
                 interrupted -> {
                     shooterSubsystem.stopKicker();
                     shooterSubsystem.stopFlywheels();
-                    shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
+                    shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
                 },
                 () -> false,
                 shooterSubsystem)
@@ -74,7 +74,7 @@ public class ShooterCommands {
 
     public Command intakeGet(boolean includePostIntake) {
         FunctionalCommand preparePivot = new FunctionalCommand(
-                () -> shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE)),
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE)),
                 () -> {
                 },
                 interrupt -> {
@@ -133,7 +133,7 @@ public class ShooterCommands {
 
     private void initializeShooterByState(ShootingStates state) {
         shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-        shooterSubsystem.setPivotAngle(Rotation2d.fromDegrees(state.getAngle()));
+        shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(state.getAngle()));
         shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM));
     }
 }

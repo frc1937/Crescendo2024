@@ -27,6 +27,6 @@ public class ShooterKick extends Command {
     public void end(boolean interrupted) {
         shooter.stopFlywheels();
         shooter.stopKicker();
-        shooter.setPivotAngle(Rotation2d.fromDegrees(0));
+        shooter.setPitchPosition(Rotation2d.fromDegrees(0));
     }
 }
