@@ -50,7 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("Current Angle Pitch", pitch.getPosition().getDegrees());
+        SmartDashboard.putNumber("Current Angle Pitch", pitch.getPitch().getDegrees());
         SmartDashboard.putNumber("Setpoint Pitch", pitch.getSetpoint().getDegrees());
         SmartDashboard.putNumber("left flywheel rpm", leftFlywheel.getSpeed().in(RPM));
         SmartDashboard.putBoolean("Does see note", doesSeeNote());

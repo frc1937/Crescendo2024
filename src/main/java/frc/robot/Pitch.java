@@ -9,6 +9,8 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,33 +28,32 @@ public class Pitch {
     private final ArmFeedforward feedforward;
     private double feedforwardCorrection = 0;
 
-    public Pitch(int motorId, boolean invert, double p, double d, double s, double g, double v) {
-        feedback = new PIDController(p, d, 0);
+    public Pitch(int motorId, double p, double d, double s, double g, double v) {
+        feedback = new PIDController(p, 0, d);
         feedforward = new ArmFeedforward(s, g, v);
 
         motor = new CANSparkFlex(motorId, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
-        motor.setIdleMode(IdleMode.kCoast);
-        motor.setInverted(invert);
 
         motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
         motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
-        feedback.setTolerance(FlywheelControlConstants.TOLERANCE);
+        // WARNING FIXME XXX TODO Shout at Uriel
+        // feedback.setTolerance(FlywheelControlConstants.TOLERANCE);
 
         encoder = new CANCoder(PIVOT_CAN_CODER);
         encoder.configFactoryDefault();
-        encoder.configMagnetOffset(-249.082031-150);
+        encoder.configSensorDirection(true);
     }
 
     public void periodic() {
         Rotation2d rotation2d = Rotation2d.fromDegrees(encoder.getAbsolutePosition());
-        double feedbackCorrection = feedback.calculate(rotation2d.getRadians());
+        double feedbackCorrection = feedback.calculate(rotation2d.getRotations());
 
         SmartDashboard.putNumber("Voltage Pitch", -(feedbackCorrection + feedforwardCorrection));
 
-        motor.setVoltage((feedbackCorrection + feedforwardCorrection));
+        motor.setVoltage(feedbackCorrection + feedforwardCorrection);
     }
 
     public void setPosition(Rotation2d rotation2d) {
@@ -64,8 +65,8 @@ public class Pitch {
         return feedback.atSetpoint();
     }
 
-    public Rotation2d getPosition() {
-        return Rotation2d.fromDegrees(encoder.getAbsolutePosition());
+    public Rotation2d getPitch() {
+        return Rotation2d.fromDegrees(encoder.getAbsolutePosition() - 343);  // TODO move 343 to Constants.java
     }
 
     public Rotation2d getSetpoint() {
