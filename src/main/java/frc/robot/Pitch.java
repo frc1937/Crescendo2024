@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ShootingConstants.FlywheelControlConstants;
 
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
@@ -42,14 +43,16 @@ public class Pitch {
 
         encoder = new CANCoder(PIVOT_CAN_CODER);
         encoder.configFactoryDefault();
-        encoder.configMagnetOffset(-PIVOT_CONSTRAINT_DEGREES);
+        encoder.configMagnetOffset(-249.082031-150);
     }
 
     public void periodic() {
         Rotation2d rotation2d = Rotation2d.fromDegrees(encoder.getAbsolutePosition());
         double feedbackCorrection = feedback.calculate(rotation2d.getRadians());
 
-        motor.setVoltage(feedbackCorrection + feedforwardCorrection);
+        SmartDashboard.putNumber("Voltage Pitch", -(feedbackCorrection + feedforwardCorrection));
+
+        motor.setVoltage((feedbackCorrection + feedforwardCorrection));
     }
 
     public void setPosition(Rotation2d rotation2d) {
@@ -63,6 +66,10 @@ public class Pitch {
 
     public Rotation2d getPosition() {
         return Rotation2d.fromDegrees(encoder.getAbsolutePosition());
+    }
+
+    public Rotation2d getSetpoint() {
+        return Rotation2d.fromRadians(feedback.getSetpoint());
     }
 
     public void stopMotor() {

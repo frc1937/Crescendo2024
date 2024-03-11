@@ -33,7 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, false, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, true, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
-    private final Pitch pitch = new Pitch(PIVOT_ID, false, 0, 0, 0, 0);
+    private final Pitch pitch = new Pitch(PIVOT_ID, false, 1, 0.05, 0.05, 0.05);
     private int consecutiveNoteInsideSamples = 0;
     private final LedSubsystem ledSubsystem = new LedSubsystem();
 
@@ -50,6 +50,8 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         /* FOR DEBUGGING, REMOVE */
+        SmartDashboard.putNumber("Current Angle Pitch", pitch.getPosition().getDegrees());
+        SmartDashboard.putNumber("Setpoint Pitch", pitch.getSetpoint().getDegrees());
         SmartDashboard.putNumber("left flywheel rpm", leftFlywheel.getSpeed().in(RPM));
         SmartDashboard.putBoolean("Does see note", doesSeeNote());
 
@@ -75,8 +77,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed) {
-        rightFlywheel.setSpeed(speed);
-        leftFlywheel.setSpeed(speed);
+//        rightFlywheel.setSpeed(speed);
+//        leftFlywheel.setSpeed(speed);
     }
 
     /**
@@ -89,20 +91,21 @@ public class ShooterSubsystem extends SubsystemBase {
      *              {@code speed}.
      */
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
-        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - spin);
-        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - spin);
-
-        rightFlywheel.setSpeed(rightSpeed);
-        leftFlywheel.setSpeed(leftSpeed);
+//        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - spin);
+//        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - spin);
+//
+//        rightFlywheel.setSpeed(rightSpeed);
+//        leftFlywheel.setSpeed(leftSpeed);
     }
 
     public void stopFlywheels() {
-        leftFlywheel.stopMotor();
-        rightFlywheel.stopMotor();
+//        leftFlywheel.stopMotor();
+//        rightFlywheel.stopMotor();
     }
 
     public boolean areFlywheelsReady() {
-        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
+        return true;
+//        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
     }
 
     public boolean hasPivotArrived() {
