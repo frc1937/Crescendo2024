@@ -26,8 +26,8 @@ public class Pitch {
     private final ArmFeedforward feedforward;
     private double feedforwardCorrection = 0;
 
-    public Pitch(int motorId, boolean invert, double p, double s, double g, double v) {
-        feedback = new PIDController(p, 0, 0);
+    public Pitch(int motorId, boolean invert, double p, double d, double s, double g, double v) {
+        feedback = new PIDController(p, d, 0);
         feedforward = new ArmFeedforward(s, g, v);
 
         motor = new CANSparkFlex(motorId, MotorType.kBrushless);
