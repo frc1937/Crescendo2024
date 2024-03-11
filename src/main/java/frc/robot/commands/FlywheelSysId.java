@@ -10,13 +10,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 /** Add your docs here. */
 public class FlywheelSysId {
     private final SysIdRoutine routine;
 
     public FlywheelSysId(ShooterSubsystem shooter) {
         this.routine = new SysIdRoutine(
-            new Config(),
+            new Config(null, null, Seconds.of(15)),
             new Mechanism(shooter::setFlywheelsVoltage, shooter::logFlywheels, shooter)
         );
     }
@@ -25,7 +27,15 @@ public class FlywheelSysId {
         return routine.quasistatic(SysIdRoutine.Direction.kForward);
     }
 
+    public Command getQuasistaticTestBackward() {
+        return routine.quasistatic(SysIdRoutine.Direction.kReverse);
+    }
+
     public Command getDynamicTest() {
-        return routine.quasistatic(SysIdRoutine.Direction.kForward);
+        return routine.dynamic(SysIdRoutine.Direction.kForward);
+    }
+
+    public Command getDynamicTestBackward() {
+        return routine.dynamic(SysIdRoutine.Direction.kReverse);
     }
 }

@@ -18,12 +18,15 @@ import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_FF;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
@@ -32,37 +35,18 @@ import static frc.robot.Constants.ShootingConstants.FLYWHEEL_P;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_VELOCITY_TOLERANCE;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
-import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_FF;
-import static frc.robot.Constants.ShootingConstants.PIVOT_DOWN_P;
-import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_D;
-import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_FF;
-import static frc.robot.Constants.ShootingConstants.PIVOT_HIGH_P;
-import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
-import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MAX;
-import static frc.robot.Constants.ShootingConstants.PIVOT_RANGE_MIN;
-import static frc.robot.Constants.ShootingConstants.PIVOT_UP_FF;
-import static frc.robot.Constants.ShootingConstants.PIVOT_UP_P;
-import static frc.robot.Constants.ShootingConstants.SHOOTER_VERTICAL_ANGLE;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Rotation;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.MutableMeasure.mutable;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
-    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless),
-            pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final RelativeEncoder flywheelEncoder = flywheelMaster.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168),
-            pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
-    private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
-    private final SparkPIDController pitchController, flywheelsController;
+    private final CANSparkFlex flywheelMaster = new CANSparkFlex(FLYWHEEL_LEFT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final CANSparkFlex flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
+
+    //            pivotMotor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
+    private final RelativeEncoder flywheelEncoder = flywheelSlave.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
+//            pivotInternalEncoder = pivotMotor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
+//    private final CANCoder pivotEncoder = new CANCoder(PIVOT_CAN_CODER);
+    private final SparkPIDController flywheelsController;
     private double pivotSetpoint = 0, targetFlywheelVelocity = 0;
     private int consecutiveNoteInsideSamples = 0;
 
@@ -79,54 +63,49 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelsController = flywheelMaster.getPIDController();
         configureFlywheelMotor(flywheelMaster);
 
-        CANSparkFlex flywheelSlave = new CANSparkFlex(FLYWHEEL_RIGHT_ID, CANSparkLowLevel.MotorType.kBrushless);
         configureFlywheelMotor(flywheelSlave);
 
-        configurePivotMotor(pivotMotor);
-
-        configureCanCoder(pivotEncoder);
-
-        flywheelSlave.follow(flywheelMaster, true);
-
-        pitchController = pivotMotor.getPIDController();
-        setupPivotController();
+//        flywheelSlave.follow(flywheelMaster, true);
+//
+//        pitchController = pivotMotor.getPIDController();
+//        setupPivotController();
     }
 
     @Override
     public void periodic() {
-        double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
-        pivotInternalEncoder.setPosition(currentAngle);
+//        double currentAngle = -(pivotEncoder.getPosition() - PIVOT_ENCODER_OFFSET);
+//        pivotInternalEncoder.setPosition(currentAngle);
 
         /* FOR DEBUGGING, REMOVE */
         SmartDashboard.putNumber("Target Flywheel RPM", targetFlywheelVelocity);
-        SmartDashboard.putNumber("Current angle", currentAngle);
+//        SmartDashboard.putNumber("Current angle", currentAngle);
         SmartDashboard.putNumber("Pivot setpoint", pivotSetpoint);
         SmartDashboard.putBoolean("Does see note", doesSeeNote());
         SmartDashboard.putNumber("Flywheel RPM", flywheelEncoder.getVelocity());
         SmartDashboard.putNumber("Flywheel ANGLE", flywheelEncoder.getPosition());
 
-        if (pivotSetpoint < 80) {
-            // Front region
-            if (pivotSetpoint >= currentAngle) {
-                // Up-moving PID
-                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
-            } else {
-                // Down-moving PID
-                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
-            }
-        } else if (pivotSetpoint > SHOOTER_VERTICAL_ANGLE * 2 - 80) {
-            // Rear region
-            if (pivotSetpoint <= currentAngle) {
-                // Up-moving PID
-                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
-            } else {
-                // Down-moving PID
-                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
-            }
-        } else {
-            // Top region
-            pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
-        }
+//        if (pivotSetpoint < 80) {
+//            // Front region
+//            if (pivotSetpoint >= currentAngle) {
+//                // Up-moving PID
+//                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
+//            } else {
+//                // Down-moving PID
+//                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
+//            }
+//        } else if (pivotSetpoint > SHOOTER_VERTICAL_ANGLE * 2 - 80) {
+//            // Rear region
+//            if (pivotSetpoint <= currentAngle) {
+//                // Up-moving PID
+//                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 0);
+//            } else {
+//                // Down-moving PID
+//                pitchController.setReference(pivotSetpoint, CANSparkBase.ControlType.kPosition, 1);
+//            }
+//        } else {
+//            // Top region
+//            pitchController.setReference(pivotSetpoint, ControlType.kPosition, 2);
+//        }
 
         if(doesSeeNote()) {
             consecutiveNoteInsideSamples++;
@@ -167,22 +146,22 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return Math.abs(pivotSetpoint - pivotInternalEncoder.getPosition()) < 1.5;
+        return false;
+//        return Math.abs(pivotSetpoint - pivotInternalEncoder.getPosition()) < 1.5;
     }
 
     public void setPivotAngle(Rotation2d rotation2d) {
-        pivotSetpoint = rotation2d.getDegrees();
+//        pivotSetpoint = rotation2d.getDegrees();
     }
 
     public void setFlywheelsVoltage(Measure<Voltage> volts) {
-        flywheelMaster.setVoltage(volts.in(Volts));
+        flywheelSlave.setVoltage(volts.in(Volts));
     }
 
     public void logFlywheels(SysIdRoutineLog log) {
         log.motor("flywheel")
-            .voltage(
-                m_appliedVoltage.mut_replace(
-                    flywheelMaster.get() * RobotController.getBatteryVoltage(), Volts))
+            .voltage(m_appliedVoltage.mut_replace(
+                    flywheelSlave.getAppliedOutput() * flywheelSlave.getBusVoltage(), Volts))
             .angularPosition(m_angle.mut_replace(flywheelEncoder.getPosition(), Rotations))
             .angularVelocity(
                 m_velocity.mut_replace(flywheelEncoder.getVelocity(), RPM));
@@ -209,26 +188,26 @@ public class ShooterSubsystem extends SubsystemBase {
     private void configurePivotMotor(CANSparkFlex motor) {
         configureFlywheelMotor(motor);
 
-        pivotMotor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
-        pivotMotor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
-        pivotMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+//        pivotMotor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
+//        pivotMotor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
+//        pivotMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
     private void setupPivotController() {
-        pitchController.setP(PIVOT_UP_P, 0);
-        pitchController.setFF(PIVOT_UP_FF, 0);
-
-        pitchController.setP(PIVOT_DOWN_P, 1);
-        pitchController.setFF(PIVOT_DOWN_FF, 1);
-
-        pitchController.setP(PIVOT_HIGH_P, 2);
-        pitchController.setD(PIVOT_HIGH_D, 2);
-        pitchController.setFF(PIVOT_HIGH_FF, 2);
-
-        pitchController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);
-
-        pivotInternalEncoder.setPosition(pivotEncoder.getAbsolutePosition());
-        pivotEncoder.setPosition(pivotEncoder.getAbsolutePosition());
+//        pitchController.setP(PIVOT_UP_P, 0);
+//        pitchController.setFF(PIVOT_UP_FF, 0);
+//
+//        pitchController.setP(PIVOT_DOWN_P, 1);
+//        pitchController.setFF(PIVOT_DOWN_FF, 1);
+//
+//        pitchController.setP(PIVOT_HIGH_P, 2);
+//        pitchController.setD(PIVOT_HIGH_D, 2);
+//        pitchController.setFF(PIVOT_HIGH_FF, 2);
+//
+//        pitchController.setOutputRange(PIVOT_RANGE_MIN, PIVOT_RANGE_MAX);
+//
+//        pivotInternalEncoder.setPosition(pivotEncoder.getAbsolutePosition());
+//        pivotEncoder.setPosition(pivotEncoder.getAbsolutePosition());
     }
 
     private boolean doesSeeNote() {
