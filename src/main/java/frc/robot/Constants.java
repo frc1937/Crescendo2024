@@ -204,14 +204,13 @@ public final class Constants {
         public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
         public static final double PITCH_DEFAULT_ANGLE = 20;
 
-
         public static final int
                 FLYWHEEL_LEFT_ID = 15,
                 FLYWHEEL_RIGHT_ID = 16,
                 PIVOT_ID = 1,
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
-        public static final double PIVOT_ENCODER_OFFSET = 283.184;
+        public static final double PIVOT_ENCODER_OFFSET = 343;
         public static final double PIVOT_UP_P = 0.03;
         public static final double PIVOT_UP_FF = 0.000055;
         public static final double PIVOT_HIGH_P = 0.02;
@@ -220,6 +219,7 @@ public final class Constants {
         public static final double PIVOT_DOWN_P = 0.025;
         public static final double PIVOT_DOWN_FF = 0.0005;
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;
+        public static final double PIVOT_TOLERANCE = Units.degreesToRadians(5);
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
         public static final class FlywheelControlConstants {
@@ -240,6 +240,7 @@ public final class Constants {
 
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;
+
 
         /**
          * In seconds

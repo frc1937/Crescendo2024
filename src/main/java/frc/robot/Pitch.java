@@ -6,11 +6,9 @@ package frc.robot;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-
-import edu.wpi.first.hal.simulation.EncoderDataJNI;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,27 +27,31 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
+import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
+import static frc.robot.Constants.ShootingConstants.PIVOT_TOLERANCE;
 
 public class Pitch {
     private final PIDController feedback;
     private final CANSparkFlex motor;
     private final CANCoder encoder;
     private final ArmFeedforward feedforward;
-    private final TrapezoidProfile motionProfile = new TrapezoidProfile(PITCH_CONSTRAINTS);
-    private final TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
-
-    private double feedforwardCorrection = 0;
+    private final TrapezoidProfile motionProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints
+            (0.1, 0.1));
+    private final TrapezoidProfile.State goal = new TrapezoidProfile.State();
+    private boolean goalIsSetpoint = false;
 
     public Pitch(int motorId, double p, double d, double s, double g, double v) {
         feedback = new PIDController(p, 0, d);
         feedforward = new ArmFeedforward(s, g, v);
 
         motor = new CANSparkFlex(motorId, MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
 
+        motor.restoreFactoryDefaults();
+        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
         motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
         motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+
+        feedback.setTolerance(PIVOT_TOLERANCE);
 
         // WARNING FIXME XXX TODO Shout at Uriel
         // feedback.setTolerance(FlywheelControlConstants.TOLERANCE);
@@ -61,7 +63,14 @@ public class Pitch {
 
     public void periodic() {
         // Calculate the position and velocity setpoints
+
         TrapezoidProfile.State setpoint = motionProfile.calculate(0.02, getCurrentState(), goal);
+        goalIsSetpoint = goal.equals(setpoint);
+
+        setpoint.velocity = MathUtil.clamp(setpoint.velocity, -0.1, 0.1);
+
+        SmartDashboard.putNumber("Setpoint Position [deg]", setpoint.position);
+        SmartDashboard.putNumber("Setpoint Velocity [RadPS]", setpoint.velocity);
 
         // Derive the acceleration setpoint from the current and future velocity
         double accelerationRadPerSecSquared = (setpoint.velocity - getCurrentVelocity().in(RadiansPerSecond)) / 0.02;
@@ -82,14 +91,24 @@ public class Pitch {
         setGoal(Radians.of(rotation2d.getRadians()), RadiansPerSecond.of(0));
     }
 
+    public boolean atGoal() {
+        // WARNING: this does not check whether the velocity goal was reached
+        return goalIsSetpoint && feedback.atSetpoint();
+    }
+
+    @Deprecated
     public boolean atSetpoint() {
-        return false;
-        // WARNING: Unimplemented
-        // return feedback.atSetpoint();
+        return atGoal();
     }
 
     public Rotation2d getPitch() {
-        return Rotation2d.fromDegrees(encoder.getAbsolutePosition() - 343);  // TODO move 343 to Constants.java
+        double angle = (encoder.getAbsolutePosition() - PIVOT_ENCODER_OFFSET);
+
+        if (angle < -30) {
+            angle += 360;
+        }
+
+        return Rotation2d.fromDegrees(angle);
     }
 
     public Measure<Velocity<Angle>> getCurrentVelocity() {
