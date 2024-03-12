@@ -60,9 +60,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
 
-        flywheelsController = flywheelMaster.getPIDController();
-        configureFlywheelMotor(flywheelMaster);
-
+        flywheelsController = flywheelSlave.getPIDController();
         configureFlywheelMotor(flywheelSlave);
 
 //        flywheelSlave.follow(flywheelMaster, true);
@@ -132,13 +130,13 @@ public class ShooterSubsystem extends SubsystemBase {
         if (pid) {
             flywheelsController.setReference(targetFlywheelVelocity, ControlType.kVelocity);
         } else {
-            flywheelMaster.set(targetFlywheelVelocity / FLYWHEEL_MAX_RPM);
+            flywheelSlave.set(targetFlywheelVelocity / FLYWHEEL_MAX_RPM);
         }
     }
 
     public void stopFlywheels() {
         targetFlywheelVelocity = 0;
-        flywheelMaster.stopMotor();
+        flywheelSlave.stopMotor();
     }
 
     public boolean areFlywheelsReady() {
