@@ -234,10 +234,11 @@ public final class Constants {
              * All in rotations per second and voltages
              */
             public static final double
-                    RIGHT_P = 0.00098616,
-                    RIGHT_S = 0.083607,
-                    RIGHT_V = 0.35701,
-                    RIGHT_A = 1.2298,
+                    RIGHT_P = 0.046963,
+                    RIGHT_S =  0.17613,
+                    RIGHT_V = 0.11157,
+                    RIGHT_A = 0.020308,
+
                     LEFT_P = 0.027878,
                     LEFT_S = 0.081674,
                     LEFT_V = 0.1084,

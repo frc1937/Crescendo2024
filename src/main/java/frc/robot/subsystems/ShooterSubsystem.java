@@ -26,7 +26,6 @@ import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIG
 import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_S;
 import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_V;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
-import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -77,8 +76,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed) {
-//        rightFlywheel.setSpeed(speed);
-//        leftFlywheel.setSpeed(speed);
+        rightFlywheel.setSpeed(speed);
+        leftFlywheel.setSpeed(speed);
     }
 
     /**
@@ -91,21 +90,20 @@ public class ShooterSubsystem extends SubsystemBase {
      *              {@code speed}.
      */
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
-//        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - spin);
-//        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - spin);
-//
-//        rightFlywheel.setSpeed(rightSpeed);
-//        leftFlywheel.setSpeed(leftSpeed);
+        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - spin);
+        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - spin);
+
+        rightFlywheel.setSpeed(rightSpeed);
+        leftFlywheel.setSpeed(leftSpeed);
     }
 
     public void stopFlywheels() {
-//        leftFlywheel.stopMotor();
-//        rightFlywheel.stopMotor();
+        leftFlywheel.stopMotor();
+        rightFlywheel.stopMotor();
     }
 
     public boolean areFlywheelsReady() {
-        return true;
-//        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
+        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
     }
 
     public boolean hasPivotArrived() {

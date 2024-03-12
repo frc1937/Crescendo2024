@@ -25,6 +25,7 @@ public class Flywheel {
     private final PIDController feedback;
     private final SimpleMotorFeedforward feedforward;
     private double feedforwardCorrection = 0;
+    private Measure<Velocity<Angle>> setpoint;
 
     public Flywheel(int motorId, boolean invert, double p, double s, double v, double a) {
         feedback = new PIDController(p, 0, 0);
@@ -43,12 +44,21 @@ public class Flywheel {
     public void periodic() {
         Measure<Velocity<Angle>> velocity = RPM.of(encoder.getVelocity());
         double feedbackCorrection = feedback.calculate(velocity.in(RotationsPerSecond));
+
         motor.setVoltage(feedbackCorrection + feedforwardCorrection);
     }
 
     public void setSpeed(Measure<Velocity<Angle>> speed) {
+        setpoint = speed;
+
         feedback.setSetpoint(speed.in(RotationsPerSecond));
         feedforwardCorrection = feedforward.calculate(speed.in(RotationsPerSecond));
+    }
+
+    public Measure<Velocity<Angle>> getSetpoint() {
+        if(setpoint != null)
+            return setpoint;
+        return RPM.of(0);
     }
 
     public boolean atSetpoint() {
