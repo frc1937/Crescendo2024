@@ -4,10 +4,18 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
@@ -38,8 +46,18 @@ public class Pitch {
     private final CANCoder encoder = new CANCoder(PIVOT_CAN_CODER);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
     private final ProfiledPIDController controller;
-    private final LinearFilter filter = LinearFilter.singlePoleIIR(0.08, 0.02);
-    private double filteredPositionDegrees;
+
+    // Neglect the effect of gravity
+    private final LinearSystem<N2,N1,N1> plant = LinearSystemId.identifyPositionSystem(PITCH_KV, PITCH_KA);
+    private final KalmanFilter<N2,N1,N1> observer = new KalmanFilter<>(
+        Nat.N2(),
+        Nat.N1(),
+        plant,
+        VecBuilder.fill(Units.degreesToRadians(1.2), DegreesPerSecond.of(20).in(RadiansPerSecond)),
+        VecBuilder.fill(Units.degreesToRadians(0.8)),
+        0.02
+    );
+    private double voltage = 0;
 
     public Pitch() {
 //        SmartDashboard.putNumber("pitch/p-value", 0);
@@ -66,12 +84,14 @@ public class Pitch {
     public void periodic() {
 //        controller.setP(SmartDashboard.getNumber("pitch/p-value", 0));
 //        controller.setD(SmartDashboard.getNumber("pitch/d-value", 0));
-        filteredPositionDegrees = filter.calculate(getRawPosition());
 
-        double velocitySetpoint = controller.calculate(Units.degreesToRadians(filteredPositionDegrees));
+        observer.correct(VecBuilder.fill(voltage), VecBuilder.fill(Units.degreesToRadians(getRawPosition())));
 
-        double voltage = feedforward.calculate(Units.degreesToRadians(filteredPositionDegrees), velocitySetpoint);
+        double velocitySetpoint = controller.calculate(observer.getXhat(0));
+
+        voltage = feedforward.calculate(observer.getXhat(0), velocitySetpoint);
         motor.setVoltage(voltage);
+        observer.predict(VecBuilder.fill(voltage), 0.02);
     }
 
     public void setGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
@@ -94,7 +114,7 @@ public class Pitch {
     }
 
     public Rotation2d getCurrentPosition() {
-        return Rotation2d.fromDegrees(filteredPositionDegrees);
+        return Rotation2d.fromRadians(observer.getXhat(0));
     }
 
     public double getRawPosition() {
