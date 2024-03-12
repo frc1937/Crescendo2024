@@ -11,7 +11,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
@@ -39,8 +38,8 @@ public class Pitch {
     private final ProfiledPIDController controller;
 
     public Pitch() {
-        SmartDashboard.putNumber("pitch/p-value", 0);
-        SmartDashboard.putNumber("pitch/d-value", 0);
+//        SmartDashboard.putNumber("pitch/p-value", 0);
+//        SmartDashboard.putNumber("pitch/d-value", 0);
 
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
@@ -61,8 +60,8 @@ public class Pitch {
     }
 
     public void periodic() {
-        controller.setP(SmartDashboard.getNumber("pitch/p-value", 0));
-        controller.setD(SmartDashboard.getNumber("pitch/d-value", 0));
+//        controller.setP(SmartDashboard.getNumber("pitch/p-value", 0));
+//        controller.setD(SmartDashboard.getNumber("pitch/d-value", 0));
 
         double velocitySetpoint = controller.calculate(getCurrentPosition().getRadians());
 
