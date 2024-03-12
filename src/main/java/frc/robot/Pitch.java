@@ -6,8 +6,10 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -36,6 +38,8 @@ public class Pitch {
     private final CANCoder encoder = new CANCoder(PIVOT_CAN_CODER);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
     private final ProfiledPIDController controller;
+    private final LinearFilter filter = LinearFilter.singlePoleIIR(0.08, 0.02);
+    private double filteredPositionDegrees;
 
     public Pitch() {
 //        SmartDashboard.putNumber("pitch/p-value", 0);
@@ -62,10 +66,11 @@ public class Pitch {
     public void periodic() {
 //        controller.setP(SmartDashboard.getNumber("pitch/p-value", 0));
 //        controller.setD(SmartDashboard.getNumber("pitch/d-value", 0));
+        filteredPositionDegrees = filter.calculate(getRawPosition());
 
-        double velocitySetpoint = controller.calculate(getCurrentPosition().getRadians());
+        double velocitySetpoint = controller.calculate(Units.degreesToRadians(filteredPositionDegrees));
 
-        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
+        double voltage = feedforward.calculate(Units.degreesToRadians(filteredPositionDegrees), velocitySetpoint);
         motor.setVoltage(voltage);
     }
 
@@ -89,13 +94,17 @@ public class Pitch {
     }
 
     public Rotation2d getCurrentPosition() {
+        return Rotation2d.fromDegrees(filteredPositionDegrees);
+    }
+
+    public double getRawPosition() {
         double angle = (encoder.getAbsolutePosition() - PIVOT_ENCODER_OFFSET);
 
         if (angle < -30) {
             angle += 360;
         }
-
-        return Rotation2d.fromDegrees(angle);
+        
+        return angle;
     }
 
     public Measure<Velocity<Angle>> getCurrentVelocity() {
