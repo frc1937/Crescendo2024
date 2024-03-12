@@ -23,6 +23,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static frc.robot.Constants.ShootingConstants.PITCH_KD;
+import static frc.robot.Constants.ShootingConstants.PITCH_KG;
+import static frc.robot.Constants.ShootingConstants.PITCH_KP;
+import static frc.robot.Constants.ShootingConstants.PITCH_KS;
+import static frc.robot.Constants.ShootingConstants.PITCH_KV;
+import static frc.robot.Constants.ShootingConstants.PITCH_MAX_VELOCITY;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
@@ -34,9 +42,8 @@ public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
     private final CANCoder encoder;
 
-    private final ProfiledPIDController controller = new ProfiledPIDController(
-        1, 0, 0, new TrapezoidProfile.Constraints(0.1, 0.1));
-    private final ArmFeedforward feedforward = new ArmFeedforward(0.43245,  0.24276, 13.585);
+    private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KS);
+    private final ProfiledPIDController controller;
 
     // private final TrapezoidProfile.State goal = new TrapezoidProfile.State();
 
@@ -46,11 +53,16 @@ public class Pitch {
         motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
         motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
 
-        controller.setTolerance(PIVOT_TOLERANCE);
-
         encoder = new CANCoder(PIVOT_CAN_CODER);
         encoder.configFactoryDefault();
         encoder.configSensorDirection(true);
+        
+        var wrostCaseAcceleration = RadiansPerSecond.per(Second).of(feedforward.maxAchievableAcceleration(7, 0, Double.MIN_NORMAL));
+        controller = new ProfiledPIDController(
+            PITCH_KP, 0, PITCH_KD,
+            new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, wrostCaseAcceleration.in(RotationsPerSecond.per(Second)))
+        );
+        controller.setTolerance(PIVOT_TOLERANCE);
     }
 
     public void periodic() {
