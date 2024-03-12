@@ -91,7 +91,9 @@ public class Pitch {
     public Rotation2d getCurrentPosition() {
         double angle = (encoder.getAbsolutePosition() - PIVOT_ENCODER_OFFSET);
 
-        if (angle < -30) angle += 360;
+        if (angle < -30) {
+            angle += 360;
+        }
 
         return Rotation2d.fromDegrees(angle);
     }
