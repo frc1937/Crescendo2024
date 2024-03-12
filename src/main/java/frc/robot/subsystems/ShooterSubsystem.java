@@ -39,7 +39,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
 
-        pitch.setPosition(Rotation2d.fromDegrees(30));
+        pitch.setPosition(Rotation2d.fromDegrees(45));
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return pitch.atSetpoint();
+        return pitch.atGoal();
     }
 
     public void setPitchPosition(Rotation2d rotation2d) {
