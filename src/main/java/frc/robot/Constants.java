@@ -221,10 +221,10 @@ public final class Constants {
         public static final double PITCH_KS = 0.43245,
                                    PITCH_KG = 0.24276,
                                    PITCH_KV = 13.585,
-                                   PITCH_KA = 0,  // TODO Uriel please find and enter the appropriate value here
+                                   PITCH_KA = 1.7189,
                                    PITCH_KP = 1,  // TODO Calibrate
                                    PITCH_KD = 0,  // TODO Calibrate
-                                   PITCH_MAX_VELOCITY = 0.2;  // TODO Calibrate
+                                   PITCH_MAX_VELOCITY = 0.5;  // TODO Calibrate
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;  // TODO might need to re-define this, idk
         public static final double PIVOT_TOLERANCE = Units.degreesToRadians(5);
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;

@@ -33,7 +33,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, false, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, true, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
     private final Pitch pitch = new Pitch();
-    //66.848, 19.787, 0.43245, 0.24276, 13.585);
     private int consecutiveNoteInsideSamples = 0;
     private final LedSubsystem ledSubsystem = new LedSubsystem();
 

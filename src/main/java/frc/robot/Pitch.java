@@ -11,12 +11,14 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
+import static frc.robot.Constants.ShootingConstants.PITCH_KA;
 import static frc.robot.Constants.ShootingConstants.PITCH_KD;
 import static frc.robot.Constants.ShootingConstants.PITCH_KG;
 import static frc.robot.Constants.ShootingConstants.PITCH_KP;
@@ -32,34 +34,38 @@ import static frc.robot.Constants.ShootingConstants.PIVOT_TOLERANCE;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
-    private final CANCoder encoder;
-
-    private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KS);
+    private final CANCoder encoder = new CANCoder(PIVOT_CAN_CODER);
+    private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
     private final ProfiledPIDController controller;
 
-    // private final TrapezoidProfile.State goal = new TrapezoidProfile.State();
-
     public Pitch() {
+        SmartDashboard.putNumber("pitch/p-value", 0);
+        SmartDashboard.putNumber("pitch/d-value", 0);
+
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
         motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
         motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
 
-        encoder = new CANCoder(PIVOT_CAN_CODER);
         encoder.configFactoryDefault();
         encoder.configSensorDirection(true);
         
-        var wrostCaseAcceleration = RadiansPerSecond.per(Second).of(feedforward.maxAchievableAcceleration(7, 0, Double.MIN_NORMAL));
+        var worstCaseAcceleration = RadiansPerSecond.per(Second).of(feedforward.maxAchievableAcceleration(7, 0, Double.MIN_NORMAL));
+
         controller = new ProfiledPIDController(
             PITCH_KP, 0, PITCH_KD,
-            new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, wrostCaseAcceleration.in(RotationsPerSecond.per(Second)))
+            new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, worstCaseAcceleration.in(RotationsPerSecond.per(Second)))
         );
+
         controller.setTolerance(PIVOT_TOLERANCE);
     }
 
     public void periodic() {
+        controller.setP(SmartDashboard.getNumber("pitch/p-value", 0));
+        controller.setD(SmartDashboard.getNumber("pitch/d-value", 0));
+
         double velocitySetpoint = controller.calculate(getCurrentPosition().getRadians());
-        // setpoint.velocity = MathUtil.clamp(setpoint.velocity, -0.1, 0.1);
+
         double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
         motor.setVoltage(voltage);
     }
@@ -86,9 +92,7 @@ public class Pitch {
     public Rotation2d getCurrentPosition() {
         double angle = (encoder.getAbsolutePosition() - PIVOT_ENCODER_OFFSET);
 
-        if (angle < -30) {
-            angle += 360;
-        }
+        if (angle < -30) angle += 360;
 
         return Rotation2d.fromDegrees(angle);
     }
