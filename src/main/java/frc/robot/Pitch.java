@@ -28,8 +28,6 @@ import static frc.robot.Constants.ShootingConstants.PITCH_KS;
 import static frc.robot.Constants.ShootingConstants.PITCH_KV;
 import static frc.robot.Constants.ShootingConstants.PITCH_MAX_VELOCITY;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_TOLERANCE;
@@ -39,12 +37,14 @@ public class Pitch {
     private final CANCoder encoder = new CANCoder(PIVOT_CAN_CODER);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
     private final ProfiledPIDController controller;
+    private double setpoint;
     public Pitch() {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
-        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES);
 
+//        motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
+//        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, (PIVOT_CONSTRAINT_DEGREES));
+//TODO: WARNING (TEST CAUTIOUSLY) see why limit isn't working.
         encoder.configFactoryDefault();
         encoder.configSensorDirection(true);
 
@@ -59,19 +59,21 @@ public class Pitch {
     }
 
     public void periodic() {
-        SmartDashboard.putNumber("pitch/CurrentAngle", getRawPosition());
-        SmartDashboard.putNumber("pitch/Setpoint", controller.getGoal().position);
-
+        SmartDashboard.putNumber("pitch/CurrentAngle", motor.getEncoder().getPosition());
+        SmartDashboard.putNumber("pitch/Setpoint", setpoint);
+        //TODO FIXME XXXYYYZZZZ See why it only works for the first setpoint. Lowering deadband/tweaking acceleration MIGHT! help
         double velocitySetpoint = MathUtil.applyDeadband(
                 controller.calculate(Units.degreesToRadians(getRawPosition())), 0.05);
 
         double voltage = feedforward.calculate(Units.degreesToRadians(getRawPosition()), velocitySetpoint);
         motor.setVoltage(voltage);
+
+        SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
     }
 
     public void setGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
-        controller.setP(PITCH_KP);
-        controller.setD(PITCH_KD);
+        //THIS CAUSES THE THING TO YEET ITSELF
+//        controller.reset(getRawPosition());
 
         controller.setGoal(new TrapezoidProfile.State(position.in(Radians), velocity.in(RadiansPerSecond)));
     }
@@ -79,16 +81,13 @@ public class Pitch {
     @Deprecated
     public void setPosition(Rotation2d rotation2d) {
         setGoal(Radians.of(rotation2d.getRadians()), RadiansPerSecond.of(0));
+
+        setpoint = rotation2d.getDegrees();
     }
 
     public boolean atGoal() {
         // WARNING: this does not check whether the velocity goal was reached
         return controller.atGoal();
-    }
-
-
-    public Rotation2d getCurrentPosition() {
-        return Rotation2d.fromDegrees(getRawPosition());
     }
 
     public double getRawPosition() {
