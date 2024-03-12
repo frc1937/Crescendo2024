@@ -106,7 +106,8 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
 
-        drLeftTrigger.whileTrue(shooterCommands.intakeGet());
+
+        drLeftTrigger.whileTrue((shooterCommands.receiveFromFeeder()));
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 

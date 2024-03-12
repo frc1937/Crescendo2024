@@ -223,7 +223,7 @@ public final class Constants {
                                    PITCH_KV = 12.824,
                                    PITCH_KA = 3.995,
                                    PITCH_KP = 0.8,  // TODO Calibrate
-                                   PITCH_KD = 0.005,  // TODO Calibrate
+                                   PITCH_KD = 0,  // TODO Calibrate
                                    PITCH_MAX_VELOCITY = 1;
         public static final float PIVOT_CONSTRAINT_DEGREES = 150;  // TODO might need to re-define this, idk
         public static final double PIVOT_TOLERANCE = Units.degreesToRadians(5);
