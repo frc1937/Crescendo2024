@@ -33,11 +33,15 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, false, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, true, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
     private final Pitch pitch = new Pitch();
+//    private final RetardedPitch retardedPitch = new RetardedPitch();
     private int consecutiveNoteInsideSamples = 0;
     private final LedSubsystem ledSubsystem = new LedSubsystem();
 
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
+
+        pitch.setPosition(Rotation2d.fromDegrees(2));
+//        retardedPitch.setSetpoint(2);
     }
 
     @Override
@@ -49,7 +53,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("Current Angle Pitch", pitch.getCurrentPosition().getDegrees());
+//        SmartDashboard.putNumber("Current Angle Pitch", pitch.getCurrentPosition().getDegrees());
         SmartDashboard.putNumber("left flywheel rpm", leftFlywheel.getSpeed().in(RPM));
         SmartDashboard.putBoolean("Does see note", doesSeeNote());
 
@@ -60,6 +64,7 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.periodic();
 
         pitch.periodic();
+//        retardedPitch.periodic();
     }
 
     public boolean doesSeeNoteNoiseless() {
@@ -106,11 +111,12 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean hasPivotArrived() {
-        return pitch.atSetpoint();
+        return false;
+//        return pitch.atSetpoint();
     }
 
     public void setPitchPosition(Rotation2d rotation2d) {
-        pitch.setPosition(rotation2d);
+//        pitch.setPosition(rotation2d);
     }
 
     private void configureSRXMotor(WPI_TalonSRX motor) {
