@@ -63,7 +63,7 @@ public class Pitch {
         // Configure the relative encoder
         relativeEncoder.setPosition(getCurrentPosition().getRotations() * PITCH_TRANSMISSION_RATIO);
 
-        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, PIVOT_CONSTRAINT_DEGREES * PITCH_TRANSMISSION_RATIO);
+        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, (float)Units.degreesToRotations(PIVOT_CONSTRAINT_DEGREES) * PITCH_TRANSMISSION_RATIO);
         motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
         // TODO: WARNING (TEST CAUTIOUSLY) see why limit isn't working.
 
