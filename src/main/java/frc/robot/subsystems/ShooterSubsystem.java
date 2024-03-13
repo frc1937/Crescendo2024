@@ -42,33 +42,36 @@ public class ShooterSubsystem extends SubsystemBase {
                      leftFlywheel.theoreticalMaximumVelocity.baseUnitMagnitude()));
     
     public ShooterSubsystem() {
-        configureSRXMotor(kickerMotor);
+        kickerMotor.configFactoryDefault();
+        kickerMotor.setNeutralMode(NeutralMode.Brake);
+
 
         // pitch.setPosition(Rotation2d.fromDegrees(45));
     }
 
     @Override
     public void periodic() {
-        if (doesSeeNoteNoiseless()) {
+        if (isLoaded()) {
             ledSubsystem.setLedColour(255, 80, 0);
         } else {
             ledSubsystem.setLedColour(0, 0, 255);
         }
 
-        /* FOR DEBUGGING, REMOVE */
-        SmartDashboard.putNumber("left flywheel rpm", leftFlywheel.getSpeed().in(RPM));
-        SmartDashboard.putBoolean("Does see note", doesSeeNote());
-
-        if (doesSeeNote()) consecutiveNoteInsideSamples++;
-        else consecutiveNoteInsideSamples = 0;
+        if (!beamBreaker.get()) {
+            consecutiveNoteInsideSamples++;
+        } else {
+            consecutiveNoteInsideSamples = 0;
+        };
 
         leftFlywheel.periodic();
         rightFlywheel.periodic();
-
         pitch.periodic();
     }
 
-    public boolean doesSeeNoteNoiseless() {
+    /**
+     * @return whether a NOTE is present inside the shooter
+     */
+    public boolean isLoaded() {
         return consecutiveNoteInsideSamples >= CONSIDERED_NOISELESS_THRESHOLD;
     }
 
@@ -90,13 +93,12 @@ public class ShooterSubsystem extends SubsystemBase {
      * certain speed and rotation
      *
      * @param speed the average target speed of both flywheels
-     * @param spin  a value in range [0, 1] where (1 - spin) = (right speed / left speed). Thus,
-     *              the difference between the left and right speeds is proprtional to
-     *              {@code speed}.
+     * @param differencePercents  a value in range [0, 1] where (1 - differencePercents) = (right speed / left speed).
+     *              Thus, the difference between the left and right speeds is proprtional to {@code speed}.
      */
-    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
-        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - spin);
-        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - spin);
+    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double differencePercents) {
+        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - differencePercents);
+        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - differencePercents);
 
         rightFlywheel.setSpeed(rightSpeed);
         leftFlywheel.setSpeed(leftSpeed);
@@ -111,20 +113,12 @@ public class ShooterSubsystem extends SubsystemBase {
         return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
     }
 
-    public boolean hasPivotArrived() {
+    public boolean isPitchReady() {
         return pitch.atGoal();
     }
 
-    public void setPitchPosition(Rotation2d rotation2d) {
-        pitch.setGoal(rotation2d);
-    }
-
-    private void configureSRXMotor(WPI_TalonSRX motor) {
-        motor.configFactoryDefault();
-        motor.setNeutralMode(NeutralMode.Brake);
-    }
-
-    private boolean doesSeeNote() {
-        return !beamBreaker.get();
+    public void setPitchPosition(Rotation2d goal) {
+        // SmartDashboard.putNumber("pitch/Goal", goal.getDegrees());
+        pitch.setGoal(goal);
     }
 }
