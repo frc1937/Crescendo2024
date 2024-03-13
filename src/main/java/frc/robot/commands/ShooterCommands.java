@@ -134,6 +134,6 @@ public class ShooterCommands {
     private void initializeShooterByState(ShootingStates state) {
         shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
         shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(state.getAngle()));
-        shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getRpmProportion() * state.getSpeedPercentage() * FLYWHEEL_MAX_RPM));
+        shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getSpeedPercentage() * shooterSubsystem.theoreticalMaximumVelocity.in(RPM)));
     }
 }

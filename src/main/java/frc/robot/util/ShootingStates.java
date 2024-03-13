@@ -1,18 +1,17 @@
 package frc.robot.util;
 
 public enum ShootingStates {
-    EMPTY(130, 0, 0),
-    AMP(120, 0.055, 1),
-    SPEAKER_FRONT(76, 0.72, 0.9), //WORKING
-    SPEAKER_BACK(137, 0.69, 0.7), //WORK
-    STAGE_FRONT(61, 0.93, 0.98);
+    EMPTY(130, 0),
+    AMP(120, 0.055),
+    SPEAKER_FRONT(76, 0.72 * 0.9), //WORKING
+    SPEAKER_BACK(137, 0.69 * 0.7), //WORK
+    STAGE_FRONT(61, 0.93 * 0.98);
 
-    private final double angle, speedPercentage, rpmProportion;
+    private final double angle, speedPercentage;
 
-    ShootingStates(double angle, double speedPercentage, double rpmProportion) {
+    ShootingStates(double angle, double speedPercentage) {
         this.angle = angle;
         this.speedPercentage = speedPercentage;
-        this.rpmProportion = rpmProportion;
     }
 
     public double getAngle() {
@@ -21,9 +20,5 @@ public enum ShootingStates {
 
     public double getSpeedPercentage() {
         return this.speedPercentage;
-    }
-
-    public double getRpmProportion() {
-        return this.rpmProportion;
     }
 }
