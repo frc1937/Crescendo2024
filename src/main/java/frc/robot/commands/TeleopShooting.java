@@ -112,7 +112,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                                     orientationToVirtualTarget);
 
-            shooter.setPitchPosition(targetShooterOrientation);
+            shooter.setPitchGoal(targetShooterOrientation);
             shooter.setFlywheelsSpeed(RPM.of(
 //                    SmartDashboard.getNumber("swerve/velocity [rpm]", 0))
                     SLOPE_TO_VELOCITY_MAP.get(slopeToVirtualTarget))
@@ -138,7 +138,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         public void end(boolean interrupted) {
             if (interrupted) {
                 shooter.stopFlywheels();
-                shooter.setPitchPosition(Rotation2d.fromDegrees(0));
+                shooter.setPitchGoal(Rotation2d.fromDegrees(0));
             }
         }
     }
@@ -176,7 +176,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         public void end(boolean interrupted) {
             shooter.stopKicker();
             shooter.stopFlywheels();
-            shooter.setPitchPosition(Rotation2d.fromDegrees(0));
+            shooter.setPitchGoal(Rotation2d.fromDegrees(0));
         }
     }
 }

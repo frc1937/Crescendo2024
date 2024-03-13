@@ -17,7 +17,7 @@ public class AutonomousShooter {
     public Command adjustShooter(double degrees, int rpm) {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(degrees));
+                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(degrees));
                     shooterSubsystem.setFlywheelsSpeed(RPM.of(rpm));
                 },
                 () -> {

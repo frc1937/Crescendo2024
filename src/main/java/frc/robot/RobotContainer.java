@@ -138,30 +138,30 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(90)),
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(90)),
                 shooterSubsystem)
             .andThen(new WaitCommand(3))
             .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(0)),
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
                 shooterSubsystem))
             .andThen(new WaitCommand(3))
             .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(45)),
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(45)),
                 shooterSubsystem))
             .andThen(new WaitCommand(3))
             .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(0)),
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
                 shooterSubsystem))
             .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(30)),
-                shooterSubsystem))
-            .andThen(new WaitCommand(3))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(60)),
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(30)),
                 shooterSubsystem))
             .andThen(new WaitCommand(3))
             .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(0)),
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(60)),
+                shooterSubsystem))
+            .andThen(new WaitCommand(3))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
                 shooterSubsystem));
         // return autoChooser.getSelected();
     }

@@ -117,8 +117,12 @@ public class ShooterSubsystem extends SubsystemBase {
         return pitch.atGoal();
     }
 
-    public void setPitchPosition(Rotation2d goal) {
+    public void setPitchGoal(Rotation2d goal) {
         // SmartDashboard.putNumber("pitch/Goal", goal.getDegrees());
         pitch.setGoal(goal);
+    }
+
+    public void setPitchGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
+        pitch.setGoal(position, velocity);
     }
 }
