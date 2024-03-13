@@ -222,12 +222,16 @@ public final class Constants {
                                    PITCH_KG = 0.31481,
                                    PITCH_KV = 12.824,
                                    PITCH_KA = 3.995,
-                                   PITCH_KP = 0.8,  // TODO Calibrate
-                                   PITCH_KD = 0,  // TODO Calibrate
-                                   PITCH_MAX_VELOCITY = 1;
-        public static final float PIVOT_CONSTRAINT_DEGREES = (float) (20);  // TODO might need to re-define this, idk
+                                   PITCH_KP = 1.5,
+                                   PITCH_KD = 0.0,
+                                   PITCH_MAX_VELOCITY = 35,
+                                   PITCH_MAX_ACCELERATION = 25;
+        public static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO we need to re-define this, idk
         public static final double PIVOT_TOLERANCE = Units.degreesToRadians(0.2);
-        public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kReverse;
+        public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
+        public static final float PITCH_TRANSMISSION_RATIO = 150;
+        public static final double DEFAULT_PITCH_DEADBAND = 0.025,
+                                   VERTICAL_PITCH_DEADBAND = 0.06;
 
         public static final class FlywheelControlConstants {
             /**

@@ -7,12 +7,16 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AutonomousShooter;
 import frc.robot.commands.IntakeCommand;
@@ -133,7 +137,33 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(90)),
+                shooterSubsystem)
+            .andThen(new WaitCommand(3))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(0)),
+                shooterSubsystem))
+            .andThen(new WaitCommand(3))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(45)),
+                shooterSubsystem))
+            .andThen(new WaitCommand(3))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(0)),
+                shooterSubsystem))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(30)),
+                shooterSubsystem))
+            .andThen(new WaitCommand(3))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(60)),
+                shooterSubsystem))
+            .andThen(new WaitCommand(3))
+            .andThen(new InstantCommand(
+                () -> shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(0)),
+                shooterSubsystem));
+        // return autoChooser.getSelected();
     }
 
     public void infrequentPeriodic() {
