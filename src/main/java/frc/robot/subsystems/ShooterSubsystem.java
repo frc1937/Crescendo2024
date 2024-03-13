@@ -36,6 +36,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private int consecutiveNoteInsideSamples = 0;
     private final LedSubsystem ledSubsystem = new LedSubsystem();
 
+    public final Measure<Velocity<Angle>> theoreticalMaximumVelocity =
+        rightFlywheel.theoreticalMaximumVelocity.unit().of(
+            Math.min(rightFlywheel.theoreticalMaximumVelocity.baseUnitMagnitude(),
+                     leftFlywheel.theoreticalMaximumVelocity.baseUnitMagnitude()));
+    
     public ShooterSubsystem() {
         configureSRXMotor(kickerMotor);
 

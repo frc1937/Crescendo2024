@@ -27,6 +27,8 @@ public class Flywheel {
     private double feedforwardCorrection = 0;
     private Measure<Velocity<Angle>> setpoint;
 
+    public final Measure<Velocity<Angle>> theoreticalMaximumVelocity;
+
     public Flywheel(int motorId, boolean invert, double p, double s, double v, double a) {
         feedback = new PIDController(p, 0, 0);
         feedforward = new SimpleMotorFeedforward(s, v, a);
@@ -39,6 +41,8 @@ public class Flywheel {
         feedback.setTolerance(FlywheelControlConstants.TOLERANCE);
 
         encoder = motor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
+
+        theoreticalMaximumVelocity = RotationsPerSecond.of(feedforward.maxAchievableVelocity(12, Double.MIN_VALUE));
     }
 
     public void periodic() {
