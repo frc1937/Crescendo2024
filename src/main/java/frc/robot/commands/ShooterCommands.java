@@ -22,7 +22,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> initializeShooterByState(state),
                 () -> {
-                    if (shooterSubsystem.doesSeeNoteNoiseless() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.hasPivotArrived()) {
+                    if (shooterSubsystem.isLoaded() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.isPitchReady()) {
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
                     }
                 },
@@ -51,7 +51,7 @@ public class ShooterCommands {
                     shooterSubsystem.stopKicker();
                     shooterSubsystem.setPitchPosition(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
                 },
-                shooterSubsystem::doesSeeNoteNoiseless,
+                shooterSubsystem::isLoaded,
                 shooterSubsystem
         ).andThen(setKickerSpeed(KICKER_SPEED_BACKWARDS).withTimeout(0.7));
     }
@@ -79,7 +79,7 @@ public class ShooterCommands {
                 },
                 interrupt -> {
                 },
-                shooterSubsystem::hasPivotArrived,
+                shooterSubsystem::isLoaded,
                 shooterSubsystem);
 
         FunctionalCommand operateIntake = new FunctionalCommand(
@@ -98,7 +98,7 @@ public class ShooterCommands {
                         shooterSubsystem.stopFlywheels();
                     }
                 },
-                shooterSubsystem::doesSeeNoteNoiseless,
+                shooterSubsystem::isLoaded,
                 intakeSubsystem, shooterSubsystem);
 
         Command prepareAndOperateIntake = preparePivot.andThen(operateIntake);

@@ -30,7 +30,7 @@ import static frc.robot.Constants.Swerve.*;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.Constants.VisionConstants.REAR_CAMERA_NAME;
 
-public class SwerveSubsystem extends SubsystemBase {
+public class DrivetrainSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
     public final SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
@@ -44,7 +44,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private double yawCorrection = 0;
 
-    public SwerveSubsystem() {
+    public DrivetrainSubsystem() {
         SmartDashboard.putData("Field", field2d);
 
         gyro.configFactoryDefault();

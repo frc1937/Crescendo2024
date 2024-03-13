@@ -27,7 +27,7 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.util.ShootingStates;
 import frc.robot.util.TriggerButton;
 
@@ -62,7 +62,7 @@ public class RobotContainer {
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     private final TriggerButton opLeftTrigger = new TriggerButton(operatorController, XboxController.Axis.kLeftTrigger);
     /* Subsystems */
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final DrivetrainSubsystem swerveSubsystem = new DrivetrainSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();

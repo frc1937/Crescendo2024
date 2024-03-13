@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.robot.Constants;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.DoubleSupplier;
 
@@ -21,7 +21,7 @@ import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
 import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
 
 public class TeleopShooting extends SequentialCommandGroup {
-    public TeleopShooting(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public TeleopShooting(DrivetrainSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
                 new TeleopAim(swerve, shooter, translationSup, strafeSup),
                 new TeleopThrow(swerve, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
@@ -32,7 +32,7 @@ public class TeleopShooting extends SequentialCommandGroup {
     }
 
     private static class TeleopAim extends Command {
-        private final SwerveSubsystem swerve;
+        private final DrivetrainSubsystem swerve;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
         private Rotation2d targetShooterOrientation = new Rotation2d();
@@ -40,7 +40,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         private double slopeToVirtualTarget = DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
         private final Timer deadlineTimer = new Timer();
 
-        public TeleopAim(SwerveSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+        public TeleopAim(DrivetrainSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
             this.shooter = shooter;
             this.translationSup = translationSup;
@@ -122,7 +122,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         @Override
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady();
-            boolean pitchReady = shooter.hasPivotArrived();
+            boolean pitchReady = shooter.isPitchReady();
             boolean azimuthReady = swerve.azimuthAtGoal();
             boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
             boolean reachedDeadline = deadlineTimer.hasElapsed(2.5);
@@ -144,11 +144,11 @@ public class TeleopShooting extends SequentialCommandGroup {
     }
 
     public static class TeleopThrow extends Command {
-        private final SwerveSubsystem swerve;
+        private final DrivetrainSubsystem swerve;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
 
-        public TeleopThrow(SwerveSubsystem swerve, ShooterSubsystem shooter,
+        public TeleopThrow(DrivetrainSubsystem swerve, ShooterSubsystem shooter,
                            DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.swerve = swerve;
             this.shooter = shooter;
