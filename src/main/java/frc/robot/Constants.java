@@ -26,9 +26,7 @@ import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.*;
 
 public final class Constants {
     public static final String TFILAT_HADERECH = """
@@ -46,6 +44,16 @@ public final class Constants {
      */
     public static final double INFREQUENT_PERIODIC_PERIOD = 0.1;
     public static final double STICK_DEADBAND = 0.1;
+
+    public static final class Mount { //todo: TUNE CONSTANTS TO SYSTEM SPECIFICS
+        public static final int MOUNT_RIGHT_MOTOR_ID = 2;
+        public static final int MOUNT_LEFT_MOTOR_ID = 3;
+        public static final Measure<Angle> MOUNT_AT_TOP_ENCODER_VALUE = Degrees.of(0.5);
+        public static final Measure<Angle> MOUNT_SOFT_LIMIT = Degrees.of(1.5);
+        public static final double MOUNT_SPEED_SCALAR = 0.5;
+        public static final double MOUNT_AUTO_SPEED = 0.5;
+    }
+
 
     public static final class Transforms {
         /**
@@ -200,8 +208,10 @@ public final class Constants {
 
         public static final InterpolatingTreeMap<Double, ShooterSubsystem.Reference> DISTANCE_TO_REFERENCE_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(), ShooterSubsystem.Reference::interpolate);
-        
-        /** A small helper function for the following static block */
+
+        /**
+         * A small helper function for the following static block
+         */
         private static final void putReference(double distance, double degrees, double rpm, double spin) {
             DISTANCE_TO_REFERENCE_MAP.put(distance, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
         }
@@ -231,19 +241,19 @@ public final class Constants {
         // public static final double PIVOT_DOWN_P = 0.025;
         // public static final double PIVOT_DOWN_FF = 0.0005;
         public static final double PITCH_KS = 0.38398,
-                                   PITCH_KG = 0.31481,
-                                   PITCH_KV = 12.824,
-                                   PITCH_KA = 3.995,
-                                   PITCH_KP = 1.5,//1.d / 0.02,
-                                   PITCH_KD = 0.0,
-                                   PITCH_MAX_VELOCITY = 25,//1.05,
-                                   PITCH_MAX_ACCELERATION = 35;//0.75;
+                PITCH_KG = 0.31481,
+                PITCH_KV = 12.824,
+                PITCH_KA = 3.995,
+                PITCH_KP = 1.5,//1.d / 0.02,
+                PITCH_KD = 0.0,
+                PITCH_MAX_VELOCITY = 25,//1.05,
+                PITCH_MAX_ACCELERATION = 35;//0.75;
         public static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
         public static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
         public static final float PITCH_TRANSMISSION_RATIO = 150;
         public static final double DEFAULT_PITCH_DEADBAND = 0.025,
-                                   VERTICAL_PITCH_DEADBAND = 0.06;
+                VERTICAL_PITCH_DEADBAND = 0.06;
 
         public static final class FlywheelControlConstants {
             /**
@@ -251,11 +261,11 @@ public final class Constants {
              */
             public static final double
                     RIGHT_P = 0.046963,
-                    RIGHT_S =  0.17613,
+                    RIGHT_S = 0.17613,
                     RIGHT_V = 0.11157,
                     RIGHT_A = 0.020308,
 
-                    LEFT_P = 0.027878,
+            LEFT_P = 0.027878,
                     LEFT_S = 0.081674,
                     LEFT_V = 0.1084,
                     LEFT_A = 0.021644,

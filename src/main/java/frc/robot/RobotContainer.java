@@ -121,8 +121,7 @@ public class RobotContainer {
                 )
         );
 
-        opStartButton.whileTrue(mountCommands.startAutomaticMount(0.5));
-        //todo move to constants, no param wtf
+        opStartButton.whileTrue(mountCommands.startAutomaticMount());
     }
 
 

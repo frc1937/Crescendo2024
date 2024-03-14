@@ -6,6 +6,9 @@ import frc.robot.subsystems.MountSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+import static frc.robot.Constants.Mount.MOUNT_AUTO_SPEED;
+import static frc.robot.Constants.Mount.MOUNT_SPEED_SCALAR;
+
 public class MountCommands {
     private final MountSubsystem mountSubsystem;
 
@@ -13,26 +16,28 @@ public class MountCommands {
         this.mountSubsystem = mountSubsystem;
     }
 
-    public Command startManualMount(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed) {
+    public Command startManualMount(DoubleSupplier leftSpeedSup, DoubleSupplier rightSpeedSup) {
         return new FunctionalCommand(
-                () -> mountSubsystem.manualMount(leftSpeed.getAsDouble(), rightSpeed.getAsDouble()),
+                () -> mountSubsystem.manualMount(
+                        leftSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR, rightSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR
+                ),
                 () -> {
                 },
-                (interrupt) -> mountSubsystem.stopMount(),
+                interrupt -> mountSubsystem.stopMount(),
                 () -> false,
+
                 mountSubsystem
         );
     }
 
-    public Command startAutomaticMount(double speed) {
+    public Command startAutomaticMount() {
         return new FunctionalCommand(
-                () -> mountSubsystem.autoMount(speed),
+                () -> mountSubsystem.autoMount(MOUNT_AUTO_SPEED),
                 () -> {},
-                (interrupt) -> mountSubsystem.stopMount(),
-                () -> false,
+                interrupt -> mountSubsystem.stopMount(),
+                mountSubsystem::isAtTop,
+
                 mountSubsystem
         );
     }
-
-    //It is in this format as we need to create multiple commands with different speeds.
 }
