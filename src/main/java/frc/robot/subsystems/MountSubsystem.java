@@ -2,11 +2,13 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MountSubsystem extends SubsystemBase {
     private final CANSparkMax mountRightMotor = new CANSparkMax(5, CANSparkMax.MotorType.kBrushless);
     private final CANSparkMax mountLeftMotor = new CANSparkMax(6, CANSparkMax.MotorType.kBrushless);
+    private final RelativeEncoder encoder = mountLeftMotor.getEncoder();
 
     //todo:
     // Move magic numbers to constants
@@ -18,7 +20,21 @@ public class MountSubsystem extends SubsystemBase {
         configMotor(mountLeftMotor);
     }
 
-    public void setMount(double leftSpeed, double rightSpeed) {
+    /**
+    @param speed - Speed of the motors, ought to be positive
+     */
+    public void autoMount(double speed) {
+        speed = Math.abs(speed);
+
+        if(encoder.getPosition() >= 4/*constant*/) {
+            speed *= -1;
+        }
+
+        mountLeftMotor.set(speed);
+        mountRightMotor.set(speed);
+    }
+
+    public void manualMount(double leftSpeed, double rightSpeed) {
         mountLeftMotor.set(leftSpeed);
         mountRightMotor.set(rightSpeed);
     }
@@ -33,6 +49,6 @@ public class MountSubsystem extends SubsystemBase {
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
         motor.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
-        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, 4);
+        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, 4/*constant*/);
     }
 }

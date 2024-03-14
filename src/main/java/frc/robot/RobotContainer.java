@@ -17,12 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.AutonomousShooter;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ShooterKick;
-import frc.robot.commands.TeleopShooting;
-import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.*;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -66,21 +61,11 @@ public class RobotContainer {
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     /* Commands */
+    private final MountCommands mountCommands = new MountCommands(mountSubsystem);
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
     private final AutonomousShooter autonomousShooter = new AutonomousShooter(shooterSubsystem);
-//    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
-        drivetrain.setDefaultCommand(
-                new TeleopSwerve(
-                        drivetrain,
-                        () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value),
-                        () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value),
-                        () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value),
-                        drRightBumper
-                )
-        );
-
         NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
 
         NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(3));
@@ -91,10 +76,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("AdjustShooter2", autonomousShooter.adjustShooter(134.4, 4000));
         NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(64, 4000));
         NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(125, 4000));
-//        NamedCommands.registerCommand("AdjustShooter1", new AdjustShooter(shooterSubsystem, -1.2));
-//        NamedCommands.registerCommand("AdjustShooter2", new AdjustShooter(shooterSubsystem, -0.85));
-//        NamedCommands.registerCommand("AdjustShooter3", new AdjustShooter(shooterSubsystem, 1.1));
-//        NamedCommands.registerCommand("AdjustShooter4", new AdjustShooter(shooterSubsystem, -0.99));
 
         autoChooser = AutoBuilder.buildAutoChooser("Crown (3)");
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -106,17 +87,25 @@ public class RobotContainer {
     private void configureBindings() {
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
+        DoubleSupplier rotationSup = () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value);
+
+        drivetrain.setDefaultCommand(
+                new TeleopSwerve(
+                        drivetrain,
+                        translationSup,
+                        strafeSup,
+                        rotationSup,
+                        drRightBumper
+                )
+        );
 
         drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
-
 
         drLeftTrigger.whileTrue((shooterCommands.intakeGet()));
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
-//        drBButton.whileTrue(new Mount(mountSubsystem));
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-
         drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
 
         //Operator buttons:
@@ -125,13 +114,15 @@ public class RobotContainer {
         opYButton.whileTrue(shooterCommands.shootToAmp(ShootingStates.AMP));
         opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
 
-//        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
+        mountSubsystem.setDefaultCommand(
+                mountCommands.startManualMount(
+                        () -> -operatorController.getRawAxis(XboxController.Axis.kLeftY.value),
+                        () -> -operatorController.getRawAxis(XboxController.Axis.kRightY.value)
+                )
+        );
 
-//        opRightBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.STAGE_FRONT));
-//        opRightBumper.toggleOnFalse(shooterCommands.stopShooter());
-//        opLeftBumper.whileTrue(shooterCommands.accelerateFlywheel(ShootingStates.SPEAKER_FRONT));
-//        opLeftBumper.toggleOnFalse(shooterCommands.stopShooter());
-//        opStartButton.whileTrue(mountCommands.testMountCommand());
+        opStartButton.whileTrue(mountCommands.startAutomaticMount(0.5));
+        //todo move to constants, no param wtf
     }
 
 
