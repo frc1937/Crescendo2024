@@ -3,7 +3,7 @@ package frc.robot.util;
 public enum ShootingStates {
     EMPTY(130, 0),
     AMP(120, 0.055),
-    SPEAKER_FRONT(76, 0.72 * 0.9), //WORKING
+    SPEAKER_FRONT(50, 0.4), //WORKING
     SPEAKER_BACK(137, 0.69 * 0.7), //WORK
     STAGE_FRONT(61, 0.93 * 0.98);
 

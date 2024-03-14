@@ -1,13 +1,23 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.ShootingStates;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.*;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FEEDER_ANGLE;
+import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FLOOR_ANGLE;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -26,9 +36,7 @@ public class ShooterCommands {
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
                     }
                 },
-                interrupted -> {
-                    shooterSubsystem.reset();
-                },
+                interrupted -> shooterSubsystem.reset(),
                 () -> false,
 
                 shooterSubsystem
@@ -57,47 +65,33 @@ public class ShooterCommands {
     public Command postIntake() {
         return new FunctionalCommand(
                 () -> {
+                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
                 },
                 () -> {
                 },
-                interrupted -> {
-                    shooterSubsystem.reset();
-                },
+                interrupted -> shooterSubsystem.reset(),
                 () -> false,
-                shooterSubsystem)
-                .withTimeout(0.7);
+                shooterSubsystem).withTimeout(0.7);
     }
 
     public Command intakeGet(boolean includePostIntake) {
-        FunctionalCommand preparePivot = new FunctionalCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE)),
+        Command prepareAndOperateIntake = new FunctionalCommand(
                 () -> {
-                },
-                interrupt -> {
-                },
-                shooterSubsystem::isLoaded,
-                shooterSubsystem);
-
-        FunctionalCommand operateIntake = new FunctionalCommand(
-                () -> {
+                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE));
                     intakeSubsystem.setSpeedPercentage(0.7);
                     shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
-                () -> {
-                },
-                interrupted -> {
+                () -> {},
+                (interrupted) -> {
+                    shooterSubsystem.reset();
                     intakeSubsystem.stopMotor();
-
-                    if (Boolean.TRUE.equals(interrupted)) {
-                        shooterSubsystem.stopKicker();
-                        shooterSubsystem.stopFlywheels();
-                    }
                 },
-                shooterSubsystem::isLoaded,
-                intakeSubsystem, shooterSubsystem);
 
-        Command prepareAndOperateIntake = preparePivot.andThen(operateIntake);
+                shooterSubsystem::isLoaded,
+                shooterSubsystem
+        );
 
         if (includePostIntake) {
             return prepareAndOperateIntake.andThen(postIntake());
@@ -128,8 +122,10 @@ public class ShooterCommands {
     }
 
     private void initializeShooterByState(ShootingStates state) {
-        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+//        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
         shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(state.getAngle()));
-        shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getSpeedPercentage() * shooterSubsystem.theoreticalMaximumVelocity.in(RPM)));
-    }
+        shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getSpeedPercentage() *
+                MathUtil.clamp(shooterSubsystem.theoreticalMaximumVelocity.in(RPM), -6400, 6400)));
+        //todo: This is fucking retarded bruh aint no way this is 39,000 max vel lmfao
+   }
 }

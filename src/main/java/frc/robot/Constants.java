@@ -200,7 +200,7 @@ public final class Constants {
         public static final double POSE_HISTORY_DURATION = 0.5;
 
         public static final double SHOOTING_SPIN = 0.01f;
-        public static final double PITCH_INTAKE_FLOOR_ANGLE = 0.5;
+        public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.2;
         public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
         public static final double PITCH_DEFAULT_ANGLE = 0;
 
@@ -222,10 +222,10 @@ public final class Constants {
                                    PITCH_KG = 0.31481,
                                    PITCH_KV = 12.824,
                                    PITCH_KA = 3.995,
-                                   PITCH_KP = 1.d / 0.02,
+                                   PITCH_KP = 1.5,//1.d / 0.02,
                                    PITCH_KD = 0.0,
-                                   PITCH_MAX_VELOCITY = 1.05,
-                                   PITCH_MAX_ACCELERATION = 0.75;
+                                   PITCH_MAX_VELOCITY = 25,//1.05,
+                                   PITCH_MAX_ACCELERATION = 35;//0.75;
         public static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
         public static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
@@ -269,7 +269,7 @@ public final class Constants {
         public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.0, 5.555, 2.05);
         public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.48, 5.555, 2.05);
 
-        public static final double KICKER_SPEED_BACKWARDS = -0.5;
+        public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
         public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
     }

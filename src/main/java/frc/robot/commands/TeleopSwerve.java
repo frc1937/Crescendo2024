@@ -10,21 +10,21 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class TeleopSwerve extends Command {
-    private final DrivetrainSubsystem swerveSubsystem;
+    private final DrivetrainSubsystem drivetrain;
     private final DoubleSupplier
             translationSup,
             strafeSup,
             rotationSup;
     private final BooleanSupplier robotCentricSup;
 
-    public TeleopSwerve(DrivetrainSubsystem swerveSubsystem, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
-        this.swerveSubsystem = swerveSubsystem;
+    public TeleopSwerve(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
+        this.drivetrain = drivetrain;
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
         this.robotCentricSup = robotCentricSup;
 
-        addRequirements(swerveSubsystem);
+        addRequirements(drivetrain);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TeleopSwerve extends Command {
         double rotationValue = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
 
         /* Drive */
-        swerveSubsystem.drive(
+        drivetrain.drive(
                 new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED),
                 rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
                 !robotCentricSup.getAsBoolean(),

@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -62,7 +61,7 @@ public class RobotContainer {
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     private final TriggerButton opLeftTrigger = new TriggerButton(operatorController, XboxController.Axis.kLeftTrigger);
     /* Subsystems */
-    private final DrivetrainSubsystem swerveSubsystem = new DrivetrainSubsystem();
+    private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
@@ -72,9 +71,9 @@ public class RobotContainer {
 //    private final TestMountCommand mountCommands = new TestMountCommand(mountSubsystem);
 
     public RobotContainer() {
-        swerveSubsystem.setDefaultCommand(
+        drivetrain.setDefaultCommand(
                 new TeleopSwerve(
-                        swerveSubsystem,
+                        drivetrain,
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value),
                         () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value),
                         () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value),
@@ -108,17 +107,17 @@ public class RobotContainer {
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
 
-        drAButton.whileTrue(new TeleopShooting(swerveSubsystem, shooterSubsystem, translationSup, strafeSup));
+        drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
 
 
-        drLeftTrigger.whileTrue((shooterCommands.receiveFromFeeder()));
+        drLeftTrigger.whileTrue((shooterCommands.intakeGet()));
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
 //        drBButton.whileTrue(new Mount(mountSubsystem));
-        drStartButton.onTrue(new InstantCommand(swerveSubsystem::zeroGyro));
+        drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
 
-        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.EMPTY));
+        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
@@ -167,6 +166,6 @@ public class RobotContainer {
     }
 
     public void infrequentPeriodic() {
-        swerveSubsystem.infrequentPeriodic();
+        drivetrain.infrequentPeriodic();
     }
 }

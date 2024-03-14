@@ -67,6 +67,19 @@ public class ShooterSubsystem extends SubsystemBase {
         leftFlywheel.periodic();
         rightFlywheel.periodic();
         pitch.periodic();
+
+        SmartDashboard.putBoolean("shooter/isLoaded", isLoaded());
+        SmartDashboard.putBoolean("shooter/areFlywheelsReady", areFlywheelsReady());
+        SmartDashboard.putBoolean("shooter/hasPitchArrived", isPitchReady());
+
+        SmartDashboard.putNumber("shooterflywheel/flywheelSpeedRight", rightFlywheel.getSpeed().in(RPM));
+        SmartDashboard.putNumber("shooterflywheel/flywheelSpeedLeft", leftFlywheel.getSpeed().in(RPM));
+
+
+        SmartDashboard.putNumber("shooterflywheel/flywheelSpeedRightSetpoint", rightFlywheel.getSetpoint().in(RPM));
+        SmartDashboard.putNumber("shooterflywheel/flywheelSpeedLeftSetpoint", leftFlywheel.getSetpoint().in(RPM));
+        SmartDashboard.putNumber("shooterflywheel/flywheelSpeedMax", theoreticalMaximumVelocity.in(RPM));
+
     }
 
     /**

@@ -21,10 +21,10 @@ import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
 import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
 
 public class TeleopShooting extends SequentialCommandGroup {
-    public TeleopShooting(DrivetrainSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public TeleopShooting(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
-                new TeleopAim(swerve, shooter, translationSup, strafeSup),
-                new TeleopThrow(swerve, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
+                new TeleopAim(drivetrain, shooter, translationSup, strafeSup),
+                new TeleopThrow(drivetrain, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
 
         SmartDashboard.putNumber("swerve/velocity [rpm]", 3000);
@@ -32,7 +32,7 @@ public class TeleopShooting extends SequentialCommandGroup {
     }
 
     private static class TeleopAim extends Command {
-        private final DrivetrainSubsystem swerve;
+        private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
         private Rotation2d targetShooterOrientation = new Rotation2d();
@@ -40,13 +40,13 @@ public class TeleopShooting extends SequentialCommandGroup {
         private double slopeToVirtualTarget = DEFAULT_SLOPE_TO_VIRTUAL_TARGET;
         private final Timer deadlineTimer = new Timer();
 
-        public TeleopAim(DrivetrainSubsystem swerve, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
-            this.swerve = swerve;
+        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+            this.drivetrain = drivetrain;
             this.shooter = shooter;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
 
-            addRequirements(swerve, shooter);
+            addRequirements(drivetrain, shooter);
         }
 
         @Override
@@ -61,7 +61,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
             // Predict the position the robot will be in when the NOTE is released
-            RobotState predictedState = RobotState.predict(swerve.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
 
             Translation3d predictedShooterPosition;
             if (orientationToVirtualTarget != null) {
@@ -109,7 +109,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 //                    Rotation2d.fromDegrees(SmartDashboard.getNumber("swerve/orientation [deg]", 0));
                     SLOPE_TO_PITCH_MAP.get(slopeToVirtualTarget);
 
-            swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
+            drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                                     orientationToVirtualTarget);
 
             shooter.setPitchGoal(targetShooterOrientation);
@@ -123,7 +123,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         public boolean isFinished() {
             boolean flywheelsReady = shooter.areFlywheelsReady();
             boolean pitchReady = shooter.isPitchReady();
-            boolean azimuthReady = swerve.azimuthAtGoal();
+            boolean azimuthReady = drivetrain.azimuthAtGoal();
             boolean slopeViable = slopeToVirtualTarget >= MINIMUM_VIABLE_SLOPE && slopeToVirtualTarget <= MAXIMUM_VIABLE_SLOPE;
             boolean reachedDeadline = deadlineTimer.hasElapsed(2.5);
 
@@ -144,18 +144,18 @@ public class TeleopShooting extends SequentialCommandGroup {
     }
 
     public static class TeleopThrow extends Command {
-        private final DrivetrainSubsystem swerve;
+        private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
 
-        public TeleopThrow(DrivetrainSubsystem swerve, ShooterSubsystem shooter,
+        public TeleopThrow(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter,
                            DoubleSupplier translationSup, DoubleSupplier strafeSup) {
-            this.swerve = swerve;
+            this.drivetrain = drivetrain;
             this.shooter = shooter;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
 
-            addRequirements(swerve, shooter);
+            addRequirements(drivetrain, shooter);
         }
 
         @Override
@@ -169,7 +169,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
-            swerve.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
+            drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
         }
 
         @Override
