@@ -21,8 +21,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Second;
 import static frc.robot.Constants.ShootingConstants.DEFAULT_PITCH_DEADBAND;
 import static frc.robot.Constants.ShootingConstants.PITCH_KA;
 import static frc.robot.Constants.ShootingConstants.PITCH_KD;
@@ -63,9 +61,9 @@ public class Pitch {
         // Configure the relative encoder
         relativeEncoder.setPosition(getCurrentPosition().getRotations() * PITCH_TRANSMISSION_RATIO);
 
+        // Configure a soft limit
         motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, (float)Units.degreesToRotations(PIVOT_CONSTRAINT_DEGREES) * PITCH_TRANSMISSION_RATIO);
         motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
-        // TODO: WARNING (TEST CAUTIOUSLY) see why limit isn't working.
 
         controller = new ProfiledPIDController(
                 PITCH_KP, 0, PITCH_KD,
