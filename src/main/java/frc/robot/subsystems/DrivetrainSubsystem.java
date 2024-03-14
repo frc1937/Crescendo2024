@@ -108,7 +108,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds chassisSpeeds, boolean closedLoop) {
-        SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+        ChassisSpeeds discretizedChassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+        
+        SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(discretizedChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
         for (SwerveModule mod : swerveModules) {
