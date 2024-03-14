@@ -26,6 +26,7 @@ import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIG
 import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_S;
 import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_V;
 import static frc.robot.Constants.ShootingConstants.KICKER_ID;
+import static frc.robot.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -124,5 +125,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setPitchGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
         pitch.setGoal(position, velocity);
+    }
+
+    public void reset() {
+        stopFlywheels();
+        stopKicker();
+        setPitchGoal(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
     }
 }

@@ -27,9 +27,7 @@ public class ShooterCommands {
                     }
                 },
                 interrupted -> {
-                    shooterSubsystem.stopKicker();
-                    shooterSubsystem.stopFlywheels();
-                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE));
+                    shooterSubsystem.reset();
                 },
                 () -> false,
 
@@ -63,9 +61,7 @@ public class ShooterCommands {
                 () -> {
                 },
                 interrupted -> {
-                    shooterSubsystem.stopKicker();
-                    shooterSubsystem.stopFlywheels();
-                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
+                    shooterSubsystem.reset();
                 },
                 () -> false,
                 shooterSubsystem)

@@ -25,8 +25,6 @@ public class ShooterKick extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        shooter.stopFlywheels();
-        shooter.stopKicker();
-        shooter.setPitchGoal(Rotation2d.fromDegrees(0));
+        shooter.reset();
     }
 }
