@@ -15,11 +15,8 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.*;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
-import static frc.robot.Constants.Transforms.ROBOT_TO_PIVOT;
-import static frc.robot.Constants.Transforms.SHOOTER_ARM_LENGTH;
 
 public class TeleopShooting extends SequentialCommandGroup {
     public TeleopShooting(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
@@ -163,9 +160,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void end(boolean interrupted) {
-            shooter.stopKicker();
-            shooter.stopFlywheels();
-            shooter.setPitchGoal(Rotation2d.fromDegrees(0));
+            shooter.reset();
         }
     }
 }
