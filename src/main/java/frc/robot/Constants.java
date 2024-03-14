@@ -19,12 +19,16 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
+import frc.robot.subsystems.ShooterSubsystem;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 
 public final class Constants {
     public static final String TFILAT_HADERECH = """
@@ -184,25 +188,33 @@ public final class Constants {
 //            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.90 * FLYWHEEL_MAX_RPM);
         }
 
-        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<>(
+        public static final InterpolatingTreeMap<Double, Double> DISTANCE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
-            SLOPE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
+            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
+            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
+            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
+            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
         }
 
-        public static final double MINIMUM_VIABLE_SLOPE = 0.25;
-        public static final double MAXIMUM_VIABLE_SLOPE = 1.22;
+        public static final InterpolatingTreeMap<Double, ShooterSubsystem.Reference> DISTANCE_TO_REFERENCE_MAP = new InterpolatingTreeMap<>(
+                InverseInterpolator.forDouble(), ShooterSubsystem.Reference::interpolate);
+        
+        /** A small helper function for the following static block */
+        private static final void putReference(double distance, double degrees, double rpm, double spin) {
+            DISTANCE_TO_REFERENCE_MAP.put(distance, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
+        }
+
+        static {
+            putReference(0, 0, 0, 0);
+        }
 
         public static final double POSE_HISTORY_DURATION = 0.5;
 
-        public static final double SHOOTING_SPIN = 0.01f;
         public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.2;
         public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
-        public static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(-24.2);
+        public static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
 
         public static final int
                 FLYWHEEL_LEFT_ID = 15,
@@ -266,8 +278,8 @@ public final class Constants {
         public static final int SHOOTER_VERTICAL_ANGLE = 112;
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
-        public static final Translation3d BLUE_TARGET_POSITION = new Translation3d(0.0, 5.555, 2.05);
-        public static final Translation3d RED_TARGET_POSITION = new Translation3d(16.48, 5.555, 2.05);
+        public static final Translation2d BLUE_TARGET_POSITION = new Translation2d(0.0, 5.555);
+        public static final Translation2d RED_TARGET_POSITION = new Translation2d(16.48, 5.555);
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
