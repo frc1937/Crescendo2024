@@ -123,6 +123,10 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.setGoal(goal);
     }
 
+    public Rotation2d getPitchPosition() {
+        return pitch.getCurrentPosition();
+    }
+
     public void setPitchGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
         pitch.setGoal(position, velocity);
     }
