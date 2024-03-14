@@ -7,25 +7,28 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import edu.wpi.first.math.geometry.Rotation2d;
+import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
+import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.util.ShootingStates;
 import frc.robot.util.TriggerButton;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.DoubleSupplier;
+import java.util.stream.Stream;
 
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.TFILAT_HADERECH;
@@ -77,7 +80,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(64, 4000));
         NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(125, 4000));
 
-        autoChooser = AutoBuilder.buildAutoChooser("Crown (3)");
+        autoChooser = buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
@@ -126,36 +129,66 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(90)),
-                shooterSubsystem)
-            .andThen(new WaitCommand(3))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
-                shooterSubsystem))
-            .andThen(new WaitCommand(3))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(45)),
-                shooterSubsystem))
-            .andThen(new WaitCommand(3))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
-                shooterSubsystem))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(30)),
-                shooterSubsystem))
-            .andThen(new WaitCommand(3))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(60)),
-                shooterSubsystem))
-            .andThen(new WaitCommand(3))
-            .andThen(new InstantCommand(
-                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
-                shooterSubsystem));
-        // return autoChooser.getSelected();
+//        return new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(90)),
+//                shooterSubsystem)
+//            .andThen(new WaitCommand(3))
+//            .andThen(new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
+//                shooterSubsystem))
+//            .andThen(new WaitCommand(3))
+//            .andThen(new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(45)),
+//                shooterSubsystem))
+//            .andThen(new WaitCommand(3))
+//            .andThen(new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
+//                shooterSubsystem))
+//            .andThen(new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(30)),
+//                shooterSubsystem))
+//            .andThen(new WaitCommand(3))
+//            .andThen(new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(60)),
+//                shooterSubsystem))
+//            .andThen(new WaitCommand(3))
+//            .andThen(new InstantCommand(
+//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
+//                shooterSubsystem));
+        return autoChooser.getSelected();
     }
 
     public void infrequentPeriodic() {
         drivetrain.infrequentPeriodic();
+    }
+
+    public static SendableChooser<Command> buildAutoChooser() {
+        SendableChooser<Command> chooser = new SendableChooser<>();
+        List<String> autoNames = getAllAutoNames();
+
+        List<Command> options = new ArrayList<>();
+
+        for (String autoName : autoNames) {
+            PathPlannerPath auto = PathPlannerPath.fromChoreoTrajectory(autoName);
+            options.add(AutoBuilder.followPath(auto));
+        }
+        //TODO: See that this works as intended cuz its copied :D
+        options.forEach(auto -> chooser.addOption(auto.getName(), auto));
+        return chooser;
+    }
+
+    private static List<String> getAllAutoNames() {
+        File[] autoFiles = new File(Filesystem.getDeployDirectory(), "choreo/").listFiles();
+
+        if (autoFiles == null) {
+            return new ArrayList<>();
+        }
+
+        return Stream.of(autoFiles)
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .filter(name -> name.endsWith(".auto")) //todo: Check how choreo nmaes their files and use that instead
+                .map(name -> name.substring(0, name.lastIndexOf(".")))
+                .toList();
     }
 }
