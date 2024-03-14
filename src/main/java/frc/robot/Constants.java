@@ -222,10 +222,10 @@ public final class Constants {
                                    PITCH_KG = 0.31481,
                                    PITCH_KV = 12.824,
                                    PITCH_KA = 3.995,
-                                   PITCH_KP = 1.5,
+                                   PITCH_KP = 1.d / 0.02,
                                    PITCH_KD = 0.0,
-                                   PITCH_MAX_VELOCITY = 35,
-                                   PITCH_MAX_ACCELERATION = 25;
+                                   PITCH_MAX_VELOCITY = 1.05,
+                                   PITCH_MAX_ACCELERATION = 0.75;
         public static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
         public static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
         public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
