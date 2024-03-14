@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.Interpolator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -101,7 +102,6 @@ public class ShooterSubsystem extends SubsystemBase {
         kickerMotor.stopMotor();
     }
 
-    @Deprecated
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed) {
         rightFlywheel.setSpeed(speed);
         leftFlywheel.setSpeed(speed);
@@ -112,13 +112,11 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.stopMotor();
     }
 
-    @Deprecated
     public void setPitchGoal(Rotation2d goal) {
         // SmartDashboard.putNumber("pitch/Goal", goal.getDegrees());
         pitch.setGoal(goal);
     }
 
-    @Deprecated
     public void setPitchGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
         pitch.setGoal(position, velocity);
     }
@@ -126,6 +124,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setReference(Reference reference) {
         pitch.setGoal(reference.pitchPosition, reference.pitchVelocity);
         setFlywheelsSpeed(reference.velocity, reference.spin);
+    }
+
+    public void setPitchConstraints(TrapezoidProfile.Constraints constraints) {
+        pitch.setConstraints(constraints);
     }
     
     public void reset() {
@@ -149,6 +151,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean atReference() {
         return pitchAtReference() && flywheelsAtReference();
     }
+
+    public TrapezoidProfile.Constraints getPitchConstraints() {
+        return pitch.getConstraints();
+    }
     
     /**
      * Rotate the flywheels to certain speeds s.t. NOTEs will be released with
@@ -158,7 +164,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param differencePercents  a value in range [0, 1] where (1 - differencePercents) = (right speed / left speed).
      *              Thus, the difference between the left and right speeds is proprtional to {@code speed}.
      */
-    private void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double differencePercents) {
+    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double differencePercents) {
         Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - differencePercents);
         Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - differencePercents);
 

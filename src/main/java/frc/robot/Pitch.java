@@ -98,6 +98,10 @@ public class Pitch {
         setGoal(position, RadiansPerSecond.of(0));
     }
 
+    public void setConstraints(TrapezoidProfile.Constraints constraints) {
+        controller.setConstraints(constraints);
+    }
+
     public boolean atGoal() {
         // WARNING: this does not check whether the velocity goal was reached
         return controller.atGoal();
@@ -119,6 +123,10 @@ public class Pitch {
 
     public Measure<Velocity<Angle>> getCurrentVelocity() {
         return DegreesPerSecond.of(absoluteEncoder.getVelocity());
+    }
+
+    public TrapezoidProfile.Constraints getConstraints() {
+        return controller.getConstraints();
     }
 
     public void stopMotor() {
