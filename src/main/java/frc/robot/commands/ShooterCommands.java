@@ -124,8 +124,9 @@ public class ShooterCommands {
     private void initializeShooterByState(ShootingStates state) {
 //        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
         shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(state.getAngle()));
-        shooterSubsystem.setFlywheelsSpeed(RPM.of(state.getSpeedPercentage() *
-                MathUtil.clamp(shooterSubsystem.theoreticalMaximumVelocity.in(RPM), -6400, 6400)));
+        shooterSubsystem.setFlywheelsSpeed(RPM.of(
+            state.getSpeedPercentage() * shooterSubsystem.theoreticalMaximumVelocity.in(RPM)
+        ));
         //todo: This is fucking retarded bruh aint no way this is 39,000 max vel lmfao
    }
 }

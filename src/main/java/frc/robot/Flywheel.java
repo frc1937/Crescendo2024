@@ -42,7 +42,7 @@ public class Flywheel {
 
         encoder = motor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
 
-        theoreticalMaximumVelocity = RotationsPerSecond.of(feedforward.maxAchievableVelocity(12, Double.MIN_VALUE));
+        theoreticalMaximumVelocity = RotationsPerSecond.of(feedforward.maxAchievableVelocity(12, 0));
     }
 
     public void periodic() {
