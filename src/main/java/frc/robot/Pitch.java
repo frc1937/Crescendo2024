@@ -87,14 +87,15 @@ public class Pitch {
         SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
     }
 
-    public void setGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
-        controller.setGoal(new TrapezoidProfile.State(position.in(Radians), velocity.in(RadiansPerSecond)));
+    public void setGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
+        controller.setGoal(new TrapezoidProfile.State(position.getRadians(), velocity.in(RadiansPerSecond)));
 
-        deadband = position.isNear(Degrees.of(90), 0.05) ? VERTICAL_PITCH_DEADBAND : DEFAULT_PITCH_DEADBAND;
+        boolean isTop = MathUtil.isNear(position.getRadians(), Math.PI / 2, 0.05);
+        deadband = isTop ? VERTICAL_PITCH_DEADBAND : DEFAULT_PITCH_DEADBAND;
     }
 
     public void setGoal(Rotation2d position) {
-        setGoal(Radians.of(position.getRadians()), RadiansPerSecond.of(0));
+        setGoal(position, RadiansPerSecond.of(0));
     }
 
     public boolean atGoal() {

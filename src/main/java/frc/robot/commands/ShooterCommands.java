@@ -32,7 +32,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> initializeShooterByState(state),
                 () -> {
-                    if (shooterSubsystem.isLoaded() && shooterSubsystem.areFlywheelsReady() && shooterSubsystem.isPitchReady()) {
+                    if (shooterSubsystem.isLoaded() && shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference()) {
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
                     }
                 },
@@ -55,7 +55,7 @@ public class ShooterCommands {
                 interrupted -> {
                     shooterSubsystem.stopFlywheels();
                     shooterSubsystem.stopKicker();
-                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
+                    shooterSubsystem.setPitchGoal(PITCH_DEFAULT_ANGLE);
                 },
                 shooterSubsystem::isLoaded,
                 shooterSubsystem

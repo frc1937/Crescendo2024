@@ -202,7 +202,7 @@ public final class Constants {
         public static final double SHOOTING_SPIN = 0.01f;
         public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.2;
         public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
-        public static final double PITCH_DEFAULT_ANGLE = 0;
+        public static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(-24.2);
 
         public static final int
                 FLYWHEEL_LEFT_ID = 15,

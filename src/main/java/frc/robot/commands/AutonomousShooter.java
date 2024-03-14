@@ -25,7 +25,7 @@ public class AutonomousShooter {
                 interrupted -> {
                 },
                 () -> {
-                    boolean isReady = shooterSubsystem.areFlywheelsReady() && shooterSubsystem.isPitchReady();
+                    boolean isReady = shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference();
                     return isReady || (!shooterSubsystem.isLoaded());
                 },
                 shooterSubsystem);

@@ -4,16 +4,20 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.interpolation.Interpolator;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.math.MeasureUtils;
 import frc.robot.Flywheel;
 import frc.robot.Pitch;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
@@ -69,8 +73,8 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.periodic();
 
         SmartDashboard.putBoolean("shooter/isLoaded", isLoaded());
-        SmartDashboard.putBoolean("shooter/areFlywheelsReady", areFlywheelsReady());
-        SmartDashboard.putBoolean("shooter/hasPitchArrived", isPitchReady());
+        SmartDashboard.putBoolean("shooter/areFlywheelsReady", flywheelsAtReference());
+        SmartDashboard.putBoolean("shooter/hasPitchArrived", pitchAtReference());
 
         SmartDashboard.putNumber("shooterflywheel/flywheelSpeedRight", rightFlywheel.getSpeed().in(RPM));
         SmartDashboard.putNumber("shooterflywheel/flywheelSpeedLeft", leftFlywheel.getSpeed().in(RPM));
@@ -97,11 +101,55 @@ public class ShooterSubsystem extends SubsystemBase {
         kickerMotor.stopMotor();
     }
 
+    @Deprecated
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed) {
         rightFlywheel.setSpeed(speed);
         leftFlywheel.setSpeed(speed);
     }
 
+    public void stopFlywheels() {
+        leftFlywheel.stopMotor();
+        rightFlywheel.stopMotor();
+    }
+
+    @Deprecated
+    public void setPitchGoal(Rotation2d goal) {
+        // SmartDashboard.putNumber("pitch/Goal", goal.getDegrees());
+        pitch.setGoal(goal);
+    }
+
+    @Deprecated
+    public void setPitchGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
+        pitch.setGoal(position, velocity);
+    }
+
+    public void setReference(Reference reference) {
+        pitch.setGoal(reference.pitchPosition, reference.pitchVelocity);
+        setFlywheelsSpeed(reference.velocity, reference.spin);
+    }
+    
+    public void reset() {
+        setReference(new Reference());
+        stopFlywheels();
+        stopKicker();
+    }
+    
+    public Rotation2d getPitchPosition() {
+        return pitch.getCurrentPosition();
+    }
+
+    public boolean flywheelsAtReference() {
+        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
+    }
+
+    public boolean pitchAtReference() {
+        return pitch.atGoal();
+    }
+
+    public boolean atReference() {
+        return pitchAtReference() && flywheelsAtReference();
+    }
+    
     /**
      * Rotate the flywheels to certain speeds s.t. NOTEs will be released with
      * certain speed and rotation
@@ -110,7 +158,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param differencePercents  a value in range [0, 1] where (1 - differencePercents) = (right speed / left speed).
      *              Thus, the difference between the left and right speeds is proprtional to {@code speed}.
      */
-    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double differencePercents) {
+    private void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double differencePercents) {
         Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - differencePercents);
         Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - differencePercents);
 
@@ -118,35 +166,50 @@ public class ShooterSubsystem extends SubsystemBase {
         leftFlywheel.setSpeed(leftSpeed);
     }
 
-    public void stopFlywheels() {
-        leftFlywheel.stopMotor();
-        rightFlywheel.stopMotor();
-    }
+    public static class Reference implements Interpolatable<Reference> {
+        public Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
+        public Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
+        public Measure<Velocity<Angle>> velocity = RPM.of(0);
+        public double spin = 0;
 
-    public boolean areFlywheelsReady() {
-        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
-    }
+        public Reference(Rotation2d pitchPosition,
+                         Measure<Velocity<Angle>> pitchVelocity,
+                         Measure<Velocity<Angle>> velocity,
+                         double spin) {
+            this.pitchPosition = pitchPosition;
+            this.pitchVelocity = pitchVelocity;
+            this.velocity = velocity;
+            this.spin = spin;
+        }
 
-    public boolean isPitchReady() {
-        return pitch.atGoal();
-    }
+        public Reference(Rotation2d pitchPosition,
+                         Measure<Velocity<Angle>> velocity,
+                         double spin) {
+            this.pitchPosition = pitchPosition;
+            this.velocity = velocity;
+            this.spin = spin;
+        }
+        
+        public Reference(Rotation2d pitchPosition,
+                         Measure<Velocity<Angle>> velocity) {
+            this.pitchPosition = pitchPosition;
+            this.velocity = velocity;
+        }
+                
+        public Reference(Rotation2d pitchPosition) {
+            this.pitchPosition = pitchPosition;
+        }
 
-    public void setPitchGoal(Rotation2d goal) {
-        // SmartDashboard.putNumber("pitch/Goal", goal.getDegrees());
-        pitch.setGoal(goal);
-    }
+        public Reference() {}
 
-    public Rotation2d getPitchPosition() {
-        return pitch.getCurrentPosition();
-    }
-
-    public void setPitchGoal(Measure<Angle> position, Measure<Velocity<Angle>> velocity) {
-        pitch.setGoal(position, velocity);
-    }
-
-    public void reset() {
-        stopFlywheels();
-        stopKicker();
-        setPitchGoal(Rotation2d.fromDegrees(PITCH_DEFAULT_ANGLE));
+        @Override
+        public Reference interpolate(Reference endValue, double t) {
+            return new Reference(
+                pitchPosition.interpolate(endValue.pitchPosition, t),
+                MeasureUtils.interpolate(pitchVelocity, endValue.pitchVelocity, t),
+                MeasureUtils.interpolate(velocity, endValue.velocity, t),
+                Interpolator.forDouble().interpolate(spin, endValue.spin, t)
+            );
+        }
     }
 }
