@@ -32,6 +32,7 @@ import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.Swerve.SLEW_RATE_LIMIT;
 import static frc.robot.Constants.TFILAT_HADERECH;
 
 public class RobotContainer {
@@ -89,11 +90,9 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        double val = 2.5;
-
-        SlewRateLimiter translationRateLimiter = new SlewRateLimiter(val);
-        SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(val);
-        SlewRateLimiter rotationRateLimiter = new SlewRateLimiter(val);
+        SlewRateLimiter translationRateLimiter = new SlewRateLimiter(SLEW_RATE_LIMIT);
+        SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(SLEW_RATE_LIMIT);
+        SlewRateLimiter rotationRateLimiter = new SlewRateLimiter(SLEW_RATE_LIMIT);
 
         DoubleSupplier translationSup = () -> translationRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kLeftY.value));
         DoubleSupplier strafeSup = () -> strafeRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kLeftX.value));
