@@ -294,6 +294,13 @@ public final class Constants {
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
         public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
+        public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
+                Rotation2d.fromDegrees(50), RPM.of(3000));
+        public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
+                Rotation2d.fromDegrees(110), RPM.of(3000));
+
+        public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
+                Rotation2d.fromDegrees(-20), RPM.of(-3000));
     }
 
     public static final class Swerve {

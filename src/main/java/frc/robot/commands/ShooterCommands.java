@@ -1,23 +1,19 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.util.ShootingStates;
 
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
+import static frc.robot.Constants.ShootingConstants.INTAKE;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
 import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FEEDER_ANGLE;
-import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FLOOR_ANGLE;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -28,9 +24,9 @@ public class ShooterCommands {
         this.intakeSubsystem = intakeSubsystem;
     }
 
-    public Command shootNote(ShootingStates state) {
+    public Command shootNote(ShooterSubsystem.Reference reference) {
         return new FunctionalCommand(
-                () -> initializeShooterByState(state),
+                () -> initializeShooter(false, reference),
                 () -> {
                     if (shooterSubsystem.isLoaded() && shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference()) {
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
@@ -75,15 +71,15 @@ public class ShooterCommands {
                 shooterSubsystem).withTimeout(0.7);
     }
 
-    public Command intakeGet(boolean includePostIntake) {
+    public Command floorIntake(boolean includePostIntake) {
         Command prepareAndOperateIntake = new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE));
+                    initializeShooter(true, INTAKE);
+
                     intakeSubsystem.setSpeedPercentage(0.7);
-                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
-                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
-                () -> {},
+                () -> {
+                },
                 (interrupted) -> {
                     shooterSubsystem.reset();
                     intakeSubsystem.stopMotor();
@@ -100,8 +96,8 @@ public class ShooterCommands {
         }
     }
 
-    public Command intakeGet() {
-        return intakeGet(true);
+    public Command floorIntake() {
+        return floorIntake(true);
     }
 
     public Command setKickerSpeed(double speed) {
@@ -114,19 +110,11 @@ public class ShooterCommands {
                 shooterSubsystem
         );
     }
+    private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {
+        if(shouldUseKicker)
+            shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
 
-    public ParallelCommandGroup shootToAmp(ShootingStates state) {
-        return new ParallelCommandGroup(
-                shootNote(state).andThen(new InstantCommand(() -> shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD)).withTimeout(0.7))
-        );
+        shooterSubsystem.setPitchGoal(reference.pitchPosition);
+        shooterSubsystem.setFlywheelsSpeed(reference.flywheelVelocity);
     }
-
-    private void initializeShooterByState(ShootingStates state) {
-//        shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-        shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(state.getAngle()));
-        shooterSubsystem.setFlywheelsSpeed(RPM.of(
-            state.getSpeedPercentage() * shooterSubsystem.theoreticalMaximumVelocity.in(RPM)
-        ));
-        //todo: This is fucking retarded bruh aint no way this is 39,000 max vel lmfao
-   }
 }

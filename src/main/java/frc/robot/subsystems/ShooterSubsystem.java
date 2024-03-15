@@ -123,7 +123,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setReference(Reference reference) {
         pitch.setGoal(reference.pitchPosition, reference.pitchVelocity);
-        setFlywheelsSpeed(reference.velocity, reference.spin);
+        setFlywheelsSpeed(reference.flywheelVelocity, reference.spin);
     }
 
     public void setPitchConstraints(TrapezoidProfile.Constraints constraints) {
@@ -175,31 +175,31 @@ public class ShooterSubsystem extends SubsystemBase {
     public static class Reference implements Interpolatable<Reference> {
         public Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
         public Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
-        public Measure<Velocity<Angle>> velocity = RPM.of(0);
+        public Measure<Velocity<Angle>> flywheelVelocity = RPM.of(0);
         public double spin = 0;
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> pitchVelocity,
-                         Measure<Velocity<Angle>> velocity,
+                         Measure<Velocity<Angle>> flywheelVelocity,
                          double spin) {
             this.pitchPosition = pitchPosition;
             this.pitchVelocity = pitchVelocity;
-            this.velocity = velocity;
+            this.flywheelVelocity = flywheelVelocity;
             this.spin = spin;
         }
 
         public Reference(Rotation2d pitchPosition,
-                         Measure<Velocity<Angle>> velocity,
+                         Measure<Velocity<Angle>> flywheelVelocity,
                          double spin) {
             this.pitchPosition = pitchPosition;
-            this.velocity = velocity;
+            this.flywheelVelocity = flywheelVelocity;
             this.spin = spin;
         }
         
         public Reference(Rotation2d pitchPosition,
-                         Measure<Velocity<Angle>> velocity) {
+                         Measure<Velocity<Angle>> flywheelVelocity) {
             this.pitchPosition = pitchPosition;
-            this.velocity = velocity;
+            this.flywheelVelocity = flywheelVelocity;
         }
                 
         public Reference(Rotation2d pitchPosition) {
@@ -213,7 +213,7 @@ public class ShooterSubsystem extends SubsystemBase {
             return new Reference(
                 pitchPosition.interpolate(endValue.pitchPosition, t),
                 MeasureUtils.interpolate(pitchVelocity, endValue.pitchVelocity, t),
-                MeasureUtils.interpolate(velocity, endValue.velocity, t),
+                MeasureUtils.interpolate(flywheelVelocity, endValue.flywheelVelocity, t),
                 Interpolator.forDouble().interpolate(spin, endValue.spin, t)
             );
         }

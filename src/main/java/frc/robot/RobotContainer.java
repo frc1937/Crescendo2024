@@ -17,12 +17,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.*;
+import frc.robot.commands.AutonomousShooter;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.MountCommands;
+import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ShooterKick;
+import frc.robot.commands.TeleopShooting;
+import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.util.ShootingStates;
 import frc.robot.util.TriggerButton;
 
 import java.io.File;
@@ -32,6 +37,8 @@ import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
+import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
 import static frc.robot.Constants.Swerve.SLEW_RATE_LIMIT;
 import static frc.robot.Constants.TFILAT_HADERECH;
 
@@ -73,7 +80,7 @@ public class RobotContainer {
     public RobotContainer() {
         NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
 
-        NamedCommands.registerCommand("Intake", shooterCommands.intakeGet(false).withTimeout(3));
+        NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(false).withTimeout(3));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
@@ -110,18 +117,16 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
 
-        drLeftTrigger.whileTrue((shooterCommands.intakeGet()));
+        drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
         drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-        drXButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
+        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
 
         //Operator buttons:
-        opAButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_FRONT));
-        opBButton.whileTrue(shooterCommands.shootNote(ShootingStates.SPEAKER_BACK));
-        opYButton.whileTrue(shooterCommands.shootToAmp(ShootingStates.AMP));
-        opXButton.whileTrue(shooterCommands.shootNote(ShootingStates.STAGE_FRONT));
+        opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
+        opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 
         mountSubsystem.setDefaultCommand(
                 mountCommands.startManualMount(
