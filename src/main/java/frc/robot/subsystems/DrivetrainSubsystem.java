@@ -261,7 +261,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180));
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
-        // yawCorrection = 
+        yawCorrection = MathUtil.applyDeadband(yawCorrection, AZIMUTH_CONTROLLER_DEADBAND);
     }
 
     public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
