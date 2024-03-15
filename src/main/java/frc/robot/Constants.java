@@ -356,16 +356,16 @@ public final class Constants {
         public static final double ANGLE_KD = 0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 0.03;// 0.073456;  // TODO try the value 0.05
+        public static final double DRIVE_KP = 0.05;// 0.073456;  // TODO try the value 0.05
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0;
         public static final double DRIVE_KF = 0.0;
 
         /* Drive Motor Characterization Values
          * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
-        public static final double DRIVE_KS = 0;//0.16368; //(0.32 / 12); //TODO: This must be tuned to specific robot
-        public static final double DRIVE_KV = 0;//0.10915; //(1.51 / 12);
-        public static final double DRIVE_KA = 0; // (0.27 / 12);
+        public static final double DRIVE_KS = 0.27053;//0.16368; //(0.32 / 12); //TODO: This must be tuned to specific robot
+        public static final double DRIVE_KV = 0.10861;//0.10915; //(1.51 / 12);
+        public static final double DRIVE_KA = 0.023132; // (0.27 / 12);
 
         /* SwerveSubsystem Profiling Values */
         /**

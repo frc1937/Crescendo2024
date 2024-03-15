@@ -8,6 +8,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -88,9 +89,15 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
-        DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
-        DoubleSupplier rotationSup = () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value);
+        double val = 2.5;
+
+        SlewRateLimiter translationRateLimiter = new SlewRateLimiter(val);
+        SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(val);
+        SlewRateLimiter rotationRateLimiter = new SlewRateLimiter(val);
+
+        DoubleSupplier translationSup = () -> translationRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kLeftY.value));
+        DoubleSupplier strafeSup = () -> strafeRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kLeftX.value));
+        DoubleSupplier rotationSup = () -> rotationRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kRightX.value));
 
         drivetrain.setDefaultCommand(
                 new TeleopSwerve(
