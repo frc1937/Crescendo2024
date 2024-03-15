@@ -1,14 +1,18 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
 import static frc.robot.Constants.ShootingConstants.INTAKE;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FEEDER_ANGLE;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -47,16 +51,33 @@ public class ShooterCommands {
                 shooterSubsystem).withTimeout(1.2);
     }
 
+    public FunctionalCommand receiveFromFeeder() {
+        return new FunctionalCommand(
+                () -> {
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-0.55 * FLYWHEEL_MAX_RPM));
+                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FEEDER_ANGLE));
+                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+                },
+                () -> {
+                },
+                interrupted -> {
+                    shooterSubsystem.stopFlywheels();
+                    shooterSubsystem.stopKicker();
+                    shooterSubsystem.setPitchGoal(PITCH_DEFAULT_ANGLE);
+                },
+                shooterSubsystem::isLoaded,
+                shooterSubsystem
+        );
+    }
+
+
     public Command floorIntake(boolean includePostIntake) {
         Command prepareAndOperateIntake = new FunctionalCommand(
                 () -> {
                     initializeShooter(true, INTAKE);
-
                     intakeSubsystem.setSpeedPercentage(0.7);
                 },
-                () -> {
-                }
-                ,
+                () -> {},
                 (interrupted) -> {
                     shooterSubsystem.reset();
                     intakeSubsystem.stopMotor();

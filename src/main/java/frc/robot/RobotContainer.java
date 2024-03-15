@@ -117,6 +117,7 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
 
+        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
@@ -166,7 +167,8 @@ public class RobotContainer {
 //            .andThen(new InstantCommand(
 //                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
 //                shooterSubsystem));
-        return autoChooser.getSelected();
+        return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("TestPathFr.1"));
+        //autoChooser.getSelected();
     }
 
     public void infrequentPeriodic() {

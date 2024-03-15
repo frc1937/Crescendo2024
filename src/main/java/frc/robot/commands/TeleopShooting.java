@@ -34,6 +34,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         SmartDashboard.putNumber("calibration/angle [deg]", 0);
         SmartDashboard.putNumber("calibration/rpm [RPM]", 0);
+        SmartDashboard.putNumber("calibration/spin [idk]", 0);
     }
 
     private static class TeleopAim extends Command {
@@ -119,7 +120,8 @@ public class TeleopShooting extends SequentialCommandGroup {
 //                    DISTANCE_TO_REFERENCE_MAP.get(virtualTargetDistance)
                     new ShooterSubsystem.Reference(
                             Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)),
-                            RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0))
+                            RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0)),
+                            SmartDashboard.getNumber("calibration/spin [idk]", 0)
                     )
             );
 

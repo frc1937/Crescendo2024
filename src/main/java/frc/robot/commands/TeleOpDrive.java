@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -31,7 +30,7 @@ public class TeleOpDrive extends Command {
     @Override
     public void execute() {
         Translation2d stickTranslation = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble());
-        
+
         // Deadband the joysticks
         if (stickTranslation.getNorm() < Constants.STICK_DEADBAND) {
             stickTranslation = new Translation2d();
