@@ -43,6 +43,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final ProfiledPIDController azimuthController = new ProfiledPIDController(
             AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
             AZIMUTH_CONTROLLER_CONSTRAINTS);
+    private final double AZIMUTH_CONTROLLER_DEADBAND = 0.12;
 
     private double yawCorrection = 0;
 
@@ -117,7 +118,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public void drive(ChassisSpeeds chassisSpeeds, boolean closedLoop) {
         ChassisSpeeds discretizedChassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-        
+
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(discretizedChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
@@ -260,6 +261,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
         SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180));
+
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
         yawCorrection = MathUtil.applyDeadband(yawCorrection, AZIMUTH_CONTROLLER_DEADBAND);
     }

@@ -34,7 +34,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         SmartDashboard.putNumber("calibration/angle [deg]", 0);
         SmartDashboard.putNumber("calibration/rpm [RPM]", 0);
-        SmartDashboard.putNumber("calibration/spin [idk]", 0);
+//        SmartDashboard.putNumber("calibration/spin [idk]", 0);
     }
 
     private static class TeleopAim extends Command {
@@ -111,7 +111,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             SmartDashboard.putNumber("shooting/distance from target [meters]", targetDisplacement.getNorm());
             SmartDashboard.putNumber("shooting/distance from virtual target [meters]", virtualTargetDistance);
 
-            // Aim the azimuth to the virtual target
+            // Aim the azimuth to the virtual target todo: reenable
             drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                                     virtualTargetDisplacement.getAngle());
 
@@ -121,7 +121,8 @@ public class TeleopShooting extends SequentialCommandGroup {
                     new ShooterSubsystem.Reference(
                             Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)),
                             RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0)),
-                            SmartDashboard.getNumber("calibration/spin [idk]", 0)
+//                            SmartDashboard.getNumber("calibration/spin [idk]", 0)
+                            0.1
                     )
             );
 
@@ -172,7 +173,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void execute() {
-            // Get values, deadband
+//            // Get values, deadband
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 

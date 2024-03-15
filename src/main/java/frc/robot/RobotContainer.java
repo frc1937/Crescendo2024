@@ -167,7 +167,7 @@ public class RobotContainer {
 //            .andThen(new InstantCommand(
 //                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
 //                shooterSubsystem));
-        return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("TestPathFr.1"));
+        return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("GoStraightBitch"));
         //autoChooser.getSelected();
     }
 

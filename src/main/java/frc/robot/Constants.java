@@ -289,7 +289,7 @@ public final class Constants {
 
         public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         public static final Translation2d BLUE_TARGET_POSITION = new Translation2d(0.0, 5.555);
-        public static final Translation2d RED_TARGET_POSITION = new Translation2d(16.48, 5.555);
+        public static final Translation2d RED_TARGET_POSITION = new Translation2d(16.48, 5.3);
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
@@ -300,7 +300,7 @@ public final class Constants {
                 Rotation2d.fromDegrees(115), RPM.of(3000));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(-21.2), RPM.of(-4500));
+                Rotation2d.fromDegrees(-21.2), RPM.of(-2000));
     }
 
     public static final class Swerve {
