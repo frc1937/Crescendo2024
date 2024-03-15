@@ -18,8 +18,6 @@ public class TeleOpDrive extends Command {
             rotationSup;
     private final BooleanSupplier robotCentricSup;
 
-    Rotation2d lastAzimuth;
-
     public TeleOpDrive(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
         this.drivetrain = drivetrain;
         this.translationSup = translationSup;
@@ -31,16 +29,10 @@ public class TeleOpDrive extends Command {
     }
 
     @Override
-    public void initialize() {
-        lastAzimuth = drivetrain.getPose().getRotation();
-    }
-
-    @Override
     public void execute() {
         Translation2d stickTranslation = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble());
         
         // Deadband the joysticks
-        // NOTE Is this really desired?
         if (stickTranslation.getNorm() < Constants.STICK_DEADBAND) {
             stickTranslation = new Translation2d();
         }
@@ -48,17 +40,10 @@ public class TeleOpDrive extends Command {
 
         Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
 
-        // If the robot should move but shouldn't rotate, correct any yaw disturbance
-        if (stickTranslation.getNorm() >= Constants.STICK_DEADBAND && Math.abs(rotationValue) <= Constants.STICK_DEADBAND) {
-            drivetrain.driveWithAzimuth(translation, lastAzimuth, !robotCentricSup.getAsBoolean());
-        } else {
-            lastAzimuth = drivetrain.getPose().getRotation();
-
-            drivetrain.drive(
-                    translation,
-                    rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
-                    !robotCentricSup.getAsBoolean(),
-                    true);
-        }
+        drivetrain.drive(
+                translation,
+                rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
+                !robotCentricSup.getAsBoolean(),
+                true);
     }
 }
