@@ -49,7 +49,7 @@ public class TeleOpDrive extends Command {
         Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
 
         // If the robot should move but shouldn't rotate, correct any yaw disturbance
-        if (stickTranslation.getNorm() >= 0.01 && Math.abs(rotationValue) <= 0.01) {
+        if (stickTranslation.getNorm() >= Constants.STICK_DEADBAND && Math.abs(rotationValue) <= Constants.STICK_DEADBAND) {
             drivetrain.driveWithAzimuth(translation, lastAzimuth, !robotCentricSup.getAsBoolean());
         } else {
             lastAzimuth = drivetrain.getPose().getRotation();
