@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -231,13 +233,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
         Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
         estimatedRearPose.ifPresent(this::updateByEstimator);
 
-        field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+        poseEstimator.update(getGyroYaw(), getModulePositions());
+
+        field2d.setRobotPose(getPose());
 
         SmartDashboard.putData("Field", field2d);
 
         // Calculate the azimuth control. Whilst it is always calculated, only
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
-        SmartDashboard.putNumber("Azimuth [deg]", getPose().getRotation().getDegrees());
+        SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
+        SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180));
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
     }
 
@@ -267,8 +272,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
                     visionPoseEstimator.confidenceCalculator(estimatedRobotPose)
             );
         }
-
-        poseEstimator.update(getGyroYaw(), getModulePositions());
     }
 
     private void sampleRobotPose() {
