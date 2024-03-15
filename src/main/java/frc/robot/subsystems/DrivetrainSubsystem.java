@@ -94,9 +94,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * Publish the current PID gains so they can be modified
      */
     public void publishControllerGains() {
-        SmartDashboard.putNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P);
-        SmartDashboard.putNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I);
-        SmartDashboard.putNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D);
+        if (!SmartDashboard.containsKey("swerve/azimuth-controller/p")) {
+            SmartDashboard.putNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P);
+        }
+        if (!SmartDashboard.containsKey("swerve/azimuth-controller/i")) {
+            SmartDashboard.putNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I);
+        }
+        if (!SmartDashboard.containsKey("swerve/azimuth-controller/d")) {
+            SmartDashboard.putNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D);
+        }
     }
 
     /**
@@ -244,6 +250,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180));
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
+        // yawCorrection = 
     }
 
     public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {

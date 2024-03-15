@@ -304,9 +304,8 @@ public final class Constants {
     }
 
     public static final class Swerve {
-        public static final double AZIMUTH_CONTROLLER_P = 16, AZIMUTH_CONTROLLER_I = 0,
-                AZIMUTH_CONTROLLER_D = 2,
-                AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(2);
+        public static final double AZIMUTH_CONTROLLER_P = 8, AZIMUTH_CONTROLLER_I = 0,
+                AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.5);
 
         public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-

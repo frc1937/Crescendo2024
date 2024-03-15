@@ -49,7 +49,7 @@ public class AzimuthDrive extends Command {
         drivetrain.rereadControllerGains();
       }
 
-      drivetrain.driveWithAzimuth(new Translation2d(translationValue, strafeValue), Rotation2d.fromDegrees(90));
+      drivetrain.driveWithAzimuth(new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED), Rotation2d.fromDegrees(90));
     } else {
       drivetrain.drive(
         new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED),
