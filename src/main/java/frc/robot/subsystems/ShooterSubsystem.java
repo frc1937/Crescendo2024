@@ -152,12 +152,11 @@ public class ShooterSubsystem extends SubsystemBase {
      * certain speed and rotation
      *
      * @param speed the average target speed of both flywheels
-     * @param differencePercents  a value in range [0, 1] where (1 - differencePercents) = (right speed / left speed).
-     *              Thus, the difference between the left and right speeds is proprtional to {@code speed}.
+     * @param spin  the ratio between the right and the left flywheel angular velocities.
      */
-    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double differencePercents) {
-        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(2.d - differencePercents);
-        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(1.d - differencePercents);
+    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin) {
+        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(spin + 1);
+        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(spin);
 
         rightFlywheel.setSpeed(rightSpeed);
         leftFlywheel.setSpeed(leftSpeed);
@@ -167,7 +166,7 @@ public class ShooterSubsystem extends SubsystemBase {
         public Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
         public Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
         public Measure<Velocity<Angle>> flywheelVelocity = RPM.of(0);
-        public double spin = 0;
+        public double spin = 1;
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> pitchVelocity,

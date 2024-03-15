@@ -217,7 +217,7 @@ public final class Constants {
         }
 
         static {
-            putReference(0, 0, 0, 0);
+            putReference(0, 0, 0, 1);
         }
 
         public static final double POSE_HISTORY_DURATION = 0.5;
