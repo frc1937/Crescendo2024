@@ -83,12 +83,8 @@ public class SwerveModule {
         if (closedLoop) {
             double targetMotorRPS = speed.in(MetersPerSecond) / Swerve.WHEEL_CIRCUMFERENCE * Swerve.DRIVE_GEAR_RATIO;
             double targetMotorFalcon = Conversions.MPSToFalcon(speed.in(MetersPerSecond), Swerve.WHEEL_CIRCUMFERENCE, Swerve.DRIVE_GEAR_RATIO);
-            double feedForward = feedforward.calculate(targetMotorRPS) / 1023.d * 100.0;
+            double feedForward = feedforward.calculate(targetMotorRPS);
             driveMotor.set(ControlMode.Velocity, targetMotorFalcon, DemandType.ArbitraryFeedForward, feedForward);
-//            driveMotor.config_kF(0, feedforward.calculate(targetMotorRPS) / 1023.d);
-//            double feedBack = driveController.calculate(driveMotor.getSelectedSensorVelocity())
-//            driveMotor.configNeutralDeadband(0.1);
-
         } else {
             double percentOutput = speed.in(MetersPerSecond) / Swerve.MAX_SPEED;
             driveMotor.set(ControlMode.PercentOutput, percentOutput);

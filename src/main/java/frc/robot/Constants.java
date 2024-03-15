@@ -308,8 +308,8 @@ public final class Constants {
                 COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L2);
 
         /* Drivetrain Constants */
-        public static final double TRACK_WIDTH = 0.565;
-        public static final double WHEEL_BASE = 0.615;
+        public static final double TRACK_WIDTH = 0.615;
+        public static final double WHEEL_BASE = 0.565;
         public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
         public static final Measure<Distance> DRIVE_BASE_RADIUS =
                 Meters.of(new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm());
@@ -356,16 +356,16 @@ public final class Constants {
         public static final double ANGLE_KD = 0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 0.05;// 0.073456;  // TODO try the value 0.05
+        public static final double DRIVE_KP = 0.053067;
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0;
         public static final double DRIVE_KF = 0.0;
 
-        /* Drive Motor Characterization Values
-         * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
-        public static final double DRIVE_KS = 0.27053;//0.16368; //(0.32 / 12); //TODO: This must be tuned to specific robot
-        public static final double DRIVE_KV = 0.10861;//0.10915; //(1.51 / 12);
-        public static final double DRIVE_KA = 0.023132; // (0.27 / 12);
+        /* Drive Motor Characterization Values */
+        // Convert the values calculated by SysId from volts to [-1, 1], which TalonFX uses.
+        public static final double DRIVE_KS = 0.27053 / 12.d;
+        public static final double DRIVE_KV = 0.10861 / 12.d;
+        public static final double DRIVE_KA = 0.023132 / 12.d;
 
         /* SwerveSubsystem Profiling Values */
         /**
@@ -439,6 +439,11 @@ public final class Constants {
          * considered 'in-place'.
          */
         public static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.01 * MAX_SPEED;
+
+        /**
+         * Filter any change in joystick values over SLEW_RATE_LIMIT units per second where units are [-1, 1].
+         */
+        public static final double SLEW_RATE_LIMIT = 2.5;
 
         public static final class AutoConstants {
             public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
