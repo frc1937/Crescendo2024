@@ -4,9 +4,6 @@
 
 package frc.robot.commands.calibration;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,50 +11,53 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
 public class AzimuthDrive extends Command {
-  private final DrivetrainSubsystem drivetrain;
-  private final DoubleSupplier translationSup, strafeSup, rotationSup;
-  private final BooleanSupplier overrideAzimuthSup;
+    private final DrivetrainSubsystem drivetrain;
+    private final DoubleSupplier translationSup, strafeSup, rotationSup;
+    private final BooleanSupplier overrideAzimuthSup;
 
-  private boolean lastOverrideAzimuth;
+    private boolean lastOverrideAzimuth;
 
-  public AzimuthDrive(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier overrideAzimuthSup) {
-    this.drivetrain = drivetrain;
-    this.translationSup = translationSup;
-    this.strafeSup = strafeSup;
-    this.rotationSup = rotationSup;
-    this.overrideAzimuthSup = overrideAzimuthSup;
+    public AzimuthDrive(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier overrideAzimuthSup) {
+        this.drivetrain = drivetrain;
+        this.translationSup = translationSup;
+        this.strafeSup = strafeSup;
+        this.rotationSup = rotationSup;
+        this.overrideAzimuthSup = overrideAzimuthSup;
 
-    addRequirements(drivetrain);
+        addRequirements(drivetrain);
 
-  }
-
-  @Override
-  public void initialize() {
-    drivetrain.publishControllerGains();
-  }
-
-  @Override
-  public void execute() {
-    double translationValue = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
-    double strafeValue = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
-    double rotationValue = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
-    boolean overrideAzimuth = overrideAzimuthSup.getAsBoolean();
-
-    if (overrideAzimuth) {
-      if (!lastOverrideAzimuth) {
-        drivetrain.rereadControllerGains();
-      }
-
-      drivetrain.driveWithAzimuth(new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED), Rotation2d.fromDegrees(90));
-    } else {
-      drivetrain.drive(
-        new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED),
-        rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
-        true,
-        true);
     }
 
-    lastOverrideAzimuth = overrideAzimuth;
-  }
+    @Override
+    public void initialize() {
+        drivetrain.publishControllerGains();
+    }
+
+    @Override
+    public void execute() {
+        double translationValue = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double strafeValue = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double rotationValue = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
+        boolean overrideAzimuth = overrideAzimuthSup.getAsBoolean();
+
+        if (overrideAzimuth) {
+            if (!lastOverrideAzimuth) {
+                drivetrain.rereadControllerGains();
+            }
+
+            drivetrain.driveWithAzimuth(new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED), Rotation2d.fromDegrees(90));
+        } else {
+            drivetrain.drive(
+                    new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED),
+                    rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
+                    true,
+                    true);
+        }
+
+        lastOverrideAzimuth = overrideAzimuth;
+    }
 }

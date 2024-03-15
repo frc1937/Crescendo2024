@@ -1,7 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -10,12 +11,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.robot.Constants;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-import static frc.robot.Constants.ShootingConstants.*;
+import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
 public class TeleopShooting extends SequentialCommandGroup {
@@ -24,6 +31,9 @@ public class TeleopShooting extends SequentialCommandGroup {
                 new TeleopAim(drivetrain, shooter, translationSup, strafeSup),
                 new TeleopThrow(drivetrain, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
+
+        SmartDashboard.putNumber("calibration/angle [deg]", 0);
+        SmartDashboard.putNumber("calibration/rpm [RPM]", 0);
     }
 
     private static class TeleopAim extends Command {
@@ -54,6 +64,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             Translation2d virtualTargetDisplacement = calculateVirtualTargetDisplacement(
                 targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
+
         }
 
         /**
@@ -104,7 +115,15 @@ public class TeleopShooting extends SequentialCommandGroup {
                                     virtualTargetDisplacement.getAngle());
 
             // Aim the shooter
-            shooter.setReference(DISTANCE_TO_REFERENCE_MAP.get(virtualTargetDistance));
+            shooter.setReference(
+//                    DISTANCE_TO_REFERENCE_MAP.get(virtualTargetDistance)
+                    new ShooterSubsystem.Reference(
+                            Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)),
+                            RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0))
+                    )
+            );
+
+//            shooter.setPitchGoal(Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)));
         }
 
         @Override

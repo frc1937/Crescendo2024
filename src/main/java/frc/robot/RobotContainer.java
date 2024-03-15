@@ -118,11 +118,11 @@ public class RobotContainer {
         drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
 
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
         drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
+        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
@@ -198,7 +198,7 @@ public class RobotContainer {
         return Stream.of(autoFiles)
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
-                .filter(name -> name.endsWith(".auto")) //todo: Check how choreo nmaes their files and use that instead
+                .filter(name -> name.endsWith(".traj")) //todo: Check how choreo nmaes their files and use that instead
                 .map(name -> name.substring(0, name.lastIndexOf(".")))
                 .toList();
     }

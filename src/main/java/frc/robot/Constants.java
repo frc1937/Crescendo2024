@@ -297,10 +297,10 @@ public final class Constants {
         public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(50), RPM.of(3000));
         public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(110), RPM.of(3000));
+                Rotation2d.fromDegrees(115), RPM.of(3000));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(-20), RPM.of(-3000));
+                Rotation2d.fromDegrees(-21.2), RPM.of(-4500));
     }
 
     public static final class Swerve {
