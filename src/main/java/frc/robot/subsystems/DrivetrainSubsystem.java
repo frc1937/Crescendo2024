@@ -161,7 +161,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @see #setAzimuthGoal(Rotation2d)
      */
     public void driveWithAzimuth(Translation2d translation) {
-        drive(translation, yawCorrection, true, true);
+        driveWithAzimuth(translation, true);
+    }
+
+    public void driveWithAzimuth(Translation2d translation, boolean fieldRelative) {
+        drive(translation, yawCorrection, fieldRelative, true);
     }
 
     /**
@@ -175,6 +179,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void driveWithAzimuth(Translation2d translation, Rotation2d azimuthGoal) {
         setAzimuthGoal(azimuthGoal);
         driveWithAzimuth(translation);
+
+        driveWithAzimuth(translation, azimuthGoal, true);
+    }
+
+    public void driveWithAzimuth(Translation2d translation, Rotation2d azimuthGoal, boolean fieldRelative) {
+        setAzimuthGoal(azimuthGoal);
+        driveWithAzimuth(translation, fieldRelative);
     }
 
     public boolean azimuthAtGoal() {
