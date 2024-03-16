@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.268872123329832,
+        "y": 6.665430988519635
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.7311072820343836,
+        "y": 5.935099437766444
+      },
+      "isLocked": false,
+      "linkedName": "NOTE 1 (KMS)"
+    },
+    {
+      "anchor": {
+        "x": 3.5369685153784722,
+        "y": 6.110748798074173
+      },
+      "prevControl": {
+        "x": 3.352074451896651,
+        "y": 6.6192074726491805
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.7,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -163.68614757373953,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": "KMS (10)",
+  "previewStartingState": {
+    "rotation": -36.32682595248615,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

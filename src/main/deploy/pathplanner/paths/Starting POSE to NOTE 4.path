@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.708089344106616,
+        "y": 4.455946929911878
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.1872418519611814,
+        "y": 0.18489406348182139
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.80644932461036,
+        "y": 0.6286398158381904
+      },
+      "prevControl": {
+        "x": 3.2966062328521053,
+        "y": 0.036978812696364244
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "NOTE 1 (UNICORN)"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.7,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Unicorn (8)",
+  "previewStartingState": {
+    "rotation": -61.073574164746375,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
