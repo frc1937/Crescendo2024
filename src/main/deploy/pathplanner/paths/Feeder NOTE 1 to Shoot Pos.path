@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.399682384950355,
+        "y": 0.6656186285345547
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.948263986618063,
+        "y": 3.540721315676866
+      },
+      "isLocked": false,
+      "linkedName": "NOTE 1 (FEEDER)"
+    },
+    {
+      "anchor": {
+        "x": 3.814309610601203,
+        "y": 5.029118526705522
+      },
+      "prevControl": {
+        "x": 4.785003443880762,
+        "y": 4.613106883871427
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.7,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 170.31121343963318,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Cross the Line (5)",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
