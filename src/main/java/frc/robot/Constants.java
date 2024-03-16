@@ -295,16 +295,16 @@ public final class Constants {
         public static final double KICKER_SPEED_FORWARD = 1;
         public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
         public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(50), RPM.of(3000));
+                Rotation2d.fromDegrees(20), RPM.of(3000));//50!
         public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(115), RPM.of(3000));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(-21.2), RPM.of(-2000));
+                Rotation2d.fromDegrees(-21.2), RPM.of(-4000));
     }
 
     public static final class Swerve {
-        public static final double AZIMUTH_CONTROLLER_P = 9, AZIMUTH_CONTROLLER_I = 0,
+        public static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
                 AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.5),
                 AZIMUTH_CONTROLLER_DEADBAND = 0.1;
 
@@ -458,7 +458,7 @@ public final class Constants {
                     new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                     Constants.Swerve.MAX_SPEED,
                     DRIVE_BASE_RADIUS.in(Meters),
-                    new ReplanningConfig());
+                    new ReplanningConfig(true, true));
         }
     }
 

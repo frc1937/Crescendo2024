@@ -31,6 +31,7 @@ import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 import static frc.robot.Constants.Swerve.*;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.Constants.VisionConstants.REAR_CAMERA_NAME;
+import static frc.robot.Robot.shouldRunPhotonvision;
 
 public class DrivetrainSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -89,6 +90,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         azimuthController.enableContinuousInput(-Math.PI, Math.PI);
 
         SmartDashboard.putNumber("Azimuth Error [rad]", azimuthController.getPositionError());
+        SmartDashboard.putNumber("Azimuth Current [deg]", getGyroYaw().getDegrees());
     }
 
     /**
@@ -245,11 +247,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
-        estimatedFrontPose.ifPresent(this::updateByEstimator);
+        if(shouldRunPhotonvision) {
+            Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
+            estimatedFrontPose.ifPresent(this::updateByEstimator);
 
-        Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
-        estimatedRearPose.ifPresent(this::updateByEstimator);
+            Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
+            estimatedRearPose.ifPresent(this::updateByEstimator);
+        }
 
         poseEstimator.update(getGyroYaw(), getModulePositions());
 
@@ -261,6 +265,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
         SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180));
+        SmartDashboard.putNumber("swerve/azimuth [target]", azimuthController.getGoal().position * 180 / Math.PI);
 
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
         yawCorrection = MathUtil.applyDeadband(yawCorrection, AZIMUTH_CONTROLLER_DEADBAND);

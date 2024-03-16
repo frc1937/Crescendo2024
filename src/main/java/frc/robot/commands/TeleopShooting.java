@@ -37,6 +37,10 @@ public class TeleopShooting extends SequentialCommandGroup {
 //        SmartDashboard.putNumber("calibration/spin [idk]", 0);
     }
 
+    public TeleopShooting(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter) {
+        new TeleopShooting(drivetrain, shooter, () -> 0, () -> 0);
+    }
+
     private static class TeleopAim extends Command {
         private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
@@ -111,7 +115,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             SmartDashboard.putNumber("shooting/distance from target [meters]", targetDisplacement.getNorm());
             SmartDashboard.putNumber("shooting/distance from virtual target [meters]", virtualTargetDistance);
 
-            // Aim the azimuth to the virtual target todo: reenable
+            // Aim the azimuth to the virtual target
             drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
                                     virtualTargetDisplacement.getAngle());
 
@@ -125,9 +129,8 @@ public class TeleopShooting extends SequentialCommandGroup {
                             0.1
                     )
             );
-
-//            shooter.setPitchGoal(Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)));
         }
+
 
         @Override
         public boolean isFinished() {

@@ -7,40 +7,31 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AutonomousShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommands;
+import frc.robot.commands.RotateToSpeaker;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
-import frc.robot.commands.TeleopShooting;
 import frc.robot.commands.TeleOpDrive;
+import frc.robot.commands.TeleopShooting;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.TriggerButton;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.DoubleSupplier;
-import java.util.stream.Stream;
 
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
-import static frc.robot.Constants.Swerve.SLEW_RATE_LIMIT;
-import static frc.robot.Constants.TFILAT_HADERECH;
 
 public class RobotContainer {
     private final XboxController driveController = new XboxController(0);
@@ -78,18 +69,18 @@ public class RobotContainer {
     private final AutonomousShooter autonomousShooter = new AutonomousShooter(shooterSubsystem);
 
     public RobotContainer() {
-        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
+//        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
 
-        NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(false).withTimeout(3));
+        NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(true).withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
-        NamedCommands.registerCommand("AdjustShooter1", autonomousShooter.adjustShooter(136, 3500));
-        NamedCommands.registerCommand("AdjustShooter2", autonomousShooter.adjustShooter(134.4, 4000));
+        NamedCommands.registerCommand("AdjustShooter1", autonomousShooter.adjustShooter(108, 3000));
+        NamedCommands.registerCommand("AdjustShooter2", autonomousShooter.adjustShooter(114, 3000));
         NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(64, 4000));
         NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(125, 4000));
 
-        autoChooser = buildAutoChooser();
+        autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
@@ -97,13 +88,9 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        SlewRateLimiter translationRateLimiter = new SlewRateLimiter(SLEW_RATE_LIMIT);
-        SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(SLEW_RATE_LIMIT);
-        SlewRateLimiter rotationRateLimiter = new SlewRateLimiter(SLEW_RATE_LIMIT);
-
-        DoubleSupplier translationSup = () -> translationRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kLeftY.value));
-        DoubleSupplier strafeSup = () -> strafeRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kLeftX.value));
-        DoubleSupplier rotationSup = () -> rotationRateLimiter.calculate(-driveController.getRawAxis(XboxController.Axis.kRightX.value));
+        DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
+        DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
+        DoubleSupplier rotationSup = () -> -driveController.getRawAxis(XboxController.Axis.kRightX.value);
 
         drivetrain.setDefaultCommand(
                 new TeleOpDrive(
@@ -117,13 +104,15 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
 
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+//        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
-        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
+
+        drXButton.whileTrue(new RotateToSpeaker(drivetrain));
+//        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
+//        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
@@ -141,67 +130,49 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-//        return new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(90)),
-//                shooterSubsystem)
-//            .andThen(new WaitCommand(3))
-//            .andThen(new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
-//                shooterSubsystem))
-//            .andThen(new WaitCommand(3))
-//            .andThen(new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(45)),
-//                shooterSubsystem))
-//            .andThen(new WaitCommand(3))
-//            .andThen(new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
-//                shooterSubsystem))
-//            .andThen(new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(30)),
-//                shooterSubsystem))
-//            .andThen(new WaitCommand(3))
-//            .andThen(new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(60)),
-//                shooterSubsystem))
-//            .andThen(new WaitCommand(3))
-//            .andThen(new InstantCommand(
-//                () -> shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(0)),
-//                shooterSubsystem));
-        return AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("GoStraightBitch"));
-        //autoChooser.getSelected();
+//        return new SequentialCommandGroup(
+//                autonomousShooter.adjustShooter(112, 2000),
+//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY),
+//                //shoot first note
+//
+//                new ParallelCommandGroup(
+//                        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Base to NOTE 1 (3)")),
+//                        shooterCommands.floorIntake(true).withTimeout(2.7)
+//                ),
+//                new ParallelCommandGroup(
+//                        new RotateToSpeaker(drivetrain).withTimeout(1).andThen(new RotateToSpeaker(drivetrain)),
+//                        autonomousShooter.adjustShooter(30, 3000)
+//                ),
+//
+//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY),
+//                //SHOOT NOTE 1 ^
+//
+//                new ParallelCommandGroup(
+//                        AutoBuilder.followPath(PathPlannerPath.fromPathFile("NOTE 1 to NOTE 2 (0.3)")),
+//                        shooterCommands.floorIntake(true).withTimeout(3)
+//                ).andThen(new ParallelCommandGroup(
+//                        new RotateToSpeaker(drivetrain).withTimeout(2.4),
+//                        autonomousShooter.adjustShooter(34, 3000)
+//                )),
+//
+//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY),
+//                //SHOOT note 2 ^
+//
+//                new ParallelCommandGroup(
+//                        AutoBuilder.followPath(PathPlannerPath.fromPathFile("NOTE 2 to NOTE 3 (0.3)")),
+//                        shooterCommands.floorIntake(true).withTimeout(3)
+//                ).andThen(new ParallelCommandGroup(
+//                        new RotateToSpeaker(drivetrain).withTimeout(2.4),
+//                        autonomousShooter.adjustShooter(30, 3000)
+//                )),
+//
+//                new WaitCommand(0.5),
+//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY)
+//        );
+        return autoChooser.getSelected();
     }
 
     public void infrequentPeriodic() {
         drivetrain.infrequentPeriodic();
-    }
-
-    public static SendableChooser<Command> buildAutoChooser() {
-        SendableChooser<Command> chooser = new SendableChooser<>();
-        List<String> autoNames = getAllAutoNames();
-
-        List<Command> options = new ArrayList<>();
-
-        for (String autoName : autoNames) {
-            PathPlannerPath auto = PathPlannerPath.fromChoreoTrajectory(autoName);
-            options.add(AutoBuilder.followPath(auto));
-        }
-        //TODO: See that this works as intended cuz its copied :D
-        options.forEach(auto -> chooser.addOption(auto.getName(), auto));
-        return chooser;
-    }
-
-    private static List<String> getAllAutoNames() {
-        File[] autoFiles = new File(Filesystem.getDeployDirectory(), "choreo/").listFiles();
-
-        if (autoFiles == null) {
-            return new ArrayList<>();
-        }
-
-        return Stream.of(autoFiles)
-                .filter(file -> !file.isDirectory())
-                .map(File::getName)
-                .filter(name -> name.endsWith(".traj")) //todo: Check how choreo nmaes their files and use that instead
-                .map(name -> name.substring(0, name.lastIndexOf(".")))
-                .toList();
     }
 }

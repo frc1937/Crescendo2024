@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.7543128599770712,
-        "y": 0.5269480809231892
+        "x": 2.732679339232552,
+        "y": 1.1833220062836523
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.492129416691267,
-        "y": 0.7580656602754654
+        "x": 8.399682384950355,
+        "y": 0.6656186285345547
       },
       "prevControl": {
-        "x": 7.492129416691267,
-        "y": 0.7580656602754654
+        "x": 6.615454672350784,
+        "y": 0.6009057063159178
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NOTE 1 (FEEDER)"
     }
   ],
   "rotationTargets": [
