@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import static frc.robot.Constants.INFREQUENT_PERIODIC_PERIOD;
 
 public class Robot extends TimedRobot {
-    public static boolean shouldRunPhotonvision;
     public static CTREConfigs ctreConfigs;
     private Command autonomousCommand;
     private RobotContainer robotContainer;
@@ -35,7 +34,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        shouldRunPhotonvision = false;
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
@@ -49,8 +47,6 @@ public class Robot extends TimedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
-
-        shouldRunPhotonvision = true;
     }
 
     @Override

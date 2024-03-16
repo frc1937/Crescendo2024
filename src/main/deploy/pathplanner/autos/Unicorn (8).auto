@@ -12,7 +12,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter1"
+                  "name": "AdjustShooter4"
                 }
               },
               {
@@ -29,15 +29,28 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Intake"
+                  "pathName": "Starting POSE to NOTE 4"
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "Starting pos to NOTE 4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeUnicorn"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -69,7 +82,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter2"
+                  "name": "AdjustShooter3"
                 }
               },
               {
@@ -94,7 +107,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake"
+                  "name": "IntakeUnicorn"
                 }
               }
             ]
@@ -126,7 +139,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AdjustShooter2"
+                  "name": "AdjustShooter3"
                 }
               },
               {

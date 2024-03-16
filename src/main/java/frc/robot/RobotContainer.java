@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.AutonomousShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommands;
-import frc.robot.commands.RotateToSpeaker;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
@@ -73,12 +73,21 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(true).withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
+        NamedCommands.registerCommand("Rotate", new AimAtSpeaker(drivetrain, 1));
+        NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(drivetrain, 0.5));
+
+
+        NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake(true).withTimeout(2.7));
+
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
         NamedCommands.registerCommand("AdjustShooter1", autonomousShooter.adjustShooter(108, 3000));
         NamedCommands.registerCommand("AdjustShooter2", autonomousShooter.adjustShooter(114, 3000));
-        NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(64, 4000));
-        NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(125, 4000));
+        NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(25.1, 4000));
+        NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(109, 4000));
+        NamedCommands.registerCommand("AdjustShooter5", autonomousShooter.adjustShooter(49, 4000));
+        NamedCommands.registerCommand("AdjustShooter6", autonomousShooter.adjustShooter(28, 4500));
+        NamedCommands.registerCommand("AdjustShooter7", autonomousShooter.adjustShooter(26.5, 4500));
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -110,7 +119,7 @@ public class RobotContainer {
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
 
-        drXButton.whileTrue(new RotateToSpeaker(drivetrain));
+        drXButton.whileTrue(new AimAtSpeaker(drivetrain, 1));
 //        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
 //        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 

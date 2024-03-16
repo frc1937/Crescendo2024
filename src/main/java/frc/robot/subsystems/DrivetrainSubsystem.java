@@ -31,7 +31,7 @@ import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 import static frc.robot.Constants.Swerve.*;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.Constants.VisionConstants.REAR_CAMERA_NAME;
-import static frc.robot.Robot.shouldRunPhotonvision;
+
 
 public class DrivetrainSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -247,13 +247,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        if(shouldRunPhotonvision) {
-            Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
-            estimatedFrontPose.ifPresent(this::updateByEstimator);
+        Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
+        estimatedFrontPose.ifPresent(this::updateByEstimator);
 
-            Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
-            estimatedRearPose.ifPresent(this::updateByEstimator);
-        }
+        Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
+        estimatedRearPose.ifPresent(this::updateByEstimator);
 
         poseEstimator.update(getGyroYaw(), getModulePositions());
 
