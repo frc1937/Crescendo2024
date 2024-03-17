@@ -167,7 +167,6 @@ public final class Constants {
             putReference(3.27, 27.8, 3500, 0.85);
             putReference(3.7, 26.1, 4000, 0.8);
             putReference(4.1, 22.9, 5000, 0.9);
-
         }
 
         public static final double POSE_HISTORY_DURATION = 0.5;
@@ -224,7 +223,6 @@ public final class Constants {
         public static final double PIVOT_RANGE_MIN = -0.9;
         public static final double PIVOT_RANGE_MAX = 0.9;
 
-
         /**
          * In seconds
          */
@@ -250,6 +248,9 @@ public final class Constants {
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(-21.2), RPM.of(-4000));
+
+        public static final ShooterSubsystem.Reference AMP_INIT =
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(80), RPM.of(600));
     }
 
     public static final class Swerve {
