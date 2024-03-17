@@ -227,8 +227,8 @@ public final class Constants {
         public static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
 
         public static final int
-                FLYWHEEL_LEFT_ID = 15,
-                FLYWHEEL_RIGHT_ID = 16,
+                FLYWHEEL_LEFT_ID = 16,
+                FLYWHEEL_RIGHT_ID = 15,
                 PIVOT_ID = 1,
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
@@ -260,15 +260,15 @@ public final class Constants {
              * All in rotations per second and voltages
              */
             public static final double
-                    RIGHT_P = 0.046963,
-                    RIGHT_S = 0.17613,
-                    RIGHT_V = 0.11157,
-                    RIGHT_A = 0.020308,
+                    RIGHT_P = 0.01,
+                    RIGHT_S = 0.2426,
+                    RIGHT_V = 0.11243,
+                    RIGHT_A = 0.014245,
 
-            LEFT_P = 0.027878,
-                    LEFT_S = 0.081674,
-                    LEFT_V = 0.1084,
-                    LEFT_A = 0.021644,
+            LEFT_P = 0.01,  // NOTE: This value was not provided by SysId
+                    LEFT_S = 0.2426,
+                    LEFT_V = 0.11243,
+                    LEFT_A = 0.014245,
                     TOLERANCE = 3;
         }
 
