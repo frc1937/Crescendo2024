@@ -8,6 +8,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,9 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AimAtSpeaker;
-import frc.robot.commands.AutonomousShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommands;
+import frc.robot.commands.PrepareShooter;
 import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
@@ -31,6 +32,7 @@ import frc.robot.util.TriggerButton;
 
 import java.util.function.DoubleSupplier;
 
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
@@ -69,7 +71,6 @@ public class RobotContainer {
     /* Commands */
     private final MountCommands mountCommands = new MountCommands(mountSubsystem);
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
-    private final AutonomousShooter autonomousShooter = new AutonomousShooter(shooterSubsystem);
 
     public RobotContainer() {
 //        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
@@ -83,13 +84,20 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
-        NamedCommands.registerCommand("AdjustShooter1", autonomousShooter.adjustShooter(108, 3000));
-        NamedCommands.registerCommand("AdjustShooter2", autonomousShooter.adjustShooter(114, 3000));
-        NamedCommands.registerCommand("AdjustShooter3", autonomousShooter.adjustShooter(25.1, 4000));
-        NamedCommands.registerCommand("AdjustShooter4", autonomousShooter.adjustShooter(109, 4000));
-        NamedCommands.registerCommand("AdjustShooter5", autonomousShooter.adjustShooter(49, 4000));
-        NamedCommands.registerCommand("AdjustShooter6", autonomousShooter.adjustShooter(28, 4500));
-        NamedCommands.registerCommand("AdjustShooter7", autonomousShooter.adjustShooter(26.5, 4500));
+        NamedCommands.registerCommand("AdjustShooter1", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108), RPM.of(3000))));
+        NamedCommands.registerCommand("AdjustShooter2", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), RPM.of(3000))));
+        NamedCommands.registerCommand("AdjustShooter3", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(25.1), RPM.of(4000))));
+        NamedCommands.registerCommand("AdjustShooter4", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(109), RPM.of(4000))));
+        NamedCommands.registerCommand("AdjustShooter5", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(49), RPM.of(4000))));
+        NamedCommands.registerCommand("AdjustShooter6", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(28), RPM.of(4500))));
+        NamedCommands.registerCommand("AdjustShooter7", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), RPM.of(4500))));
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);

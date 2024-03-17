@@ -34,17 +34,12 @@ public class AimAtSpeaker extends Command {
 
     @Override
     public void execute() {
-        // Get values, deadband
-        // Predict the position the robot will be in when the NOTE is released
         RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
         Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
 
-        // Calculate the displacement of the virtual target, to which the robot so it can
-        // score whilst moving
         Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
         virtualTargetDistance = virtualTargetDisplacement.getNorm();
 
-        // Aim the azimuth to the virtual target
         drivetrain.driveWithAzimuth(new Translation2d(0, 0),
                 virtualTargetDisplacement.getAngle().times(scalar));
     }
