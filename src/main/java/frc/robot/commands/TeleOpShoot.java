@@ -23,8 +23,8 @@ import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_PREDICTION_TIME;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
-public class TeleopShooting extends SequentialCommandGroup {
-    public TeleopShooting(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+public class TeleOpShoot extends SequentialCommandGroup {
+    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
                 new TeleopAim(drivetrain, shooter, translationSup, strafeSup),
                 new TeleopThrow(drivetrain, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
@@ -35,8 +35,8 @@ public class TeleopShooting extends SequentialCommandGroup {
        SmartDashboard.putNumber("calibration/spin [idk]", 1);
     }
 
-    public TeleopShooting(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter) {
-        new TeleopShooting(drivetrain, shooter, () -> 0, () -> 0);
+    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter) {
+        new TeleOpShoot(drivetrain, shooter, () -> 0, () -> 0);
     }
 
     private static class TeleopAim extends Command {

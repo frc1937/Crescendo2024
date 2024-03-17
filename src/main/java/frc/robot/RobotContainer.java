@@ -20,7 +20,7 @@ import frc.robot.commands.MountCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
-import frc.robot.commands.TeleopShooting;
+import frc.robot.commands.TeleOpShoot;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
@@ -111,7 +111,7 @@ public class RobotContainer {
                 )
         );
 
-        drAButton.whileTrue(new TeleopShooting(drivetrain, shooterSubsystem, translationSup, strafeSup));
+        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, translationSup, strafeSup));
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
