@@ -4,7 +4,6 @@
 
 package frc.lib;
 
-import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.FIELD_LENGTH;
 
@@ -14,11 +13,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class Targeting {
     /** Calculate the displacement from the centre of the robot to the target */
-    public static Translation2d calculateTargetDisplacement(RobotState robotState) {
+    public static Translation2d calculateTargetDisplacement(RobotState robotState, Translation2d blueTargetPosition) {
         DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue);
         Translation2d targetPosition = alliance == DriverStation.Alliance.Red
-                                        ? new Translation2d(FIELD_LENGTH, 0).minus(BLUE_TARGET_POSITION)
-                                        : BLUE_TARGET_POSITION;
+                                        ? new Translation2d(FIELD_LENGTH, 0).minus(blueTargetPosition)
+                                        : blueTargetPosition;
         return targetPosition.minus(robotState.getPose().getTranslation());
     }
 

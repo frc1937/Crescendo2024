@@ -232,7 +232,8 @@ public final class Constants {
         public static final double POST_SHOOTING_DELAY = 0.25;
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-        public static final Translation2d BLUE_TARGET_POSITION = new Translation2d(0.0, 5.3);
+        public static final Translation2d BLUE_SPEAKER_TARGET = new Translation2d(0.0, 5.3);
+        public static final Translation2d BLUE_ASSIST_TARGET = new Translation2d(1.0, 7.0);
         public static final double FIELD_LENGTH = 16.48;
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;

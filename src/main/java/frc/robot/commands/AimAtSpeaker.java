@@ -9,7 +9,7 @@ import frc.lib.RobotState;
 import frc.lib.Targeting;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
-import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
@@ -29,7 +29,7 @@ public class AimAtSpeaker extends Command {
     public void initialize() {
         // Predict the position the robot will be in when the NOTE is released
         RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-        Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState);
+        Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState, BLUE_SPEAKER_TARGET);
         Translation2d virtualTargetDisplacement = Targeting.calculateVirtualTargetDisplacement(
                 targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
         virtualTargetDistance = virtualTargetDisplacement.getNorm();
@@ -40,7 +40,7 @@ public class AimAtSpeaker extends Command {
         // Get values, deadband
         // Predict the position the robot will be in when the NOTE is released
         RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-        Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState);
+        Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState, BLUE_SPEAKER_TARGET);
 
         // Calculate the displacement of the virtual target, to which the robot so it can
         // score whilst moving

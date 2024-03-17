@@ -16,6 +16,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_REFERENCE_MAP;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
@@ -24,9 +25,9 @@ import static frc.robot.Constants.ShootingConstants.SHOOTING_PREDICTION_TIME;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
 public class TeleOpShoot extends SequentialCommandGroup {
-    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Translation2d blueTargetPosition, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
-                new TeleopAim(drivetrain, shooter, translationSup, strafeSup),
+                new TeleopAim(drivetrain, shooter, blueTargetPosition, translationSup, strafeSup),
                 new TeleopThrow(drivetrain, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
 
@@ -35,22 +36,20 @@ public class TeleOpShoot extends SequentialCommandGroup {
        SmartDashboard.putNumber("calibration/spin [idk]", 1);
     }
 
-    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter) {
-        new TeleOpShoot(drivetrain, shooter, () -> 0, () -> 0);
-    }
-
     private static class TeleopAim extends Command {
         private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
+        private final Translation2d blueTargetPosition;
 
         private final Timer deadlineTimer = new Timer();
 
         private double virtualTargetDistance = 0;
 
-        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Translation2d blueTargetPosition, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.drivetrain = drivetrain;
             this.shooter = shooter;
+            this.blueTargetPosition = blueTargetPosition;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
 
@@ -63,7 +62,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
             // Predict the position the robot will be in when the NOTE is released
             RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-            Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState);      
+            Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState, blueTargetPosition);      
             Translation2d virtualTargetDisplacement = Targeting.calculateVirtualTargetDisplacement(
                 targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
@@ -78,7 +77,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
             // Predict the position the robot will be in when the NOTE is released
             RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
-            Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState);      
+            Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState, blueTargetPosition);      
 
             // Calculate the displacement of the virtual target, to which the robot so it can
             // score whilst moving
