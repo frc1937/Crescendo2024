@@ -136,15 +136,15 @@ public class TeleopShooting extends SequentialCommandGroup {
         public boolean isFinished() {
             boolean azimuthReady = drivetrain.azimuthAtGoal();
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() < Constants.STICK_DEADBAND;
-            boolean readyToKick = shooter.atReference() && azimuthReady && notMoving;
+            boolean readyToKick = shooter.atReference() && azimuthReady;
             
             boolean reachedDeadline = deadlineTimer.hasElapsed(1 + virtualTargetDistance * 0.2);
             
             boolean flywheelsReady = shooter.flywheelsAtReference();  // TODO for debugging, remove
             boolean pitchReady = shooter.pitchAtReference();  // TODO for debugging, remove
-            SmartDashboard.putBooleanArray("flywheels | pitch | azimuth", new boolean[]{flywheelsReady, pitchReady, azimuthReady});
+            SmartDashboard.putBooleanArray("flywheels | pitch | azimuth | not-moving", new boolean[]{flywheelsReady, pitchReady, azimuthReady, notMoving});
 
-            return readyToKick || reachedDeadline;
+            return notMoving && (readyToKick || reachedDeadline);
         }
 
         @Override
@@ -177,11 +177,16 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public void execute() {
-//            // Get values, deadband
+            // Get values, deadband
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
             drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
+        }
+
+        @Override
+        public boolean isFinished() {
+            return targetTranslation.getNorm() > Constants.STICK_DEADBAND;
         }
 
         @Override
