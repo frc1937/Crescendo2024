@@ -15,7 +15,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.Constants.ShootingConstants.AMP_INIT;
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 
 @Deprecated //wtf should I use instead??
@@ -23,7 +23,9 @@ public class ComplexShootToAmp extends SequentialCommandGroup {
     public ComplexShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrain) {
         // First, move the shooter to the initial position and accelerate the flywheels
         FunctionalCommand prepareShooter = new FunctionalCommand(
-                () -> shooter.setReference(AMP_INIT),
+                () -> shooter.setReference(
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(80), RPM.of(600))
+    ),
                 () -> {},
                 interrupted -> {
                     if (Boolean.TRUE.equals(interrupted)) {

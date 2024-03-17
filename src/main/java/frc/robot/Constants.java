@@ -90,9 +90,8 @@ public final class Constants {
 
         /**
          * Standard deviations of the vision measurements. Increase these numbers to
-         * trust global measurements from vision
-         * less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and
-         * radians.
+         * trust global measurements from vision less.
+         * This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians.
          */
         public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(), Nat.N1())
                 .fill(
@@ -250,7 +249,8 @@ public final class Constants {
                 Rotation2d.fromDegrees(-21.2), RPM.of(-4000));
 
         public static final ShooterSubsystem.Reference AMP_INIT =
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(80), RPM.of(600));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(3000));
+
     }
 
     public static final class Swerve {

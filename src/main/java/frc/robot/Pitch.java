@@ -3,8 +3,8 @@ package frc.robot;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,9 +16,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.ShootingConstants.DEFAULT_PITCH_DEADBAND;
 import static frc.robot.Constants.ShootingConstants.PITCH_KA;
@@ -67,7 +65,6 @@ public class Pitch {
         controller = new ProfiledPIDController(
                 PITCH_KP, 0, PITCH_KD,
                 new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION));
-                // new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, worstCaseAcceleration));
 
         controller.setTolerance(PIVOT_TOLERANCE);
     }
