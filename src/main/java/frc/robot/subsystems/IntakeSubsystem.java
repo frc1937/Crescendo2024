@@ -9,7 +9,6 @@ import static frc.robot.Constants.IntakeConstants.INTAKE_MOTOR_ID;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final WPI_TalonSRX talonSRX = new WPI_TalonSRX(INTAKE_MOTOR_ID);
-
     public IntakeSubsystem() {
         configureTalonMotor(talonSRX);
 

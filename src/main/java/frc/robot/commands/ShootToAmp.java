@@ -4,15 +4,17 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.AMP_INIT;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 
 public class ShootToAmp extends SequentialCommandGroup {
@@ -21,16 +23,11 @@ public class ShootToAmp extends SequentialCommandGroup {
      */
     public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem) {
         Command prepare = new ParallelCommandGroup(
-                new TeleOpDriveRetarded(drivetrainSubsystem, () -> 0.1).withTimeout(
-                        0.21
-                ),
-
+                new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.21),
+//Should use TeleOpShoot instead.
                 new SequentialCommandGroup(
                         new WaitCommand(0.4),
-                        new PrepareShooter(shooter, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(
-                                104
-                        ), RPM.of(600)))
-                        .withTimeout(2)
+                        new PrepareShooter(shooter, AMP_INIT).withTimeout(2)
                 )
         );
 
@@ -46,5 +43,33 @@ public class ShootToAmp extends SequentialCommandGroup {
                 prepare,
                 release
         );
+    }
+
+    @Deprecated
+    private static class DriveForward extends Command {
+        private final DrivetrainSubsystem drivetrain;
+        private final double translationValue;
+
+        public DriveForward(DrivetrainSubsystem drivetrain, double translationValue) {
+            this.drivetrain = drivetrain;
+            this.translationValue = translationValue;
+
+            addRequirements(drivetrain);
+        }
+
+        @Override
+        public void execute() {
+            drivetrain.drive(
+                    new Translation2d(translationValue, 0).times(Constants.Swerve.MAX_SPEED),
+                    0,
+                    false,
+                    true);
+        }
+
+        @Override
+        public void end(boolean interrupt) {
+            //TODO: Check if drive#stop works lmfao
+            drivetrain.drive(new Translation2d(0, 0), 0, true, true);
+        }
     }
 }

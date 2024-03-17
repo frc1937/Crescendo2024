@@ -72,8 +72,6 @@ public class RobotContainer {
     private final AutonomousShooter autonomousShooter = new AutonomousShooter(shooterSubsystem);
 
     public RobotContainer() {
-        SmartDashboard.putNumber("calibrate/timeout-drive", 0.315);
-        SmartDashboard.putNumber("calibrate/degrees", 110);
 //        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
 
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(true).withTimeout(2));
