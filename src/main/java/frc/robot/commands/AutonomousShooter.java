@@ -14,6 +14,7 @@ public class AutonomousShooter {
         this.shooterSubsystem = shooterSubsystem;
     }
 
+    @Deprecated
     public Command adjustShooter(double degrees, int rpm) {
         return new FunctionalCommand(
                 () -> {

@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 /**
  * Rotate the shooter at a constant angular velocity
  */
+@Deprecated
 public class RotateShooter extends Command {
     private final ShooterSubsystem shooter;
     private final Measure<Velocity<Angle>> angularVelocity;

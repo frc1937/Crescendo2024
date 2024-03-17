@@ -307,6 +307,8 @@ public final class Constants {
         public static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
                 AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.5),
                 AZIMUTH_CONTROLLER_DEADBAND = 0.1;
+        public static final double TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7, TRANSLATION_MAX_ACCELERATION = 3;
+        public static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);
 
         public static final int PIGEON_ID = 30;
         public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
@@ -454,7 +456,7 @@ public final class Constants {
 
         public static final class AutoConstants {
             public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
-                    new PIDConstants(1.366, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(TRANSLATION_CONTROLLER_P, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                     Constants.Swerve.MAX_SPEED,
                     DRIVE_BASE_RADIUS.in(Meters),
@@ -464,6 +466,6 @@ public final class Constants {
 
     public static final class NavigationConstants {
         public static final Pose2d AMPLIFIER_POSE = new Pose2d(1.83, 7.7, Rotation2d.fromDegrees(-90));
-        public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(3.5, 3, Units.degreesToRadians(540), Units.degreesToRadians(720));
+        public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.7, 3, Units.degreesToRadians(540), Units.degreesToRadians(720));
     }
 }

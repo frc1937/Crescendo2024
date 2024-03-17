@@ -4,62 +4,75 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.Constants.Swerve.TRANSLATION_CONTROLLER_CONSTRAINTS;
+import static frc.robot.Constants.Swerve.TRANSLATION_CONTROLLER_P;
+
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
-
 public class ShootToAmp extends SequentialCommandGroup {
-    public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrain) {
-        // First, move the shooter to the initial position and accelerate the flywheels
-        FunctionalCommand prepareShooter = new FunctionalCommand(
-                () -> shooter.setReference(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(80), RPM.of(600))),
-                () -> {
-                },
-                interrupted -> {
-                    if (interrupted) {
-                        shooter.reset();
-                    }
-                },
-                shooter::pitchAtReference,
-                shooter
-        );
+  /** Creates a new ShootToAmp. */
+  public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrain) {
+    Command prepare = new ParallelCommandGroup(
+      new PrepareShooter(shooter, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(3000))),
+      new DriveForwards(drivetrain)
+    ).withTimeout(2);
 
-        // Then, start rotating the pitch backwards whilst driving forward
-        ParallelDeadlineGroup shoot = new ParallelDeadlineGroup(
-                new SequentialCommandGroup(
-                        // Rotate the pitch backwards slowly
-                        new RotateShooter(shooter, DegreesPerSecond.of(10), Rotation2d.fromDegrees(90)),
+    Command release = shooter.startEnd(
+      () -> shooter.setKickerSpeed(KICKER_SPEED_FORWARD),
+      shooter::reset
+    ).withTimeout(1);
 
-                        // Then release the note
-                        new InstantCommand(() -> shooter.setKickerSpeed(KICKER_SPEED_FORWARD), shooter),
+    addCommands(
+      prepare,
+      release
+    );
+  }
 
-                        // Then continue rotating without stopping
-                        new RotateShooter(shooter, DegreesPerSecond.of(10), Rotation2d.fromDegrees(100)),
+  private class DriveForwards extends Command {
+    private final DrivetrainSubsystem drivetrain;
 
-                        // Then reset the shooter
-                        new InstantCommand(shooter::reset, shooter)
-                ),
+    private final ProfiledPIDController controller = new ProfiledPIDController(
+      TRANSLATION_CONTROLLER_P, 0, 0, TRANSLATION_CONTROLLER_CONSTRAINTS
+    );
 
-                // Meanwhile, drive forward, away from the amp
-                drivetrain.startEnd(
-                        () -> drivetrain.drive(new ChassisSpeeds(MetersPerSecond.of(0.5),
-                                MetersPerSecond.of(0),
-                                DegreesPerSecond.of(0))),
-                        drivetrain::stop
-                )
-        );
+    private Translation2d initialPosition;
 
-        addCommands(prepareShooter, shoot);
-        addRequirements(shooter);
+    public DriveForwards(DrivetrainSubsystem drivetrain) {
+      this.drivetrain = drivetrain;
+
+      controller.setGoal(0.1);
+
+      addRequirements(drivetrain);
     }
+    
+    @Override
+    public void initialize() {
+      controller.reset(0);
+      initialPosition = drivetrain.getPose().getTranslation();
+    }
+
+    @Override
+    public void execute() {
+      drivetrain.drive(new Translation2d(controller.calculate(getTraveledDistance()), 0), 0, false, true);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      drivetrain.stop();
+    }
+
+    private double getTraveledDistance() {
+      return drivetrain.getPose().getTranslation().getDistance(initialPosition);
+    }
+  } 
 }
