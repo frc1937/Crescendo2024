@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -35,13 +34,12 @@ public class TeleOpDrive extends Command {
         if (stickTranslation.getNorm() < Constants.STICK_DEADBAND) {
             stickTranslation = new Translation2d();
         }
-        double rotationValue = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
 
         Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
 
         drivetrain.drive(
                 translation,
-                rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
+                rotationSup.getAsDouble() * Constants.Swerve.MAX_ANGULAR_VELOCITY,
                 !robotCentricSup.getAsBoolean(),
                 true);
     }
