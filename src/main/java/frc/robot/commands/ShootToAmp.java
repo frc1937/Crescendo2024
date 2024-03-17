@@ -24,7 +24,7 @@ public class ShootToAmp extends SequentialCommandGroup {
     public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem) {
         Command prepare = new ParallelCommandGroup(
                 new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.21),
-//Should use TeleOpShoot instead.
+//Should use TeleOpDrive instead.
                 new SequentialCommandGroup(
                         new WaitCommand(0.4),
                         new PrepareShooter(shooter, AMP_INIT).withTimeout(2)
