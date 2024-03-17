@@ -1,16 +1,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.RobotState;
-import frc.lib.Targeting;
+import frc.lib.Target;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
-import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
 public class AimAtSpeaker extends Command {
@@ -29,8 +26,8 @@ public class AimAtSpeaker extends Command {
     public void initialize() {
         // Predict the position the robot will be in when the NOTE is released
         RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-        Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState, BLUE_SPEAKER_TARGET);
-        Translation2d virtualTargetDisplacement = Targeting.calculateVirtualTargetDisplacement(
+        Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
+        Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                 targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
         virtualTargetDistance = virtualTargetDisplacement.getNorm();
     }
@@ -40,11 +37,11 @@ public class AimAtSpeaker extends Command {
         // Get values, deadband
         // Predict the position the robot will be in when the NOTE is released
         RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-        Translation2d targetDisplacement = Targeting.calculateTargetDisplacement(predictedState, BLUE_SPEAKER_TARGET);
+        Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
 
         // Calculate the displacement of the virtual target, to which the robot so it can
         // score whilst moving
-        Translation2d virtualTargetDisplacement = Targeting.calculateVirtualTargetDisplacement(virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
+        Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
         virtualTargetDistance = virtualTargetDisplacement.getNorm();
 
         // Aim the azimuth to the virtual target

@@ -22,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import frc.lib.Target;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -145,29 +146,6 @@ public final class Constants {
             DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
         }
 
-        public static final InterpolatingTreeMap<Double, ShooterSubsystem.Reference> DISTANCE_TO_REFERENCE_MAP = new InterpolatingTreeMap<>(
-                InverseInterpolator.forDouble(), ShooterSubsystem.Reference::interpolate);
-
-        /**
-         * A small helper function for the following static block
-         */
-        private static final void putReference(double distance, double degrees, double rpm, double spin) {
-            DISTANCE_TO_REFERENCE_MAP.put(distance, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
-        }
-
-        static {
-            putReference(1.24, 53, 2500, 1);
-            putReference(1.56, 47, 2500, 1);
-            putReference(1.85, 44, 2500, 1);
-            putReference(2.08, 40, 2700, 1);
-            putReference(2.33, 35, 3000, 0.85);
-            putReference(2.72, 34, 3000, 0.85);
-            putReference(2.95, 31, 3500, 0.85);
-            putReference(3.27, 27.8, 3500, 0.85);
-            putReference(3.7, 26.1, 4000, 0.8);
-            putReference(4.1, 22.9, 5000, 0.9);
-        }
-
         public static final double POSE_HISTORY_DURATION = 0.3;
 
         public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.7;
@@ -232,9 +210,22 @@ public final class Constants {
         public static final double POST_SHOOTING_DELAY = 0.25;
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-        public static final Translation2d BLUE_SPEAKER_TARGET = new Translation2d(0.0, 5.3);
+        public static final Target BLUE_SPEAKER_TARGET = new Target(new Translation2d(0.0, 5.3));
         public static final Translation2d BLUE_ASSIST_TARGET = new Translation2d(1.0, 7.0);
         public static final double FIELD_LENGTH = 16.48;
+
+        static {
+            BLUE_SPEAKER_TARGET.putMeasurement(1.24, 53, 2500, 1);
+            BLUE_SPEAKER_TARGET.putMeasurement(1.56, 47, 2500, 1);
+            BLUE_SPEAKER_TARGET.putMeasurement(1.85, 44, 2500, 1);
+            BLUE_SPEAKER_TARGET.putMeasurement(2.08, 40, 2700, 1);
+            BLUE_SPEAKER_TARGET.putMeasurement(2.33, 35, 3000, 0.85);
+            BLUE_SPEAKER_TARGET.putMeasurement(2.72, 34, 3000, 0.85);
+            BLUE_SPEAKER_TARGET.putMeasurement(2.95, 31, 3500, 0.85);
+            BLUE_SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500, 0.85);
+            BLUE_SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000, 0.8);
+            BLUE_SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000, 0.9);
+        }
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
