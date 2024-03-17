@@ -42,7 +42,7 @@ public final class Constants {
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
      */
-    public static final double INFREQUENT_PERIODIC_PERIOD = 0.1;
+    public static final double INFREQUENT_PERIODIC_PERIOD = 0.05;
     public static final double STICK_DEADBAND = 0.1;
 
     public static final class Mount { //todo: TUNE CONSTANTS TO SYSTEM SPECIFICS
@@ -168,7 +168,7 @@ public final class Constants {
             putReference(4.1, 22.9, 5000, 0.9);
         }
 
-        public static final double POSE_HISTORY_DURATION = 0.5;
+        public static final double POSE_HISTORY_DURATION = 0.3;
 
         public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.7;
         public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
