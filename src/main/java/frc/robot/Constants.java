@@ -260,12 +260,11 @@ public final class Constants {
              * All in rotations per second and voltages
              */
             public static final double
-                    RIGHT_P = 0.01,
-                    RIGHT_S = 0.2426,
-                    RIGHT_V = 0.11243,
-                    RIGHT_A = 0.014245,
-
-            LEFT_P = 0.01,  // NOTE: This value was not provided by SysId
+                    RIGHT_P = 0.027796,
+                    RIGHT_S = 0.025648,
+                    RIGHT_V = 0.10953,
+                    RIGHT_A = 0.02502,
+                    LEFT_P = 0.03,  // NOTE: This value was not provided by SysId
                     LEFT_S = 0.2426,
                     LEFT_V = 0.11243,
                     LEFT_A = 0.014245,
