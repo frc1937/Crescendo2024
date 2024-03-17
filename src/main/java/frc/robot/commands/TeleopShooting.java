@@ -135,7 +135,7 @@ public class TeleopShooting extends SequentialCommandGroup {
         @Override
         public boolean isFinished() {
             boolean azimuthReady = drivetrain.azimuthAtGoal();
-            boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() < Constants.STICK_DEADBAND;
+            boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
             
             boolean reachedDeadline = deadlineTimer.hasElapsed(1 + virtualTargetDistance * 0.2);
@@ -186,7 +186,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            return targetTranslation.getNorm() > Constants.STICK_DEADBAND;
+            return new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() > Constants.STICK_DEADBAND;
         }
 
         @Override
