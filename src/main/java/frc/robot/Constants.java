@@ -230,10 +230,8 @@ public final class Constants {
          * In seconds
          */
         public static final double POST_SHOOTING_DELAY = 0.25;
-        public static final int SHOOTER_UTMOST_ANGLE = 220;
-        public static final int SHOOTER_VERTICAL_ANGLE = 112;
+        public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-        public static final double NOTE_RELEASE_VELOCITY = 5.5; //todo: CONFIGURE
         public static final Translation2d BLUE_TARGET_POSITION = new Translation2d(0.0, 5.555);
         public static final Translation2d RED_TARGET_POSITION = new Translation2d(16.48, 5.3);
 

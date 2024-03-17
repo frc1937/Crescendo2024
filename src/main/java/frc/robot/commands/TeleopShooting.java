@@ -24,6 +24,7 @@ import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.RED_TARGET_POSITION;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.ShootingConstants.SHOOTING_PREDICTION_TIME;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
 public class TeleopShooting extends SequentialCommandGroup {
@@ -104,7 +105,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
             // Predict the position the robot will be in when the NOTE is released
-            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
             Translation2d targetDisplacement = calculateTargetDisplacement(predictedState);      
 
             // Calculate the displacement of the virtual target, to which the robot so it can
@@ -133,13 +134,14 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
+            boolean azimuthReady = drivetrain.azimuthAtGoal();
+            boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() < Constants.STICK_DEADBAND;
+            boolean readyToKick = shooter.atReference() && azimuthReady && notMoving;
+            
+            boolean reachedDeadline = deadlineTimer.hasElapsed(1 + virtualTargetDistance * 0.2);
+            
             boolean flywheelsReady = shooter.flywheelsAtReference();  // TODO for debugging, remove
             boolean pitchReady = shooter.pitchAtReference();  // TODO for debugging, remove
-            boolean azimuthReady = drivetrain.azimuthAtGoal();
-            boolean reachedDeadline = deadlineTimer.hasElapsed(1 + virtualTargetDistance * 0.2);
-
-            boolean readyToKick = shooter.atReference() && azimuthReady;
-
             SmartDashboard.putBooleanArray("flywheels | pitch | azimuth", new boolean[]{flywheelsReady, pitchReady, azimuthReady});
 
             return readyToKick || reachedDeadline;
