@@ -18,6 +18,7 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.BLUE_TARGET_POSITION;
+import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_REFERENCE_MAP;
 import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
@@ -34,7 +35,7 @@ public class TeleopShooting extends SequentialCommandGroup {
 
         SmartDashboard.putNumber("calibration/angle [deg]", 0);
         SmartDashboard.putNumber("calibration/rpm [RPM]", 0);
-//        SmartDashboard.putNumber("calibration/spin [idk]", 0);
+       SmartDashboard.putNumber("calibration/spin [idk]", 1);
     }
 
     public TeleopShooting(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter) {
@@ -113,7 +114,7 @@ public class TeleopShooting extends SequentialCommandGroup {
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
             
             SmartDashboard.putNumber("shooting/distance from target [meters]", targetDisplacement.getNorm());
-            SmartDashboard.putNumber("shooting/distance from virtual target [meters]", virtualTargetDistance);
+            SmartDashboard.putNumber("calibration/distance from virtual target [meters]", virtualTargetDistance);
 
             // Aim the azimuth to the virtual target
             drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
@@ -121,13 +122,12 @@ public class TeleopShooting extends SequentialCommandGroup {
 
             // Aim the shooter
             shooter.setReference(
-//                    DISTANCE_TO_REFERENCE_MAP.get(virtualTargetDistance)
-                    new ShooterSubsystem.Reference(
-                            Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)),
-                            RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0)),
-//                            SmartDashboard.getNumber("calibration/spin [idk]", 0)
-                            0.1
-                    )
+                   DISTANCE_TO_REFERENCE_MAP.get(virtualTargetDistance)
+                    // new ShooterSubsystem.Reference(
+                    //         Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)),
+                    //         RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0)),
+                    //        SmartDashboard.getNumber("calibration/spin [idk]", 1)
+                    // )
             );
         }
 

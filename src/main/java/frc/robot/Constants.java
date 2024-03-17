@@ -135,66 +135,6 @@ public final class Constants {
          */
         public static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
         public static final int FLYWHEEL_MAX_RPM = 6400;
-        /**
-         * This table maps virtual shooter slopes to shooter orientations that actually achieve
-         * the desired results, based on calibration and experimentation.
-         * <p>
-         * To obtain the samples, place the robot at some distance from the target, record the virtual
-         * target slope given by the program as a key, and at an arbitrary pitch angle. Adjust it repeatedly
-         * until the robot consistently scores with the current slope(i.e. from its current position). Then
-         * move the robot to a different position and repeat until the table is complete. A good initial
-         * angle is the arc-tangent of the virtual slope.
-         */
-        public static final InterpolatingTreeMap<Double, Rotation2d> SLOPE_TO_PITCH_MAP = new InterpolatingTreeMap<>(
-                InverseInterpolator.forDouble(), Rotation2d::interpolate);
-
-        static {
-            SLOPE_TO_PITCH_MAP.put(0.387, Rotation2d.fromDegrees(58.5));
-            SLOPE_TO_PITCH_MAP.put(0.393, Rotation2d.fromDegrees(59.7));
-            SLOPE_TO_PITCH_MAP.put(0.42, Rotation2d.fromDegrees(60.2));
-            SLOPE_TO_PITCH_MAP.put(0.433, Rotation2d.fromDegrees(61));
-            SLOPE_TO_PITCH_MAP.put(0.44, Rotation2d.fromDegrees(60.6));
-
-            //LATEST TODAY
-//            SLOPE_TO_PITCH_MAP.put(0.38, Rotation2d.fromDegrees(60.2));
-            SLOPE_TO_PITCH_MAP.put(0.48, Rotation2d.fromDegrees(65));
-            SLOPE_TO_PITCH_MAP.put(0.5, Rotation2d.fromDegrees(64));
-            SLOPE_TO_PITCH_MAP.put(0.56, Rotation2d.fromDegrees(67));
-            SLOPE_TO_PITCH_MAP.put(0.68, Rotation2d.fromDegrees(70));
-            SLOPE_TO_PITCH_MAP.put(0.76, Rotation2d.fromDegrees(72.7));
-            SLOPE_TO_PITCH_MAP.put(0.81, Rotation2d.fromDegrees(72.5));
-            SLOPE_TO_PITCH_MAP.put(0.93, Rotation2d.fromDegrees(77));
-//DIS 2:
-//            SLOPE_TO_PITCH_MAP.put(0.94, Rotation2d.fromDegrees(84));
-//            SLOPE_TO_PITCH_MAP.put(0.87, Rotation2d.fromDegrees(78.5));
-//            SLOPE_TO_PITCH_MAP.put(0.77, Rotation2d.fromDegrees(76));
-//            SLOPE_TO_PITCH_MAP.put(0.67, Rotation2d.fromDegrees(73.5));
-//            SLOPE_TO_PITCH_MAP.put(0.52, Rotation2d.fromDegrees(65));
-//            SLOPE_TO_PITCH_MAP.put(0.41, Rotation2d.fromDegrees(61));
-//            SLOPE_TO_PITCH_MAP.put(0.36, Rotation2d.fromDegrees(58.8));
-        }
-
-        public static final InterpolatingTreeMap<Double, Double> SLOPE_TO_VELOCITY_MAP = new InterpolatingTreeMap<>(
-                InverseInterpolator.forDouble(), Interpolator.forDouble());
-
-        static {
-//            SLOPE_TO_VELOCITY_MAP.put(0.38, 5500.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.393, 5500.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.42, 5500.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.44, 5500.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.48, 5000.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.56, 4500.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.68, 4000.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.76, 3000.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.81, 5000.0);
-            SLOPE_TO_VELOCITY_MAP.put(0.93, 3000.0);
-
-//            SLOPE_TO_VELOCITY_MAP.put(0.87, 0.85 * FLYWHEEL_MAX_RPM);
-//            SLOPE_TO_VELOCITY_MAP.put(0.67, 0.86 * FLYWHEEL_MAX_RPM);
-//            SLOPE_TO_VELOCITY_MAP.put(0.52, 0.88 * FLYWHEEL_MAX_RPM);
-//            //SLOPE_TO_VELOCITY_MAP.put(0.436, 0.95 * FLYWHEEL_MAX_RPM);
-//            SLOPE_TO_VELOCITY_MAP.put(0.41, 0.90 * FLYWHEEL_MAX_RPM);
-        }
 
         public static final InterpolatingTreeMap<Double, Double> DISTANCE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
@@ -217,7 +157,17 @@ public final class Constants {
         }
 
         static {
-            putReference(0, 0, 0, 1);
+            putReference(1.24, 53, 2500, 1);
+            putReference(1.56, 47, 2500, 1);
+            putReference(1.85, 44, 2500, 1);
+            putReference(2.08, 40, 2700, 1);
+            putReference(2.33, 35, 3000, 0.85);
+            putReference(2.72, 34, 3000, 0.85);
+            putReference(2.95, 31, 3500, 0.85);
+            putReference(3.27, 27.8, 3500, 0.85);
+            putReference(3.7, 26.1, 4000, 0.8);
+            putReference(4.1, 22.9, 5000, 0.9);
+
         }
 
         public static final double POSE_HISTORY_DURATION = 0.5;
@@ -304,7 +254,7 @@ public final class Constants {
 
     public static final class Swerve {
         public static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
-                AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.5),
+                AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(2.5),
                 AZIMUTH_CONTROLLER_DEADBAND = 0.1;
         public static final double TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7, TRANSLATION_MAX_ACCELERATION = 3;
         public static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);

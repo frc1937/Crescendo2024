@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ShootingConstants.FlywheelControlConstants;
 
 import static edu.wpi.first.units.Units.RPM;
@@ -48,6 +49,9 @@ public class Flywheel {
     public void periodic() {
         Measure<Velocity<Angle>> velocity = RPM.of(encoder.getVelocity());
         double feedbackCorrection = feedback.calculate(velocity.in(RotationsPerSecond));
+
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/velocity [rpm]", velocity.in(RPM));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/setpoint [rpm]", feedback.getSetpoint() * 60);
 
         motor.setVoltage(feedbackCorrection + feedforwardCorrection);
     }

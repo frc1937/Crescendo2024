@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -47,24 +48,22 @@ public class ShooterCommands {
                 shooterSubsystem).withTimeout(1.2);
     }
 
-//    public FunctionalCommand receiveFromFeeder() {
-//        return new FunctionalCommand(
-//                () -> {
-//                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-0.55 * FLYWHEEL_MAX_RPM));
-//                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FEEDER_ANGLE));
-//                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-//                },
-//                () -> {
-//                },
-//                interrupted -> {
-//                    shooterSubsystem.stopFlywheels();
-//                    shooterSubsystem.stopKicker();
-//                    shooterSubsystem.setPitchGoal(PITCH_DEFAULT_ANGLE);
-//                },
-//                shooterSubsystem::isLoaded,
-//                shooterSubsystem
-//        );
-//    }
+   public FunctionalCommand receiveFromFeeder() {
+       return new FunctionalCommand(
+               () -> {
+                   shooterSubsystem.setFlywheelsSpeed(RPM.of(-1500));
+                   shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(40));
+                   shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+               },
+               () -> {
+               },
+               interrupted -> {
+                   shooterSubsystem.reset();
+               },
+               shooterSubsystem::isLoaded,
+               shooterSubsystem
+       );
+   }
 
 
     public Command floorIntake(boolean includePostIntake) {
