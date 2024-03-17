@@ -103,7 +103,6 @@ public class Pitch {
     }
 
     public boolean atGoal() {
-        // WARNING: this does not check whether the velocity goal was reached
         return controller.atGoal() && Math.abs(controller.getGoal().velocity - getCurrentVelocity().in(RadiansPerSecond)) < 0.02;
     }
 

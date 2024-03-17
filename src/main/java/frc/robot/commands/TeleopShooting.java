@@ -131,13 +131,12 @@ public class TeleopShooting extends SequentialCommandGroup {
             );
         }
 
-
         @Override
         public boolean isFinished() {
             boolean flywheelsReady = shooter.flywheelsAtReference();  // TODO for debugging, remove
             boolean pitchReady = shooter.pitchAtReference();  // TODO for debugging, remove
             boolean azimuthReady = drivetrain.azimuthAtGoal();
-            boolean reachedDeadline = deadlineTimer.hasElapsed(2.5);
+            boolean reachedDeadline = deadlineTimer.hasElapsed(1 + virtualTargetDistance * 0.2);
 
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
