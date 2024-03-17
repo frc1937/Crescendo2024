@@ -57,9 +57,7 @@ public class ShooterCommands {
                },
                () -> {
                },
-               interrupted -> {
-                   shooterSubsystem.reset();
-               },
+               interrupted -> shooterSubsystem.reset(),
                shooterSubsystem::isLoaded,
                shooterSubsystem
        );

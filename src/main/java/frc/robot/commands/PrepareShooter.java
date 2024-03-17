@@ -8,30 +8,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class PrepareShooter extends Command {
-  private final ShooterSubsystem shooter;
-  private final ShooterSubsystem.Reference reference;
+    private final ShooterSubsystem shooter;
+    private final ShooterSubsystem.Reference reference;
 
-  public PrepareShooter(ShooterSubsystem shooter, ShooterSubsystem.Reference reference) {
-    this.shooter = shooter;
-    this.reference = reference;
+    public PrepareShooter(ShooterSubsystem shooter, ShooterSubsystem.Reference reference) {
+        this.shooter = shooter;
+        this.reference = reference;
 
-    addRequirements(shooter);
-  }
-
-  @Override
-  public void initialize() {
-    shooter.setReference(reference);
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    if (interrupted) {
-      shooter.reset();
+        addRequirements(shooter);
     }
-  }
 
-  @Override
-  public boolean isFinished() {
-    return shooter.atReference();
-  }
+    @Override
+    public void initialize() {
+        shooter.setReference(reference);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        if (interrupted) {
+            shooter.reset();
+        }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return shooter.atReference();
+    }
 }

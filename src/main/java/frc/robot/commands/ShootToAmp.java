@@ -4,31 +4,41 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import static frc.robot.Constants.ShootingConstants.AMP_INIT;
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
-import static frc.robot.Constants.Swerve.TRANSLATION_CONTROLLER_CONSTRAINTS;
-import static frc.robot.Constants.Swerve.TRANSLATION_CONTROLLER_P;
 
 public class ShootToAmp extends SequentialCommandGroup {
     /**
      * Creates a new ShootToAmp.
      */
-    public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrain) {
+    public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem) {
         Command prepare = new ParallelCommandGroup(
-                new PrepareShooter(shooter, AMP_INIT),
-                new DriveForwards(drivetrain)
-        ).withTimeout(2);
+                new TeleOpDriveRetarded(drivetrainSubsystem, () -> 0.1).withTimeout(
+                        0.21
+                ),
+
+                new SequentialCommandGroup(
+                        new WaitCommand(0.4),
+                        new PrepareShooter(shooter, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(
+                                104
+                        ), RPM.of(600)))
+                        .withTimeout(2)
+                )
+        );
 
         Command release = shooter.startEnd(
-                () -> shooter.setKickerSpeed(KICKER_SPEED_FORWARD),
+                () -> {
+                    shooter.setKickerSpeed(KICKER_SPEED_FORWARD);
+                    shooter.setFlywheelsSpeed(RPM.of(600));
+                },
                 shooter::reset
         ).withTimeout(1);
 
@@ -36,42 +46,5 @@ public class ShootToAmp extends SequentialCommandGroup {
                 prepare,
                 release
         );
-    }
-
-    private static class DriveForwards extends Command {
-        private final DrivetrainSubsystem drivetrain;
-
-        private final ProfiledPIDController controller = new ProfiledPIDController(
-                TRANSLATION_CONTROLLER_P, 0, 0, TRANSLATION_CONTROLLER_CONSTRAINTS
-        );
-
-        private Translation2d initialPosition;
-
-        public DriveForwards(DrivetrainSubsystem drivetrain) {
-            this.drivetrain = drivetrain;
-            controller.setGoal(0.1);
-
-            addRequirements(drivetrain);
-        }
-
-        @Override
-        public void initialize() {
-            controller.reset(0);
-            initialPosition = drivetrain.getPose().getTranslation();
-        }
-
-        @Override
-        public void execute() {
-            drivetrain.drive(new Translation2d(controller.calculate(getTraveledDistance()), 0), 0, false, true);
-        }
-
-        @Override
-        public void end(boolean interrupted) {
-            drivetrain.stop();
-        }
-
-        private double getTraveledDistance() {
-            return drivetrain.getPose().getTranslation().getDistance(initialPosition);
-        }
     }
 }

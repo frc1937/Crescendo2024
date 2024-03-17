@@ -29,8 +29,6 @@ import static frc.robot.Constants.ShootingConstants.PITCH_MAX_ACCELERATION;
 import static frc.robot.Constants.ShootingConstants.PITCH_MAX_VELOCITY;
 import static frc.robot.Constants.ShootingConstants.PITCH_TRANSMISSION_RATIO;
 import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DEGREES;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CONSTRAINT_DIRECTION;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
 import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
 import static frc.robot.Constants.ShootingConstants.PIVOT_TOLERANCE;
@@ -59,8 +57,8 @@ public class Pitch {
         relativeEncoder.setPosition(getCurrentPosition().getRotations() * PITCH_TRANSMISSION_RATIO);
 
         // Configure a soft limit
-        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, (float)Units.degreesToRotations(PIVOT_CONSTRAINT_DEGREES) * PITCH_TRANSMISSION_RATIO);
-        motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
+//        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, (float)Units.degreesToRotations(PIVOT_CONSTRAINT_DEGREES) * PITCH_TRANSMISSION_RATIO);
+//        motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
 
         controller = new ProfiledPIDController(
                 PITCH_KP, 0, PITCH_KD,

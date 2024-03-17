@@ -17,6 +17,7 @@ import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.AutonomousShooter;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommands;
+import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
@@ -70,13 +71,14 @@ public class RobotContainer {
     private final AutonomousShooter autonomousShooter = new AutonomousShooter(shooterSubsystem);
 
     public RobotContainer() {
+        SmartDashboard.putNumber("calibrate/timeout-drive", 0.315);
+        SmartDashboard.putNumber("calibrate/degrees", 110);
 //        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
 
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(true).withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("Rotate", new AimAtSpeaker(drivetrain, 1));
         NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(drivetrain, 0.5));
-
 
         NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake(true).withTimeout(2.7));
 
@@ -114,13 +116,13 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
 
-//        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
 
-        drXButton.whileTrue(new AimAtSpeaker(drivetrain, 1));
+        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain));
 //        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
 //        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 

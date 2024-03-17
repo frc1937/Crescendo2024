@@ -99,6 +99,7 @@ public class RobotState {
             firstTwist2LogSize,
             middlePoseSample.getKey()
         );
+
         double predictedAndLastTwistSizeRatio = Math.exp((predictedTwist2LogSize - lastTwist2LogSize) / 2);
         // double predictedTwistSize = Math.exp(predictedTwist2LogSize / 2);
         // double predictedAndLastTwistSizeRatio = predictedTwistSize / Math.sqrt(lastTwistSizeSquared);
@@ -115,6 +116,7 @@ public class RobotState {
 
         // Derive the speed prediction from the predicted twist
         double predictedTwistDuration = futureTime - lastPoseSample.getKey();
+
         ChassisSpeeds predictedVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(
                 predictedTwist.dx / predictedTwistDuration,
                 predictedTwist.dy / predictedTwistDuration,
