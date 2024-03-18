@@ -4,10 +4,6 @@
 
 package frc.lib;
 
-import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
-import static frc.robot.Constants.ShootingConstants.FIELD_LENGTH;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
@@ -16,21 +12,25 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
+import static frc.robot.Constants.ShootingConstants.FIELD_LENGTH;
+
 public class Target {
     private final Translation2d bluePosition;
+    private final Translation2d redPosition;
     private final InterpolatingTreeMap<Double, ShooterSubsystem.Reference> distanceToReferenceMap = new InterpolatingTreeMap<>(
             InverseInterpolator.forDouble(), ShooterSubsystem.Reference::interpolate);
 
     public Target(Translation2d bluePosition) {
         this.bluePosition = bluePosition;
+        redPosition = new Translation2d(FIELD_LENGTH - bluePosition.getX(), bluePosition.getY());
     }
 
     /** Calculate the displacement from the centre of the robot to the target */
     public Translation2d calculateTargetDisplacement(RobotState robotState) {
         DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue);
-        Translation2d targetPosition = alliance == DriverStation.Alliance.Red
-                                        ? new Translation2d(FIELD_LENGTH, 0).minus(bluePosition)
-                                        : bluePosition;
+        Translation2d targetPosition = alliance == DriverStation.Alliance.Red ? redPosition : bluePosition;
         return targetPosition.minus(robotState.getPose().getTranslation());
     }
 
