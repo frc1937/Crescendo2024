@@ -41,7 +41,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
 
         private final Timer deadlineTimer = new Timer();
 
-        private double virtualTargetDistance = 0;
+        private double targetDistance = 0;
 
         public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.drivetrain = drivetrain;
@@ -56,13 +56,6 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
         @Override
         public void initialize() {
             deadlineTimer.restart();
-
-            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
-            Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
-            Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
-                    targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
-            virtualTargetDistance = virtualTargetDisplacement.getNorm();
-
         }
 
         @Override
@@ -73,15 +66,10 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
             RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
 
-            Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
-                    virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
-            virtualTargetDistance = virtualTargetDisplacement.getNorm();
-
-            SmartDashboard.putNumber("shooting/distance from target [meters]", targetDisplacement.getNorm());
-            SmartDashboard.putNumber("calibration/distance from virtual target [meters]", virtualTargetDistance);
+            SmartDashboard.putNumber("calibration/distance from target [meters]", targetDisplacement.getNorm());
 
             drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    virtualTargetDisplacement.getAngle());
+                    targetDisplacement.getAngle());
 
             // Aim the shooter
             shooter.setReference(
@@ -98,7 +86,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
-            boolean reachedDeadline = deadlineTimer.hasElapsed(1 + virtualTargetDistance * 0.2);
+            boolean reachedDeadline = deadlineTimer.hasElapsed(1 + targetDistance * 0.2);
 
             boolean flywheelsReady = shooter.flywheelsAtReference();  // TODO for debugging, remove
             boolean pitchReady = shooter.pitchAtReference();  // TODO for debugging, remove
