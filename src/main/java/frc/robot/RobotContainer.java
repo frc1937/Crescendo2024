@@ -75,12 +75,12 @@ public class RobotContainer {
     public RobotContainer() {
 //        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
 
-        NamedCommands.registerCommand("Intake", shooterCommands.floorIntake(true).withTimeout(2));
+        NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("Rotate", new AimAtSpeaker(drivetrain, 1));
         NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(drivetrain, 0.5));
 
-        NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake(true).withTimeout(2.7));
+        NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake().withTimeout(2.7));
 
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
@@ -125,8 +125,8 @@ public class RobotContainer {
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.4));
-        drLeftTrigger.whileTrue((shooterCommands.floorIntakeAndPost()));
+        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.45));
+        drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
 
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 

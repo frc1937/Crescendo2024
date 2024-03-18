@@ -289,7 +289,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             Pose3d visionPose = estimatedRobotPose.estimatedPose;
             poseEstimator.addVisionMeasurement(visionPose.toPose2d(),
                     Timer.getFPGATimestamp(),
-                    visionPoseEstimator.confidenceCalculator()
+                    visionPoseEstimator.confidenceCalculator(estimatedRobotPose)
             );
         }
     }

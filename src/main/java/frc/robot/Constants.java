@@ -218,15 +218,15 @@ public final class Constants {
         public static final double KICKER_SPEED_FORWARD = 1;
         public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
         public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(20), RPM.of(3000));//50!
+                Rotation2d.fromDegrees(50), RPM.of(2500));//50!
         public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(115), RPM.of(3000));
+                Rotation2d.fromDegrees(113), RPM.of(2000));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(-21.2), RPM.of(-1800));
 
         public static final ShooterSubsystem.Reference AMP_INIT =
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), RPM.of(600));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), RPM.of(500));
 
     }
 

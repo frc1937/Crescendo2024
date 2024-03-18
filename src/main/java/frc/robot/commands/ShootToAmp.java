@@ -22,14 +22,14 @@ public class ShootToAmp extends SequentialCommandGroup {
      */
     public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem) {
         Command prepare = new ParallelCommandGroup(
-                new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.17), //0.19
+                new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.2), //0.19
                 new PrepareShooter(shooter, AMP_INIT).withTimeout(1.9 + 0.37)
         );
 
         Command release = shooter.startEnd(
                 () -> {
                     shooter.setKickerSpeed(KICKER_SPEED_FORWARD);
-                    shooter.setFlywheelsSpeed(RPM.of(600));
+                    shooter.setFlywheelsSpeed(RPM.of(500));
                 },
                 shooter::reset
         ).withTimeout(1.5);

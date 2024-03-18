@@ -37,64 +37,30 @@ public class ShooterCommands {
     public Command postIntake() {
         return new FunctionalCommand(
                 () -> {
-                    System.out.println("Started post intake");
-                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-1500));
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-1400));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
-                () -> {
-                },
+                () -> {},
                 interrupted -> {
-                    System.out.println("Interrupted");
                     shooterSubsystem.reset();
                     intakeSubsystem.stopMotor();
                 },
                 () -> false,
-                shooterSubsystem);
+                shooterSubsystem
+        );
     }
 
-    public Command floorIntakeAndPost() {
+    public Command floorIntake() {
         return new FunctionalCommand(
                 () -> {
                     initializeShooter(true, INTAKE);
                     intakeSubsystem.setSpeedPercentage(0.8);
                 },
                 () -> {},
-
-                interrupted -> {
-                },
-
-                shooterSubsystem::isLoaded,
-
-                shooterSubsystem
-        );
-    }
-
-    public Command floorIntake(boolean includePostIntake) {
-        Command prepareAndOperateIntake = new FunctionalCommand(
-                () -> {
-                    initializeShooter(true, INTAKE);
-                    intakeSubsystem.setSpeedPercentage(0.8);
-                },
-                () -> {},
-
-                interrupted -> {
-                    shooterSubsystem.reset();
-                    intakeSubsystem.stopMotor();
-                },
-
+                interrupted -> {},
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
         );
-
-        if (includePostIntake) {
-            return prepareAndOperateIntake.andThen(postIntake());
-        } else {
-            return prepareAndOperateIntake;
-        }
-    }
-
-    public Command floorIntake() {
-        return floorIntake(true);
     }
 
     private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {
@@ -102,7 +68,5 @@ public class ShooterCommands {
             shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
 
         shooterSubsystem.setReference(reference);
-//        shooterSubsystem.setPitchGoal(reference.pitchPosition);
-//        shooterSubsystem.setFlywheelsSpeed(reference.flywheelVelocity);
     }
 }
