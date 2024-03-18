@@ -29,7 +29,6 @@ public class AzimuthDrive extends Command {
         this.overrideAzimuthSup = overrideAzimuthSup;
 
         addRequirements(drivetrain);
-
     }
 
     @Override

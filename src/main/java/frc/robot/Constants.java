@@ -68,8 +68,6 @@ public final class Constants {
                 new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
                 ROBOT_TO_REAR_CAMERA = REAR_CAMERA_TO_ROBOT.inverse();
         public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
-
-        public static final double SHOOTER_ARM_LENGTH = 0.49;
     }
 
     public static class VisionConstants {
@@ -135,7 +133,6 @@ public final class Constants {
          */
         public static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
         public static final int FLYWHEEL_MAX_RPM = 6400;
-
         public static final InterpolatingTreeMap<Double, Double> DISTANCE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
 
@@ -159,13 +156,6 @@ public final class Constants {
                 PIVOT_CAN_CODER = 22,
                 KICKER_ID = 8;
         public static final double PIVOT_ENCODER_OFFSET = 343;
-        // public static final double PIVOT_UP_P = 0.03;
-        // public static final double PIVOT_UP_FF = 0.000055;
-        // public static final double PIVOT_HIGH_P = 0.02;
-        // public static final double PIVOT_HIGH_D = 0.02;
-        // public static final double PIVOT_HIGH_FF = 0.000085;
-        // public static final double PIVOT_DOWN_P = 0.025;
-        // public static final double PIVOT_DOWN_FF = 0.0005;
         public static final double PITCH_KS = 0.38398,
                 PITCH_KG = 0.31481,
                 PITCH_KV = 12.824,
@@ -196,9 +186,6 @@ public final class Constants {
                     LEFT_A = 0.014245,
                     TOLERANCE = 3;
         }
-
-        public static final double PIVOT_RANGE_MIN = -0.9;
-        public static final double PIVOT_RANGE_MAX = 0.9;
 
         /**
          * In seconds
@@ -284,10 +271,6 @@ public final class Constants {
 
         /* SwerveSubsystem Current Limiting */
         public static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 25;
-        public static final int ANGLE_PEAK_CURRENT_LIMIT = 40;
-        public static final double ANGLE_PEAK_CURRENT_DURATION = 0.1;
-        public static final boolean ANGLE_ENABLE_CURRENT_LIMIT = true;
-
         public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 35;
         public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.1;
@@ -335,8 +318,8 @@ public final class Constants {
         public static final class Module0 {
             public static final int DRIVE_MOTOR_ID = 14;
             public static final int ANGLE_MOTOR_ID = 11;
-            public static final int CAN_CODER_ID = 18;//178.594-247.140
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(246.885);//247.140-178.594+180);//243.55);
+            public static final int CAN_CODER_ID = 18;
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(246.885);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -346,7 +329,7 @@ public final class Constants {
             public static final int DRIVE_MOTOR_ID = 3;
             public static final int ANGLE_MOTOR_ID = 10;
             public static final int CAN_CODER_ID = 20;
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);//283.799-358.24+180);//103.45);//;
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -356,7 +339,7 @@ public final class Constants {
             public static final int DRIVE_MOTOR_ID = 13;
             public static final int ANGLE_MOTOR_ID = 6;
             public static final int CAN_CODER_ID = 19;//
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.459);//190.283-359.209);//188.23);
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.459);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -365,8 +348,8 @@ public final class Constants {
         public static final class Module3 {
             public static final int DRIVE_MOTOR_ID = 2;
             public static final int ANGLE_MOTOR_ID = 9;
-            public static final int CAN_CODER_ID = 21; //179.385-294.609
-            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(115.840);//294.609-179.385);//116.46);
+            public static final int CAN_CODER_ID = 21;
+            public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(115.840);
             public static final SwerveModuleConstants CONSTANTS =
                     new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
@@ -374,8 +357,6 @@ public final class Constants {
         public static final boolean ANGLE_INVERT = true;
         public static final double VOLTAGE_COMP = 12.0;
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
-
-
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
         public static final TrapezoidProfile.Constraints AZIMUTH_CONTROLLER_CONSTRAINTS =
@@ -388,11 +369,6 @@ public final class Constants {
          * considered 'in-place'.
          */
         public static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.01 * MAX_SPEED;
-
-        /**
-         * Filter any change in joystick values over SLEW_RATE_LIMIT units per second where units are [-1, 1].
-         */
-        public static final double SLEW_RATE_LIMIT = 2.5;
 
         public static final class AutoConstants {
             public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(

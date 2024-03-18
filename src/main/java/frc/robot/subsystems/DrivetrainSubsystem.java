@@ -180,9 +180,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * @see #driveWithAzimuth(Translation2d)
      */
     public void driveWithAzimuth(Translation2d translation, Rotation2d azimuthGoal) {
-        setAzimuthGoal(azimuthGoal);
-        driveWithAzimuth(translation);
-
         driveWithAzimuth(translation, azimuthGoal, true);
     }
 

@@ -19,6 +19,7 @@ import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommands;
 import frc.robot.commands.PrepareShooter;
+import frc.robot.commands.RotateToAmp;
 import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
@@ -124,8 +125,9 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
 
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+//        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
+        drLeftBumper.whileTrue(new RotateToAmp(drivetrain, translationSup, strafeSup));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
