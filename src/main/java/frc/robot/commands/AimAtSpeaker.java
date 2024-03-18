@@ -10,6 +10,10 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 
+/**
+ * Should use TeleOpShoot OR make TeleOpShoot use this. No need for both.
+ */
+@Deprecated
 public class AimAtSpeaker extends Command {
     private final DrivetrainSubsystem drivetrain;
     private final double scalar;

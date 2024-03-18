@@ -68,8 +68,7 @@ public class ShootToAmp extends SequentialCommandGroup {
 
         @Override
         public void end(boolean interrupt) {
-            //TODO: Check if drive#stop works lmfao
-            drivetrain.drive(new Translation2d(0, 0), 0, true, true);
+            drivetrain.stop();
         }
     }
 }
