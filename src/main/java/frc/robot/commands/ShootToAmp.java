@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -23,12 +22,8 @@ public class ShootToAmp extends SequentialCommandGroup {
      */
     public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem) {
         Command prepare = new ParallelCommandGroup(
-                new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.21),
-//Should use TeleOpDrive instead.
-                new SequentialCommandGroup(
-                        new WaitCommand(0.4),
-                        new PrepareShooter(shooter, AMP_INIT).withTimeout(2)
-                )
+                new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.17), //0.19
+                new PrepareShooter(shooter, AMP_INIT).withTimeout(1.9 + 0.37)
         );
 
         Command release = shooter.startEnd(
@@ -37,7 +32,7 @@ public class ShootToAmp extends SequentialCommandGroup {
                     shooter.setFlywheelsSpeed(RPM.of(600));
                 },
                 shooter::reset
-        ).withTimeout(1);
+        ).withTimeout(1.5);
 
         addCommands(
                 prepare,
@@ -60,7 +55,7 @@ public class ShootToAmp extends SequentialCommandGroup {
         @Override
         public void execute() {
             drivetrain.drive(
-                    new Translation2d(translationValue, 0).times(Constants.Swerve.MAX_SPEED),
+                    new Translation2d(-translationValue, 0).times(Constants.Swerve.MAX_SPEED),
                     0,
                     false,
                     true);

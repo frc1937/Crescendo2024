@@ -19,7 +19,6 @@ import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommands;
 import frc.robot.commands.PrepareShooter;
-import frc.robot.commands.RotateToAmp;
 import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
@@ -126,8 +125,9 @@ public class RobotContainer {
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-        drLeftBumper.whileTrue(new RotateToAmp(drivetrain, translationSup, strafeSup));
+        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.4));
+        drLeftTrigger.whileTrue((shooterCommands.floorIntakeAndPost()));
+
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
@@ -139,6 +139,7 @@ public class RobotContainer {
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
+        opXButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(-1000))));
 
         mountSubsystem.setDefaultCommand(
                 mountCommands.startManualMount(

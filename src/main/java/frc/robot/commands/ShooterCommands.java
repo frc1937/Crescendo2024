@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -38,31 +37,37 @@ public class ShooterCommands {
     public Command postIntake() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-3000));
+                    System.out.println("Started post intake");
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-1500));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {
                 },
-                interrupted -> shooterSubsystem.reset(),
+                interrupted -> {
+                    System.out.println("Interrupted");
+                    shooterSubsystem.reset();
+                    intakeSubsystem.stopMotor();
+                },
                 () -> false,
-                shooterSubsystem).withTimeout(1.2);
+                shooterSubsystem);
     }
 
-   public FunctionalCommand receiveFromFeeder() {
-       return new FunctionalCommand(
-               () -> {
-                   shooterSubsystem.setFlywheelsSpeed(RPM.of(-1500));
-                   shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(40));
-                   shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-               },
-               () -> {
-               },
-               interrupted -> shooterSubsystem.reset(),
-               shooterSubsystem::isLoaded,
-               shooterSubsystem
-       );
-   }
+    public Command floorIntakeAndPost() {
+        return new FunctionalCommand(
+                () -> {
+                    initializeShooter(true, INTAKE);
+                    intakeSubsystem.setSpeedPercentage(0.8);
+                },
+                () -> {},
 
+                interrupted -> {
+                },
+
+                shooterSubsystem::isLoaded,
+
+                shooterSubsystem
+        );
+    }
 
     public Command floorIntake(boolean includePostIntake) {
         Command prepareAndOperateIntake = new FunctionalCommand(
@@ -71,7 +76,8 @@ public class ShooterCommands {
                     intakeSubsystem.setSpeedPercentage(0.8);
                 },
                 () -> {},
-                (interrupted) -> {
+
+                interrupted -> {
                     shooterSubsystem.reset();
                     intakeSubsystem.stopMotor();
                 },
@@ -95,7 +101,8 @@ public class ShooterCommands {
         if(shouldUseKicker)
             shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
 
-        shooterSubsystem.setPitchGoal(reference.pitchPosition);
-        shooterSubsystem.setFlywheelsSpeed(reference.flywheelVelocity);
+        shooterSubsystem.setReference(reference);
+//        shooterSubsystem.setPitchGoal(reference.pitchPosition);
+//        shooterSubsystem.setFlywheelsSpeed(reference.flywheelVelocity);
     }
 }
