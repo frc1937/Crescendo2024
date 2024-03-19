@@ -93,7 +93,7 @@ public final class Constants {
          * trust global measurements from vision less.
          * This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians.
          */
-        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 0.5, 0.5, 0.7);
+        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 1.d, 1.d, 1.d);
 
         /**
          * Standard deviations of model states. Increase these numbers to trust your
