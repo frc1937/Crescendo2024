@@ -39,6 +39,7 @@ public class ShooterCommands {
                 () -> {
                     shooterSubsystem.setFlywheelsSpeed(RPM.of(-1400));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+                    intakeSubsystem.setSpeedPercentage(0.4);
                 },
                 () -> {},
                 interrupted -> {

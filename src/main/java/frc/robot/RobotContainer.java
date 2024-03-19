@@ -129,7 +129,7 @@ public class RobotContainer {
 
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
-        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.45));
+        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
 
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
