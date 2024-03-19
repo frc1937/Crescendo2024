@@ -213,6 +213,8 @@ public final class Constants {
             BLUE_ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
         }
 
+        public static boolean SHOOTING_WHILST_MOVING = false;
+
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
         public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
