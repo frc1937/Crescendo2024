@@ -196,8 +196,8 @@ public final class Constants {
             SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500, 0.9);
             SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150, 1.1);
 
-            SPEAKER_TARGET.putTimeOfFlightMeasurement(1.d, 0.4);
-            SPEAKER_TARGET.putTimeOfFlightMeasurement(5.d, 0.6);
+            SPEAKER_TARGET.putTimeOfFlightMeasurement(1.d, 0.2);
+            SPEAKER_TARGET.putTimeOfFlightMeasurement(5.d, 0.4);
         }
 
         static {
