@@ -125,6 +125,8 @@ public class RobotContainer {
         );
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
+        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_ASSIST_TARGET, translationSup, strafeSup));
+
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.45));

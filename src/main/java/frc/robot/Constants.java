@@ -187,7 +187,7 @@ public final class Constants {
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
         public static final Target BLUE_SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.3), Degrees.of(1.85));
-        public static final Target BLUE_ASSIST_TARGET = new Target(new Translation2d(1.5, 7.0), Degrees.of(5));
+        public static final Target BLUE_ASSIST_TARGET = new Target(new Translation2d(1.5, 7.0), Degrees.of(3.5));
         public static final double FIELD_LENGTH = 16.48;
 
         static {
@@ -204,6 +204,13 @@ public final class Constants {
             BLUE_SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400, 0.9);
             BLUE_SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500, 0.9);
             BLUE_SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150, 1.1);
+        }
+
+        static {
+            BLUE_ASSIST_TARGET.putMeasurement(5, 45, 1700, 0.7);
+            BLUE_ASSIST_TARGET.putMeasurement(8, 45, 2300, 0.75);
+            BLUE_ASSIST_TARGET.putMeasurement(11, 36, 2900, 0.8);
+            BLUE_ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
         }
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
