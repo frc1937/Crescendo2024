@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.DISTANCE_TO_TIME_OF_FLIGHT_MAP;
 import static frc.robot.Constants.ShootingConstants.FIELD_LENGTH;
 
 public class Target {

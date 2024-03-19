@@ -7,9 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
+import frc.robot.commands.leds.AlternatingDots;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
@@ -20,18 +23,21 @@ public class ShootToAmp extends SequentialCommandGroup {
     /**
      * Creates a new ShootToAmp.
      */
-    public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem) {
+    public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem, LEDsSubsystem leds) {
         Command prepare = new ParallelCommandGroup(
                 new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.2), //0.19
                 new PrepareShooter(shooter, AMP_INIT).withTimeout(1.9 + 0.37)
         );
 
-        Command release = shooter.startEnd(
-                () -> {
-                    shooter.setKickerSpeed(KICKER_SPEED_FORWARD);
-                    shooter.setFlywheelsSpeed(RPM.of(500));
-                },
-                shooter::reset
+        Command release = new ParallelDeadlineGroup(
+            shooter.startEnd(
+                    () -> {
+                        shooter.setKickerSpeed(KICKER_SPEED_FORWARD);
+                        shooter.setFlywheelsSpeed(RPM.of(500));
+                    },
+                    shooter::reset
+            ),
+            new AlternatingDots(leds)
         ).withTimeout(1.5);
 
         addCommands(

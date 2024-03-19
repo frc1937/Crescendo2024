@@ -40,7 +40,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
     private final Pitch pitch = new Pitch();
     private int consecutiveNoteInsideSamples = 0;
-    private final LedSubsystem ledSubsystem = new LedSubsystem();
 
     public final Measure<Velocity<Angle>> theoreticalMaximumVelocity =
         rightFlywheel.theoreticalMaximumVelocity.lt(leftFlywheel.theoreticalMaximumVelocity)
@@ -57,12 +56,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (isLoaded()) {
-            ledSubsystem.setLedColour(255, 80, 0);
-        } else {
-            ledSubsystem.setLedColour(0, 0, 255);
-        }
-
         if (!beamBreaker.get()) {
             consecutiveNoteInsideSamples++;
         } else {

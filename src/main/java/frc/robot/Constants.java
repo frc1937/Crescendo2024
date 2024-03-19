@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.lib.Target;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
@@ -108,6 +109,12 @@ public final class Constants {
 
     public static class IntakeConstants {
         public static final int INTAKE_MOTOR_ID = 5;
+    }
+
+    public static final class LEDsConstants {
+        public static final int LEDS_COUNT = 46;
+        public static Color8Bit COLOUR_WHEN_EMPTY = new Color8Bit(0, 0, 255);
+        public static Color8Bit COLOUR_WHEN_LOADED = new Color8Bit(255, 80, 0);
     }
 
     public static final class ShootingConstants {

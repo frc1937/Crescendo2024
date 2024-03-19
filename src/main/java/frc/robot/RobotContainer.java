@@ -25,8 +25,11 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
+import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.commands.leds.Pointing;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.TriggerButton;
@@ -70,6 +73,7 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
+    private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
     private final MountCommands mountCommands = new MountCommands(mountSubsystem);
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
@@ -124,9 +128,11 @@ public class RobotContainer {
                 )
         );
 
-        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, SPEAKER_TARGET, translationSup, strafeSup, false));
-        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, SPEAKER_TARGET, translationSup, strafeSup, true));
-        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, ASSIST_TARGET, translationSup, strafeSup, true));
+        leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
+
+        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false));
+        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true));
+        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true));
 
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
@@ -137,7 +143,7 @@ public class RobotContainer {
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
 
-        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain));
+        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 //        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
 //        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 

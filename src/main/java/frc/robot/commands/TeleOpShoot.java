@@ -5,11 +5,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.lib.Target;
 import frc.robot.Constants;
+import frc.robot.commands.leds.OsculatingStrip;
+import frc.robot.commands.leds.Pointing;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -19,11 +23,14 @@ import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
-public class TeleOpShoot extends SequentialCommandGroup {
-    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving) {
-        addCommands(
+public class TeleOpShoot extends ParallelDeadlineGroup {
+    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, LEDsSubsystem leds, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving) {
+        super(
+            new SequentialCommandGroup(
                 new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup, shootingWhilstMoving),
                 new TeleopThrow(drivetrain, shooter, translationSup, strafeSup, shootingWhilstMoving).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
+            ),
+            new Pointing(leds)
         );
     }
 
