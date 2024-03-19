@@ -34,8 +34,6 @@ public class TeleOpShoot extends SequentialCommandGroup {
         private final Target target;
         private final DoubleSupplier translationSup, strafeSup;
 
-        private final Timer deadlineTimer = new Timer();
-
         private double virtualTargetDistance = 0;
 
         public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
@@ -50,8 +48,6 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
         @Override
         public void initialize() {
-            deadlineTimer.restart();
-
             // Predict the position the robot will be in when the NOTE is released
             RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
@@ -94,11 +90,9 @@ public class TeleOpShoot extends SequentialCommandGroup {
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
-            boolean reachedDeadline = deadlineTimer.hasElapsed(3.5);
-
             SmartDashboard.putBooleanArray("azimuth | not-moving", new boolean[]{azimuthReady, notMoving});
 
-            return notMoving && (readyToKick || reachedDeadline);
+            return notMoving && readyToKick;
         }
 
         @Override
