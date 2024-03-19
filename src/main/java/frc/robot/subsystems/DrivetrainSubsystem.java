@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +16,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -28,6 +32,8 @@ import org.photonvision.EstimatedRobotPose;
 
 import java.util.Optional;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 import static frc.robot.Constants.Swerve.*;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
@@ -47,10 +53,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
             AZIMUTH_CONTROLLER_CONSTRAINTS);
     private final double AZIMUTH_CONTROLLER_DEADBAND = 0.12;
 
+    private final MedianFilter xMedianFilter = new MedianFilter(10);
+    private final MedianFilter yMedianFilter = new MedianFilter(10);
+    private final MedianFilter thetaMedianFilter = new MedianFilter(10);
+
     private double yawCorrection = 0;
 
     public DrivetrainSubsystem() {
         SmartDashboard.putData("Field", field2d);
+        
 
         gyro.configFactoryDefault();
         zeroGyro();

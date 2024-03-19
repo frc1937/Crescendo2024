@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +37,8 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
         private double virtualTargetDistance = 0;
 
+        private final MedianFilter distanceFilter = new MedianFilter(10);
+
         public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.drivetrain = drivetrain;
             this.shooter = shooter;
@@ -53,7 +56,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
             Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
-            virtualTargetDistance = virtualTargetDisplacement.getNorm();
+            virtualTargetDistance = distanceFilter.calculate(virtualTargetDisplacement.getNorm());
 
         }
 
@@ -71,10 +74,11 @@ public class TeleOpShoot extends SequentialCommandGroup {
             // score whilst moving
             Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                     virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
-            virtualTargetDistance = virtualTargetDisplacement.getNorm();
+            virtualTargetDistance = distanceFilter.calculate(virtualTargetDisplacement.getNorm());
 
-            SmartDashboard.putNumber("shooting/distance from target [meters]", targetDisplacement.getNorm());
+            SmartDashboard.putNumber("calibration/distance from target [meters]", targetDisplacement.getNorm());
             SmartDashboard.putNumber("calibration/distance from virtual target [meters]", virtualTargetDistance);
+            SmartDashboard.putNumber("calibration/filtered distance from virtual target [meters]", virtualTargetDistance);
 
             // Aim the azimuth to the virtual target
             drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
@@ -104,13 +108,11 @@ public class TeleOpShoot extends SequentialCommandGroup {
     }
 
     public static class TeleopThrow extends Command {
-        private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
         private final DoubleSupplier translationSup, strafeSup;
 
         public TeleopThrow(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter,
                            DoubleSupplier translationSup, DoubleSupplier strafeSup) {
-            this.drivetrain = drivetrain;
             this.shooter = shooter;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
