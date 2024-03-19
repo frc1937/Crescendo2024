@@ -17,7 +17,6 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_PREDICTION_TIME;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
 public class TeleOpShoot extends SequentialCommandGroup {
@@ -64,7 +63,8 @@ public class TeleOpShoot extends SequentialCommandGroup {
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
             // Predict the position the robot will be in when the NOTE is released
-            RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
+            // RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
+            RobotState predictedState = drivetrain.getHistory().estimate();
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
 
             // Calculate the displacement of the virtual target, to which the robot so it can
