@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,8 +36,6 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
         private double virtualTargetDistance = 0;
 
-        private final MedianFilter distanceFilter = new MedianFilter(10);
-
         public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
             this.drivetrain = drivetrain;
             this.shooter = shooter;
@@ -56,7 +53,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
             Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
-            virtualTargetDistance = distanceFilter.calculate(virtualTargetDisplacement.getNorm());
+            virtualTargetDistance = virtualTargetDisplacement.getNorm();
 
         }
 
@@ -74,7 +71,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
             // score whilst moving
             Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                     virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
-            virtualTargetDistance = distanceFilter.calculate(virtualTargetDisplacement.getNorm());
+            virtualTargetDistance = virtualTargetDisplacement.getNorm();
 
             SmartDashboard.putNumber("calibration/distance from target [meters]", targetDisplacement.getNorm());
             SmartDashboard.putNumber("calibration/distance from virtual target [meters]", virtualTargetDistance);
