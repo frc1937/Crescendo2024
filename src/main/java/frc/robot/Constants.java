@@ -201,6 +201,9 @@ public final class Constants {
             BLUE_SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500, 0.85);
             BLUE_SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000, 0.8);
             BLUE_SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000, 0.9);
+            BLUE_SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400, 0.9);
+            BLUE_SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500, 0.9);
+            BLUE_SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150, 1.1);
         }
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
@@ -220,7 +223,7 @@ public final class Constants {
 
     public static final class Swerve {
         public static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
-                AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(2),
+                AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85),
                 AZIMUTH_CONTROLLER_DEADBAND = 0.1;
         public static final double TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7, TRANSLATION_MAX_ACCELERATION = 3;
         public static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);

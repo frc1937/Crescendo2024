@@ -69,8 +69,8 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
 
             SmartDashboard.putNumber("calibration/distance from target [meters]", targetDisplacement.getNorm());
 
-            drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
-                    targetDisplacement.getAngle());
+            // drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
+            //         targetDisplacement.getAngle());
 
             // Aim the shooter
             shooter.setReference(
@@ -83,15 +83,15 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            boolean azimuthReady = drivetrain.azimuthAtGoal();
+            // boolean azimuthReady = drivetrain.azimuthAtGoal();
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
-            boolean readyToKick = shooter.atReference() && azimuthReady;
+            boolean readyToKick = shooter.atReference();
 
             boolean reachedDeadline = deadlineTimer.hasElapsed(1 + targetDistance * 0.2);
 
             boolean flywheelsReady = shooter.flywheelsAtReference();  // TODO for debugging, remove
             boolean pitchReady = shooter.pitchAtReference();  // TODO for debugging, remove
-            SmartDashboard.putBooleanArray("flywheels | pitch | azimuth | not-moving", new boolean[]{flywheelsReady, pitchReady, azimuthReady, notMoving});
+            SmartDashboard.putBooleanArray("flywheels | pitch | azimuth | not-moving", new boolean[]{flywheelsReady, pitchReady, notMoving});
 
             return notMoving && (readyToKick || reachedDeadline);
         }

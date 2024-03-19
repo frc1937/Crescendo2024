@@ -69,7 +69,7 @@ public class Pitch {
 
     public void periodic() {
         SmartDashboard.putNumber("pitch/CurrentAngle", getCurrentPosition().getDegrees());
-        SmartDashboard.putNumber("pitch/Setpoint", Units.radiansToDegrees(controller.getSetpoint().position));
+        SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
         SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
         SmartDashboard.putNumber("pitch/relativePosition", getPositionFromRelativeEncoder().getDegrees());
 

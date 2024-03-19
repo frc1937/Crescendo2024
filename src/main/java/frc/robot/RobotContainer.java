@@ -24,6 +24,7 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
+import frc.robot.commands.calibration.TeleOpShootCalibration;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
