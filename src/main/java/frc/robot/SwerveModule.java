@@ -81,6 +81,9 @@ public class SwerveModule {
 
     private void setSpeed(Measure<Velocity<Distance>> speed, boolean closedLoop) {
         if (closedLoop) {
+            if (speed.in(MetersPerSecond) < 0.05) {
+                driveMotor.set(ControlMode.PercentOutput, 0);
+            }
             double targetMotorRPS = speed.in(MetersPerSecond) / Swerve.WHEEL_CIRCUMFERENCE * Swerve.DRIVE_GEAR_RATIO;
             double targetMotorFalcon = Conversions.MPSToFalcon(speed.in(MetersPerSecond), Swerve.WHEEL_CIRCUMFERENCE, Swerve.DRIVE_GEAR_RATIO);
             double feedForward = feedforward.calculate(targetMotorRPS);
