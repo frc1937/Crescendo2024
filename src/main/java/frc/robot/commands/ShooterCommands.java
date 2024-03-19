@@ -37,7 +37,7 @@ public class ShooterCommands {
     public Command postIntake() {
         return new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-1400));
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-2000));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                     intakeSubsystem.setSpeedPercentage(0.4);
                 },

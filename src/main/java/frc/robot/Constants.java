@@ -222,7 +222,7 @@ public final class Constants {
                 Rotation2d.fromDegrees(113), RPM.of(2000));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(-21.2), RPM.of(-1800), 0.75, 16);
+                Rotation2d.fromDegrees(-21.2), RPM.of(-3000), 0.75, 10);
 
         public static final ShooterSubsystem.Reference AMP_INIT =
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), RPM.of(500));
