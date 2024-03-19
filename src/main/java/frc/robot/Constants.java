@@ -207,8 +207,8 @@ public final class Constants {
         }
 
         static {
-            BLUE_ASSIST_TARGET.putMeasurement(5, 45, 1700, 0.7);
-            BLUE_ASSIST_TARGET.putMeasurement(8, 45, 2300, 0.75);
+            BLUE_ASSIST_TARGET.putMeasurement(5, 60, 1750, 0.7);
+            BLUE_ASSIST_TARGET.putMeasurement(8, 50, 2350, 0.75);
             BLUE_ASSIST_TARGET.putMeasurement(11, 36, 2900, 0.8);
             BLUE_ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
         }
