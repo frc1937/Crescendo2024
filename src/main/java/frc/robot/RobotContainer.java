@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.MountCommand;
 import frc.robot.commands.MountCommands;
 import frc.robot.commands.PrepareShooter;
 import frc.robot.commands.ShootToAmp;
@@ -24,7 +25,6 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
-import frc.robot.commands.calibration.TeleOpShootCalibration;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MountSubsystem;
@@ -147,9 +147,9 @@ public class RobotContainer {
         opXButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(-1000))));
 
         mountSubsystem.setDefaultCommand(
-                mountCommands.startManualMount(
-                        () -> -operatorController.getRawAxis(XboxController.Axis.kLeftY.value),
-                        () -> -operatorController.getRawAxis(XboxController.Axis.kRightY.value)
+                new MountCommand(mountSubsystem,
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kLeftY.value), Constants.STICK_DEADBAND*0.5),
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
                 )
         );
 
@@ -202,5 +202,16 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         drivetrain.infrequentPeriodic();
+    }
+
+    public void robotPeriodic() {
+
+        SmartDashboard.putNumber("op/nice1",
+                MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kLeftY.value), Constants.STICK_DEADBAND*0.5));
+        SmartDashboard.putNumber("op/nice2",
+                MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
+        );
+
+
     }
 }

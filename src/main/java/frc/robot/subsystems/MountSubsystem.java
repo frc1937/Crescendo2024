@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Rotations;
@@ -18,13 +19,21 @@ public class MountSubsystem extends SubsystemBase {
         configMotor(mountRightMotor);
         configMotor(mountLeftMotor);
 
+        mountLeftMotor.setInverted(true);
+
         rightEncoder.setPosition(0);
         leftEncoder.setPosition(0);
     }
 
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("mount/rightEncoder", rightEncoder.getPosition());
+        SmartDashboard.putNumber("mount/leftEncoder", leftEncoder.getPosition());
+    }
+
     public boolean isAtTop() {
-        return rightEncoder.getPosition() >= MOUNT_AT_TOP_ENCODER_VALUE.in(Rotations) &&
-                leftEncoder.getPosition() >= MOUNT_AT_TOP_ENCODER_VALUE.in(Rotations);
+        return rightEncoder.getPosition() >= MOUNT_AT_TOP_LEFT_VALUE.in(Rotations) &&
+                leftEncoder.getPosition() >= MOUNT_AT_TOP_RIGHT_VALUE.in(Rotations);
     }
 
     /**
@@ -42,8 +51,11 @@ public class MountSubsystem extends SubsystemBase {
     }
 
     public void manualMount(double leftSpeed, double rightSpeed) {
-        mountLeftMotor.set(leftSpeed);
-        mountRightMotor.set(rightSpeed);
+        if(rightEncoder.getPosition() < MOUNT_AT_TOP_RIGHT_VALUE.in(Rotations))
+            mountLeftMotor.set(leftSpeed);
+
+        if(leftEncoder.getPosition() < MOUNT_AT_TOP_LEFT_VALUE.in(Rotations))
+            mountRightMotor.set(rightSpeed);
     }
 
     public void stopMount() {
@@ -55,7 +67,7 @@ public class MountSubsystem extends SubsystemBase {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
-        motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) MOUNT_SOFT_LIMIT.in(Rotations));
-        motor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+//        motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) MOUNT_SOFT_LIMIT.in(Rotations));
+//        motor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     }
 }

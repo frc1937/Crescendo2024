@@ -48,10 +48,12 @@ public final class Constants {
     public static final double STICK_DEADBAND = 0.1;
 
     public static final class Mount { //todo: TUNE CONSTANTS TO SYSTEM SPECIFICS
-        public static final int MOUNT_RIGHT_MOTOR_ID = 2;
-        public static final int MOUNT_LEFT_MOTOR_ID = 3;
-        public static final Measure<Angle> MOUNT_AT_TOP_ENCODER_VALUE = Degrees.of(0.5);
-        public static final Measure<Angle> MOUNT_SOFT_LIMIT = Degrees.of(1.5);
+        public static final int MOUNT_RIGHT_MOTOR_ID = 7;
+        public static final int MOUNT_LEFT_MOTOR_ID = 12;
+        public static final Measure<Angle> MOUNT_AT_TOP_LEFT_VALUE = Rotations.of(68);
+        public static final Measure<Angle> MOUNT_AT_TOP_RIGHT_VALUE = Rotations.of(69);
+
+        public static final Measure<Angle> MOUNT_SOFT_LIMIT = Rotations.of(1.5);
         public static final double MOUNT_SPEED_SCALAR = 0.5;
         public static final double MOUNT_AUTO_SPEED = 0.5;
     }
@@ -105,7 +107,7 @@ public final class Constants {
     }
 
     public static class IntakeConstants {
-        public static final int INTAKE_MOTOR_ID = 11;
+        public static final int INTAKE_MOTOR_ID = 5;
     }
 
     public static final class ShootingConstants {
