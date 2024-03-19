@@ -126,10 +126,8 @@ public final class Constants {
                 InverseInterpolator.forDouble(), Interpolator.forDouble());
 
         static {
-            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.87, 0.35);
-            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.67, 0.4);
-            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.52, 0.5);
-            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(0.41, 0.6);
+            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(1.d, 0.4);
+            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(5.d, 0.6);
         }
 
         public static final double POSE_HISTORY_DURATION = 0.3;
