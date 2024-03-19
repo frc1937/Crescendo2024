@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.RobotStateHistory;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
 import frc.robot.vision.VisionPoseEstimator;
@@ -39,7 +40,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
     public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
     private final Field2d field2d = new Field2d();
-    private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);
+    private final RobotStateHistory history = new RobotStateHistory();
     private double previousTimestamp = 0;
     private final ProfiledPIDController azimuthController = new ProfiledPIDController(
             AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
@@ -245,10 +246,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
         Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
-        estimatedFrontPose.ifPresent(this::updateByEstimator);
 
-        Optional<EstimatedRobotPose> estimatedRearPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), REAR_CAMERA_NAME);
-        estimatedRearPose.ifPresent(this::updateByEstimator);
+        estimatedFrontPose.ifPresent(this::updateByEstimator);
 
         poseEstimator.update(getGyroYaw(), getModulePositions());
 
@@ -266,8 +265,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         yawCorrection = MathUtil.applyDeadband(yawCorrection, AZIMUTH_CONTROLLER_DEADBAND);
     }
 
-    public TimeInterpolatableBuffer<Pose2d> getPoseHistory() {
-        return poseHistory;
+    public RobotStateHistory getHistory() {
+        return history;
     }
 
     public void infrequentPeriodic() {
@@ -279,22 +278,41 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     private void updateByEstimator(EstimatedRobotPose estimatedRobotPose) {
-        if (estimatedRobotPose == null) return;
+        if (estimatedRobotPose == null) {
+            return;
+        }
 
-        double currentTimestamp = estimatedRobotPose.timestampSeconds;
+        if (previousTimestamp < estimatedRobotPose.timestampSeconds) {
+            previousTimestamp = estimatedRobotPose.timestampSeconds;
 
-        if (previousTimestamp != currentTimestamp) {
-            previousTimestamp = currentTimestamp;
+            Pose2d visionPose = estimatedRobotPose.estimatedPose.toPose2d();
 
-            Pose3d visionPose = estimatedRobotPose.estimatedPose;
-            poseEstimator.addVisionMeasurement(visionPose.toPose2d(),
-                    Timer.getFPGATimestamp(),
-                    visionPoseEstimator.confidenceCalculator(estimatedRobotPose)
+            Pose2d filteredVisionPose = new Pose2d(
+                xMedianFilter.calculate(visionPose.getX()),
+                yMedianFilter.calculate(visionPose.getY()),
+                Rotation2d.fromRadians(thetaMedianFilter.calculate(visionPose.getRotation().getRadians())));
+
+            Measure<Velocity<Angle>> angularVelocity;
+            try {
+                angularVelocity = RadiansPerSecond.of(history.estimate().getVelocity().omegaRadiansPerSecond);
+            } catch (NullPointerException e) {
+                angularVelocity = RadiansPerSecond.of(0);
+            }
+
+            SmartDashboard.putNumber("Angular Velocity", angularVelocity.in(RotationsPerSecond));
+
+            field2d.getObject("Vision").setPose(visionPose);
+
+            poseEstimator.addVisionMeasurement(
+                    filteredVisionPose,
+                    Timer.getFPGATimestamp()//,
+                    // estimatedRobotPose.timestampSeconds/* - 0.02 * 5*/,  // TODO this needs to be more sofisticated
+                    // visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity)
             );
         }
     }
 
     private void sampleRobotPose() {
-        poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
+        history.addSample(Timer.getFPGATimestamp(), getPose());
     }
 }

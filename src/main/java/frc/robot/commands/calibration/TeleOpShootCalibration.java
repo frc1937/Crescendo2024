@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.calibration;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -63,7 +63,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
-            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
+            RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
 
             SmartDashboard.putNumber("calibration/distance from target [meters]", targetDisplacement.getNorm());

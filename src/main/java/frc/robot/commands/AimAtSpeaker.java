@@ -29,7 +29,7 @@ public class AimAtSpeaker extends Command {
     @Override
     public void initialize() {
         // Predict the position the robot will be in when the NOTE is released
-        RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+        RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
         Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
         Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                 targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
@@ -38,7 +38,7 @@ public class AimAtSpeaker extends Command {
 
     @Override
     public void execute() {
-        RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+        RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
         Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
 
         Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(virtualTargetDistance, targetDisplacement, predictedState.getVelocity());

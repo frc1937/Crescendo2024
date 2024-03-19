@@ -53,7 +53,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
             deadlineTimer.restart();
 
             // Predict the position the robot will be in when the NOTE is released
-            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_DELAY);
+            RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
             Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
@@ -68,7 +68,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
             // Predict the position the robot will be in when the NOTE is released
-            RobotState predictedState = RobotState.predict(drivetrain.getPoseHistory(), Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
+            RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
 
             // Calculate the displacement of the virtual target, to which the robot so it can
