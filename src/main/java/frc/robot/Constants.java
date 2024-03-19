@@ -8,6 +8,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.*;
@@ -92,13 +93,7 @@ public final class Constants {
          * trust global measurements from vision less.
          * This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians.
          */
-        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(), Nat.N1())
-                .fill(
-                        // if these numbers are less than one, multiplying will do bad things
-                        1, // x
-                        1, // y
-                        1 * Math.PI // theta
-                );
+        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 0.5, 0.5, 0.7);
 
         /**
          * Standard deviations of model states. Increase these numbers to trust your
@@ -106,13 +101,7 @@ public final class Constants {
          * matrix is in the form [x, y, theta]ᵀ, with units in meters and radians, then
          * meters.
          */
-        public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(), Nat.N1())
-                .fill(
-                        // if these numbers are less than one, multiplying will do bad things
-                        .1, // x
-                        .1, // y
-                        .1);
-
+        public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 0.1, 0.1, 0.03);
     }
 
     public static class IntakeConstants {
@@ -197,7 +186,7 @@ public final class Constants {
         public static final double POST_SHOOTING_DELAY = 0.25;
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-        public static final Target BLUE_SPEAKER_TARGET = new Target(new Translation2d(0.0, 5.3));
+        public static final Target BLUE_SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.3));
         public static final Translation2d BLUE_ASSIST_TARGET = new Translation2d(1.0, 7.0);
         public static final double FIELD_LENGTH = 16.48;
 
@@ -223,11 +212,10 @@ public final class Constants {
                 Rotation2d.fromDegrees(113), RPM.of(2000));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(-21.2), RPM.of(-1800));
+                Rotation2d.fromDegrees(-21.2), RPM.of(-1800), 0.75, 16);
 
         public static final ShooterSubsystem.Reference AMP_INIT =
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), RPM.of(500));
-
     }
 
     public static final class Swerve {

@@ -25,12 +25,16 @@ public class Flywheel {
     private final RelativeEncoder encoder;
     private final PIDController feedback;
     private final SimpleMotorFeedforward feedforward;
+    private final double p;
+
     private double feedforwardCorrection = 0;
     private Measure<Velocity<Angle>> setpoint;
 
     public final Measure<Velocity<Angle>> theoreticalMaximumVelocity;
 
     public Flywheel(int motorId, boolean invert, double p, double s, double v, double a) {
+        this.p = p;
+
         feedback = new PIDController(p, 0, 0);
         feedforward = new SimpleMotorFeedforward(s, v, a);
 
@@ -56,11 +60,16 @@ public class Flywheel {
         motor.setVoltage(feedbackCorrection + feedforwardCorrection);
     }
 
-    public void setSpeed(Measure<Velocity<Angle>> speed) {
+    public void setSpeed(Measure<Velocity<Angle>> speed, double force) {
         setpoint = speed;
 
         feedback.setSetpoint(speed.in(RotationsPerSecond));
+        feedback.setP(p * force);
         feedforwardCorrection = feedforward.calculate(speed.in(RotationsPerSecond));
+    }
+
+    public void setSpeed(Measure<Velocity<Angle>> speed) {
+        setSpeed(speed, 1);
     }
 
     public Measure<Velocity<Angle>> getSetpoint() {
