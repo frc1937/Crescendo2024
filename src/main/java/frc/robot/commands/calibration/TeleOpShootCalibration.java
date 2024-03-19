@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.lib.Target;
 import frc.robot.Constants;
+import frc.robot.commands.TeleOpShoot;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
