@@ -7,8 +7,10 @@ import frc.lib.RobotState;
 import frc.lib.Target;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
+import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 
 /**
  * Should use TeleOpShoot OR make TeleOpShoot use this. No need for both.
@@ -51,6 +53,6 @@ public class AimAtSpeaker extends Command {
 
     @Override
     public boolean isFinished() {
-        return drivetrain.azimuthAtGoal();
+        return drivetrain.azimuthAtGoal(Radians.of(AZIMUTH_CONTROLLER_TOLERANCE));
     }
 }

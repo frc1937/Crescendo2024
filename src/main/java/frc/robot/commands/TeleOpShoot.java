@@ -90,7 +90,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            boolean azimuthReady = drivetrain.azimuthAtGoal();
+            boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance());
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 

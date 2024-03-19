@@ -30,6 +30,7 @@ import org.photonvision.EstimatedRobotPose;
 
 import java.util.Optional;
 
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
@@ -198,8 +199,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         driveWithAzimuth(translation, fieldRelative);
     }
 
-    public boolean azimuthAtGoal() {
-        return Math.abs(azimuthController.getPositionError()) < AZIMUTH_CONTROLLER_TOLERANCE;
+    public boolean azimuthAtGoal(Measure<Angle> tolerance) {
+        return Math.abs(azimuthController.getPositionError()) < tolerance.in(Radians);
     }
 
     public void resetPose() {

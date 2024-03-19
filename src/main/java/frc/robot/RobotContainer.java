@@ -34,6 +34,7 @@ import frc.robot.util.TriggerButton;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.BLUE_ASSIST_TARGET;
 import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
@@ -46,8 +47,8 @@ public class RobotContainer {
 
     /* MAIN-DRIVER */
     private final JoystickButton drAButton = new JoystickButton(driveController, XboxController.Button.kA.value);
+    private final JoystickButton drYButton = new JoystickButton(driveController, XboxController.Button.kY.value);
     private final JoystickButton drBButton = new JoystickButton(driveController, XboxController.Button.kB.value);
-    private final JoystickButton driveYButton = new JoystickButton(driveController, XboxController.Button.kY.value);
     private final JoystickButton drXButton = new JoystickButton(driveController, XboxController.Button.kX.value);
     private final JoystickButton drStartButton = new JoystickButton(driveController, XboxController.Button.kStart.value);
     private final TriggerButton drLeftTrigger = new TriggerButton(driveController, XboxController.Axis.kLeftTrigger);
