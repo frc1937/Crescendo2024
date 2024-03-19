@@ -17,14 +17,13 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_WHILST_MOVING;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
 public class TeleOpShoot extends SequentialCommandGroup {
-    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving) {
         addCommands(
-                new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup),
-                new TeleopThrow(drivetrain, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
+                new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup, shootingWhilstMoving),
+                new TeleopThrow(drivetrain, shooter, translationSup, strafeSup, shootingWhilstMoving).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
     }
 
@@ -33,15 +32,17 @@ public class TeleOpShoot extends SequentialCommandGroup {
         private final ShooterSubsystem shooter;
         private final Target target;
         private final DoubleSupplier translationSup, strafeSup;
+        private final boolean shootingWhilstMoving;
 
         private double virtualTargetDistance = 0;
 
-        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving) {
             this.drivetrain = drivetrain;
             this.shooter = shooter;
             this.target = target;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
+            this.shootingWhilstMoving = shootingWhilstMoving;
 
             addRequirements(drivetrain, shooter);
         }
@@ -51,7 +52,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
             // Predict the position the robot will be in when the NOTE is released
             RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
-            Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
+            Translation2d virtualTargetDisplacement = target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
         }
@@ -69,7 +70,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
             // Calculate the displacement of the virtual target, to which the robot so it can
             // score whilst moving
-            Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
+            Translation2d virtualTargetDisplacement = target.calculateVirtualTargetDisplacement(
                     virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
 
@@ -93,7 +94,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
             SmartDashboard.putBooleanArray("azimuth | not-moving | pitch", new boolean[]{azimuthReady, notMoving, shooter.pitchAtReference()});
 
-            return (SHOOTING_WHILST_MOVING || notMoving) && readyToKick;
+            return (shootingWhilstMoving || notMoving) && readyToKick;
         }
 
         @Override
@@ -108,20 +109,23 @@ public class TeleOpShoot extends SequentialCommandGroup {
         private final ShooterSubsystem shooter;
         private final DrivetrainSubsystem drivetrain;
         private final DoubleSupplier translationSup, strafeSup;
+        private final boolean shootingWhilstMoving;
 
         public TeleopThrow(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter,
-                           DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+                           DoubleSupplier translationSup, DoubleSupplier strafeSup,
+                           boolean shootingWhilstMoving) {
             this.shooter = shooter;
             this.drivetrain = drivetrain;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
+            this.shootingWhilstMoving = shootingWhilstMoving;
 
             addRequirements(drivetrain, shooter);
         }
 
         @Override
         public void execute() {
-            if (SHOOTING_WHILST_MOVING) {
+            if (shootingWhilstMoving) {
                 // Get values, deadband
                 double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
                 double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
@@ -137,7 +141,7 @@ public class TeleOpShoot extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            if (SHOOTING_WHILST_MOVING) {
+            if (shootingWhilstMoving) {
                 return false;
             } else {
                 return new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() > Constants.STICK_DEADBAND;

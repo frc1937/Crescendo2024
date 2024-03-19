@@ -6,6 +6,7 @@ package frc.lib;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,6 +24,7 @@ public class Target {
     private final Translation2d redPosition;
     private final InterpolatingTreeMap<Double, ShooterSubsystem.Reference> distanceToReferenceMap = new InterpolatingTreeMap<>(
             InverseInterpolator.forDouble(), ShooterSubsystem.Reference::interpolate);
+    private final InterpolatingDoubleTreeMap distanceToTimeOfFlightMap = new InterpolatingDoubleTreeMap();
     private final Measure<Angle> azimuthTolerance;
 
     public Target(Translation2d bluePosition, Measure<Angle> azimuthTolerance) {
@@ -38,11 +40,12 @@ public class Target {
         return targetPosition.minus(robotState.getPose().getTranslation());
     }
 
-    /**
-     * A small helper function for adding measurements from Constants
-     */
-    public void putMeasurement(double distance, double degrees, double rpm, double spin) {
-        distanceToReferenceMap.put(distance, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
+    public void putMeasurement(double distanceMetres, double degrees, double rpm, double spin) {
+        distanceToReferenceMap.put(distanceMetres, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
+    }
+
+    public void putTimeOfFlightMeasurement(double distanceMetres, double timeOfFlightSeconds) {
+        distanceToTimeOfFlightMap.put(distanceMetres, timeOfFlightSeconds);
     }
 
     public ShooterSubsystem.Reference getReferenceByDistance(double distance) {
@@ -57,10 +60,10 @@ public class Target {
      * Find the displacement to the virtual target, i.e., the target to which the robot should aim s.t.
      * the NOTE enters the actual target, even whilst moving.
      */
-    public static Translation2d calculateVirtualTargetDisplacement(double virtualTargetDistance,
-                                                                    Translation2d targetDisplacement,
-                                                                    ChassisSpeeds velocity) {
-        double timeOfFlight = DISTANCE_TO_TIME_OF_FLIGHT_MAP.get(virtualTargetDistance);
+    public Translation2d calculateVirtualTargetDisplacement(double virtualTargetDistance,
+                                                            Translation2d targetDisplacement,
+                                                            ChassisSpeeds velocity) {
+        double timeOfFlight = distanceToTimeOfFlightMap.get(virtualTargetDistance);
 
         Translation2d displacementDueToRobotVelocity = new Translation2d(
                 velocity.vxMetersPerSecond * timeOfFlight,

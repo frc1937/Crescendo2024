@@ -34,8 +34,8 @@ import frc.robot.util.TriggerButton;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.BLUE_ASSIST_TARGET;
-import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
+import static frc.robot.Constants.ShootingConstants.ASSIST_TARGET;
+import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
@@ -124,8 +124,9 @@ public class RobotContainer {
                 )
         );
 
-        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
-        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_ASSIST_TARGET, translationSup, strafeSup));
+        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, SPEAKER_TARGET, translationSup, strafeSup, false));
+        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, SPEAKER_TARGET, translationSup, strafeSup, true));
+        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, ASSIST_TARGET, translationSup, strafeSup, true));
 
 
 //        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());

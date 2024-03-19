@@ -122,13 +122,6 @@ public final class Constants {
          */
         public static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
         public static final int FLYWHEEL_MAX_RPM = 6400;
-        public static final InterpolatingTreeMap<Double, Double> DISTANCE_TO_TIME_OF_FLIGHT_MAP = new InterpolatingTreeMap<>(
-                InverseInterpolator.forDouble(), Interpolator.forDouble());
-
-        static {
-            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(1.d, 0.4);
-            DISTANCE_TO_TIME_OF_FLIGHT_MAP.put(5.d, 0.6);
-        }
 
         public static final double POSE_HISTORY_DURATION = 0.3;
 
@@ -184,34 +177,38 @@ public final class Constants {
         public static final double POST_SHOOTING_DELAY = 0.25;
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-        public static final Target BLUE_SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.3), Degrees.of(1.85));
-        public static final Target BLUE_ASSIST_TARGET = new Target(new Translation2d(1.5, 7.0), Degrees.of(3.5));
+        public static final Target SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.555), Degrees.of(1.85));
+        public static final Target ASSIST_TARGET = new Target(new Translation2d(1.5, 7.0), Degrees.of(3.5));
         public static final double FIELD_LENGTH = 16.48;
 
         static {
-            BLUE_SPEAKER_TARGET.putMeasurement(1.24, 53, 2500, 1);
-            BLUE_SPEAKER_TARGET.putMeasurement(1.56, 47, 2500, 1);
-            BLUE_SPEAKER_TARGET.putMeasurement(1.85, 44, 2500, 1);
-            BLUE_SPEAKER_TARGET.putMeasurement(2.08, 40, 2700, 1);
-            BLUE_SPEAKER_TARGET.putMeasurement(2.33, 35, 3000, 0.85);
-            BLUE_SPEAKER_TARGET.putMeasurement(2.72, 34, 3000, 0.85);
-            BLUE_SPEAKER_TARGET.putMeasurement(2.95, 31, 3500, 0.85);
-            BLUE_SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500, 0.85);
-            BLUE_SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000, 0.8);
-            BLUE_SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000, 0.9);
-            BLUE_SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400, 0.9);
-            BLUE_SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500, 0.9);
-            BLUE_SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150, 1.1);
+            SPEAKER_TARGET.putMeasurement(1.24, 53, 2500, 1);
+            SPEAKER_TARGET.putMeasurement(1.56, 47, 2500, 1);
+            SPEAKER_TARGET.putMeasurement(1.85, 44, 2500, 1);
+            SPEAKER_TARGET.putMeasurement(2.08, 40, 2700, 1);
+            SPEAKER_TARGET.putMeasurement(2.33, 35, 3000, 0.85);
+            SPEAKER_TARGET.putMeasurement(2.72, 34, 3000, 0.85);
+            SPEAKER_TARGET.putMeasurement(2.95, 31, 3500, 0.85);
+            SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500, 0.85);
+            SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000, 0.8);
+            SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000, 0.9);
+            SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400, 0.9);
+            SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500, 0.9);
+            SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150, 1.1);
+
+            SPEAKER_TARGET.putTimeOfFlightMeasurement(1.d, 0.4);
+            SPEAKER_TARGET.putTimeOfFlightMeasurement(5.d, 0.6);
         }
 
         static {
-            BLUE_ASSIST_TARGET.putMeasurement(5, 60, 1750, 0.7);
-            BLUE_ASSIST_TARGET.putMeasurement(8, 50, 2350, 0.75);
-            BLUE_ASSIST_TARGET.putMeasurement(11, 36, 2900, 0.8);
-            BLUE_ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
-        }
+            ASSIST_TARGET.putMeasurement(5, 60, 1750, 0.7);
+            ASSIST_TARGET.putMeasurement(8, 50, 2350, 0.75);
+            ASSIST_TARGET.putMeasurement(11, 36, 2900, 0.8);
+            ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
 
-        public static boolean SHOOTING_WHILST_MOVING = false;
+            ASSIST_TARGET.putTimeOfFlightMeasurement(1.d, 1.5);
+            ASSIST_TARGET.putTimeOfFlightMeasurement(14.d, 2.5);
+        }
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
         public static final double KICKER_SPEED_FORWARD = 1;
