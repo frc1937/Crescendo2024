@@ -41,11 +41,9 @@ public class AlignWithAmp extends Command {
 
     Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
 
-    double angle = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue ? -90 : 90;
-
     drivetrain.driveWithAzimuth(
         translation,
-        Rotation2d.fromDegrees(angle),
+        Rotation2d.fromDegrees(90),
         true
     );
   }
