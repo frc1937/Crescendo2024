@@ -32,6 +32,11 @@ public class AlternatingDots extends Command {
     }
 
     @Override
+    public void initialize() {
+        leds.start();
+    }
+
+    @Override
     public void execute() {
         if (state) {
             leds.setBuffer(state0Buffer);
@@ -44,6 +49,6 @@ public class AlternatingDots extends Command {
 
     @Override
     public void end(boolean interrupt) {
-        leds.clear();
+        leds.stop();
     }
 }

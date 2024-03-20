@@ -38,6 +38,7 @@ public class ColourByShooter extends Command {
 
     @Override
     public void initialize() {
+        leds.start();
         leds.setBuffer(bufferWhenEmpty);
     }
 
@@ -56,6 +57,6 @@ public class ColourByShooter extends Command {
 
     @Override
     public void end(boolean interrupt) {
-        leds.clear();
+        leds.stop();
     }
 }

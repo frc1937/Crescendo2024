@@ -25,6 +25,11 @@ public class Pointing extends Command {
     }
 
     @Override
+    public void initialize() {
+        leds.start();
+    }
+
+    @Override
     public void execute() {
         Color8Bit globalColour = shooter.isLoaded() ? LEDsConstants.COLOUR_WHEN_LOADED : LEDsConstants.COLOUR_WHEN_EMPTY;
 
@@ -48,6 +53,6 @@ public class Pointing extends Command {
 
     @Override
     public void end(boolean interrupt) {
-        leds.clear();
+        leds.stop();
     }
 }

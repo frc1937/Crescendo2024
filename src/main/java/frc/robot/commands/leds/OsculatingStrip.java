@@ -25,6 +25,11 @@ public class OsculatingStrip extends Command {
     }
 
     @Override
+    public void initialize() {
+        leds.start();
+    }
+
+    @Override
     public void execute() {
         AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
@@ -45,6 +50,6 @@ public class OsculatingStrip extends Command {
 
     @Override
     public void end(boolean interrupt) {
-        leds.clear();
+        leds.stop();
     }
 }

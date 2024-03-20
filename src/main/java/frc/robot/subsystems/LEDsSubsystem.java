@@ -11,7 +11,6 @@ public class LEDsSubsystem extends SubsystemBase {
 
     public LEDsSubsystem() {
         leds.setLength(buffer.getLength());
-        leds.start();
     }
 
     public void setBuffer(AddressableLEDBuffer buffer) {
@@ -20,7 +19,11 @@ public class LEDsSubsystem extends SubsystemBase {
         }
     }
 
-    public void clear() {
+    public void stop() {
         leds.stop();
+    }
+
+    public void start() {
+        leds.start();
     }
 }
