@@ -229,7 +229,7 @@ public final class Constants {
         public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(50), RPM.of(2600));//50!
         public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(113), RPM.of(2000));
+                Rotation2d.fromDegrees(111.5), RPM.of(2500));
 
         public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(-21.2), RPM.of(-3000), 0.75, 10);
