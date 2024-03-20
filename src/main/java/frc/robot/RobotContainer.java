@@ -88,7 +88,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
         NamedCommands.registerCommand("AdjustShooter1", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.75), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.25), RPM.of(3000))));
         NamedCommands.registerCommand("AdjustShooter2", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), RPM.of(3000))));
         NamedCommands.registerCommand("AdjustShooter3", new PrepareShooter(shooterSubsystem,
@@ -101,6 +101,9 @@ public class RobotContainer {
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(28), RPM.of(4500))));
         NamedCommands.registerCommand("AdjustShooter7", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), RPM.of(4500))));
+        NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(106.75), RPM.of(3000))));
+
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
