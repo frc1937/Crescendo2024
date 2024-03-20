@@ -40,7 +40,7 @@ public class Target {
     }
 
     public void putMeasurement(double distanceMetres, double degrees, double rpm, double spin) {
-        distanceToReferenceMap.put(distanceMetres, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
+        distanceToReferenceMap.put(distanceMetres, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm * 0.75), spin));
     }
 
     public void putTimeOfFlightMeasurement(double distanceMetres, double timeOfFlightSeconds) {
