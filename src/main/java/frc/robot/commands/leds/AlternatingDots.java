@@ -13,15 +13,15 @@ import frc.robot.subsystems.LEDsSubsystem;
 public class AlternatingDots extends Command {
     private final LEDsSubsystem leds;
 
-    private boolean state = false;
+    private int t = 0;
 
     private static final AddressableLEDBuffer state0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
             state1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
     static {
         for (int i = 0; i < LEDsConstants.LEDS_COUNT; i++) {
-            state0Buffer.setLED(i, i % 2 == 0 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
-            state1Buffer.setLED(i, i % 2 == 1 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
+            state0Buffer.setLED(i, (i / 3) % 2 == 0 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
+            state1Buffer.setLED(i, (i / 3) % 2 == 1 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
         }
     }
 
@@ -38,13 +38,13 @@ public class AlternatingDots extends Command {
 
     @Override
     public void execute() {
-        if (state) {
+        if ((t / 5) % 2 == 0) {
             leds.setBuffer(state0Buffer);
         } else {
             leds.setBuffer(state1Buffer);
         }
 
-        state = !state;
+        t++;
     }
 
     @Override
