@@ -162,6 +162,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
     }
 
+    public void resetAzimuthController() {
+        azimuthController.reset(getPose().getRotation().getRadians(), history.estimate().getVelocity().omegaRadiansPerSecond);
+    }
+
     /**
      * Set the azimuth goal.
      *

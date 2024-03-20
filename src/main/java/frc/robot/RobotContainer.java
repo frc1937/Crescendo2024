@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AimAtSpeaker;
+import frc.robot.commands.AlignWithAmp;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommand;
 import frc.robot.commands.PrepareShooter;
@@ -134,7 +135,7 @@ public class RobotContainer {
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
         drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.85)));
 
-        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+        drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
 
