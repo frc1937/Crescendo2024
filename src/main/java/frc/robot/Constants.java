@@ -212,8 +212,9 @@ public final class Constants {
             SPEAKER_TARGET.putTimeOfFlightMeasurement(1.d, 0.2);
             SPEAKER_TARGET.putTimeOfFlightMeasurement(5.d, 0.4);
 
-            SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 3);
-            SPEAKER_TARGET.putAzimuthToleranceMeasurement(5.d, 1.4);
+            SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 3.8);
+        SPEAKER_TARGET.putAzimuthToleranceMeasurement(4.d, 3.0);
+            SPEAKER_TARGET.putAzimuthToleranceMeasurement(7.d, 1.4);
         }
 
         static {
@@ -221,12 +222,13 @@ public final class Constants {
             ASSIST_TARGET.putMeasurement(8, 50, 2350, 0.75);
             ASSIST_TARGET.putMeasurement(11, 36, 2900, 0.8);
             ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
+            ASSIST_TARGET.putMeasurement(17, 36, 4100, 0.85);
 
             ASSIST_TARGET.putTimeOfFlightMeasurement(1.d, 1.5);
-            ASSIST_TARGET.putTimeOfFlightMeasurement(14.d, 2.5);
+            ASSIST_TARGET.putTimeOfFlightMeasurement(17.d, 2.6);
 
-            SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 5.d);
-            SPEAKER_TARGET.putAzimuthToleranceMeasurement(15.d, 3);
+            ASSIST_TARGET.putAzimuthToleranceMeasurement(2.d, 5.d);
+            ASSIST_TARGET.putAzimuthToleranceMeasurement(15.d, 3);
         }
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
