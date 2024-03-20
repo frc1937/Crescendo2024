@@ -41,6 +41,6 @@ public class TeleOpDrive extends Command {
                 translation,
                 rotationSup.getAsDouble() * Constants.Swerve.MAX_ANGULAR_VELOCITY,
                 !robotCentricSup.getAsBoolean(),
-                false);
+                true);
     }
 }
