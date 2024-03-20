@@ -25,7 +25,6 @@ import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
 import frc.robot.commands.leds.ColourByShooter;
-import frc.robot.commands.leds.Pointing;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDsSubsystem;
@@ -37,10 +36,10 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.ASSIST_TARGET;
-import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
+import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
 
 public class RobotContainer {
     private final XboxController driveController = new XboxController(0);
@@ -113,8 +112,7 @@ public class RobotContainer {
     private void configureBindings() {
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
-        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(
-                -driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
+        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
 
         drivetrain.setDefaultCommand(
                 new TeleOpDrive(
@@ -125,30 +123,28 @@ public class RobotContainer {
                         drRightBumper
                 )
         );
-
+//op: feeder, me
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true));
         drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true));
 
-
-//        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
 
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-
-        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
-//        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
+        //        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
 //        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
         opXButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(-1000))));
+        opYButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
         mountSubsystem.setDefaultCommand(
                 new MountCommand(mountSubsystem,

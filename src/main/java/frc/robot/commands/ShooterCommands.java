@@ -1,14 +1,17 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
+import static frc.robot.Constants.ShootingConstants.FLYWHEEL_MAX_RPM;
 import static frc.robot.Constants.ShootingConstants.INTAKE;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_BACKWARDS;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FEEDER_ANGLE;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -17,6 +20,25 @@ public class ShooterCommands {
     public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
         this.intakeSubsystem = intakeSubsystem;
+    }
+
+
+    public FunctionalCommand receiveFromFeeder() {
+        return new FunctionalCommand(
+                () -> {
+                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-0.55 * FLYWHEEL_MAX_RPM));
+                    shooterSubsystem.setPitchGoal(Rotation2d.fromDegrees(PITCH_INTAKE_FEEDER_ANGLE));
+                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
+                },
+                () -> {
+                },
+                interrupted -> {
+                    shooterSubsystem.stopFlywheels();
+                    shooterSubsystem.stopKicker();
+                },
+                shooterSubsystem::isLoaded,
+                shooterSubsystem
+        );
     }
 
     public Command shootNote(ShooterSubsystem.Reference reference) {
