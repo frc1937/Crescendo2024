@@ -134,6 +134,7 @@ public class RobotContainer {
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(3.7)));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
         drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.85)));
+        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
         drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
@@ -149,7 +150,6 @@ public class RobotContainer {
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
         opXButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(-1000))));
-        opYButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
         mountSubsystem.setDefaultCommand(
                 new MountCommand(mountSubsystem,
