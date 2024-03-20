@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.MedianFilter;
@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -33,7 +35,13 @@ import java.util.Optional;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.Swerve.*;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_D;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
+import static frc.robot.Constants.Swerve.AutoConstants;
+import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -310,11 +318,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
             field2d.getObject("Vision").setPose(visionPose);
 
+            Matrix<N3,N1> confidence = visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity);
+            
+            if (Double.isNaN(confidence.get(0, 0)) ||  Double.isNaN(confidence.get(1, 0))
+                || Double.isNaN(filteredVisionPose.getX()) || Double.isNaN(filteredVisionPose.getY())) {
+                return;
+            }
+            
             poseEstimator.addVisionMeasurement(
                     filteredVisionPose,
                     Timer.getFPGATimestamp(),
                     // estimatedRobotPose.timestampSeconds/* - 0.02 * 5*/,  // TODO this needs to be more sofisticated
-                    visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity)
+                    confidence
             );
         }
     }
