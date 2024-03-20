@@ -103,7 +103,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
-            boolean reachedDeadline = deadlineTimer.hasElapsed(3.5);
+            boolean reachedDeadline = deadlineTimer.hasElapsed(4.0);
 
             SmartDashboard.putBooleanArray("azimuth | not-moving | pitch | flywheels", new boolean[]{azimuthReady, notMoving, shooter.pitchAtReference(), shooter.flywheelsAtReference()});
 
