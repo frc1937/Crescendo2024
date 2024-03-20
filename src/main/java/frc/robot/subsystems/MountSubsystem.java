@@ -42,11 +42,9 @@ public class MountSubsystem extends SubsystemBase {
     }
 
     public void manualMount(double leftSpeed, double rightSpeed) {
-        if(rightEncoder.getPosition() < MOUNT_AT_TOP_RIGHT_VALUE.in(Rotations))
-            leftMotor.set(leftSpeed);
+        leftMotor.set(leftSpeed);
 
-        if(leftEncoder.getPosition() < MOUNT_AT_TOP_LEFT_VALUE.in(Rotations))
-            rightMotor.set(rightSpeed);
+        rightMotor.set(rightSpeed);
     }
 
     public void stopMount() {

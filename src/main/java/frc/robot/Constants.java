@@ -11,10 +11,12 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.Interpolator;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -29,7 +31,10 @@ import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
 
 public final class Constants {
     public static final String TFILAT_HADERECH = """
@@ -54,7 +59,7 @@ public final class Constants {
         public static final Measure<Angle> MOUNT_AT_TOP_LEFT_VALUE = Rotations.of(68);
         public static final Measure<Angle> MOUNT_AT_TOP_RIGHT_VALUE = Rotations.of(69);
 
-        public static final double MOUNT_SPEED_SCALAR = 0.5;
+        public static final double MOUNT_SPEED_SCALAR = 0.9;
         public static final double MOUNT_AUTO_SPEED = 0.5;
     }
 
