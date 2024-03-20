@@ -37,7 +37,7 @@ public class ShootToAmp extends SequentialCommandGroup {
                     },
                     shooter::reset
             ),
-            new AlternatingDots(leds)
+            new AlternatingDots(leds, shooter)
         ).withTimeout(1.5);
 
         addCommands(

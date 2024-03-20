@@ -9,24 +9,32 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.LEDsConstants;
 import frc.robot.subsystems.LEDsSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class AlternatingDots extends Command {
     private final LEDsSubsystem leds;
+    private final ShooterSubsystem shooter;
 
     private int t = 0;
 
-    private static final AddressableLEDBuffer state0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
-            state1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
+    private static final AddressableLEDBuffer emptyState0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
+                                              emptyState1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
+                                              loadedState0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
+                                              loadedState1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
     static {
         for (int i = 0; i < LEDsConstants.LEDS_COUNT; i++) {
-            state0Buffer.setLED(i, (i / 3) % 2 == 0 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
-            state1Buffer.setLED(i, (i / 3) % 2 == 1 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
+            boolean condition = (i / 3) % 2 == 0;
+            emptyState0Buffer.setLED(i, condition ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
+            emptyState1Buffer.setLED(i, !condition ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
+            loadedState0Buffer.setLED(i, condition ? LEDsConstants.COLOUR_WHEN_LOADED : new Color8Bit());
+            loadedState1Buffer.setLED(i, !condition ? LEDsConstants.COLOUR_WHEN_LOADED : new Color8Bit());
         }
     }
 
-    public AlternatingDots(LEDsSubsystem leds) {
+    public AlternatingDots(LEDsSubsystem leds, ShooterSubsystem shooter) {
         this.leds = leds;
+        this.shooter = shooter;
 
         addRequirements(leds);
     }
@@ -38,10 +46,19 @@ public class AlternatingDots extends Command {
 
     @Override
     public void execute() {
+        // TODO This might set the same buffer twice but who cares
         if ((t / 5) % 2 == 0) {
-            leds.setBuffer(state0Buffer);
+            if (shooter.isLoaded()) {
+                leds.setBuffer(loadedState0Buffer);
+            } else {
+                leds.setBuffer(emptyState0Buffer);
+            }
         } else {
-            leds.setBuffer(state1Buffer);
+            if (shooter.isLoaded()) {
+                leds.setBuffer(loadedState1Buffer);
+            } else {
+                leds.setBuffer(emptyState1Buffer);
+            }
         }
 
         t++;
