@@ -103,7 +103,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("AdjustShooter7", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), RPM.of(4500))));
         NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(106.75), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), RPM.of(3000))));
 
 
         autoChooser = AutoBuilder.buildAutoChooser();
