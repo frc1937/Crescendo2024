@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommand;
-import frc.robot.commands.MountCommands;
 import frc.robot.commands.PrepareShooter;
 import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
@@ -75,7 +74,6 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
-    private final MountCommands mountCommands = new MountCommands(mountSubsystem);
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
 
     public RobotContainer() {
@@ -158,8 +156,6 @@ public class RobotContainer {
                         () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
                 )
         );
-
-        opStartButton.whileTrue(mountCommands.startAutomaticMount());
     }
 
 
