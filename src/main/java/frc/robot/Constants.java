@@ -227,7 +227,7 @@ public final class Constants {
         public static final double KICKER_SPEED_FORWARD = 1;
         public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
         public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
-                Rotation2d.fromDegrees(50), RPM.of(2500));//50!
+                Rotation2d.fromDegrees(50), RPM.of(2600));//50!
         public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
                 Rotation2d.fromDegrees(113), RPM.of(2000));
 

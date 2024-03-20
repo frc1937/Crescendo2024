@@ -88,7 +88,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
         NamedCommands.registerCommand("AdjustShooter1", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.75), RPM.of(3000))));
         NamedCommands.registerCommand("AdjustShooter2", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), RPM.of(3000))));
         NamedCommands.registerCommand("AdjustShooter3", new PrepareShooter(shooterSubsystem,
