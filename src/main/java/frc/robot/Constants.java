@@ -191,7 +191,7 @@ public final class Constants {
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
         public static final Target SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.555), Degrees.of(1.85));
-        public static final Target ASSIST_TARGET = new Target(new Translation2d(1.5, 7.0), Degrees.of(3.5));
+        public static final Target ASSIST_TARGET = new Target(new Translation2d(-0.5, 8.0), Degrees.of(3.5));
         public static final double FIELD_LENGTH = 16.48;
 
         static {
