@@ -37,7 +37,8 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
         private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
         private final Target target;
-        private final DoubleSupplier translationSup, strafeSup;
+        private final DoubleSupplier translationSup,
+                                     strafeSup;
         private final boolean shootingWhilstMoving;
 
         private double virtualTargetDistance = 0;
@@ -98,7 +99,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
-            SmartDashboard.putBooleanArray("azimuth | not-moving | pitch", new boolean[]{azimuthReady, notMoving, shooter.pitchAtReference()});
+            SmartDashboard.putBooleanArray("azimuth | not-moving | pitch | flywheels", new boolean[]{azimuthReady, notMoving, shooter.pitchAtReference(), shooter.flywheelsAtReference()});
 
             return (shootingWhilstMoving || notMoving) && readyToKick;
         }
