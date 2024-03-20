@@ -71,6 +71,8 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             Translation2d virtualTargetDisplacement = target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
+
+            drivetrain.resetAzimuthController();
         }
 
         @Override
@@ -104,7 +106,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
 
         @Override
         public boolean isFinished() {
-            boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance());
+            boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance(virtualTargetDistance));
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 

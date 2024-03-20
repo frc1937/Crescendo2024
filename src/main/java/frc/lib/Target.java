@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.ShootingConstants.FIELD_LENGTH;
 
 public class Target {
@@ -24,12 +25,11 @@ public class Target {
     private final InterpolatingTreeMap<Double, ShooterSubsystem.Reference> distanceToReferenceMap = new InterpolatingTreeMap<>(
             InverseInterpolator.forDouble(), ShooterSubsystem.Reference::interpolate);
     private final InterpolatingDoubleTreeMap distanceToTimeOfFlightMap = new InterpolatingDoubleTreeMap();
-    private final Measure<Angle> azimuthTolerance;
+    private final InterpolatingDoubleTreeMap distanceToAzimuthToleranceMap = new InterpolatingDoubleTreeMap();
 
-    public Target(Translation2d bluePosition, Measure<Angle> azimuthTolerance) {
+    public Target(Translation2d bluePosition) {
         this.bluePosition = bluePosition;
         redPosition = new Translation2d(FIELD_LENGTH - bluePosition.getX(), bluePosition.getY());
-        this.azimuthTolerance = azimuthTolerance;
     }
 
     /** Calculate the displacement from the centre of the robot to the target */
@@ -47,12 +47,16 @@ public class Target {
         distanceToTimeOfFlightMap.put(distanceMetres, timeOfFlightSeconds);
     }
 
+    public void putAzimuthToleranceMeasurement(double distanceMetres, double toleranceRadians) {
+        distanceToAzimuthToleranceMap.put(distanceMetres, toleranceRadians);
+    }
+
     public ShooterSubsystem.Reference getReferenceByDistance(double distance) {
         return distanceToReferenceMap.get(distance);
     }
 
-    public Measure<Angle> getAzimuthTolerance() {
-        return azimuthTolerance;
+    public Measure<Angle> getAzimuthTolerance(double distanceMetres) {
+        return Radians.of(distanceToAzimuthToleranceMap.get(distanceMetres));
     }
 
     /**

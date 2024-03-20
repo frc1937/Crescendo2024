@@ -190,8 +190,8 @@ public final class Constants {
         public static final double POST_SHOOTING_DELAY = 0.25;
         public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-        public static final Target SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.555), Degrees.of(1.85));
-        public static final Target ASSIST_TARGET = new Target(new Translation2d(-0.5, 8.0), Degrees.of(3.5));
+        public static final Target SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.555));
+        public static final Target ASSIST_TARGET = new Target(new Translation2d(-0.5, 8.0));
         public static final double FIELD_LENGTH = 16.48;
 
         static {
@@ -211,6 +211,9 @@ public final class Constants {
 
             SPEAKER_TARGET.putTimeOfFlightMeasurement(1.d, 0.2);
             SPEAKER_TARGET.putTimeOfFlightMeasurement(5.d, 0.4);
+
+            SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 3);
+            SPEAKER_TARGET.putAzimuthToleranceMeasurement(5.d, 1.4);
         }
 
         static {
@@ -221,6 +224,9 @@ public final class Constants {
 
             ASSIST_TARGET.putTimeOfFlightMeasurement(1.d, 1.5);
             ASSIST_TARGET.putTimeOfFlightMeasurement(14.d, 2.5);
+
+            SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 5.d);
+            SPEAKER_TARGET.putAzimuthToleranceMeasurement(15.d, 3);
         }
 
         public static final double KICKER_SPEED_BACKWARDS = -0.7;
