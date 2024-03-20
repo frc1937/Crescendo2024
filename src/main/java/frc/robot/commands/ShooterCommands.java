@@ -3,7 +3,10 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import frc.robot.commands.leds.OsculatingStrip;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
@@ -15,11 +18,13 @@ import static frc.robot.Constants.ShootingConstants.PITCH_INTAKE_FEEDER_ANGLE;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
+    private final LEDsSubsystem leds;
     private final IntakeSubsystem intakeSubsystem;
 
-    public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem) {
+    public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem, LEDsSubsystem leds) {
         this.shooterSubsystem = shooterSubsystem;
         this.intakeSubsystem = intakeSubsystem;
+        this.leds = leds;
     }
 
 
@@ -74,7 +79,8 @@ public class ShooterCommands {
     }
 
     public Command floorIntake() {
-        return new FunctionalCommand(
+        return new ParallelDeadlineGroup(
+            new FunctionalCommand(
                 () -> {
                     initializeShooter(true, INTAKE);
                     intakeSubsystem.setSpeedPercentage(0.8);
@@ -83,6 +89,8 @@ public class ShooterCommands {
                 interrupted -> {},
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
+            ),
+            new OsculatingStrip(leds, shooterSubsystem)
         );
     }
 

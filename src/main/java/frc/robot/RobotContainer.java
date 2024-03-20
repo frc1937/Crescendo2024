@@ -73,7 +73,7 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
-    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
+    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
 
     public RobotContainer() {
 //        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));

@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.lib.Target;
 import frc.robot.Constants;
-import frc.robot.commands.leds.OsculatingStrip;
 import frc.robot.commands.leds.Pointing;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.LEDsSubsystem;
@@ -30,7 +29,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
                 new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup, shootingWhilstMoving),
                 new TeleopThrow(drivetrain, shooter, translationSup, strafeSup, shootingWhilstMoving).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
             ),
-            new Pointing(leds)
+            new Pointing(leds, shooter)
         );
     }
 

@@ -9,31 +9,42 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.LEDsConstants;
 import frc.robot.subsystems.LEDsSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
-@Deprecated
 public class OsculatingStrip extends Command {
-  private final LEDsSubsystem leds;
+    private final LEDsSubsystem leds;
+    private final ShooterSubsystem shooter;
 
-  private int t = 0;
+    private int t = 0;
 
-  public OsculatingStrip(LEDsSubsystem leds) {
-    this.leds = leds;
+    public OsculatingStrip(LEDsSubsystem leds, ShooterSubsystem shooter) {
+        this.leds = leds;
+        this.shooter = shooter;
 
-    addRequirements(leds);
-  }
-
-  @Override
-  public void execute() {
-    AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
-
-    int stripMiddle = (int)(30.d * Math.cos(t * 0.05));
-
-    for (int i = 0; i < LEDsConstants.LEDS_COUNT; i++) {
-      buffer.setLED(i, Math.abs(stripMiddle - i) < 5 ? LEDsConstants.COLOUR_WHEN_EMPTY : new Color8Bit());
+        addRequirements(leds);
     }
 
-    leds.setBuffer(buffer);
+    @Override
+    public void execute() {
+        AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
-    t++;
-  }
+        int stripMiddle = (int) (30.d * Math.cos(t * 0.05));
+
+        Color8Bit globalColour = shooter.isLoaded() ? LEDsConstants.COLOUR_WHEN_LOADED : LEDsConstants.COLOUR_WHEN_EMPTY;
+
+        for (int i = 0; i < LEDsConstants.LEDS_COUNT / 2; i++) {
+            Color8Bit localColour = Math.abs(stripMiddle - i) < 5 ? globalColour : new Color8Bit();
+            buffer.setLED(i, localColour);
+            buffer.setLED(LEDsConstants.LEDS_COUNT - i - 1, localColour);
+        }
+
+        leds.setBuffer(buffer);
+
+        t++;
+    }
+
+    @Override
+    public void end(boolean interrupt) {
+        leds.clear();
+    }
 }

@@ -19,4 +19,8 @@ public class LEDsSubsystem extends SubsystemBase {
             leds.setData(buffer);
         }
     }
+
+    public void clear() {
+        leds.stop();
+    }
 }
