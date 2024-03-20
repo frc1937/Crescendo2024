@@ -327,9 +327,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
             
             poseEstimator.addVisionMeasurement(
                     filteredVisionPose,
-                    Timer.getFPGATimestamp()//,
+                    Timer.getFPGATimestamp(),
                     // estimatedRobotPose.timestampSeconds/* - 0.02 * 5*/,  // TODO this needs to be more sofisticated
-                    //confidence
+                    confidence
             );
         }
     }
