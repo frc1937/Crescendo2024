@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AimAtSpeaker;
 import frc.robot.commands.AlignWithAmp;
+import frc.robot.commands.AlignWithChain;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.MountCommand;
 import frc.robot.commands.PrepareShooter;
@@ -127,18 +128,18 @@ public class RobotContainer {
             if (rawNorm < Constants.STICK_DEADBAND) {
                 return new Translation2d();
             } else {
-                return rawTranslationJoystick.times(rawNorm).unaryMinus();
+                return rawTranslationJoystick.unaryMinus();
             }
         };
         
-        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
+        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-Math.abs(driveController.getRawAxis(XboxController.Axis.kRightX.value)) * driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
 
         drivetrain.setDefaultCommand(
                 new TeleOpDrive(
                         drivetrain,
                         translationSup,
                         rotationSup,
-                        drRightBumper
+                        () -> false
                 )
         );
 //op: feeder, me
@@ -152,7 +153,7 @@ public class RobotContainer {
         drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-
+        drRightBumper.whileTrue(new AlignWithChain(drivetrain, rotationSup, rotationSup));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
