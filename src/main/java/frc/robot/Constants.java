@@ -138,7 +138,7 @@ public final class Constants {
 
         public static final double POSE_HISTORY_DURATION = 0.3;
 
-        public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.7;
+        public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.583960;
         public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
         public static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
 
