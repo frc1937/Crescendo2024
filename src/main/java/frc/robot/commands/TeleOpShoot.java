@@ -31,8 +31,8 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             new SequentialCommandGroup(
                 new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup, shootingWhilstMoving, deadline),
                 new TeleopThrow(drivetrain, shooter, translationSup, strafeSup, shootingWhilstMoving).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
-            ),
-            new Pointing(leds, shooter)
+            )//,
+            //new Pointing(leds, shooter)
         );
     }
 

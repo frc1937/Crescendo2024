@@ -27,6 +27,7 @@ import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
 import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.commands.leds.DumbColourByShooter;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDsSubsystem;
@@ -131,7 +132,7 @@ public class RobotContainer {
                 )
         );
 //op: feeder, me
-        leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
+        leds.setDefaultCommand(new DumbColourByShooter(leds, shooterSubsystem));
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));

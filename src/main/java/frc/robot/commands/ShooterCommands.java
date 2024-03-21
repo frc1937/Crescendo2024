@@ -89,8 +89,8 @@ public class ShooterCommands {
                 interrupted -> {},
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
-            ),
-            new OsculatingStrip(leds, shooterSubsystem)
+            )//,
+            //new OsculatingStrip(leds, shooterSubsystem)
         );
     }
 

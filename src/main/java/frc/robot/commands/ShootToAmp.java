@@ -36,8 +36,8 @@ public class ShootToAmp extends SequentialCommandGroup {
                         shooter.setFlywheelsSpeed(RPM.of(500));
                     },
                     shooter::reset
-            ),
-            new AlternatingDots(leds, shooter)
+            )//,
+            //new AlternatingDots(leds, shooter)
         ).withTimeout(1.5);
 
         addCommands(
