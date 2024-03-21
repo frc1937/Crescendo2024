@@ -38,6 +38,7 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.ShootingConstants.ASSIST;
 import static frc.robot.Constants.ShootingConstants.ASSIST_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
@@ -134,7 +135,8 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
-        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.4)));
+        // drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.5)));
+        drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
         drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
