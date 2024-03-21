@@ -18,7 +18,6 @@ import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
@@ -27,11 +26,11 @@ import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 
 public class TeleOpShoot extends ParallelDeadlineGroup {
-    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, LEDsSubsystem leds, Target target, Supplier<Translation2d> translationSup, boolean shootingWhilstMoving, Measure<Time> deadline) {
+    public TeleOpShoot(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, LEDsSubsystem leds, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving, Measure<Time> deadline) {
         super(
             new SequentialCommandGroup(
-                new TeleopAim(drivetrain, shooter, target, translationSup, shootingWhilstMoving, deadline),
-                new TeleopThrow(drivetrain, shooter, translationSup, shootingWhilstMoving).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
+                new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup, shootingWhilstMoving, deadline),
+                new TeleopThrow(drivetrain, shooter, translationSup, strafeSup, shootingWhilstMoving).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
             ),
             new Pointing(leds, shooter)
         );
@@ -41,7 +40,8 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
         private final DrivetrainSubsystem drivetrain;
         private final ShooterSubsystem shooter;
         private final Target target;
-        private final Supplier<Translation2d> translationSup;
+        private final DoubleSupplier translationSup,
+                                     strafeSup;
         private final boolean shootingWhilstMoving;
         private final Measure<Time> deadline;
 
@@ -49,11 +49,12 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
 
         private double virtualTargetDistance = 0;
 
-        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, Supplier<Translation2d> translationSup, boolean shootingWhilstMoving, Measure<Time> deadline) {
+        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving, Measure<Time> deadline) {
             this.drivetrain = drivetrain;
             this.shooter = shooter;
             this.target = target;
             this.translationSup = translationSup;
+            this.strafeSup = strafeSup;
             this.shootingWhilstMoving = shootingWhilstMoving;
             this.deadline = deadline;
 
@@ -76,6 +77,10 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
 
         @Override
         public void execute() {
+            // Get values, deadband
+            double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
+            double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
+
             // Predict the position the robot will be in when the NOTE is released
             // RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
             RobotState predictedState = drivetrain.getHistory().estimate();
@@ -92,7 +97,8 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             SmartDashboard.putNumber("calibration/filtered distance from virtual target [meters]", virtualTargetDistance);
 
             // Aim the azimuth to the virtual target
-            drivetrain.driveWithAzimuth(translationSup.get().times(MAX_SPEED), virtualTargetDisplacement.getAngle());
+            drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
+                    virtualTargetDisplacement.getAngle());
 
             // Aim the shooter
             shooter.setReference(target.getReferenceByDistance(virtualTargetDistance));
@@ -101,7 +107,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
         @Override
         public boolean isFinished() {
             boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance(virtualTargetDistance));
-            boolean notMoving = translationSup.get().getNorm() <= Constants.STICK_DEADBAND;
+            boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
             boolean reachedDeadline = deadlineTimer.hasElapsed(deadline.in(Seconds));
@@ -122,15 +128,16 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
     public static class TeleopThrow extends Command {
         private final ShooterSubsystem shooter;
         private final DrivetrainSubsystem drivetrain;
-        private final Supplier<Translation2d> translationSup;
+        private final DoubleSupplier translationSup, strafeSup;
         private final boolean shootingWhilstMoving;
 
         public TeleopThrow(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter,
-                           Supplier<Translation2d> translationSup,
+                           DoubleSupplier translationSup, DoubleSupplier strafeSup,
                            boolean shootingWhilstMoving) {
             this.shooter = shooter;
             this.drivetrain = drivetrain;
             this.translationSup = translationSup;
+            this.strafeSup = strafeSup;
             this.shootingWhilstMoving = shootingWhilstMoving;
 
             addRequirements(drivetrain, shooter);
@@ -139,7 +146,11 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
         @Override
         public void execute() {
             if (shootingWhilstMoving) {
-                drivetrain.driveWithAzimuth(translationSup.get().times(MAX_SPEED));
+                // Get values, deadband
+                double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
+                double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
+
+                drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED));
             }
         }
 
@@ -153,7 +164,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             if (shootingWhilstMoving) {
                 return false;
             } else {
-                return translationSup.get().getNorm() > Constants.STICK_DEADBAND;
+                return new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() > Constants.STICK_DEADBAND;
             }
         }
 

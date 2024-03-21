@@ -7,17 +7,19 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class TeleOpDrive extends Command {
     private final DrivetrainSubsystem drivetrain;
-    private final Supplier<Translation2d> translationSup;
-    private final DoubleSupplier rotationSup;
+    private final DoubleSupplier
+            translationSup,
+            strafeSup,
+            rotationSup;
     private final BooleanSupplier robotCentricSup;
 
-    public TeleOpDrive(DrivetrainSubsystem drivetrain, Supplier<Translation2d> translationSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
+    public TeleOpDrive(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
         this.drivetrain = drivetrain;
         this.translationSup = translationSup;
+        this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
         this.robotCentricSup = robotCentricSup;
 
@@ -26,7 +28,14 @@ public class TeleOpDrive extends Command {
 
     @Override
     public void execute() {
-        Translation2d translation = translationSup.get().times(Constants.Swerve.MAX_SPEED);
+        Translation2d stickTranslation = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble());
+
+        // Deadband the joysticks
+        if (stickTranslation.getNorm() < Constants.STICK_DEADBAND) {
+            stickTranslation = new Translation2d();
+        }
+
+        Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
 
         drivetrain.drive(
                 translation,

@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,11 +15,13 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class AlignWithAmp extends Command {
   private final DrivetrainSubsystem drivetrain;
-  private final Supplier<Translation2d> translationSup;
+  private final DoubleSupplier translationSup,
+                               strafeSup;
 
-  public AlignWithAmp(DrivetrainSubsystem drivetrain, Supplier<Translation2d> translationSup) {
+  public AlignWithAmp(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
     this.drivetrain = drivetrain;
     this.translationSup = translationSup;
+    this.strafeSup = strafeSup;
 
     addRequirements(drivetrain);
   }
@@ -32,7 +33,13 @@ public class AlignWithAmp extends Command {
 
   @Override
   public void execute() {
-    Translation2d translation = translationSup.get().times(Constants.Swerve.MAX_SPEED);
+    Translation2d stickTranslation = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble());
+
+    if (stickTranslation.getNorm() < Constants.STICK_DEADBAND) {
+      stickTranslation = new Translation2d();
+    }
+
+    Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
 
     drivetrain.driveWithAzimuth(
         translation,

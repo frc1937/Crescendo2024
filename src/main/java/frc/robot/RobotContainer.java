@@ -9,7 +9,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,7 +35,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.TriggerButton;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
@@ -118,26 +116,15 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        Supplier<Translation2d> translationSup = () -> {
-            Translation2d rawTranslationJoystick = new Translation2d(
-                driveController.getRawAxis(XboxController.Axis.kLeftY.value),
-                driveController.getRawAxis(XboxController.Axis.kLeftX.value)
-            );
-
-            double rawNorm = rawTranslationJoystick.getNorm();
-            if (rawNorm < Constants.STICK_DEADBAND) {
-                return new Translation2d();
-            } else {
-                return rawTranslationJoystick.unaryMinus();
-            }
-        };
-        
-        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-Math.abs(driveController.getRawAxis(XboxController.Axis.kRightX.value)) * driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
+        DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
+        DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
+        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
 
         drivetrain.setDefaultCommand(
                 new TeleOpDrive(
                         drivetrain,
                         translationSup,
+                        strafeSup,
                         rotationSup,
                         () -> false
                 )
@@ -145,12 +132,12 @@ public class RobotContainer {
 //op: feeder, me
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, false, Seconds.of(3.7)));
-        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, true, Seconds.of(5)));
-        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, true, Seconds.of(1.85)));
+        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(3.7)));
+        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
+        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.85)));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
-        drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup));
+        drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
         drRightBumper.whileTrue(new AlignWithChain(drivetrain, rotationSup, rotationSup));
