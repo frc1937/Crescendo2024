@@ -132,7 +132,7 @@ public class RobotContainer {
 //op: feeder, me
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(3.7)));
+        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
         drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.4)));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
