@@ -1,6 +1,9 @@
 package frc.robot;
 
-import com.ctre.phoenix.sensors.CANCoder;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -18,26 +21,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static frc.robot.Constants.ShootingConstants.DEFAULT_PITCH_DEADBAND;
-import static frc.robot.Constants.ShootingConstants.PITCH_KA;
-import static frc.robot.Constants.ShootingConstants.PITCH_KD;
-import static frc.robot.Constants.ShootingConstants.PITCH_KG;
-import static frc.robot.Constants.ShootingConstants.PITCH_KP;
-import static frc.robot.Constants.ShootingConstants.PITCH_KS;
-import static frc.robot.Constants.ShootingConstants.PITCH_KV;
-import static frc.robot.Constants.ShootingConstants.PITCH_MAX_ACCELERATION;
-import static frc.robot.Constants.ShootingConstants.PITCH_MAX_VELOCITY;
-import static frc.robot.Constants.ShootingConstants.PITCH_TRANSMISSION_RATIO;
-import static frc.robot.Constants.ShootingConstants.PIVOT_CAN_CODER;
-import static frc.robot.Constants.ShootingConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.Constants.ShootingConstants.PIVOT_ID;
-import static frc.robot.Constants.ShootingConstants.PIVOT_TOLERANCE;
-import static frc.robot.Constants.ShootingConstants.VERTICAL_PITCH_DEADBAND;
+import static frc.robot.Constants.ShootingConstants.*;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
     private final RelativeEncoder relativeEncoder = motor.getEncoder();
-    private final CANCoder absoluteEncoder = new CANCoder(PIVOT_CAN_CODER);
+    private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
     private final ProfiledPIDController controller;
 
@@ -49,9 +38,12 @@ public class Pitch {
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
         // Configure the absolute encoder. Use the blocking methods because we configure
-        // the relative encoder according to this one right away. 
-        absoluteEncoder.configFactoryDefault(80);
-        absoluteEncoder.configSensorDirection(true, 80);
+        // the relative encoder according to this one right away.
+        CANcoderConfiguration config = new CANcoderConfiguration();
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        //todo: Check if this is the equivalent of true
+
+        absoluteEncoder.getConfigurator().apply(config, 0.080);
 
         // Configure the relative encoder
         relativeEncoder.setPosition(getCurrentPosition().getRotations() * PITCH_TRANSMISSION_RATIO);
@@ -102,7 +94,7 @@ public class Pitch {
     }
 
     public Rotation2d getCurrentPosition() {
-        double angle = (absoluteEncoder.getAbsolutePosition() - PIVOT_ENCODER_OFFSET);
+        double angle = (absoluteEncoder.getAbsolutePosition().getValue() - PIVOT_ENCODER_OFFSET);
 
         if (angle < -30) {
             angle += 360;
@@ -116,7 +108,7 @@ public class Pitch {
     }
 
     public Measure<Velocity<Angle>> getCurrentVelocity() {
-        return DegreesPerSecond.of(absoluteEncoder.getVelocity());
+        return DegreesPerSecond.of(absoluteEncoder.getVelocity().getValue());
     }
 
     public TrapezoidProfile.Constraints getConstraints() {
