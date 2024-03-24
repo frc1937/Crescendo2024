@@ -16,17 +16,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.AimAtSpeaker;
+import frc.robot.commands.AlignWithAmp;
+import frc.robot.commands.AlignWithChain;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.MountCommands;
+import frc.robot.commands.MountCommand;
 import frc.robot.commands.PrepareShooter;
 import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
-import frc.robot.commands.calibration.TeleOpShootCalibration;
+import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.commands.leds.DumbColourByShooter;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.TriggerButton;
@@ -34,11 +38,13 @@ import frc.robot.util.TriggerButton;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.BLUE_ASSIST_TARGET;
-import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
+import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.ShootingConstants.ASSIST;
+import static frc.robot.Constants.ShootingConstants.ASSIST_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
+import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
 
 public class RobotContainer {
     private final XboxController driveController = new XboxController(0);
@@ -70,9 +76,9 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
+    private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
-    private final MountCommands mountCommands = new MountCommands(mountSubsystem);
-    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem);
+    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
 
     public RobotContainer() {
 //        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
@@ -87,7 +93,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
         NamedCommands.registerCommand("AdjustShooter1", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.25), RPM.of(3000))));
         NamedCommands.registerCommand("AdjustShooter2", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), RPM.of(3000))));
         NamedCommands.registerCommand("AdjustShooter3", new PrepareShooter(shooterSubsystem,
@@ -100,6 +106,9 @@ public class RobotContainer {
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(28), RPM.of(4500))));
         NamedCommands.registerCommand("AdjustShooter7", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), RPM.of(4500))));
+        NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), RPM.of(3000))));
+
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -111,8 +120,7 @@ public class RobotContainer {
     private void configureBindings() {
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
-        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(
-                -driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
+        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
 
         drivetrain.setDefaultCommand(
                 new TeleOpDrive(
@@ -120,24 +128,26 @@ public class RobotContainer {
                         translationSup,
                         strafeSup,
                         rotationSup,
-                        drRightBumper
+                        () -> false
                 )
         );
+//op: feeder, me
+        leds.setDefaultCommand(new DumbColourByShooter(leds, shooterSubsystem));
 
-        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_SPEAKER_TARGET, translationSup, strafeSup));
-        drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, BLUE_ASSIST_TARGET, translationSup, strafeSup));
+        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
+        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
+        // drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.5)));
+        drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
+        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
-
-//        drLeftBumper.whileTrue(shooterCommands.receiveFromFeeder());
+        drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-
+        drRightBumper.whileTrue(new AlignWithChain(drivetrain, rotationSup, rotationSup));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-
-        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain));
-//        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
+        //        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
 //        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 
         //Operator buttons:
@@ -146,13 +156,11 @@ public class RobotContainer {
         opXButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(-1000))));
 
         mountSubsystem.setDefaultCommand(
-                mountCommands.startManualMount(
-                        () -> -operatorController.getRawAxis(XboxController.Axis.kLeftY.value),
-                        () -> -operatorController.getRawAxis(XboxController.Axis.kRightY.value)
+                new MountCommand(mountSubsystem,
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kLeftY.value), Constants.STICK_DEADBAND*0.5),
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
                 )
         );
-
-        opStartButton.whileTrue(mountCommands.startAutomaticMount());
     }
 
 
@@ -201,5 +209,16 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         drivetrain.infrequentPeriodic();
+    }
+
+    public void robotPeriodic() {
+
+        SmartDashboard.putNumber("op/nice1",
+                MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kLeftY.value), Constants.STICK_DEADBAND*0.5));
+        SmartDashboard.putNumber("op/nice2",
+                MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
+        );
+
+
     }
 }

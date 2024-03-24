@@ -17,7 +17,9 @@ import java.util.Optional;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
+import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
+import static frc.robot.Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS;
 
 public class VisionPoseEstimator {
     private final PhotonCamera frontCamera = new PhotonCamera(FRONT_CAMERA_NAME);
@@ -45,19 +47,12 @@ public class VisionPoseEstimator {
             return VISION_MEASUREMENT_STANDARD_DEVIATIONS;
         }
 
-        double targetFactors;
-
-        if(estimation.targetsUsed.isEmpty()) {
-            targetFactors = 0;
-        } else {
-            targetFactors =
-                    1.d / estimation.targetsUsed.stream()
-                            .mapToDouble(t -> 2.5 / (2.5 + t.getBestCameraToTarget().getTranslation().getNorm()))
-                            .sum();
-        }
-
+        double targetFactors =
+                1.d / estimation.targetsUsed.stream()
+                        .mapToDouble(t -> 2.5 / (2.5 + t.getBestCameraToTarget().getTranslation().getNorm()))
+                        .sum();
         double rotationFactor =
-                2.d / (2.d + angularVelocity.in(RotationsPerSecond));
+                2.d / (2.d + Math.abs(angularVelocity.in(RotationsPerSecond)));
         double factor = 1.d / (targetFactors + rotationFactor);
 
         return VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(factor);
@@ -76,3 +71,5 @@ public class VisionPoseEstimator {
         return poseEstimator.update();
     }
 }
+
+//

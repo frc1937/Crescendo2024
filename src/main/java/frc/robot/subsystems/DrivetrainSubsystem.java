@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.MedianFilter;
@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -33,11 +35,14 @@ import java.util.Optional;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
-import static frc.robot.Constants.Swerve.*;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_D;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
+import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
+import static frc.robot.Constants.Swerve.AutoConstants;
+import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
-import static frc.robot.Constants.VisionConstants.REAR_CAMERA_NAME;
-
 
 public class DrivetrainSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -77,7 +82,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         poseEstimator = new SwerveDrivePoseEstimator(
                 SWERVE_KINEMATICS,
-                getGyroYaw(),
+                getGyroAzimuth(),
                 getModulePositions(),
                 new Pose2d(),
                 Constants.VisionConstants.STATE_STANDARD_DEVIATIONS,
@@ -86,7 +91,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
-                pose -> poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose),
+                pose -> poseEstimator.resetPosition(getGyroAzimuth(), getModulePositions(), pose),
                 () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
                 this::drive,
                 AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
@@ -101,7 +106,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         azimuthController.enableContinuousInput(-Math.PI, Math.PI);
 
         SmartDashboard.putNumber("Azimuth Error [rad]", azimuthController.getPositionError());
-        SmartDashboard.putNumber("Azimuth Current [deg]", getGyroYaw().getDegrees());
+        SmartDashboard.putNumber("Azimuth Current [deg]", getGyroAzimuth().getDegrees());
     }
 
     /**
@@ -150,11 +155,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         if (fieldRelative) {
             ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    translation.getX(), translation.getY(), rotation, getGyroYaw());
+                    translation.getX(), translation.getY(), rotation, getGyroAzimuth());
             drive(chassisSpeeds, closedLoop);
         } else {
             drive(new ChassisSpeeds(translation.getX(), translation.getY(), rotation), closedLoop);
         }
+    }
+
+    public void resetAzimuthController() {
+        azimuthController.reset(getPose().getRotation().getRadians(), history.estimate().getVelocity().omegaRadiansPerSecond);
     }
 
     /**
@@ -240,8 +249,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     }
 
-    // TODO rename to getGyroAzimuth
-    public Rotation2d getGyroYaw() {
+    public Rotation2d getGyroAzimuth() {
         return Constants.Swerve.INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
@@ -255,11 +263,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
+        if (DriverStation.isTeleop()) {
+            Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
+            estimatedFrontPose.ifPresent(this::updateByEstimator);
+        }
 
-        estimatedFrontPose.ifPresent(this::updateByEstimator);
-
-        poseEstimator.update(getGyroYaw(), getModulePositions());
+        poseEstimator.update(getGyroAzimuth(), getModulePositions());
 
         field2d.setRobotPose(getPose());
 
@@ -268,7 +277,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // Calculate the azimuth control. Whilst it is always calculated, only
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
         SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
-        SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180));
+        SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroAzimuth().getDegrees(), -180, 180));
         SmartDashboard.putNumber("swerve/azimuth [target]", azimuthController.getGoal().position * 180 / Math.PI);
 
         yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
@@ -313,11 +322,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
             field2d.getObject("Vision").setPose(visionPose);
 
+            Matrix<N3,N1> confidence = visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity);
+            
+            if (Double.isNaN(confidence.get(0, 0)) ||  Double.isNaN(confidence.get(1, 0))
+                || Double.isNaN(filteredVisionPose.getX()) || Double.isNaN(filteredVisionPose.getY())) {
+                return;
+            }
+            
             poseEstimator.addVisionMeasurement(
                     filteredVisionPose,
                     Timer.getFPGATimestamp(),
                     // estimatedRobotPose.timestampSeconds/* - 0.02 * 5*/,  // TODO this needs to be more sofisticated
-                    visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity)
+                    confidence
             );
         }
     }

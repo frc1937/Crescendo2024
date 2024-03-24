@@ -4,11 +4,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.RobotState;
-import frc.lib.Target;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Constants.ShootingConstants.BLUE_SPEAKER_TARGET;
+import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 
@@ -32,8 +31,8 @@ public class AimAtSpeaker extends Command {
     public void initialize() {
         // Predict the position the robot will be in when the NOTE is released
         RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
-        Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
-        Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(
+        Translation2d targetDisplacement = SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
+        Translation2d virtualTargetDisplacement = SPEAKER_TARGET.calculateVirtualTargetDisplacement(
                 targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
         virtualTargetDistance = virtualTargetDisplacement.getNorm();
     }
@@ -41,9 +40,9 @@ public class AimAtSpeaker extends Command {
     @Override
     public void execute() {
         RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
-        Translation2d targetDisplacement = BLUE_SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
+        Translation2d targetDisplacement = SPEAKER_TARGET.calculateTargetDisplacement(predictedState);
 
-        Translation2d virtualTargetDisplacement = Target.calculateVirtualTargetDisplacement(virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
+        Translation2d virtualTargetDisplacement = SPEAKER_TARGET.calculateVirtualTargetDisplacement(virtualTargetDistance, targetDisplacement, predictedState.getVelocity());
         virtualTargetDistance = virtualTargetDisplacement.getNorm();
 
         drivetrain.driveWithAzimuth(new Translation2d(0, 0),

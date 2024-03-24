@@ -3,55 +3,60 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.Constants.Mount.*;
 
 public class MountSubsystem extends SubsystemBase {
-    private final CANSparkMax mountRightMotor = new CANSparkMax(MOUNT_RIGHT_MOTOR_ID, CANSparkMax.MotorType.kBrushless);
-    private final CANSparkMax mountLeftMotor = new CANSparkMax(MOUNT_LEFT_MOTOR_ID, CANSparkMax.MotorType.kBrushless);
-    private final RelativeEncoder encoder = mountLeftMotor.getEncoder();
+    private final CANSparkMax rightMotor = new CANSparkMax(MOUNT_RIGHT_MOTOR_ID, CANSparkMax.MotorType.kBrushless);
+    private final CANSparkMax leftMotor = new CANSparkMax(MOUNT_LEFT_MOTOR_ID, CANSparkMax.MotorType.kBrushless);
+    private final RelativeEncoder rightEncoder = rightMotor.getEncoder();
+    private final RelativeEncoder leftEncoder = leftMotor.getEncoder();
 
     public MountSubsystem() {
-        configMotor(mountRightMotor);
-        configMotor(mountLeftMotor);
+        configMotor(rightMotor);
+        configMotor(leftMotor);
+
+        leftMotor.setInverted(true);
+
+        rightEncoder.setPosition(0);
+        leftEncoder.setPosition(0);
+
+        leftMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) MOUNT_AT_TOP_LEFT_VALUE.in(Rotations));
+        leftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+        rightMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, (float) MOUNT_AT_TOP_RIGHT_VALUE.in(Rotations));
+        rightMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("mount/rightEncoder", rightEncoder.getPosition());
+        SmartDashboard.putNumber("mount/leftEncoder", leftEncoder.getPosition());
     }
 
     public boolean isAtTop() {
-        return encoder.getPosition() >= MOUNT_AT_TOP_ENCODER_VALUE.in(Rotations);
-    }
-
-    /**
-    @param speed - Speed of the motors, ought to be positive
-     */
-    public void autoMount(double speed) {
-        speed = Math.abs(speed);
-
-        if(encoder.getPosition() >= MOUNT_AT_TOP_ENCODER_VALUE.in(Rotations)) {
-            speed *= -1;
-        }
-
-        mountLeftMotor.set(speed);
-        mountRightMotor.set(speed);
+        return rightEncoder.getPosition() >= MOUNT_AT_TOP_LEFT_VALUE.in(Rotations) &&
+                leftEncoder.getPosition() >= MOUNT_AT_TOP_RIGHT_VALUE.in(Rotations);
     }
 
     public void manualMount(double leftSpeed, double rightSpeed) {
-        mountLeftMotor.set(leftSpeed);
-        mountRightMotor.set(rightSpeed);
+        leftMotor.set(leftSpeed);
+
+        rightMotor.set(rightSpeed);
     }
 
     public void stopMount() {
-        mountLeftMotor.stopMotor();
-        mountRightMotor.stopMotor();
+        leftMotor.stopMotor();
+        rightMotor.stopMotor();
     }
 
     private void configMotor(CANSparkMax motor) {
-        motor.restoreFactoryDefaults();
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+       motor.restoreFactoryDefaults();
+       motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
-        //todo: check directions on ROBOT
-        motor.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
-        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float) MOUNT_SOFT_LIMIT.in(Rotations));
+       motor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, 0.f);
+       motor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
     }
 }

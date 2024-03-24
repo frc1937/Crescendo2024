@@ -26,7 +26,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
     public TeleOpShootCalibration(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
                 new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup),
-                new TeleOpShoot.TeleopThrow(drivetrain, shooter, translationSup, strafeSup).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
+                new TeleOpShoot.TeleopThrow(drivetrain, shooter, translationSup, strafeSup, false).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
 
         SmartDashboard.putNumber("calibration/angle [deg]", 0);
@@ -83,7 +83,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance());
+            boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance(targetDistance));
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 
