@@ -30,6 +30,7 @@ import frc.robot.SwerveModule;
 import frc.robot.vision.VisionPoseEstimator;
 import org.photonvision.EstimatedRobotPose;
 
+import java.util.List;
 import java.util.Optional;
 
 import static edu.wpi.first.units.Units.Radians;
@@ -42,13 +43,12 @@ import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
 import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.Constants.Swerve.AutoConstants;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
-import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 
 public class DrivetrainSubsystem extends SubsystemBase {
     public final SwerveDrivePoseEstimator poseEstimator;
     public final SwerveModule[] swerveModules;
     public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
-    public final VisionPoseEstimator visionPoseEstimator = new VisionPoseEstimator();
+    public final VisionPoseEstimator visionPoseEstimator;
     private final Field2d field2d = new Field2d();
     private final RobotStateHistory history = new RobotStateHistory();
     private double previousTimestamp = 0;
@@ -63,9 +63,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private double yawCorrection = 0;
 
-    public DrivetrainSubsystem() {
+    public DrivetrainSubsystem(VisionPoseEstimator visionPoseEstimator) {
+        this.visionPoseEstimator = visionPoseEstimator;
+
         SmartDashboard.putData("Field", field2d);
-        
 
         gyro.configFactoryDefault();
         zeroGyro();
@@ -145,8 +146,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+    Open loop drive for autonomous trajectory following commands
+     @param chassisSpeeds - the speeds used
+     */
     public void drive(ChassisSpeeds chassisSpeeds) {
-        drive(chassisSpeeds, false); //todo: CHECK WHICH VALUE's CORRECT, CHANGED THIS TO FALSE
+        drive(chassisSpeeds, false);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean closedLoop) {
@@ -264,8 +269,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
         if (DriverStation.isTeleop()) {
-            Optional<EstimatedRobotPose> estimatedFrontPose = visionPoseEstimator.estimateGlobalPose(poseEstimator.getEstimatedPosition(), FRONT_CAMERA_NAME);
-            estimatedFrontPose.ifPresent(this::updateByEstimator);
+            List<Optional<EstimatedRobotPose>> estimatedPoses = visionPoseEstimator.estimateGlobalPose(getPose());
+
+            for (Optional<EstimatedRobotPose> estimatedRobotPose : estimatedPoses) {
+                estimatedRobotPose.ifPresent(this::updateByEstimator);
+            }
         }
 
         poseEstimator.update(getGyroAzimuth(), getModulePositions());
@@ -332,7 +340,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
             poseEstimator.addVisionMeasurement(
                     filteredVisionPose,
                     Timer.getFPGATimestamp(),
-                    // estimatedRobotPose.timestampSeconds/* - 0.02 * 5*/,  // TODO this needs to be more sofisticated
+//                    estimatedRobotPose.timestampSeconds,///* - 0.02 * 5*/,  // TODO this needs to be more sophisticated
+                    //wdym by that comment?
                     confidence
             );
         }

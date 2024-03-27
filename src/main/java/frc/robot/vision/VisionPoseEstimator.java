@@ -8,38 +8,54 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.util.Camera;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.estimation.TargetModel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
 import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
-import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS;
 
 public class VisionPoseEstimator {
-    private final PhotonCamera frontCamera = new PhotonCamera(FRONT_CAMERA_NAME);
-    private final PhotonPoseEstimator frontPoseEstimator = new PhotonPoseEstimator(
-            APRIL_TAG_FIELD_LAYOUT,
-            PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            frontCamera,
-            ROBOT_TO_FRONT_CAMERA
-    );
+    private final HashMap<PhotonPoseEstimator, PhotonCamera> poseEstimators = new HashMap<>();
 
-    public VisionPoseEstimator() {
-        frontPoseEstimator.setMultiTagFallbackStrategy(PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY);
-        frontPoseEstimator.setTagModel(TargetModel.kAprilTag36h11);
+    public VisionPoseEstimator(Camera... cameras) {
+        PhotonPoseEstimator poseEstimator;
+        PhotonCamera photonCamera;
+
+        for (Camera camera : cameras) {
+            photonCamera = new PhotonCamera(camera.name());
+
+            poseEstimator = new PhotonPoseEstimator(
+                    APRIL_TAG_FIELD_LAYOUT,
+                    PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                    photonCamera,
+                    camera.robotToCamera()
+            );
+
+            poseEstimator.setMultiTagFallbackStrategy(PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY);
+            poseEstimator.setTagModel(TargetModel.kAprilTag36h11);
+
+            poseEstimators.put(poseEstimator, photonCamera);
+        }
     }
 
-    public Optional<EstimatedRobotPose> estimateGlobalPose(Pose2d prevEstimatedRobotPose, String camName) {
-        if (FRONT_CAMERA_NAME.equals(camName))
-            return estimatePose(frontPoseEstimator, frontCamera, prevEstimatedRobotPose);
+    public List<Optional<EstimatedRobotPose>> estimateGlobalPose(Pose2d prevEstimatedRobotPose) {
+        List<Optional<EstimatedRobotPose>> estimatedRobotPoses = new ArrayList<>();
 
-        return Optional.empty();
+        for(Map.Entry<PhotonPoseEstimator, PhotonCamera> poseEstimator : poseEstimators.entrySet()) {
+            estimatedRobotPoses.add(estimatePose(poseEstimator.getKey(), poseEstimator.getValue(), prevEstimatedRobotPose));
+        }
+
+        return estimatedRobotPoses;
     }
 
     public Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation, Measure<Velocity<Angle>> angularVelocity) {
@@ -60,7 +76,7 @@ public class VisionPoseEstimator {
 
 
     private Optional<EstimatedRobotPose> estimatePose(PhotonPoseEstimator poseEstimator, PhotonCamera camera, Pose2d prevEstimatedRobotPose) {
-        SmartDashboard.putBoolean("isCameraConnected", camera.isConnected());
+        SmartDashboard.putBoolean("isCameraConnected " + camera.getName(), camera.isConnected());
 
         if (!camera.isConnected()) {
             return Optional.empty();
@@ -71,5 +87,3 @@ public class VisionPoseEstimator {
         return poseEstimator.update();
     }
 }
-
-//

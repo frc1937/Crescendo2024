@@ -26,25 +26,26 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.TeleOpShoot;
-import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.commands.leds.DumbColourByShooter;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.MountSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.util.Camera;
 import frc.robot.util.TriggerButton;
+import frc.robot.vision.VisionPoseEstimator;
 
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.ShootingConstants.ASSIST;
-import static frc.robot.Constants.ShootingConstants.ASSIST_TARGET;
 import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
 import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
+import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
 
 public class RobotContainer {
     private final XboxController driveController = new XboxController(0);
@@ -72,7 +73,8 @@ public class RobotContainer {
     private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
     private final TriggerButton opLeftTrigger = new TriggerButton(operatorController, XboxController.Axis.kLeftTrigger);
     /* Subsystems */
-    private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+    private final VisionPoseEstimator visionPoseEstimator;
+    private final DrivetrainSubsystem drivetrain;
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
@@ -81,7 +83,12 @@ public class RobotContainer {
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
 
     public RobotContainer() {
-//        NamedCommands.registerCommand("PrintTfilatHaDerech", Commands.print(TFILAT_HADERECH));
+        visionPoseEstimator = new VisionPoseEstimator(
+                new Camera("Front1937", FRONT_CAMERA_TO_ROBOT)
+//                new Camera("Rear1937", REAR_CAMERA_TO_ROBOT)
+        );
+
+        drivetrain = new DrivetrainSubsystem(visionPoseEstimator);
 
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
@@ -109,7 +116,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), RPM.of(3000))));
 
-
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -131,7 +137,7 @@ public class RobotContainer {
                         () -> false
                 )
         );
-//op: feeder, me
+
         leds.setDefaultCommand(new DumbColourByShooter(leds, shooterSubsystem));
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
@@ -165,45 +171,6 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-//        return new SequentialCommandGroup(
-//                autonomousShooter.adjustShooter(112, 2000),
-//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY),
-//                //shoot first note
-//
-//                new ParallelCommandGroup(
-//                        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Base to NOTE 1 (3)")),
-//                        shooterCommands.floorIntake(true).withTimeout(2.7)
-//                ),
-//                new ParallelCommandGroup(
-//                        new RotateToSpeaker(drivetrain).withTimeout(1).andThen(new RotateToSpeaker(drivetrain)),
-//                        autonomousShooter.adjustShooter(30, 3000)
-//                ),
-//
-//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY),
-//                //SHOOT NOTE 1 ^
-//
-//                new ParallelCommandGroup(
-//                        AutoBuilder.followPath(PathPlannerPath.fromPathFile("NOTE 1 to NOTE 2 (0.3)")),
-//                        shooterCommands.floorIntake(true).withTimeout(3)
-//                ).andThen(new ParallelCommandGroup(
-//                        new RotateToSpeaker(drivetrain).withTimeout(2.4),
-//                        autonomousShooter.adjustShooter(34, 3000)
-//                )),
-//
-//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY),
-//                //SHOOT note 2 ^
-//
-//                new ParallelCommandGroup(
-//                        AutoBuilder.followPath(PathPlannerPath.fromPathFile("NOTE 2 to NOTE 3 (0.3)")),
-//                        shooterCommands.floorIntake(true).withTimeout(3)
-//                ).andThen(new ParallelCommandGroup(
-//                        new RotateToSpeaker(drivetrain).withTimeout(2.4),
-//                        autonomousShooter.adjustShooter(30, 3000)
-//                )),
-//
-//                new WaitCommand(0.5),
-//                new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY)
-//        );
         return autoChooser.getSelected();
     }
 
@@ -212,13 +179,6 @@ public class RobotContainer {
     }
 
     public void robotPeriodic() {
-
-        SmartDashboard.putNumber("op/nice1",
-                MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kLeftY.value), Constants.STICK_DEADBAND*0.5));
-        SmartDashboard.putNumber("op/nice2",
-                MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
-        );
-
 
     }
 }
