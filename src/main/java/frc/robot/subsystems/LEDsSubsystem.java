@@ -14,30 +14,16 @@ public class LEDsSubsystem extends SubsystemBase {
     }
 
     public void setBuffer(AddressableLEDBuffer buffer) {
-        // if (buffer.getLength() == LEDsConstants.LEDS_COUNT) {
-        //     leds.setData(buffer);
-        // }
+         if (buffer.getLength() == LEDsConstants.LEDS_COUNT) {
+             leds.setData(buffer);
+         }
     }
 
     public void stop() {
-        // leds.stop();
+         leds.stop();
     }
 
     public void start() {
-        // leds.start();
-    }
-
-        public void trulySetBuffer(AddressableLEDBuffer buffer) {
-        if (buffer.getLength() == LEDsConstants.LEDS_COUNT) {
-            leds.setData(buffer);
-        }
-    }
-
-    public void trulyStop() {
-        leds.stop();
-    }
-
-    public void trulyStart() {
-        leds.start();
+         leds.start();
     }
 }

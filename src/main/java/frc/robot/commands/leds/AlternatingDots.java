@@ -17,10 +17,10 @@ public class AlternatingDots extends Command {
 
     private int t = 0;
 
-    private static final AddressableLEDBuffer emptyState0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
-                                              emptyState1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
-                                              loadedState0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT),
-                                              loadedState1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
+    private static final AddressableLEDBuffer emptyState0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
+    private static final AddressableLEDBuffer emptyState1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
+    private static final AddressableLEDBuffer loadedState0Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
+    private static final AddressableLEDBuffer loadedState1Buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
     static {
         for (int i = 0; i < LEDsConstants.LEDS_COUNT; i++) {

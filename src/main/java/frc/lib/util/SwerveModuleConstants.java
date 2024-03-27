@@ -10,10 +10,10 @@ public class SwerveModuleConstants {
 
     /**
      * SwerveSubsystem Module Constants to be used when creating swerve modules.
-     * @param driveMotorID
-     * @param angleMotorID
-     * @param canCoderID
-     * @param angleOffset
+     * @param driveMotorID - ID of the drive motor
+     * @param angleMotorID - ID of the angle motor
+     * @param canCoderID - ID of the canCoder
+     * @param angleOffset - Offset of canCoder to zero
      */
     public SwerveModuleConstants(int driveMotorID, int angleMotorID, int canCoderID, Rotation2d angleOffset) {
         this.driveMotorID = driveMotorID;

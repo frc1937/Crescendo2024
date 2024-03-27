@@ -13,9 +13,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class ColourByShooter extends Command {
     private final LEDsSubsystem leds;
     private final ShooterSubsystem shooter;
-
     private boolean wasLoaded = false;
-
     private static final AddressableLEDBuffer bufferWhenEmpty = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
     private static final AddressableLEDBuffer bufferWhenLoaded = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 

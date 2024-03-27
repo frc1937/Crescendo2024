@@ -14,9 +14,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class OsculatingStrip extends Command {
     private final LEDsSubsystem leds;
     private final ShooterSubsystem shooter;
-
     private int t = 0;
-
     public OsculatingStrip(LEDsSubsystem leds, ShooterSubsystem shooter) {
         this.leds = leds;
         this.shooter = shooter;

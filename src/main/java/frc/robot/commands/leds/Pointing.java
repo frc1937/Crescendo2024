@@ -35,7 +35,7 @@ public class Pointing extends Command {
 
         AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
-        int slowT = (int) ((double) t / 1.5d);
+        int slowT = (int) (t / 1.5d);
         int stripMiddle = slowT % (LEDsConstants.LEDS_COUNT / 4);
 
         for (int i = 0; i < LEDsConstants.LEDS_COUNT / 4; i++) {

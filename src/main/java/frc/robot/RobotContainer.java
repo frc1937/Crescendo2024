@@ -1,8 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -15,23 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.AimAtSpeaker;
-import frc.robot.commands.AlignWithAmp;
-import frc.robot.commands.AlignWithChain;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.MountCommand;
-import frc.robot.commands.PrepareShooter;
-import frc.robot.commands.ShootToAmp;
-import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ShooterKick;
-import frc.robot.commands.TeleOpDrive;
-import frc.robot.commands.TeleOpShoot;
-import frc.robot.commands.leds.DumbColourByShooter;
-import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.LEDsSubsystem;
-import frc.robot.subsystems.MountSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.commands.*;
+import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.subsystems.*;
 import frc.robot.util.Camera;
 import frc.robot.util.TriggerButton;
 import frc.robot.vision.VisionPoseEstimator;
@@ -40,11 +21,7 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.ShootingConstants.ASSIST;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SPEAKER_BACK;
-import static frc.robot.Constants.ShootingConstants.SPEAKER_FRONT;
-import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
+import static frc.robot.Constants.ShootingConstants.*;
 import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
 
 public class RobotContainer {
@@ -138,7 +115,7 @@ public class RobotContainer {
                 )
         );
 
-        leds.setDefaultCommand(new DumbColourByShooter(leds, shooterSubsystem));
+        leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));

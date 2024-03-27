@@ -49,9 +49,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         kickerMotor.configFactoryDefault();
         kickerMotor.setNeutralMode(NeutralMode.Brake);
-
-
-        // pitch.setPosition(Rotation2d.fromDegrees(45));
     }
 
     @Override
@@ -60,7 +57,7 @@ public class ShooterSubsystem extends SubsystemBase {
             consecutiveNoteInsideSamples++;
         } else {
             consecutiveNoteInsideSamples = 0;
-        };
+        }
 
         leftFlywheel.periodic();
         rightFlywheel.periodic();
@@ -97,7 +94,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setPitchGoal(Rotation2d goal) {
-        // SmartDashboard.putNumber("pitch/Goal", goal.getDegrees());
         pitch.setGoal(goal);
     }
 
@@ -156,11 +152,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public static class Reference implements Interpolatable<Reference> {
-        public Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
-        public Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
-        public Measure<Velocity<Angle>> flywheelVelocity = RPM.of(0);
-        public double spin = 1;
-        public double force = 1;
+        private Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
+        private Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
+        private Measure<Velocity<Angle>> flywheelVelocity = RPM.of(0);
+        private double spin = 1;
+        private double force = 1;
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> pitchVelocity,
