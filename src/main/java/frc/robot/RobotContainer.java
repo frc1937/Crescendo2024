@@ -4,17 +4,16 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.subsystems.*;
 import frc.robot.util.Camera;
-import frc.robot.util.TriggerButton;
+import frc.robot.util.Controller;
 import frc.robot.vision.VisionPoseEstimator;
 
 import java.util.function.DoubleSupplier;
@@ -23,32 +22,29 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.ShootingConstants.*;
 import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
+import static frc.robot.util.Controller.Inputs.*;
 
 public class RobotContainer {
-    private final XboxController driveController = new XboxController(0);
-    private final XboxController operatorController = new XboxController(1);
+    private static final Controller driveController = new Controller(0);
+    private static final Controller operatorController = new Controller(1);
     private final SendableChooser<Command> autoChooser;
 
     /* MAIN-DRIVER */
-    private final JoystickButton drAButton = new JoystickButton(driveController, XboxController.Button.kA.value);
-    private final JoystickButton drYButton = new JoystickButton(driveController, XboxController.Button.kY.value);
-    private final JoystickButton drBButton = new JoystickButton(driveController, XboxController.Button.kB.value);
-    private final JoystickButton drXButton = new JoystickButton(driveController, XboxController.Button.kX.value);
-    private final JoystickButton drStartButton = new JoystickButton(driveController, XboxController.Button.kStart.value);
-    private final TriggerButton drLeftTrigger = new TriggerButton(driveController, XboxController.Axis.kLeftTrigger);
-    private final TriggerButton drRightTrigger = new TriggerButton(driveController, XboxController.Axis.kRightTrigger);
-    private final JoystickButton drLeftBumper = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton drRightBumper = new JoystickButton(driveController, XboxController.Button.kRightBumper.value);
-    private final JoystickButton drBackButton = new JoystickButton(driveController, XboxController.Button.kBack.value);
+    private final Trigger drAButton = driveController.getButton(A);
+    private final Trigger drYButton = driveController.getButton(Y);
+    private final Trigger drBButton = driveController.getButton(B);
+    private final Trigger drXButton = driveController.getButton(X);
+    private final Trigger drStartButton = driveController.getButton(START);
+    private final Trigger drLeftTrigger = driveController.getStick(LEFT_STICK);
+    private final Trigger drRightTrigger = driveController.getStick(RIGHT_STICK);
+    private final Trigger drLeftBumper = driveController.getButton(LEFT_BUMPER);
+    private final Trigger drRightBumper = driveController.getButton(RIGHT_BUMPER);
+
     /* OPERATOR */
-    private final JoystickButton opAButton = new JoystickButton(operatorController, XboxController.Button.kA.value);
-    private final JoystickButton opBButton = new JoystickButton(operatorController, XboxController.Button.kB.value);
-    private final JoystickButton opYButton = new JoystickButton(operatorController, XboxController.Button.kY.value);
-    private final JoystickButton opXButton = new JoystickButton(operatorController, XboxController.Button.kX.value);
-    private final JoystickButton opRightBumper = new JoystickButton(operatorController, XboxController.Button.kRightBumper.value);
-    private final JoystickButton opLeftBumper = new JoystickButton(operatorController, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton opStartButton = new JoystickButton(operatorController, XboxController.Button.kStart.value);
-    private final TriggerButton opLeftTrigger = new TriggerButton(operatorController, XboxController.Axis.kLeftTrigger);
+    private final Trigger opAButton = operatorController.getButton(A);
+    private final Trigger opBButton = operatorController.getButton(B);
+    private final Trigger opXButton = operatorController.getButton(X);
+
     /* Subsystems */
     private final VisionPoseEstimator visionPoseEstimator;
     private final DrivetrainSubsystem drivetrain;
@@ -62,7 +58,6 @@ public class RobotContainer {
     public RobotContainer() {
         visionPoseEstimator = new VisionPoseEstimator(
                 new Camera("Front1937", FRONT_CAMERA_TO_ROBOT)
-//                new Camera("Rear1937", REAR_CAMERA_TO_ROBOT)
         );
 
         drivetrain = new DrivetrainSubsystem(visionPoseEstimator);
@@ -101,9 +96,9 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        DoubleSupplier translationSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftY.value);
-        DoubleSupplier strafeSup = () -> -driveController.getRawAxis(XboxController.Axis.kLeftX.value);
-        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(XboxController.Axis.kRightX.value), Constants.STICK_DEADBAND);
+        DoubleSupplier translationSup = () -> -driveController.getRawAxis(LEFT_Y);
+        DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
+        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), Constants.STICK_DEADBAND);
 
         drivetrain.setDefaultCommand(
                 new TeleOpDrive(
@@ -130,8 +125,6 @@ public class RobotContainer {
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-        //        drXButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
-//        driveYButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
@@ -140,8 +133,8 @@ public class RobotContainer {
 
         mountSubsystem.setDefaultCommand(
                 new MountCommand(mountSubsystem,
-                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kLeftY.value), Constants.STICK_DEADBAND*0.5),
-                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(XboxController.Axis.kRightY.value), Constants.STICK_DEADBAND*0.5)
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(LEFT_Y), Constants.STICK_DEADBAND*0.5),
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(RIGHT_Y), Constants.STICK_DEADBAND*0.5)
                 )
         );
     }
