@@ -89,4 +89,8 @@ public class Controller {
     public void rumbleController(GenericHID.RumbleType rumbleType, double intensity) {
         xboxController.setRumble(rumbleType, intensity);
     }
+
+    public XboxController getXboxController() {
+        return xboxController;
+    }
 }
