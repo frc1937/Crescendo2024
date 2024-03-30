@@ -22,7 +22,10 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.ShootingConstants.*;
 import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
+import static frc.robot.util.Controller.Axis.*;
 import static frc.robot.util.Controller.Inputs.*;
+import static frc.robot.util.Controller.Stick.LEFT_STICK;
+import static frc.robot.util.Controller.Stick.RIGHT_STICK;
 
 public class RobotContainer {
     private static final Controller driveController = new Controller(0);
@@ -44,7 +47,6 @@ public class RobotContainer {
     private final Trigger opAButton = operatorController.getButton(A);
     private final Trigger opBButton = operatorController.getButton(B);
     private final Trigger opXButton = operatorController.getButton(X);
-
     /* Subsystems */
     private final VisionPoseEstimator visionPoseEstimator;
     private final DrivetrainSubsystem drivetrain;
