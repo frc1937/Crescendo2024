@@ -150,7 +150,8 @@ public class RobotContainer {
         drivetrain.infrequentPeriodic();
     }
 
-    public void robotPeriodic() {
-
+    public void frequentPeriodic() {
+        drivetrain.periodic(); //Odometry should be updated very frequently for less ✨ error ✨
+        shooterSubsystem.periodic();
     }
 }

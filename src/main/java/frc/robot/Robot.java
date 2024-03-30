@@ -12,24 +12,25 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import static frc.robot.Constants.INFREQUENT_PERIODIC_PERIOD;
 
 public class Robot extends TimedRobot {
-    public static CTREConfigs ctreConfigs;
+    public static final CTREConfigs ctreConfigs = new CTREConfigs();
     private Command autonomousCommand;
+    private CommandScheduler commandScheduler;
     private RobotContainer robotContainer;
 
     public Robot() {
         addPeriodic(() -> robotContainer.infrequentPeriodic(), INFREQUENT_PERIODIC_PERIOD);
+        addPeriodic(() -> robotContainer.frequentPeriodic(), Constants.FREQUENT_PERIODIC_PERIOD, 0.004);
     }
 
     @Override
     public void robotInit() {
-        ctreConfigs = new CTREConfigs();
         robotContainer = new RobotContainer();
+        commandScheduler = CommandScheduler.getInstance();
     }
 
     @Override
     public void robotPeriodic() {
-        CommandScheduler.getInstance().run();
-        robotContainer.robotPeriodic();
+        commandScheduler.run();
     }
 
 
@@ -51,6 +52,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        CommandScheduler.getInstance().cancelAll();
+        commandScheduler.cancelAll();
     }
 }

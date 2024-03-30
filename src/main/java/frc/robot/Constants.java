@@ -39,12 +39,13 @@ public final class Constants {
             punishments that assemble to come to earth. May You send blessing in our handiwork, and
             grant us grace, kindness, and mercy in Your eyes and in the eyes of all who see us. May
             You hear the sound of our humble request because You are God Who hears prayer requests.
-            Blessed are You, Lord, Who hears prayer""";
+            Blessed are You, Lord, Who hears prayer"""; //Certainly didn't hear the prayers at the holocaust :(
 
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
      */
     public static final double INFREQUENT_PERIODIC_PERIOD = 0.05;
+    public static final double FREQUENT_PERIODIC_PERIOD = 0.004; //250 Hertz, default is 50.
     public static final double STICK_DEADBAND = 0.1;
 
     public static final class Mount { //todo: TUNE CONSTANTS TO SYSTEM SPECIFICS
