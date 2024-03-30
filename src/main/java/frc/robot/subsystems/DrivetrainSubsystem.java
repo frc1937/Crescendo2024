@@ -56,11 +56,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
             AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
             AZIMUTH_CONTROLLER_CONSTRAINTS);
     private final double AZIMUTH_CONTROLLER_DEADBAND = 0.12;
-
     private final MedianFilter xMedianFilter = new MedianFilter(10);
     private final MedianFilter yMedianFilter = new MedianFilter(10);
     private final MedianFilter thetaMedianFilter = new MedianFilter(10);
-
     private double yawCorrection = 0;
 
     public DrivetrainSubsystem(VisionPoseEstimator visionPoseEstimator) {
@@ -110,29 +108,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Azimuth Current [deg]", getGyroAzimuth().getDegrees());
     }
 
-    /**
-     * Publish the current PID gains so they can be modified
-     */
-    public void publishControllerGains() {
-        if (!SmartDashboard.containsKey("swerve/azimuth-controller/p")) {
-            SmartDashboard.putNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P);
-        }
-        if (!SmartDashboard.containsKey("swerve/azimuth-controller/i")) {
-            SmartDashboard.putNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I);
-        }
-        if (!SmartDashboard.containsKey("swerve/azimuth-controller/d")) {
-            SmartDashboard.putNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D);
-        }
-    }
+    public void lockSwerve() {
+        //Point all modules inwards, set speed to 0
+        SwerveModuleState[] moduleStates = new SwerveModuleState[4];
 
-    /**
-     * Re-read the PID gains without re-deploying the code.
-     */
-    public void rereadControllerGains() {
-        azimuthController.setPID(
-                SmartDashboard.getNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P),
-                SmartDashboard.getNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I),
-                SmartDashboard.getNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D));
+        moduleStates[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(315));
+        moduleStates[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        moduleStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(225));
+        moduleStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(135));
+
+        for (SwerveModule mod : swerveModules) {
+            mod.setDesiredState(moduleStates[mod.moduleNumber], false); //false so it doesn't check for speed < 0.01
+        }
     }
 
     public void drive(ChassisSpeeds chassisSpeeds, boolean closedLoop) {
@@ -147,8 +134,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     /**
-    Open loop drive for autonomous trajectory following commands
-     @param chassisSpeeds - the speeds used
+     * Open loop drive for autonomous trajectory following commands
+     *
+     * @param chassisSpeeds - the speeds used
      */
     public void drive(ChassisSpeeds chassisSpeeds) {
         drive(chassisSpeeds, false);
@@ -251,7 +239,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         } else {
             gyro.setYaw(180);
         }
-
     }
 
     public Rotation2d getGyroAzimuth() {
@@ -315,9 +302,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
             Pose2d visionPose = estimatedRobotPose.estimatedPose.toPose2d();
 
             Pose2d filteredVisionPose = new Pose2d(
-                xMedianFilter.calculate(visionPose.getX()),
-                yMedianFilter.calculate(visionPose.getY()),
-                Rotation2d.fromRadians(thetaMedianFilter.calculate(visionPose.getRotation().getRadians())));
+                    xMedianFilter.calculate(visionPose.getX()),
+                    yMedianFilter.calculate(visionPose.getY()),
+                    Rotation2d.fromRadians(thetaMedianFilter.calculate(visionPose.getRotation().getRadians())));
 
             Measure<Velocity<Angle>> angularVelocity;
             try {
@@ -330,13 +317,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
             field2d.getObject("Vision").setPose(visionPose);
 
-            Matrix<N3,N1> confidence = visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity);
-            
-            if (Double.isNaN(confidence.get(0, 0)) ||  Double.isNaN(confidence.get(1, 0))
-                || Double.isNaN(filteredVisionPose.getX()) || Double.isNaN(filteredVisionPose.getY())) {
+            Matrix<N3, N1> confidence = visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity);
+
+            if (Double.isNaN(confidence.get(0, 0)) || Double.isNaN(confidence.get(1, 0))
+                    || Double.isNaN(filteredVisionPose.getX()) || Double.isNaN(filteredVisionPose.getY())) {
                 return;
             }
-            
+
             poseEstimator.addVisionMeasurement(
                     filteredVisionPose,
                     Timer.getFPGATimestamp(),
@@ -345,6 +332,31 @@ public class DrivetrainSubsystem extends SubsystemBase {
                     confidence
             );
         }
+    }
+
+    /**
+     * Publish the current PID gains so they can be modified
+     */
+    public void publishControllerGains() {
+        if (!SmartDashboard.containsKey("swerve/azimuth-controller/p")) {
+            SmartDashboard.putNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P);
+        }
+        if (!SmartDashboard.containsKey("swerve/azimuth-controller/i")) {
+            SmartDashboard.putNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I);
+        }
+        if (!SmartDashboard.containsKey("swerve/azimuth-controller/d")) {
+            SmartDashboard.putNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D);
+        }
+    }
+
+    /**
+     * Re-read the PID gains without re-deploying the code.
+     */
+    public void rereadControllerGains() {
+        azimuthController.setPID(
+                SmartDashboard.getNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P),
+                SmartDashboard.getNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I),
+                SmartDashboard.getNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D));
     }
 
     private void sampleRobotPose() {

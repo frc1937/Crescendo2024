@@ -38,6 +38,7 @@ public class RobotContainer {
     private final Trigger drBButton = driveController.getButton(B);
     private final Trigger drXButton = driveController.getButton(X);
     private final Trigger drStartButton = driveController.getButton(START);
+    private final Trigger drBackButton = driveController.getButton(BACK);
     private final Trigger drLeftTrigger = driveController.getStick(LEFT_STICK);
     private final Trigger drRightTrigger = driveController.getStick(RIGHT_STICK);
     private final Trigger drLeftBumper = driveController.getButton(LEFT_BUMPER);
@@ -116,7 +117,6 @@ public class RobotContainer {
 
         drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
         drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
-        // drYButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, ASSIST_TARGET, translationSup, strafeSup, true, Seconds.of(1.5)));
         drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
 
@@ -127,6 +127,7 @@ public class RobotContainer {
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
+        drBackButton.onTrue(new InstantCommand(drivetrain::lockSwerve));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));

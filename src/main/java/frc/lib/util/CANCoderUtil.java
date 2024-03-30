@@ -16,7 +16,7 @@ public class CANCoderUtil {
      * This function allows reducing a CANCoder's CAN bus utilization by reducing the periodic status
      * frame period of nonessential frames from 10ms to 255ms.
      *
-     * <p>See https://docs.ctre-phoenix.com/en/stable/ch18_CommonAPI.html#cancoder for a description
+     * <p>See <a href="https://docs.ctre-phoenix.com/en/stable/ch18_CommonAPI.html#cancoder">...</a> for a description
      * of the status frames.
      *
      * @param cancoder The CANCoder to adjust the status frames on.
