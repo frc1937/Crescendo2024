@@ -14,18 +14,15 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.estimation.TargetModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
 import static frc.robot.Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS;
 
 public class VisionPoseEstimator {
-    private final HashMap<PhotonPoseEstimator, PhotonCamera> poseEstimators = new HashMap<>();
+    private final ConcurrentHashMap<PhotonPoseEstimator, PhotonCamera> poseEstimators = new ConcurrentHashMap<>();
 
     public VisionPoseEstimator(Camera... cameras) {
         PhotonPoseEstimator poseEstimator;
