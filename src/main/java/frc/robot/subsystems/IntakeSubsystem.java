@@ -9,10 +9,9 @@ import static frc.robot.Constants.IntakeConstants.INTAKE_MOTOR_ID;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final WPI_TalonSRX talonSRX = new WPI_TalonSRX(INTAKE_MOTOR_ID);
+
     public IntakeSubsystem() {
         configureTalonMotor(talonSRX);
-
-        talonSRX.setInverted(true);
     }
 
     public void setSpeedPercentage(double percentage) {
@@ -25,6 +24,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private void configureTalonMotor(WPI_TalonSRX motor) {
         motor.configFactoryDefault();
+
         motor.setNeutralMode(NeutralMode.Coast);
+        talonSRX.setInverted(true);
     }
 }

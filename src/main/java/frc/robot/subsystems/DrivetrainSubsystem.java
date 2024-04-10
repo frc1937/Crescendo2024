@@ -45,10 +45,10 @@ import static frc.robot.Constants.Swerve.AutoConstants;
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 
 public class DrivetrainSubsystem extends SubsystemBase {
-    public final SwerveDrivePoseEstimator poseEstimator;
-    public final SwerveModule[] swerveModules;
-    public final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
-    public final VisionPoseEstimator visionPoseEstimator;
+    private final SwerveDrivePoseEstimator poseEstimator;
+    private final SwerveModule[] swerveModules;
+    private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
+    private final VisionPoseEstimator visionPoseEstimator;
     private final Field2d field2d = new Field2d();
     private final RobotStateHistory history = new RobotStateHistory();
     private double previousTimestamp = 0;
@@ -338,14 +338,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * Publish the current PID gains so they can be modified
      */
     public void publishControllerGains() {
-        if (!SmartDashboard.containsKey("swerve/azimuth-controller/p")) {
-            SmartDashboard.putNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P);
+        String path = "swerve/azimuth-controller";
+
+        if (!SmartDashboard.containsKey(path+"/p")) {
+            SmartDashboard.putNumber(path+"/p", AZIMUTH_CONTROLLER_P);
         }
-        if (!SmartDashboard.containsKey("swerve/azimuth-controller/i")) {
-            SmartDashboard.putNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I);
+        if (!SmartDashboard.containsKey(path + "/i")) {
+            SmartDashboard.putNumber(path + "/i", AZIMUTH_CONTROLLER_I);
         }
-        if (!SmartDashboard.containsKey("swerve/azimuth-controller/d")) {
-            SmartDashboard.putNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D);
+        if (!SmartDashboard.containsKey(path + "/d")) {
+            SmartDashboard.putNumber(path + "/d", AZIMUTH_CONTROLLER_D);
         }
     }
 

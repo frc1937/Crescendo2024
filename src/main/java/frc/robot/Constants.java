@@ -100,8 +100,8 @@ public final class Constants {
 
     public static final class LEDsConstants {
         public static final int LEDS_COUNT = 46;
-        public static Color8Bit COLOUR_WHEN_EMPTY = new Color8Bit(0, 0, 255);
-        public static Color8Bit COLOUR_WHEN_LOADED = new Color8Bit(255, 80, 0);
+        public static final Color8Bit COLOUR_WHEN_EMPTY = new Color8Bit(0, 0, 255);
+        public static final Color8Bit COLOUR_WHEN_LOADED = new Color8Bit(255, 80, 0);
     }
 
     public static final class ShootingConstants {

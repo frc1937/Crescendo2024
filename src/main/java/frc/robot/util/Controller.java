@@ -20,10 +20,10 @@ public class Controller {
 
     public enum Stick {
         LEFT_STICK(2), RIGHT_STICK(3);
-        public final int id;
+        public final int value;
 
-        Stick(int id) {
-            this.id = id;
+        Stick(int value) {
+            this.value = value;
         }
     }
     public enum Axis {
@@ -59,7 +59,7 @@ public class Controller {
      * @return a trigger that is active when the stick is pushed past 50%
      */
     public Trigger getStick(Stick button) {
-        return new Trigger(() -> xboxController.getRawAxis(button.id) > 0.5);
+        return new Trigger(() -> xboxController.getRawAxis(button.value) > 0.5);
     }
 
     /**

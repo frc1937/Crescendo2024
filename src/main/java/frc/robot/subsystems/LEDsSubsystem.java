@@ -7,9 +7,9 @@ import frc.robot.Constants.LEDsConstants;
 
 public class LEDsSubsystem extends SubsystemBase {
     private final AddressableLED leds = new AddressableLED(0);
-    private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
 
     public LEDsSubsystem() {
+        AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDsConstants.LEDS_COUNT);
         leds.setLength(buffer.getLength());
     }
 
