@@ -31,16 +31,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 import static edu.wpi.first.units.Units.*;
 
 public final class Constants {
-    public static final String TFILAT_HADERECH = """
-            May it be Your will, Lord, our God and the God of our ancestors, that You lead us toward
-            peace, guide our footsteps toward peace, that we are supported in peace, and make us reach
-            our desired destination for life, gladness, and peace. May You rescue us from the hand of
-            every foe and ambush, from robbers and wild beasts on the trip, and from all manner of
-            punishments that assemble to come to earth. May You send blessing in our handiwork, and
-            grant us grace, kindness, and mercy in Your eyes and in the eyes of all who see us. May
-            You hear the sound of our humble request because You are God Who hears prayer requests.
-            Blessed are You, Lord, Who hears prayer"""; //Certainly didn't hear the prayers at the holocaust :(
-
     /**
      * Once how much time, in seconds, to run the infrequent periodic procedure
      */
@@ -57,7 +47,6 @@ public final class Constants {
         public static final double MOUNT_SPEED_SCALAR = 0.9;
         public static final double MOUNT_AUTO_SPEED = 0.5;
     }
-
 
     public static final class Transforms {
         /**
@@ -88,7 +77,6 @@ public final class Constants {
         public static final double NOISY_DISTANCE_METERS = 2.5;
         public static final double DISTANCE_WEIGHT = 7;
         public static final int TAG_PRESENCE_WEIGHT = 10;
-
 
         /**
          * Standard deviations of the vision measurements. Increase these numbers to
