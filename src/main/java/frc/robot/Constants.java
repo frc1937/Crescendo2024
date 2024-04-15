@@ -8,11 +8,10 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.*;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
@@ -27,6 +26,11 @@ import frc.lib.Target;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.util.AllianceUtilities;
+import org.photonvision.PhotonPoseEstimator;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -36,7 +40,11 @@ public final class Constants {
      */
     public static final double INFREQUENT_PERIODIC_PERIOD = 0.05;
     public static final double FREQUENT_PERIODIC_PERIOD = 0.004; //250 Hertz, default is 50.
+    public static final double ODOMETRY_FREQUENCY_HERTZ = 200;
     public static final double STICK_DEADBAND = 0.1;
+
+    public static final double DRIVE_NEUTRAL_DEADBAND = 0.2;
+    public static final double ROTATION_NEUTRAL_DEADBAND = 0.2;
 
     public static final class Mount { //todo: TUNE CONSTANTS TO SYSTEM SPECIFICS
         public static final int MOUNT_RIGHT_MOTOR_ID = 7;
@@ -92,6 +100,29 @@ public final class Constants {
          * meters.
          */
         public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 0.1, 0.1, 0.03);
+
+        /**
+         * The vector represents how ambiguous each value is.
+         * The first value represents how ambiguous is the x,
+         * the second one for the y, and the third one is for the theta (rotation).
+         * Increase these numbers to trust the estimate less.
+         */
+        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.003, 0.003, 0.0002);
+
+        public static final AllianceUtilities.AlliancePose2d DEFAULT_POSE = AllianceUtilities.AlliancePose2d.fromAlliancePose(5, 5, Rotation2d.fromDegrees(0));
+
+        public static final double TRANSLATION_STD_EXPONENT = 0.005;
+        public static final double ROTATION_STD_EXPONENT = 0.01;
+
+        public static final Map<Integer, Pose3d> TAG_ID_TO_POSE = new HashMap<>();
+
+        static {
+            for (AprilTag aprilTag : APRIL_TAG_FIELD_LAYOUT.getTags())
+                TAG_ID_TO_POSE.put(aprilTag.ID, aprilTag.pose);
+        }
+
+        public static final PhotonPoseEstimator.PoseStrategy PRIMARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
+        public static final PhotonPoseEstimator.PoseStrategy SECONDARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
     }
 
     public static class IntakeConstants {
@@ -251,6 +282,9 @@ public final class Constants {
         public static final Measure<Distance> DRIVE_BASE_RADIUS =
                 Meters.of(new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm());
 
+        public static final double WHEEL_DIAMETER_METRES = CHOSEN_MODULE.wheelDiameter;
+        public static final double VOLTAGE_COMPENSATION_SATURATION = 12;
+
         /* SwerveSubsystem Kinematics
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
@@ -324,7 +358,7 @@ public final class Constants {
             public static final int CAN_CODER_ID = 18;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(246.885);
             public static final SwerveModuleConstants CONSTANTS =
-                    new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                    new SwerveModuleConstants(0, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
 
         /* Front Right Module - Module 1 */
@@ -334,7 +368,7 @@ public final class Constants {
             public static final int CAN_CODER_ID = 20;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);
             public static final SwerveModuleConstants CONSTANTS =
-                    new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                    new SwerveModuleConstants(1, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
 
         /* Back Left Module - Module 2 */
@@ -344,7 +378,7 @@ public final class Constants {
             public static final int CAN_CODER_ID = 19;//
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.459);
             public static final SwerveModuleConstants CONSTANTS =
-                    new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                    new SwerveModuleConstants(2, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
 
         /* Back Right Module - Module 3 */
@@ -354,7 +388,7 @@ public final class Constants {
             public static final int CAN_CODER_ID = 21;
             public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(115.840);
             public static final SwerveModuleConstants CONSTANTS =
-                    new SwerveModuleConstants(DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                    new SwerveModuleConstants(3, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
         }
 
         public static final boolean ANGLE_INVERT = true;
@@ -377,7 +411,7 @@ public final class Constants {
             public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                     new PIDConstants(TRANSLATION_CONTROLLER_P, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
-                    Constants.Swerve.MAX_SPEED,
+                    Swerve.MAX_SPEED,
                     DRIVE_BASE_RADIUS.in(Meters),
                     new ReplanningConfig(true, true));
         }

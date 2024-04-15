@@ -12,9 +12,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.subsystems.*;
-import frc.robot.util.Camera;
 import frc.robot.util.Controller;
-import frc.robot.vision.VisionPoseEstimator;
+import frc.robot.poseestimation.PhotonCameraSource;
+import frc.robot.poseestimation.PoseEstimator;
+import frc.robot.poseestimation.PoseEstimator6328;
 
 import java.util.function.DoubleSupplier;
 
@@ -49,8 +50,8 @@ public class RobotContainer {
     private final Trigger opBButton = operatorController.getButton(B);
     private final Trigger opXButton = operatorController.getButton(X);
     /* Subsystems */
-    private final VisionPoseEstimator visionPoseEstimator;
-    private final DrivetrainSubsystem drivetrain;
+    public final PoseEstimator poseEstimator;
+    public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
@@ -59,11 +60,10 @@ public class RobotContainer {
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
 
     public RobotContainer() {
-        visionPoseEstimator = new VisionPoseEstimator(
-                new Camera("Front1937", FRONT_CAMERA_TO_ROBOT)
+        poseEstimator = new PoseEstimator(new PoseEstimator6328(), drivetrain,
+                new PhotonCameraSource("Front1937", FRONT_CAMERA_TO_ROBOT)
+//              ,new PhotonCameraSource("Rear1937", REAR_CAMERA_TO_ROBOT)
         );
-
-        drivetrain = new DrivetrainSubsystem(visionPoseEstimator);
 
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
@@ -123,7 +123,6 @@ public class RobotContainer {
         drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-        drRightBumper.whileTrue(new AlignWithChain(drivetrain, rotationSup, rotationSup));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
         drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));

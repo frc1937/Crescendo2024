@@ -1,12 +1,9 @@
 package frc.robot;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -51,7 +48,7 @@ public class SwerveModule {
         angleEncoder = new CANcoder(moduleConstants.cancoderID);
         configAngleEncoder();
 
-        mAngleMotor = new CANSparkMax(moduleConstants.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        mAngleMotor = new CANSparkMax(moduleConstants.steerMotorID, CANSparkLowLevel.MotorType.kBrushless);
         integratedAngleEncoder = mAngleMotor.getEncoder();
         angleController = mAngleMotor.getPIDController();
         configAngleMotor();
@@ -95,7 +92,6 @@ public class SwerveModule {
     }
 
     private void setAngle(SwerveModuleState desiredState) {
-        // Prevent jittering
         Rotation2d angle =
                 (Math.abs(desiredState.speedMetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS)
                         ? lastAngle
@@ -132,6 +128,10 @@ public class SwerveModule {
         );
     }
 
+    //----------------------------------------------------------------------------
+    // CODE BELOW WORKS
+    //----------------------------------------------------------------------------
+
     private void configAngleMotor() {
         mAngleMotor.restoreFactoryDefaults();
 
@@ -150,46 +150,47 @@ public class SwerveModule {
 
         mAngleMotor.enableVoltageCompensation(Swerve.VOLTAGE_COMP);
         mAngleMotor.burnFlash();
+
         resetToAbsolute();
     }
 
     private void configDriveMotor() {
-        TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
-
-        swerveDriveFXConfig.MotorOutput.Inverted = Constants.Swerve.DRIVE_MOTOR_INVERT;
-        swerveDriveFXConfig.MotorOutput.NeutralMode = Constants.Swerve.DRIVE_NEUTRAL_MODE;
-
-        /* Gear Ratio Config */
-        swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.DRIVE_GEAR_RATIO;
-
-        /* Current Limiting */
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.DRIVE_ENABLE_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.DRIVE_CONTINUOUS_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = Constants.Swerve.DRIVE_PEAK_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = Constants.Swerve.DRIVE_PEAK_CURRENT_DURATION;
-
-        /* PID Config */
-        swerveDriveFXConfig.Slot0.kP = Constants.Swerve.DRIVE_KP;
-        swerveDriveFXConfig.Slot0.kI = Constants.Swerve.DRIVE_KI;
-        swerveDriveFXConfig.Slot0.kD = Constants.Swerve.DRIVE_KD;
-
-        /* Open and Closed Loop Ramping */
-        swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = Constants.Swerve.OPEN_LOOP_RAMP;
-        swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = Constants.Swerve.OPEN_LOOP_RAMP;
-
-        swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = Constants.Swerve.CLOSED_LOOP_RAMP;
-        swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = Constants.Swerve.CLOSED_LOOP_RAMP;
-
-        driveMotor.getConfigurator().apply(swerveDriveFXConfig);
-        driveMotor.getConfigurator().setPosition(0);
+//        TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
+//
+//        swerveDriveFXConfig.MotorOutput.Inverted = Constants.Swerve.DRIVE_MOTOR_INVERT;
+//        swerveDriveFXConfig.MotorOutput.NeutralMode = Constants.Swerve.DRIVE_NEUTRAL_MODE;
+//
+//        /* Gear Ratio Config */
+//        swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.DRIVE_GEAR_RATIO;
+//
+//        /* Current Limiting */
+//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.DRIVE_ENABLE_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.DRIVE_CONTINUOUS_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = Constants.Swerve.DRIVE_PEAK_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = Constants.Swerve.DRIVE_PEAK_CURRENT_DURATION;
+//
+//        /* PID Config */
+//        swerveDriveFXConfig.Slot0.kP = Constants.Swerve.DRIVE_KP;
+//        swerveDriveFXConfig.Slot0.kI = Constants.Swerve.DRIVE_KI;
+//        swerveDriveFXConfig.Slot0.kD = Constants.Swerve.DRIVE_KD;
+//
+//        /* Open and Closed Loop Ramping */
+//        swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = Constants.Swerve.OPEN_LOOP_RAMP;
+//        swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = Constants.Swerve.OPEN_LOOP_RAMP;
+//
+//        swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = Constants.Swerve.CLOSED_LOOP_RAMP;
+//        swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = Constants.Swerve.CLOSED_LOOP_RAMP;
+//
+//        driveMotor.getConfigurator().apply(swerveDriveFXConfig);
+//        driveMotor.getConfigurator().setPosition(0);
     }
 
     private void configAngleEncoder() {
-        CANcoderConfiguration swerveCanCoderConfig  = new CANcoderConfiguration();
-        swerveCanCoderConfig.MagnetSensor.SensorDirection = Constants.Swerve.CAN_CODER_INVERT;
-        swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1; //todo:
-        //TODO XXX WARNING THIS HAS CHANGED FROM 0 - 360 TO 0 - 1. CODE MIGHT STILL USE OLD VALUES. PLEASE CHECK!
-
-        angleEncoder.getConfigurator().apply(swerveCanCoderConfig);
+//        CANcoderConfiguration swerveCanCoderConfig  = new CANcoderConfiguration();
+//        swerveCanCoderConfig.MagnetSensor.SensorDirection = Constants.Swerve.CAN_CODER_INVERT;
+//        swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1; //todo:
+//        //TODO XXX WARNING THIS HAS CHANGED FROM 0 - 360 TO 0 - 1. CODE MIGHT STILL USE OLD VALUES. PLEASE CHECK!
+//
+//        angleEncoder.getConfigurator().apply(swerveCanCoderConfig);
     }
 }

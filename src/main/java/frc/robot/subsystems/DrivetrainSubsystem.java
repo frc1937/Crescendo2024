@@ -3,109 +3,87 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.MedianFilter;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.RobotStateHistory;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.vision.VisionPoseEstimator;
-import org.photonvision.EstimatedRobotPose;
+import frc.robot.SwerveModule5990;
+import frc.robot.util.AllianceUtilities;
+import frc.robot.poseestimation.PoseEstimator;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_CONSTRAINTS;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_D;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_I;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_P;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
-import static frc.robot.Constants.Swerve.AutoConstants;
-import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.Swerve.*;
+import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
 
 public class DrivetrainSubsystem extends SubsystemBase {
-    private final SwerveDrivePoseEstimator poseEstimator;
-    private final SwerveModule[] swerveModules;
+    private final Lock odometryLock = new ReentrantLock();
+    private final PoseEstimator poseEstimator;
+    private final SwerveModule5990[] swerveModules;
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
-    private final VisionPoseEstimator visionPoseEstimator;
-    private final Field2d field2d = new Field2d();
+
+
     private final RobotStateHistory history = new RobotStateHistory();
     private double previousTimestamp = 0;
+
     private final ProfiledPIDController azimuthController = new ProfiledPIDController(
             AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
             AZIMUTH_CONTROLLER_CONSTRAINTS);
+
     private final double AZIMUTH_CONTROLLER_DEADBAND = 0.12;
     private final MedianFilter xMedianFilter = new MedianFilter(10);
     private final MedianFilter yMedianFilter = new MedianFilter(10);
     private final MedianFilter thetaMedianFilter = new MedianFilter(10);
     private double yawCorrection = 0;
 
-    public DrivetrainSubsystem(VisionPoseEstimator visionPoseEstimator) {
-        this.visionPoseEstimator = visionPoseEstimator;
-
-        SmartDashboard.putData("Field", field2d);
+    public DrivetrainSubsystem() {
+        this.poseEstimator = null;
 
         gyro.configFactoryDefault();
         zeroGyro();
 
-        swerveModules = new SwerveModule[]{
-                new SwerveModule(0, Constants.Swerve.Module0.CONSTANTS),
-                new SwerveModule(1, Constants.Swerve.Module1.CONSTANTS),
-                new SwerveModule(2, Constants.Swerve.Module2.CONSTANTS),
-                new SwerveModule(3, Constants.Swerve.Module3.CONSTANTS)
+        swerveModules = new SwerveModule5990[]{
+                new SwerveModule5990(Constants.Swerve.Module0.CONSTANTS, this),
+                new SwerveModule5990(Constants.Swerve.Module1.CONSTANTS, this),
+                new SwerveModule5990(Constants.Swerve.Module2.CONSTANTS, this),
+                new SwerveModule5990(Constants.Swerve.Module3.CONSTANTS, this)
         };
 
         Timer.delay(1.0);
-        resetModulesToAbsolute();
 
-        poseEstimator = new SwerveDrivePoseEstimator(
-                SWERVE_KINEMATICS,
-                getGyroAzimuth(),
-                getModulePositions(),
-                new Pose2d(),
-                Constants.VisionConstants.STATE_STANDARD_DEVIATIONS,
-                Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS
-        );
-
-        AutoBuilder.configureHolonomic(
-                this::getPose,
-                pose -> poseEstimator.resetPosition(getGyroAzimuth(), getModulePositions(), pose),
-                () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
-                this::drive,
-                AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
-                () -> {
-                    DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue);
-                    return alliance == DriverStation.Alliance.Red;
-                },
-                this
-        );
+        configurePathPlanner();
 
         azimuthController.setTolerance(AZIMUTH_CONTROLLER_TOLERANCE);
         azimuthController.enableContinuousInput(-Math.PI, Math.PI);
 
         SmartDashboard.putNumber("Azimuth Error [rad]", azimuthController.getPositionError());
         SmartDashboard.putNumber("Azimuth Current [deg]", getGyroAzimuth().getDegrees());
+    }
+
+    public DrivetrainSubsystem(PoseEstimator poseEstimator) {
+        this.poseEstimator = poseEstimator;
+
+        swerveModules = new SwerveModule5990[]{
+                new SwerveModule5990(Constants.Swerve.Module0.CONSTANTS, this),
+                new SwerveModule5990(Constants.Swerve.Module1.CONSTANTS, this),
+                new SwerveModule5990(Constants.Swerve.Module2.CONSTANTS, this),
+                new SwerveModule5990(Constants.Swerve.Module3.CONSTANTS, this)
+        };
     }
 
     public void lockSwerve() {
@@ -117,7 +95,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         moduleStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(225));
         moduleStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(135));
 
-        for (SwerveModule mod : swerveModules) {
+        for (SwerveModule5990 mod : swerveModules) {
             mod.setDesiredState(moduleStates[mod.moduleNumber], false); //false so it doesn't check for speed < 0.01
         }
     }
@@ -128,7 +106,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(discretizedChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
 
-        for (SwerveModule mod : swerveModules) {
+        for (SwerveModule5990 mod : swerveModules) {
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], closedLoop);
         }
     }
@@ -156,7 +134,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void resetAzimuthController() {
-        azimuthController.reset(getPose().getRotation().getRadians(), history.estimate().getVelocity().omegaRadiansPerSecond);
+        azimuthController.reset(getPose().toAlliancePose().getRotation().getRadians(), history.estimate().getVelocity().omegaRadiansPerSecond);
     }
 
     /**
@@ -183,7 +161,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void driveWithAzimuth(Translation2d translation, boolean fieldRelative) {
         drive(translation, yawCorrection, fieldRelative, true);
     }
-
+//todo: adapt DrivetrainSubsystem to use new localization system
     /**
      * Drive the robot whilst rotating it to achieve the goal azimuth
      *
@@ -206,11 +184,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void resetPose() {
-        poseEstimator.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), new Pose2d());
+        poseEstimator.resetPose(DEFAULT_POSE);
     }
 
-    public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
+    public AllianceUtilities.AlliancePose2d getPose() {
+        return poseEstimator.getCurrentPose();
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -233,11 +211,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return positions;
     }
 
+    public void setHeading(Rotation2d heading) {
+        gyro.setYaw(heading.getDegrees());
+    }
+
     public void zeroGyro() {
-        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
-            gyro.setYaw(0);
+        if(AllianceUtilities.isBlueAlliance()) {
+            setHeading(Rotation2d.fromDegrees(0));
         } else {
-            gyro.setYaw(180);
+            setHeading(Rotation2d.fromDegrees(180));
         }
     }
 
@@ -245,37 +227,25 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return Constants.Swerve.INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
-    public void resetModulesToAbsolute() {
-        for (SwerveModule mod : swerveModules) {
-            mod.resetToAbsolute();
-        }
-    }
+//    public void resetModulesToAbsolute() {
+//        for (SwerveModule mod : swerveModules) {
+//            mod.resetToAbsolute();
+//        }
+//    } //This isn't needed. You already reset when initializing.
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        if (DriverStation.isTeleop()) {
-            List<Optional<EstimatedRobotPose>> estimatedPoses = visionPoseEstimator.estimateGlobalPose(getPose());
-
-            for (Optional<EstimatedRobotPose> estimatedRobotPose : estimatedPoses) {
-                estimatedRobotPose.ifPresent(this::updateByEstimator);
-            }
-        }
-
-        poseEstimator.update(getGyroAzimuth(), getModulePositions());
-
-        field2d.setRobotPose(getPose());
-
-        SmartDashboard.putData("Field", field2d);
+        poseEstimator.updateFromOdometry(getGyroAzimuth(), getModulePositions());
 
         // Calculate the azimuth control. Whilst it is always calculated, only
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
-        SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().getRotation().getDegrees());
+        SmartDashboard.putNumber("swerve/azimuth [deg]", getPose().toAlliancePose().getRotation().getDegrees());
         SmartDashboard.putNumber("swerve/azimuth (gyro) [deg]", MathUtil.inputModulus(getGyroAzimuth().getDegrees(), -180, 180));
         SmartDashboard.putNumber("swerve/azimuth [target]", azimuthController.getGoal().position * 180 / Math.PI);
 
-        yawCorrection = azimuthController.calculate(getPose().getRotation().getRadians());
+        yawCorrection = azimuthController.calculate(getPose().toAlliancePose().getRotation().getRadians());
         yawCorrection = MathUtil.applyDeadband(yawCorrection, AZIMUTH_CONTROLLER_DEADBAND);
     }
 
@@ -289,49 +259,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public void stop() {
         drive(new ChassisSpeeds(0, 0, 0), false);
-    }
-
-    private void updateByEstimator(EstimatedRobotPose estimatedRobotPose) {
-        if (estimatedRobotPose == null) {
-            return;
-        }
-
-        if (previousTimestamp < estimatedRobotPose.timestampSeconds) {
-            previousTimestamp = estimatedRobotPose.timestampSeconds;
-
-            Pose2d visionPose = estimatedRobotPose.estimatedPose.toPose2d();
-
-            Pose2d filteredVisionPose = new Pose2d(
-                    xMedianFilter.calculate(visionPose.getX()),
-                    yMedianFilter.calculate(visionPose.getY()),
-                    Rotation2d.fromRadians(thetaMedianFilter.calculate(visionPose.getRotation().getRadians())));
-
-            Measure<Velocity<Angle>> angularVelocity;
-            try {
-                angularVelocity = RadiansPerSecond.of(history.estimate().getVelocity().omegaRadiansPerSecond);
-            } catch (NullPointerException e) {
-                angularVelocity = RadiansPerSecond.of(0);
-            }
-
-            SmartDashboard.putNumber("Angular Velocity", angularVelocity.in(RotationsPerSecond));
-
-            field2d.getObject("Vision").setPose(visionPose);
-
-            Matrix<N3, N1> confidence = visionPoseEstimator.confidenceCalculator(estimatedRobotPose, angularVelocity);
-
-            if (Double.isNaN(confidence.get(0, 0)) || Double.isNaN(confidence.get(1, 0))
-                    || Double.isNaN(filteredVisionPose.getX()) || Double.isNaN(filteredVisionPose.getY())) {
-                return;
-            }
-
-            poseEstimator.addVisionMeasurement(
-                    filteredVisionPose,
-                    Timer.getFPGATimestamp(),
-//                    estimatedRobotPose.timestampSeconds,///* - 0.02 * 5*/,  // TODO this needs to be more sophisticated
-                    //wdym by that comment?
-                    confidence
-            );
-        }
     }
 
     /**
@@ -362,6 +289,22 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     private void sampleRobotPose() {
-        history.addSample(Timer.getFPGATimestamp(), getPose());
+        history.addSample(Timer.getFPGATimestamp(), getPose().toAlliancePose());
+    }
+
+    private void configurePathPlanner() {
+        AutoBuilder.configureHolonomic(
+                () -> poseEstimator.getCurrentPose().toBlueAlliancePose(),
+                pose -> poseEstimator.resetPose(AllianceUtilities.AlliancePose2d.fromAlliancePose(pose)), //TODO LOL THIS MIGHT BE RLY WRONG
+                () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
+                this::drive,
+                AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
+                () -> !AllianceUtilities.isBlueAlliance(),
+                this
+        );
+    }
+
+    public Lock getOdometryLock() {
+        return odometryLock;
     }
 }
