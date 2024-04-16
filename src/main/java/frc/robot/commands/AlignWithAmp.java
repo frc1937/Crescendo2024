@@ -4,47 +4,37 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Swerve5990;
+
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
-import frc.robot.subsystems.DrivetrainSubsystem;
-
 public class AlignWithAmp extends Command {
-  private final DrivetrainSubsystem drivetrain;
-  private final DoubleSupplier translationSup,
-                               strafeSup;
+    private final Swerve5990 swerve5990;
+    private final DoubleSupplier translationSup,
+            strafeSup;
 
-  public AlignWithAmp(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
-    this.drivetrain = drivetrain;
-    this.translationSup = translationSup;
-    this.strafeSup = strafeSup;
+    public AlignWithAmp(Swerve5990 swerve5990, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+        this.swerve5990 = swerve5990;
+        this.translationSup = translationSup;
+        this.strafeSup = strafeSup;
 
-    addRequirements(drivetrain);
-  }
-
-  @Override
-  public void initialize() {
-    drivetrain.resetAzimuthController();
-  }
-
-  @Override
-  public void execute() {
-    Translation2d stickTranslation = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble());
-
-    if (stickTranslation.getNorm() < Constants.STICK_DEADBAND) {
-      stickTranslation = new Translation2d();
+        addRequirements(swerve5990);
     }
 
-    Translation2d translation = stickTranslation.times(Constants.Swerve.MAX_SPEED);
+    @Override
+    public void initialize() {
+        swerve5990.setupAzimuthController();
+    }
 
-    drivetrain.driveWithAzimuth(
-        translation,
-        Rotation2d.fromDegrees(90),
-        true
-    );
-  }
+    @Override
+    public void execute() {
+        //todo: deadbnad
+        swerve5990.driveFieldRelative(
+                translationSup.getAsDouble(),
+                strafeSup.getAsDouble(),
+                Rotation2d.fromDegrees(90)
+        );
+    }
 }

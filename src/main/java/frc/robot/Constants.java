@@ -36,10 +36,10 @@ import static edu.wpi.first.units.Units.*;
 
 public final class Constants {
     /**
-     * Once how much time, in seconds, to run the infrequent periodic procedure
+     * Once how much time, in Hertz (1/hertz = seconds), to run the infrequent periodic procedure
      */
-    public static final double INFREQUENT_PERIODIC_PERIOD = 0.05;
-    public static final double FREQUENT_PERIODIC_PERIOD = 0.004; //250 Hertz, default is 50.
+    public static final double INFREQUENT_PERIODIC_HERTZ = 10;
+    public static final double PERIODIC_FREQUENCY_HERTZ = 50;
     public static final double ODOMETRY_FREQUENCY_HERTZ = 200;
     public static final double STICK_DEADBAND = 0.1;
 
@@ -265,7 +265,7 @@ public final class Constants {
     public static final class Swerve {
         public static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
                 AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85),
-                AZIMUTH_CONTROLLER_DEADBAND = 0.1;
+                AZIMUTH_CONTROLLER_DEADBAND = 0.12;
         public static final double TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7, TRANSLATION_MAX_ACCELERATION = 3;
         public static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);
 

@@ -4,16 +4,13 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
-import frc.robot.commands.leds.AlternatingDots;
-import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.Swerve5990;
 
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.ShootingConstants.AMP_INIT;
@@ -23,9 +20,9 @@ public class ShootToAmp extends SequentialCommandGroup {
     /**
      * Creates a new ShootToAmp.
      */
-    public ShootToAmp(ShooterSubsystem shooter, DrivetrainSubsystem drivetrainSubsystem, LEDsSubsystem leds) {
+    public ShootToAmp(ShooterSubsystem shooter, Swerve5990 swerve5990, LEDsSubsystem leds) {
         Command prepare = new ParallelCommandGroup(
-                new DriveForward(drivetrainSubsystem, 0.1).withTimeout(0.2), //0.19
+                new DriveForward(swerve5990, 0.1).withTimeout(0.2), //0.19
                 new PrepareShooter(shooter, AMP_INIT).withTimeout(1.9 + 0.37)
         );
 
@@ -48,28 +45,28 @@ public class ShootToAmp extends SequentialCommandGroup {
 
     @Deprecated
     private static class DriveForward extends Command {
-        private final DrivetrainSubsystem drivetrain;
+        private final Swerve5990 swerve5990;
         private final double translationValue;
 
-        public DriveForward(DrivetrainSubsystem drivetrain, double translationValue) {
-            this.drivetrain = drivetrain;
+        public DriveForward(Swerve5990 swerve5990, double translationValue) {
+            this.swerve5990 = swerve5990;
             this.translationValue = translationValue;
 
-            addRequirements(drivetrain);
+            addRequirements(swerve5990);
         }
 
         @Override
         public void execute() {
-            drivetrain.drive(
-                    new Translation2d(-translationValue, 0).times(Constants.Swerve.MAX_SPEED),
+            swerve5990.drive(
+                    -translationValue,
                     0,
-                    false,
-                    true);
+                    0, true
+            );
         }
 
         @Override
         public void end(boolean interrupt) {
-            drivetrain.stop();
+            swerve5990.stop();
         }
     }
 }

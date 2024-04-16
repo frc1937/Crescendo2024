@@ -11,22 +11,19 @@ import frc.lib.RobotState;
 import frc.lib.Target;
 import frc.robot.Constants;
 import frc.robot.commands.TeleOpShoot;
-import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.POST_SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_PREDICTION_TIME;
-import static frc.robot.Constants.Swerve.MAX_SPEED;
+import static frc.robot.Constants.ShootingConstants.*;
 
 public class TeleOpShootCalibration extends SequentialCommandGroup {
-    public TeleOpShootCalibration(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public TeleOpShootCalibration(Swerve5990 swerve5990, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
-                new TeleopAim(drivetrain, shooter, target, translationSup, strafeSup),
-                new TeleOpShoot.TeleopThrow(drivetrain, shooter, translationSup, strafeSup, false).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
+                new TeleopAim(swerve5990, shooter, target, translationSup, strafeSup),
+                new TeleOpShoot.TeleopThrow(swerve5990, shooter, translationSup, strafeSup, false).withTimeout(SHOOTING_DELAY + POST_SHOOTING_DELAY)
         );
 
         SmartDashboard.putNumber("calibration/angle [deg]", 0);
@@ -35,7 +32,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
     }
 
     private static class TeleopAim extends Command {
-        private final DrivetrainSubsystem drivetrain;
+        private final Swerve5990 swerve5990;
         private final ShooterSubsystem shooter;
         private final Target target;
         private final DoubleSupplier translationSup, strafeSup;
@@ -44,14 +41,14 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
 
         private double targetDistance = 0;
 
-        public TeleopAim(DrivetrainSubsystem drivetrain, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
-            this.drivetrain = drivetrain;
+        public TeleopAim(Swerve5990 swerve5990, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+            this.swerve5990 = swerve5990;
             this.shooter = shooter;
             this.target = target;
             this.translationSup = translationSup;
             this.strafeSup = strafeSup;
 
-            addRequirements(drivetrain, shooter);
+            addRequirements(swerve5990, shooter);
         }
 
         @Override
@@ -64,12 +61,12 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
             double targetTranslation = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
             double targetStrafe = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
 
-            RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
+            RobotState predictedState = swerve5990.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
 
             SmartDashboard.putNumber("calibration/distance from target [meters]", targetDisplacement.getNorm());
 
-            drivetrain.driveWithAzimuth(new Translation2d(targetTranslation, targetStrafe).times(MAX_SPEED),
+            swerve5990.driveFieldRelative(targetTranslation, targetStrafe,
                     targetDisplacement.getAngle());
 
             // Aim the shooter
@@ -83,7 +80,7 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
 
         @Override
         public boolean isFinished() {
-            boolean azimuthReady = drivetrain.azimuthAtGoal(target.getAzimuthTolerance(targetDistance));
+            boolean azimuthReady = swerve5990.azimuthAtGoal(target.getAzimuthTolerance(targetDistance));
             boolean notMoving = new Translation2d(translationSup.getAsDouble(), strafeSup.getAsDouble()).getNorm() <= Constants.STICK_DEADBAND;
             boolean readyToKick = shooter.atReference() && azimuthReady;
 

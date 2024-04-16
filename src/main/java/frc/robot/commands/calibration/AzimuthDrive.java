@@ -6,34 +6,33 @@ package frc.robot.commands.calibration;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Swerve5990;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class AzimuthDrive extends Command {
-    private final DrivetrainSubsystem drivetrain;
+    private final Swerve5990 swerve5990;
     private final DoubleSupplier translationSup, strafeSup, rotationSup;
     private final BooleanSupplier overrideAzimuthSup;
 
     private boolean lastOverrideAzimuth;
 
-    public AzimuthDrive(DrivetrainSubsystem drivetrain, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier overrideAzimuthSup) {
-        this.drivetrain = drivetrain;
+    public AzimuthDrive(Swerve5990 swerve5990, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier overrideAzimuthSup) {
+        this.swerve5990 = swerve5990;
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
         this.overrideAzimuthSup = overrideAzimuthSup;
 
-        addRequirements(drivetrain);
+        addRequirements(swerve5990);
     }
 
     @Override
     public void initialize() {
-        drivetrain.publishControllerGains();
+        swerve5990.publishControllerGains();
     }
 
     @Override
@@ -45,15 +44,14 @@ public class AzimuthDrive extends Command {
 
         if (overrideAzimuth) {
             if (!lastOverrideAzimuth) {
-                drivetrain.rereadControllerGains();
+                swerve5990.rereadControllerGains();
             }
 
-            drivetrain.driveWithAzimuth(new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED), Rotation2d.fromDegrees(90));
+            swerve5990.driveFieldRelative(translationValue, strafeValue, Rotation2d.fromDegrees(90));
         } else {
-            drivetrain.drive(
-                    new Translation2d(translationValue, strafeValue).times(Constants.Swerve.MAX_SPEED),
-                    rotationValue * Constants.Swerve.MAX_ANGULAR_VELOCITY,
-                    true,
+            swerve5990.drive(
+                    translationValue, strafeValue,
+                    rotationValue,
                     true);
         }
 

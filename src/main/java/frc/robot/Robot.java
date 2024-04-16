@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import static frc.robot.Constants.INFREQUENT_PERIODIC_PERIOD;
+import static frc.robot.Constants.INFREQUENT_PERIODIC_HERTZ;
 
 public class Robot extends TimedRobot {
     private Command autonomousCommand;
@@ -17,8 +17,8 @@ public class Robot extends TimedRobot {
     private RobotContainer robotContainer;
 
     public Robot() {
-        addPeriodic(() -> robotContainer.infrequentPeriodic(), INFREQUENT_PERIODIC_PERIOD);
-        addPeriodic(() -> robotContainer.frequentPeriodic(), Constants.FREQUENT_PERIODIC_PERIOD, 0.004);
+        addPeriodic(() -> robotContainer.infrequentPeriodic(), 1/ INFREQUENT_PERIODIC_HERTZ);
+        addPeriodic(() -> robotContainer.frequentPeriodic(), 1 / Constants.PERIODIC_FREQUENCY_HERTZ, 0.05);
     }
 
     @Override

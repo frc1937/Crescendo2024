@@ -50,8 +50,10 @@ public class RobotContainer {
     private final Trigger opBButton = operatorController.getButton(B);
     private final Trigger opXButton = operatorController.getButton(X);
     /* Subsystems */
-    public final PoseEstimator5990 poseEstimator5990;
-    public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+    private PoseEstimator5990 poseEstimator5990;
+
+    public final Swerve5990 swerve5990 = new Swerve5990(poseEstimator5990);
+
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
@@ -60,15 +62,16 @@ public class RobotContainer {
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
 
     public RobotContainer() {
-        poseEstimator5990 = new PoseEstimator5990(new PoseEstimator6328(), drivetrain,
-                new PhotonCameraSource("Front1937", FRONT_CAMERA_TO_ROBOT)
-//              ,new PhotonCameraSource("Rear1937", REAR_CAMERA_TO_ROBOT)
+        PoseEstimator6328 poseEstimator6328 = new PoseEstimator6328();
+
+        poseEstimator5990 = new PoseEstimator5990(poseEstimator6328, swerve5990
+                , new PhotonCameraSource("Front1937", FRONT_CAMERA_TO_ROBOT)
         );
 
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
-        NamedCommands.registerCommand("Rotate", new AimAtSpeaker(drivetrain, 1));
-        NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(drivetrain, 0.5));
+        NamedCommands.registerCommand("Rotate", new AimAtSpeaker(swerve5990, 1));
+        NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(swerve5990, 0.5));
 
         NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake().withTimeout(2.7));
 
@@ -103,9 +106,9 @@ public class RobotContainer {
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
         DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), Constants.STICK_DEADBAND);
 
-        drivetrain.setDefaultCommand(
+        swerve5990.setDefaultCommand(
                 new TeleOpDrive(
-                        drivetrain,
+                        swerve5990,
                         translationSup,
                         strafeSup,
                         rotationSup,
@@ -115,18 +118,18 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        drAButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
-        drBButton.whileTrue(new TeleOpShoot(drivetrain, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
+        drAButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
+        drBButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
         drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
-        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, drivetrain, leds));
+        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
-        drLeftBumper.whileTrue(new AlignWithAmp(drivetrain, translationSup, strafeSup));
+        drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
         drRightTrigger.whileTrue(new IntakeCommand(intakeSubsystem, -0.9));
 
-        drStartButton.onTrue(new InstantCommand(drivetrain::zeroGyro));
-        drBackButton.onTrue(new InstantCommand(drivetrain::lockSwerve));
+        drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
+        drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve));
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
@@ -147,11 +150,11 @@ public class RobotContainer {
     }
 
     public void infrequentPeriodic() {
-        drivetrain.infrequentPeriodic();
+        swerve5990.infrequentPeriodic();
     }
 
     public void frequentPeriodic() {
-        drivetrain.periodic(); //Odometry should be updated very frequently for less ✨ error ✨
         shooterSubsystem.periodic();
+        poseEstimator5990.periodic();
     }
 }

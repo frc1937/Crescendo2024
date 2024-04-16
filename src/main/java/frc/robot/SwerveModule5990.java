@@ -24,7 +24,6 @@ import edu.wpi.first.units.Velocity;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.util.Conversions;
 import frc.robot.util.SwerveOptimization;
 
@@ -61,7 +60,7 @@ public class SwerveModule5990 {
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
     //You will control driveMotor velocity using feedforward to get the voltage.
 
-    public SwerveModule5990(SwerveModuleConstants constants, DrivetrainSubsystem drivetrain) {
+    public SwerveModule5990(SwerveModuleConstants constants) {
         this.swerveModuleConstants = constants;
 
         this.driveMotor = new TalonFX(swerveModuleConstants.driveMotorID);
