@@ -17,13 +17,13 @@ import frc.lib.RobotStateHistory;
 import frc.robot.Constants;
 import frc.robot.SwerveModule5990;
 import frc.robot.poseestimation.PoseEstimator5990;
-import frc.robot.util.AllianceUtilities;
 
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.Swerve.*;
 import static frc.robot.Constants.Swerve.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.*;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
@@ -87,7 +87,7 @@ public class Swerve5990 extends SubsystemBase {
 
     public void resetGyro() {
         Pose2d pose = new Pose2d(0, 0, new Rotation2d());
-        gyro.setYaw(AllianceUtilities.AlliancePose2d.fromBlueAlliancePose(pose).toAlliancePose().getRotation().getDegrees());
+        gyro.setYaw(fromBluePose(pose).getCorrectPose().getRotation().getDegrees());
     }
 
     public SwerveDriveWheelPositions getModulePositions() {
@@ -108,7 +108,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     public void setupAzimuthController() {
-        azimuthController.reset(poseEstimator5990.getCurrentPose().toBlueAlliancePose().getRotation().getRadians());
+        azimuthController.reset(poseEstimator5990.getCurrentPose().getBluePose().getRotation().getRadians());
 
         azimuthController.setTolerance(AZIMUTH_CONTROLLER_TOLERANCE);
         azimuthController.enableContinuousInput(-Math.PI, Math.PI);
@@ -131,12 +131,12 @@ public class Swerve5990 extends SubsystemBase {
      * @param targetPose - blue alliance form
      */
     public void PIDToPose(Pose2d targetPose) {
-        Pose2d currentPose = poseEstimator5990.getCurrentPose().toBlueAlliancePose();
+        Pose2d currentPose = poseEstimator5990.getCurrentPose().getBluePose();
 
         double xSpeed = translationController.calculate(currentPose.getX(), targetPose.getX());
         double ySpeed = translationController.calculate(currentPose.getY(), targetPose.getY());
 
-        int direction = AllianceUtilities.isBlueAlliance() ? 1 : -1;
+        int direction = isBlueAlliance() ? 1 : -1;
 
         ChassisSpeeds speeds = new ChassisSpeeds(
                 xSpeed * direction,
@@ -148,9 +148,9 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     public void driveFieldRelative(double xPower, double yPower, Rotation2d targetAngle) {
-        targetAngle = AllianceUtilities.toMirroredAllianceRotation(targetAngle);
+        targetAngle = getCorrectRotation(targetAngle);
 
-        Rotation2d currentAngle = poseEstimator5990.getCurrentPose().toAlliancePose().getRotation();
+        Rotation2d currentAngle = poseEstimator5990.getCurrentPose().getCorrectPose().getRotation();
 
         ChassisSpeeds selfRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(powersToSpeeds(xPower, yPower, 0), currentAngle);
 
@@ -161,7 +161,7 @@ public class Swerve5990 extends SubsystemBase {
 
     public void driveFieldRelative(double xPower, double yPower, double thetaPower) {
         ChassisSpeeds speeds = powersToSpeeds(xPower, yPower, thetaPower);
-        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, poseEstimator5990.getCurrentPose().toAlliancePose().getRotation());
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, poseEstimator5990.getCurrentPose().getCorrectPose().getRotation());
 
         driveSelfRelative(speeds);
     }
@@ -231,7 +231,7 @@ public class Swerve5990 extends SubsystemBase {
 
 
     private double calculateProfiledSpeedToAngle(Rotation2d angle) {
-        double currentAngle = poseEstimator5990.getCurrentPose().toAlliancePose().getRotation().getRadians();
+        double currentAngle = poseEstimator5990.getCurrentPose().getCorrectPose().getRotation().getRadians();
         double yawCorrection = azimuthController.calculate(
                 currentAngle,
                 angle.getRadians()
@@ -244,15 +244,15 @@ public class Swerve5990 extends SubsystemBase {
 
     private void configurePathPlanner() {
         AutoBuilder.configureHolonomic(
-                () -> poseEstimator5990.getCurrentPose().toBlueAlliancePose(),
-                pose -> poseEstimator5990.resetPose(AllianceUtilities.AlliancePose2d.fromAlliancePose(pose)),
+                () -> poseEstimator5990.getCurrentPose().getBluePose(),
+                pose -> poseEstimator5990.resetPose(fromCorrectPose(pose)),
                 //TODO LOL THIS MIGHT BE RLY WRONG
 
                 this::getSelfRelativeVelocity,
                 this::driveSelfRelative,
 
                 HOLONOMIC_PATH_FOLLOWER_CONFIG,
-                () -> !AllianceUtilities.isBlueAlliance(),
+                () -> !isBlueAlliance(),
                 this
         );
     }
@@ -289,6 +289,6 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     private void sampleRobotPose() {
-        history.addSample(Timer.getFPGATimestamp(), poseEstimator5990.getCurrentPose().toAlliancePose());
+        history.addSample(Timer.getFPGATimestamp(), poseEstimator5990.getCurrentPose().getCorrectPose());
     }
 }

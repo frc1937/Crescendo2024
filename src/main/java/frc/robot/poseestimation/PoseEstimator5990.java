@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Swerve5990;
-import frc.robot.util.AllianceUtilities;
+import frc.robot.util.AlliancePose2d;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,10 +23,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
-import static frc.robot.Constants.VisionConstants.ROTATION_STD_EXPONENT;
-import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
-import static frc.robot.Constants.VisionConstants.TRANSLATION_STD_EXPONENT;
+import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
 
 /**
  * A class that estimates the robot's pose using team 6328's custom pose estimator.
@@ -40,7 +38,7 @@ public class PoseEstimator5990 implements AutoCloseable {
     private final Lock updateLock = new ReentrantLock();
     private final Notifier updateFromOdometryNotifier;
 
-    private AllianceUtilities.AlliancePose2d robotPose = DEFAULT_POSE;
+    private AlliancePose2d robotPose = DEFAULT_POSE;
 
     /**
      * Constructs a new PoseEstimator.
@@ -68,25 +66,25 @@ public class PoseEstimator5990 implements AutoCloseable {
     public void periodic() {
         updateFromVision();
 
-        robotPose = AllianceUtilities.AlliancePose2d.fromBlueAlliancePose(swerveDrivePoseEstimator.getEstimatedPose());
-        field.setRobotPose(getCurrentPose().toBlueAlliancePose());
+        robotPose = fromBluePose(swerveDrivePoseEstimator.getEstimatedPose());
+        field.setRobotPose(getCurrentPose().getBluePose());
     }
 
     /**
      * Resets the pose estimator to the given pose, and the gyro to the given pose's heading.
      *
-     * @param currentPose the pose to reset to, as an {@link AllianceUtilities.AlliancePose2d}
+     * @param currentPose the pose to reset to, as an {@link AlliancePose2d}
      */
-    public void resetPose(AllianceUtilities.AlliancePose2d currentPose) {
-        final Pose2d currentBluePose = currentPose.toBlueAlliancePose();
+    public void resetPose(AlliancePose2d currentPose) {
+        final Pose2d currentBluePose = currentPose.getBluePose();
         swerve5990.setHeading(currentBluePose.getRotation());
         swerveDrivePoseEstimator.resetPose(currentBluePose);
     }
 
     /**
-     * @return the estimated pose of the robot, as an {@link AllianceUtilities.AlliancePose2d}
+     * @return the estimated pose of the robot, as an {@link AlliancePose2d}
      */
-    public AllianceUtilities.AlliancePose2d getCurrentPose() {
+    public AlliancePose2d getCurrentPose() {
         return robotPose;
     }
 

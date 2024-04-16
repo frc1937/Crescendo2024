@@ -26,15 +26,19 @@ import frc.lib.Target;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.util.AllianceUtilities;
+import frc.robot.util.AlliancePose2d;
 import org.photonvision.PhotonPoseEstimator;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
+    public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.54);
+    public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
+
     /**
      * Once how much time, in Hertz (1/hertz = seconds), to run the infrequent periodic procedure
      */
@@ -109,7 +113,7 @@ public final class Constants {
          */
         public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.003, 0.003, 0.0002);
 
-        public static final AllianceUtilities.AlliancePose2d DEFAULT_POSE = AllianceUtilities.AlliancePose2d.fromAlliancePose(5, 5, Rotation2d.fromDegrees(0));
+        public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(5, 5, Rotation2d.fromDegrees(0));
 
         public static final double TRANSLATION_STD_EXPONENT = 0.005;
         public static final double ROTATION_STD_EXPONENT = 0.01;
