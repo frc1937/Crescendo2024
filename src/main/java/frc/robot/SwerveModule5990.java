@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -10,7 +9,11 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.*;
+import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -21,17 +24,16 @@ import edu.wpi.first.units.Velocity;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.poseestimation.TalonFXOdometryThread6328;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.util.Conversions;
 import frc.robot.util.SwerveOptimization;
 
-import java.util.Queue;
-
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.Constants.Swerve.*;
+import static frc.robot.Constants.Swerve.MAX_SPEED;
+import static frc.robot.Constants.Swerve.SWERVE_IN_PLACE_DRIVE_MPS;
+import static frc.robot.Constants.Swerve.VOLTAGE_COMPENSATION_SATURATION;
 
 public class SwerveModule5990 {
     public final SwerveModuleConstants swerveModuleConstants;
@@ -42,13 +44,18 @@ public class SwerveModule5990 {
     private final SparkPIDController steerController;
     private final RelativeEncoder steerRelativeEncoder;
     private final CANcoder steerEncoder;
-    private final Queue<Double> steerPositionQueue, drivePositionQueue;
     private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(Constants.Swerve.DRIVE_KS, Constants.Swerve.DRIVE_KV, Constants.Swerve.DRIVE_KA);
 
-    private SwerveModuleState lastState = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
     private Rotation2d lastAngle;
 
-    private StatusSignal<Double> steerPositionSignal, drivePositionSignal, steerVelocitySignal, driveVelocitySignal;
+    /**
+     * Rotations
+     */
+    private StatusSignal<Double> steerPositionSignal, drivePositionSignal;
+    /**
+     * Rotations per second
+     */
+    private StatusSignal<Double> steerVelocitySignal, driveVelocitySignal;
 
     private final VoltageOut driveVoltageRequest = new VoltageOut(0);
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
@@ -67,18 +74,6 @@ public class SwerveModule5990 {
         configureSteerEncoder();
         configureSteerMotor();
         configureDriveMotor();
-
-        TalonFXOdometryThread6328 talonThread = TalonFXOdometryThread6328.getInstance(drivetrain.getOdometryLock());
-
-        steerPositionQueue = talonThread.registerSignal(steerPositionSignal); //Use external CANCODER for position
-        drivePositionQueue = talonThread.registerSignal(drivePositionSignal);
-    }
-
-    public void periodic() {
-        refreshStatusSignals();
-
-        steerPositionQueue.clear();
-        drivePositionQueue.clear();
     }
 
     public void setTargetState(SwerveModuleState targetState, boolean closedLoop) {
@@ -90,21 +85,26 @@ public class SwerveModule5990 {
 
     public SwerveModuleState getCurrentState() {
         return new SwerveModuleState(
-                MetersPerSecond.of(driveVelocitySignal.getValue()), //todo: THIS IS NOT CORRECT AT ALL LOL
+                MetersPerSecond.of(driveVelocitySignal.refresh().getValue()), //todo: THIS IS NOT CORRECT AT ALL LOL
                 getCurrentAngle()
         );
     }
 
     public SwerveModulePosition getCurrentPosition() {
         return new SwerveModulePosition(
-                Meters.of(drivePositionSignal.getValue()), //TODO: I doubt this actually returns metres.
+                Meters.of(drivePositionSignal.refresh().getValue()), //TODO: I doubt this actually returns metres.
                 getCurrentAngle()
         );
     }
 
 
     public Rotation2d getCurrentAngle() {
-        return new Rotation2d(steerPositionSignal.getValue());
+        return new Rotation2d(steerPositionSignal.refresh().getValue());
+    }
+
+    public void stop() {
+        steerMotor.stopMotor();
+        driveMotor.stopMotor();
     }
 
     /**
@@ -130,13 +130,13 @@ public class SwerveModule5990 {
 
     private void setTargetClosedLoopVelocity(Measure<Velocity<Distance>> targetVelocity) {
         if (targetVelocity.in(MetersPerSecond) <= 0.01) {
+
             return;
         }
 
         driveMotor.setControl(driveVelocityRequest
                 .withVelocity(targetVelocity.in(MetersPerSecond))
-                .withFeedForward(driveFeedforward.calculate(targetVelocity.in(MetersPerSecond)))
-                .withEnableFOC(false)
+//                .withFeedForward(driveFeedforward.calculate(targetVelocity.in(MetersPerSecond))) todo test
         );
     }
 
@@ -169,10 +169,10 @@ public class SwerveModule5990 {
         steerController.setD(Constants.Swerve.ANGLE_KD);
         steerController.setFF(Constants.Swerve.ANGLE_KFF);
 
-        steerMotor.enableVoltageCompensation(Constants.Swerve.VOLTAGE_COMP);
+        steerMotor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
         steerMotor.burnFlash();
 
-        steerRelativeEncoder.setPosition(steerPositionSignal.getValue()); //This might be in the wrong units
+        steerRelativeEncoder.setPosition(steerPositionSignal.refresh().getValue()); //This might be in the wrong units
         //This resets the relative encoder position to the steer pos. However, idk if this is correct usage.
     }
 
@@ -254,19 +254,5 @@ public class SwerveModule5990 {
 
             counter--;
         }
-    }
-
-    /**
-     * We much prefer updating this periodically instead of manually
-     * calling {@link StatusSignal#refresh()} each time we need a value from StatusSignals
-     */
-
-    private void refreshStatusSignals() {
-        BaseStatusSignal.refreshAll(
-                steerPositionSignal,
-                steerVelocitySignal,
-                drivePositionSignal,
-                driveVelocitySignal
-        );
     }
 }

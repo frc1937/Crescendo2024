@@ -4,17 +4,16 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule5990;
-import frc.robot.poseestimation.PoseEstimator;
-import frc.robot.poseestimation.TalonFXOdometryThread6328;
+import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.util.AllianceUtilities;
-
-import java.util.Queue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
@@ -22,32 +21,26 @@ import static frc.robot.Constants.Swerve.AutoConstants.HOLONOMIC_PATH_FOLLOWER_C
 import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
 
 public class Swerve5990 extends SubsystemBase {
-    private final Lock odometryLock = new ReentrantLock();
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
-    private final Queue<Double> timestampQueue = TalonFXOdometryThread6328.getInstance(odometryLock).getTimestampQueue();
-    private final PoseEstimator poseEstimator;
+    private final PoseEstimator5990 poseEstimator5990;
 
-    private SwerveModule5990[] modules = new SwerveModule5990[3];
+    private final SwerveModule5990[] modules = new SwerveModule5990[3];
 
-    public Swerve5990(PoseEstimator poseEstimator) {
-        this.poseEstimator = poseEstimator;
+    public Swerve5990(PoseEstimator5990 poseEstimator5990) {
+        this.poseEstimator5990 = poseEstimator5990;
 
         gyro.setYaw(AllianceUtilities.AlliancePose2d.fromBlueAlliancePose(new Pose2d(0, 0, new Rotation2d())).toAlliancePose().getRotation().getDegrees());
 
         configurePathPlanner();
     }
 
-    @Override
-    public void periodic() {
-        odometryLock.lock();
-        updateModules();
-        odometryLock.unlock();
-
-        updatePoseEstimator();
-    }
-
     public void driveSelfRelative(ChassisSpeeds speeds) {
         ChassisSpeeds discretizedChassisSpeeds = discretise(speeds);
+
+        if(isStill(discretizedChassisSpeeds)) {
+            stop();
+            return;
+        }
 
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(discretizedChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
@@ -80,10 +73,17 @@ public class Swerve5990 extends SubsystemBase {
         return gyro.getRotation2d();
     }
 
+    public void stop() {
+        for (SwerveModule5990 mod : modules) {
+            mod.stop();
+        }
+    }
+
     private void configurePathPlanner() {
         AutoBuilder.configureHolonomic(
-                () -> poseEstimator.getCurrentPose().toBlueAlliancePose(),
-                pose -> poseEstimator.resetPose(AllianceUtilities.AlliancePose2d.fromAlliancePose(pose)), //TODO LOL THIS MIGHT BE RLY WRONG
+                () -> poseEstimator5990.getCurrentPose().toBlueAlliancePose(),
+                pose -> poseEstimator5990.resetPose(AllianceUtilities.AlliancePose2d.fromAlliancePose(pose)),
+                //TODO LOL THIS MIGHT BE RLY WRONG
 
                 this::getSelfRelativeVelocity,
                 this::driveSelfRelative,
@@ -92,12 +92,6 @@ public class Swerve5990 extends SubsystemBase {
                 () -> !AllianceUtilities.isBlueAlliance(),
                 this
         );
-    }
-
-    private void updateModules() {
-        for(SwerveModule5990 module : modules) {
-            module.periodic();
-        }
     }
 
     private SwerveModuleState[] getModuleStates() {
@@ -110,14 +104,13 @@ public class Swerve5990 extends SubsystemBase {
         return states;
     }
 
-    private SwerveModulePosition[] getModulePositions() {
+    public SwerveDriveWheelPositions getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
-        for (SwerveModule5990 mod : modules) {
+        for (SwerveModule5990 mod : modules)
             positions[mod.swerveModuleConstants.moduleNumber] = mod.getCurrentPosition();
-        }
 
-        return positions;
+        return new SwerveDriveWheelPositions(positions);
     }
 
     /**
@@ -142,27 +135,4 @@ public class Swerve5990 extends SubsystemBase {
                 Math.abs(chassisSpeeds.vyMetersPerSecond) <= DRIVE_NEUTRAL_DEADBAND &&
                 Math.abs(chassisSpeeds.omegaRadiansPerSecond) <= ROTATION_NEUTRAL_DEADBAND;
     }
-
-    private void updatePoseEstimator() {
-        final int odometryUpdates = swerveInputs.odometryUpdatesYawDegrees.length;
-        final SwerveDriveWheelPositions[] swerveWheelPositions = new SwerveDriveWheelPositions[odometryUpdates];
-        final Rotation2d[] gyroRotations = new Rotation2d[odometryUpdates];
-
-        for (int i = 0; i < odometryUpdates; i++) {
-            swerveWheelPositions[i] = getSwerveWheelPositions(i);
-            gyroRotations[i] = Rotation2d.fromDegrees(swerveInputs.odometryUpdatesYawDegrees[i]);
-        }
-
-        poseEstimator.updateFromOdometry(swerveWheelPositions, gyroRotations, swerveInputs.odometryUpdatesTimestamp);
-    }
-
-    private SwerveDriveWheelPositions getSwerveWheelPositions(int odometryUpdateIndex) {
-        final SwerveModulePosition[] swerveModulePositions = new SwerveModulePosition[modules.length];
-
-        for(SwerveModule5990 module : modules) {
-            swerveModulePositions[module.swerveModuleConstants.moduleNumber] = module.getOdometryPosition(odometryUpdateIndex);
-        }
-
-        return new SwerveDriveWheelPositions(swerveModulePositions);
-    } //todo: GetOdo pose method. odoUpdate Yaw method. odoUpdateTimestamp method.
 }

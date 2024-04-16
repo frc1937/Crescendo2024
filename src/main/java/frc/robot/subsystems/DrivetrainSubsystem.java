@@ -22,7 +22,7 @@ import frc.robot.Constants;
 import frc.robot.SwerveModule;
 import frc.robot.SwerveModule5990;
 import frc.robot.util.AllianceUtilities;
-import frc.robot.poseestimation.PoseEstimator;
+import frc.robot.poseestimation.PoseEstimator5990;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,7 +33,7 @@ import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
 
 public class DrivetrainSubsystem extends SubsystemBase {
     private final Lock odometryLock = new ReentrantLock();
-    private final PoseEstimator poseEstimator;
+    private final PoseEstimator5990 poseEstimator5990;
     private final SwerveModule5990[] swerveModules;
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
 
@@ -52,7 +52,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private double yawCorrection = 0;
 
     public DrivetrainSubsystem() {
-        this.poseEstimator = null;
+        this.poseEstimator5990 = null;
 
         gyro.configFactoryDefault();
         zeroGyro();
@@ -75,8 +75,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Azimuth Current [deg]", getGyroAzimuth().getDegrees());
     }
 
-    public DrivetrainSubsystem(PoseEstimator poseEstimator) {
-        this.poseEstimator = poseEstimator;
+    public DrivetrainSubsystem(PoseEstimator5990 poseEstimator5990) {
+        this.poseEstimator5990 = poseEstimator5990;
 
         swerveModules = new SwerveModule5990[]{
                 new SwerveModule5990(Constants.Swerve.Module0.CONSTANTS, this),
@@ -184,11 +184,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void resetPose() {
-        poseEstimator.resetPose(DEFAULT_POSE);
+        poseEstimator5990.resetPose(DEFAULT_POSE);
     }
 
     public AllianceUtilities.AlliancePose2d getPose() {
-        return poseEstimator.getCurrentPose();
+        return poseEstimator5990.getCurrentPose();
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -237,7 +237,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Gyro", gyro.getYaw());
 
-        poseEstimator.updateFromOdometry(getGyroAzimuth(), getModulePositions());
+        poseEstimator5990.updateFromOdometry(getGyroAzimuth(), getModulePositions());
 
         // Calculate the azimuth control. Whilst it is always calculated, only
         // {@link #driveWithAzimuth driveWithAzimuth} uses it.
@@ -294,8 +294,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private void configurePathPlanner() {
         AutoBuilder.configureHolonomic(
-                () -> poseEstimator.getCurrentPose().toBlueAlliancePose(),
-                pose -> poseEstimator.resetPose(AllianceUtilities.AlliancePose2d.fromAlliancePose(pose)), //TODO LOL THIS MIGHT BE RLY WRONG
+                () -> poseEstimator5990.getCurrentPose().toBlueAlliancePose(),
+                pose -> poseEstimator5990.resetPose(AllianceUtilities.AlliancePose2d.fromAlliancePose(pose)), //TODO LOL THIS MIGHT BE RLY WRONG
                 () -> SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
                 this::drive,
                 AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,

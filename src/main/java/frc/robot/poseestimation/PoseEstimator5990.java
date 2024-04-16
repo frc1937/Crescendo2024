@@ -8,26 +8,35 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Swerve5990;
 import frc.robot.util.AllianceUtilities;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
+import static frc.robot.Constants.VisionConstants.ROTATION_STD_EXPONENT;
+import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
+import static frc.robot.Constants.VisionConstants.TRANSLATION_STD_EXPONENT;
 
 /**
  * A class that estimates the robot's pose using team 6328's custom pose estimator.
  */
-public class PoseEstimator implements AutoCloseable {
+public class PoseEstimator5990 implements AutoCloseable {
     private final Field2d field = new Field2d();
     private final PhotonCameraSource[] photonCameraSources;
     private final PoseEstimator6328 swerveDrivePoseEstimator;
-    private final DrivetrainSubsystem drivetrainSubsystem;
+    private final Swerve5990 drivetrainSubsystem;
+    private final Lock updateLock = new ReentrantLock();
+    private final Notifier updateFromOdometryNotifier;
     private AllianceUtilities.AlliancePose2d robotPose = DEFAULT_POSE;
 
     /**
@@ -35,22 +44,27 @@ public class PoseEstimator implements AutoCloseable {
      *
      * @param photonCameraSources the sources that should update the pose estimator apart from the odometry. This should be cameras etc.
      */
-    public PoseEstimator(PoseEstimator6328 swerveDrivePoseEstimator, DrivetrainSubsystem drivetrainSubsystem, PhotonCameraSource... photonCameraSources) {
+    public PoseEstimator5990(PoseEstimator6328 swerveDrivePoseEstimator, Swerve5990 drivetrainSubsystem, PhotonCameraSource... photonCameraSources) {
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.photonCameraSources = photonCameraSources;
         this.swerveDrivePoseEstimator = swerveDrivePoseEstimator;
 
         putAprilTagsOnFieldWidget();
         SmartDashboard.putData("Field", field);
+
+        updateFromOdometryNotifier = new Notifier(this::updateFromOdometry);
+        updateFromOdometryNotifier.startPeriodic(1 / 250.0);
     }
 
     @Override
     public void close() {
         field.close();
+        updateFromOdometryNotifier.close();
     }
 
     public void periodic() {
         updateFromVision();
+
         robotPose = AllianceUtilities.AlliancePose2d.fromBlueAlliancePose(swerveDrivePoseEstimator.getEstimatedPose());
         field.setRobotPose(getCurrentPose().toBlueAlliancePose());
     }
@@ -73,23 +87,28 @@ public class PoseEstimator implements AutoCloseable {
         return robotPose;
     }
 
-    /**
-     * Updates the pose estimator with the given swerve wheel positions and gyro rotations.
-     * This function accepts an array of swerve wheel positions and an array of gyro rotations because the odometry can be updated at a faster rate than the main loop (which is 50 hertz).
-     * This means you could have a couple of odometry updates per main loop, and you would want to update the pose estimator with all of them.
-     *
-     * @param swerveWheelPositions the swerve wheel positions accumulated since the last update
-     * @param gyroRotations        the gyro rotations accumulated since the last update
-     */
-    public void updateFromOdometry(SwerveDriveWheelPositions[] swerveWheelPositions, Rotation2d[] gyroRotations, double[] timestamps) {
-        for (int i = 0; i < swerveWheelPositions.length; i++)
-            swerveDrivePoseEstimator.addOdometryObservation(new PoseEstimator6328.OdometryObservation(swerveWheelPositions[i], gyroRotations[i], timestamps[i]));
+    private void updateFromOdometry() {
+        updateLock.lock();
+
+        final SwerveDriveWheelPositions swerveDriveWheelPositions = drivetrainSubsystem.getModulePositions();
+        final Rotation2d gyroYaw = drivetrainSubsystem.getYaw();
+        swerveDrivePoseEstimator.addOdometryObservation(new PoseEstimator6328.OdometryObservation(
+                swerveDriveWheelPositions,
+                gyroYaw,
+                Timer.getFPGATimestamp()
+        ));
+
+        updateLock.unlock();
     }
 
     private void updateFromVision() {
+        updateLock.lock();
+
         getViableVisionObservations().stream()
                 .sorted(Comparator.comparingDouble(PoseEstimator6328.VisionObservation::timestamp))
                 .forEach(swerveDrivePoseEstimator::addVisionObservation);
+
+        updateLock.unlock();
     }
 
     private List<PoseEstimator6328.VisionObservation> getViableVisionObservations() {

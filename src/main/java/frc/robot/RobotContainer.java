@@ -14,7 +14,7 @@ import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.subsystems.*;
 import frc.robot.util.Controller;
 import frc.robot.poseestimation.PhotonCameraSource;
-import frc.robot.poseestimation.PoseEstimator;
+import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.poseestimation.PoseEstimator6328;
 
 import java.util.function.DoubleSupplier;
@@ -50,7 +50,7 @@ public class RobotContainer {
     private final Trigger opBButton = operatorController.getButton(B);
     private final Trigger opXButton = operatorController.getButton(X);
     /* Subsystems */
-    public final PoseEstimator poseEstimator;
+    public final PoseEstimator5990 poseEstimator5990;
     public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -60,7 +60,7 @@ public class RobotContainer {
     private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
 
     public RobotContainer() {
-        poseEstimator = new PoseEstimator(new PoseEstimator6328(), drivetrain,
+        poseEstimator5990 = new PoseEstimator5990(new PoseEstimator6328(), drivetrain,
                 new PhotonCameraSource("Front1937", FRONT_CAMERA_TO_ROBOT)
 //              ,new PhotonCameraSource("Rear1937", REAR_CAMERA_TO_ROBOT)
         );

@@ -86,9 +86,9 @@ public class Controller {
         return DriverStation.getStickAxis(port, axis.value);
     }
 
-    public void rumbleController(GenericHID.RumbleType rumbleType, double intensity) {
-        xboxController.setRumble(rumbleType, intensity);
-    }
+    public void rumbleController(double intensity, double duration) {
+        xboxController.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+    } //todo: do
 
     public XboxController getXboxController() {
         return xboxController;

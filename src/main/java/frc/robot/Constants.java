@@ -392,7 +392,6 @@ public final class Constants {
         }
 
         public static final boolean ANGLE_INVERT = true;
-        public static final double VOLTAGE_COMP = 12.0;
         public static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
