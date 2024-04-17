@@ -21,11 +21,6 @@ public class MountCommand extends Command {
     }
 
     @Override
-    public void initialize() {
-
-    }
-
-    @Override
     public void execute() {
         mountSubsystem.manualMount(
                 leftSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR,
@@ -35,6 +30,6 @@ public class MountCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        mountSubsystem.stopMount();
+        mountSubsystem.stop();
     }
 }

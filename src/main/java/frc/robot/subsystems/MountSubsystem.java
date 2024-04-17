@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,7 +44,7 @@ public class MountSubsystem extends SubsystemBase {
         rightMotor.set(rightSpeed);
     }
 
-    public void stopMount() {
+    public void stop() {
         leftMotor.stopMotor();
         rightMotor.stopMotor();
     }

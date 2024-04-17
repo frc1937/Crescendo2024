@@ -18,7 +18,7 @@ public class IntakeSubsystem extends SubsystemBase {
         talonSRX.set(ControlMode.PercentOutput, percentage);
     }
 
-    public void stopMotor() {
+    public void stop() {
         talonSRX.stopMotor();
     }
 

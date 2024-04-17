@@ -65,7 +65,7 @@ public class ShooterCommands {
                 () -> {},
                 interrupted -> {
                     shooterSubsystem.reset();
-                    intakeSubsystem.stopMotor();
+                    intakeSubsystem.stop();
                 },
                 () -> false,
                 shooterSubsystem

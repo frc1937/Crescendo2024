@@ -3,6 +3,7 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -87,8 +88,11 @@ public class Controller {
     }
 
     public void rumbleController(double intensity, double duration) {
-        xboxController.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
-    } //todo: do
+        new StartEndCommand(
+                () ->  xboxController.setRumble(GenericHID.RumbleType.kBothRumble, intensity),
+                () -> xboxController.setRumble(GenericHID.RumbleType.kBothRumble, 0)
+        ).withTimeout(duration).schedule();
+    }
 
     public XboxController getXboxController() {
         return xboxController;

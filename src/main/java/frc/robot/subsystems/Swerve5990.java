@@ -118,6 +118,15 @@ public class Swerve5990 extends SubsystemBase {
         return Math.abs(azimuthController.getPositionError()) < tolerance.in(Radians);
     }
 
+    /**
+     * Drive the robot according to the given inputs.
+     *
+     * @param xPower - the translation power
+     * @param yPower - the strafe power
+     * @param thetaPower - the rotation power
+     * @param robotCentric - whether the robot should drive relative to itself or the field
+     */
+
     public void drive(double xPower, double yPower, double thetaPower, boolean robotCentric) {
         if(robotCentric) {
             driveSelfRelative(xPower, yPower, thetaPower);

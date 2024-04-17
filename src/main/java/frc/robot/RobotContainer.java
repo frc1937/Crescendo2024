@@ -116,6 +116,8 @@ public class RobotContainer {
                 )
         );
 
+        driveController.rumbleController(5, 5);
+
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
         drAButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
