@@ -7,9 +7,9 @@ import frc.lib.RobotState;
 import frc.robot.subsystems.Swerve5990;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Constants.ShootingConstants.SPEAKER_TARGET;
-import static frc.robot.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.Constants.Swerve.AZIMUTH_CONTROLLER_TOLERANCE;
+import static frc.robot.constants.Constants.ShootingConstants.SPEAKER_TARGET;
+import static frc.robot.constants.Constants.ShootingConstants.SHOOTING_DELAY;
+import static frc.robot.constants.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
 
 /**
  * Should use TeleOpShoot OR make TeleOpShoot use this. No need for both.

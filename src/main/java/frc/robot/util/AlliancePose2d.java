@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.Constants.FIELD_LENGTH_METRES;
+import static frc.robot.constants.Constants.FIELD_LENGTH_METRES;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 
 public class AlliancePose2d {

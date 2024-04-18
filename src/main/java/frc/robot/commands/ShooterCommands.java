@@ -9,7 +9,7 @@ import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.*;
+import static frc.robot.constants.Constants.ShootingConstants.*;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;

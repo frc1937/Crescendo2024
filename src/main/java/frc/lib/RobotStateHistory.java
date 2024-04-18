@@ -4,7 +4,7 @@
 
 package frc.lib;
 
-import static frc.robot.Constants.ShootingConstants.POSE_HISTORY_DURATION;
+import static frc.robot.constants.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 
 import java.util.Map;
 import java.util.NavigableMap;

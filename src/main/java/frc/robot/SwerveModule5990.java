@@ -9,11 +9,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.*;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -21,30 +17,24 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import frc.lib.math.Conversions;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.util.Conversions;
-import frc.robot.util.SwerveOptimization;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.Constants.Swerve.MAX_SPEED;
-import static frc.robot.Constants.Swerve.SWERVE_IN_PLACE_DRIVE_MPS;
-import static frc.robot.Constants.Swerve.VOLTAGE_COMPENSATION_SATURATION;
-import static frc.robot.util.Conversions.rotationsPerSecondToMetersPerSecond;
-import static frc.robot.util.Conversions.rotationsToMeters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.robot.constants.Constants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.constants.SwerveConstants.*;
 
 public class SwerveModule5990 {
     public final SwerveModuleConstants swerveModuleConstants;
 
-    private final SwerveOptimization swerveOptimization = new SwerveOptimization();
     private final TalonFX driveMotor;
     private final CANSparkMax steerMotor;
     private final SparkPIDController steerController;
     private final RelativeEncoder steerRelativeEncoder;
     private final CANcoder steerEncoder;
-    private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(Constants.Swerve.DRIVE_KS, Constants.Swerve.DRIVE_KV, Constants.Swerve.DRIVE_KA);
+    private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(DRIVE_KS, DRIVE_KV, DRIVE_KA);
 
     private Rotation2d lastAngle;
 
@@ -89,14 +79,14 @@ public class SwerveModule5990 {
 
     public SwerveModuleState getCurrentState() {
         return new SwerveModuleState(
-                rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue()), //todo: This MIGHT be correct
+                Conversions.rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue()), //todo: This MIGHT be correct
                 getCurrentAngle()
         );
     }
 
     public SwerveModulePosition getCurrentPosition() {
         return new SwerveModulePosition(
-                rotationsToMeters(drivePositionSignal.refresh().getValue()), //TODO: I doubt this actually returns metres.
+                Conversions.rotationsToMeters(drivePositionSignal.refresh().getValue()), //TODO: I doubt this actually returns metres.
                 getCurrentAngle()
         );
     }
@@ -115,7 +105,7 @@ public class SwerveModule5990 {
      * Sets the target velocity for the module.
      */
     private void setTargetVelocity(SwerveModuleState targetState, boolean closedLoop) {
-        Measure<Velocity<Distance>> targetVelocity = swerveOptimization.reduceSkew(MetersPerSecond.of(targetState.speedMetersPerSecond), targetState.angle, getCurrentAngle());
+        Measure<Velocity<Distance>> targetVelocity = CTREModuleState.reduceSkew(MetersPerSecond.of(targetState.speedMetersPerSecond), targetState.angle, getCurrentAngle());
 
         if (closedLoop)
             setTargetClosedLoopVelocity(targetVelocity);
@@ -160,17 +150,17 @@ public class SwerveModule5990 {
 
         CANSparkMaxUtil.setCANSparkMaxBusUsage(steerMotor, CANSparkMaxUtil.Usage.kPositionOnly);
 
-        steerMotor.setSmartCurrentLimit(Constants.Swerve.ANGLE_CONTINUOUS_CURRENT_LIMIT);
+        steerMotor.setSmartCurrentLimit(ANGLE_CONTINUOUS_CURRENT_LIMIT);
 
-        steerMotor.setInverted(Constants.Swerve.ANGLE_INVERT);
-        steerMotor.setIdleMode(Constants.Swerve.ANGLE_NEUTRAL_MODE);
+        steerMotor.setInverted(ANGLE_INVERT);
+        steerMotor.setIdleMode(ANGLE_NEUTRAL_MODE);
 
-        steerRelativeEncoder.setPositionConversionFactor(Constants.Swerve.ANGLE_CONVERSION_FACTOR);
+        steerRelativeEncoder.setPositionConversionFactor(ANGLE_CONVERSION_FACTOR);
 
-        steerController.setP(Constants.Swerve.ANGLE_KP);
-        steerController.setI(Constants.Swerve.ANGLE_KI);
-        steerController.setD(Constants.Swerve.ANGLE_KD);
-        steerController.setFF(Constants.Swerve.ANGLE_KFF);
+        steerController.setP(ANGLE_KP);
+        steerController.setI(ANGLE_KI);
+        steerController.setD(ANGLE_KD);
+        steerController.setFF(ANGLE_KFF);
 
         steerMotor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
         steerMotor.burnFlash();
@@ -183,7 +173,7 @@ public class SwerveModule5990 {
         CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
 
         swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset.getRotations();
-        swerveCanCoderConfig.MagnetSensor.SensorDirection = Constants.Swerve.CAN_CODER_INVERT;
+        swerveCanCoderConfig.MagnetSensor.SensorDirection = CAN_CODER_INVERT;
         swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1; //todo:
         //TODO XXX WARNING THIS HAS CHANGED FROM 0 - 360 TO 0 - 1. CODE MIGHT STILL USE OLD VALUES. PLEASE CHECK!
 
@@ -204,32 +194,32 @@ public class SwerveModule5990 {
         swerveDriveFXConfig.Audio.BeepOnConfig = true;
         swerveDriveFXConfig.Audio.BeepOnBoot = true;
 
-        swerveDriveFXConfig.MotorOutput.Inverted = Constants.Swerve.DRIVE_MOTOR_INVERT;
-        swerveDriveFXConfig.MotorOutput.NeutralMode = Constants.Swerve.DRIVE_NEUTRAL_MODE;
+        swerveDriveFXConfig.MotorOutput.Inverted = DRIVE_MOTOR_INVERT;
+        swerveDriveFXConfig.MotorOutput.NeutralMode = DRIVE_NEUTRAL_MODE;
 
         /* Gear Ratio Config */
-        swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.DRIVE_GEAR_RATIO;
+        swerveDriveFXConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
 
         /* Current Limiting */
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.DRIVE_ENABLE_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.DRIVE_CONTINUOUS_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = Constants.Swerve.DRIVE_PEAK_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = Constants.Swerve.DRIVE_PEAK_CURRENT_DURATION;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_CONTINUOUS_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = DRIVE_PEAK_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = DRIVE_PEAK_CURRENT_DURATION;
 
         /* PID Config */
-        swerveDriveFXConfig.Slot0.kP = Constants.Swerve.DRIVE_KP;
-        swerveDriveFXConfig.Slot0.kI = Constants.Swerve.DRIVE_KI;
-        swerveDriveFXConfig.Slot0.kD = Constants.Swerve.DRIVE_KD;
-        swerveDriveFXConfig.Slot0.kV = Constants.Swerve.DRIVE_KV;
-        swerveDriveFXConfig.Slot0.kA = Constants.Swerve.DRIVE_KA;
-        swerveDriveFXConfig.Slot0.kS = Constants.Swerve.DRIVE_KS;
+        swerveDriveFXConfig.Slot0.kP = DRIVE_KP;
+        swerveDriveFXConfig.Slot0.kI = DRIVE_KI;
+        swerveDriveFXConfig.Slot0.kD = DRIVE_KD;
+        swerveDriveFXConfig.Slot0.kV = DRIVE_KV;
+        swerveDriveFXConfig.Slot0.kA = DRIVE_KA;
+        swerveDriveFXConfig.Slot0.kS = DRIVE_KS;
 
         /* Open and Closed Loop Ramping */
-        swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = Constants.Swerve.OPEN_LOOP_RAMP;
-        swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = Constants.Swerve.OPEN_LOOP_RAMP;
+        swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = OPEN_LOOP_RAMP;
+        swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = OPEN_LOOP_RAMP;
 
-        swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = Constants.Swerve.CLOSED_LOOP_RAMP;
-        swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = Constants.Swerve.CLOSED_LOOP_RAMP;
+        swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = CLOSED_LOOP_RAMP;
+        swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = CLOSED_LOOP_RAMP;
 
         applyConfig(driveMotor, swerveDriveFXConfig);
 

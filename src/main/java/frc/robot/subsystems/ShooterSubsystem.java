@@ -19,19 +19,19 @@ import frc.robot.Pitch;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static frc.robot.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.LEFT_A;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.LEFT_P;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.LEFT_S;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.LEFT_V;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_A;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_P;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_S;
-import static frc.robot.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_V;
-import static frc.robot.Constants.ShootingConstants.KICKER_ID;
-import static frc.robot.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.constants.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
+import static frc.robot.constants.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
+import static frc.robot.constants.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_A;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_P;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_S;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_V;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_A;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_P;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_S;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_V;
+import static frc.robot.constants.Constants.ShootingConstants.KICKER_ID;
+import static frc.robot.constants.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);

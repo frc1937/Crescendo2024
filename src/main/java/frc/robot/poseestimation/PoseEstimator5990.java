@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.constants.Constants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.constants.Constants.VisionConstants.*;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
 
 /**

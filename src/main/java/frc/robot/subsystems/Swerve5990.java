@@ -14,19 +14,18 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.RobotStateHistory;
-import frc.robot.Constants;
 import frc.robot.SwerveModule5990;
 import frc.robot.poseestimation.PoseEstimator5990;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
-import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
-import static frc.robot.Constants.Swerve.*;
-import static frc.robot.Constants.Swerve.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.constants.Constants.DRIVE_NEUTRAL_DEADBAND;
+import static frc.robot.constants.Constants.ROTATION_NEUTRAL_DEADBAND;
+import static frc.robot.constants.SwerveConstants.*;
+import static frc.robot.constants.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.*;
 
 public class Swerve5990 extends SubsystemBase {
-    private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Constants.Swerve.PIGEON_ID);
+    private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
 
     private final PoseEstimator5990 poseEstimator5990;
     private final SwerveModule5990[] modules;
@@ -76,7 +75,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     public Rotation2d getGyroAzimuth() {
-        return Constants.Swerve.INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        return INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
     public void stop() {
@@ -139,7 +138,7 @@ public class Swerve5990 extends SubsystemBase {
      *
      * @param targetPose - blue alliance form
      */
-    public void PIDToPose(Pose2d targetPose) {
+    public void pidToPose(Pose2d targetPose) {
         Pose2d currentPose = poseEstimator5990.getCurrentPose().getBluePose();
 
         double xSpeed = translationController.calculate(currentPose.getX(), targetPose.getX());
@@ -222,7 +221,7 @@ public class Swerve5990 extends SubsystemBase {
         }
 
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(discretizedChassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.MAX_SPEED);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_SPEED);
 
         for (SwerveModule5990 mod : modules) {
             mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber], true);
@@ -255,7 +254,6 @@ public class Swerve5990 extends SubsystemBase {
         AutoBuilder.configureHolonomic(
                 () -> poseEstimator5990.getCurrentPose().getBluePose(),
                 pose -> poseEstimator5990.resetPose(fromCorrectPose(pose)),
-                //TODO LOL THIS MIGHT BE RLY WRONG
 
                 this::getSelfRelativeVelocity,
                 this::driveSelfRelative,
@@ -270,7 +268,7 @@ public class Swerve5990 extends SubsystemBase {
         SwerveModuleState[] states = new SwerveModuleState[4];
 
         for (SwerveModule5990 mod : modules) {
-            states[mod.swerveModuleConstants.moduleNumber] = mod.getCurrentState(); //TODO: Make a getState func
+            states[mod.swerveModuleConstants.moduleNumber] = mod.getCurrentState();
         }
 
         return states;
@@ -290,10 +288,10 @@ public class Swerve5990 extends SubsystemBase {
 
     private SwerveModule5990[] getModules() {
         return new SwerveModule5990[]{
-                new SwerveModule5990(Constants.Swerve.Module0.CONSTANTS),
-                new SwerveModule5990(Constants.Swerve.Module1.CONSTANTS),
-                new SwerveModule5990(Constants.Swerve.Module2.CONSTANTS),
-                new SwerveModule5990(Constants.Swerve.Module3.CONSTANTS)
+                new SwerveModule5990(Module0.CONSTANTS),
+                new SwerveModule5990(Module1.CONSTANTS),
+                new SwerveModule5990(Module2.CONSTANTS),
+                new SwerveModule5990(Module3.CONSTANTS)
         };
     }
 

@@ -13,8 +13,8 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Swerve5990;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.ShootingConstants.AMP_INIT;
-import static frc.robot.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.constants.Constants.ShootingConstants.AMP_INIT;
+import static frc.robot.constants.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 
 public class ShootToAmp extends SequentialCommandGroup {
     /**

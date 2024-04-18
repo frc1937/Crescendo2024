@@ -14,8 +14,8 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static frc.robot.Constants.Swerve.SWERVE_KINEMATICS;
-import static frc.robot.Constants.VisionConstants.STATES_AMBIGUITY;
+import static frc.robot.constants.Constants.VisionConstants.STATES_AMBIGUITY;
+import static frc.robot.constants.SwerveConstants.SWERVE_KINEMATICS;
 
 public class PoseEstimator6328 {
     public record OdometryObservation(

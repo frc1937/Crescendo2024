@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.*;
 import frc.robot.util.Controller;
 import frc.robot.poseestimation.PhotonCameraSource;
@@ -21,8 +22,8 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.ShootingConstants.*;
-import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
+import static frc.robot.constants.Constants.ShootingConstants.*;
+import static frc.robot.constants.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
 import static frc.robot.util.Controller.Axis.*;
 import static frc.robot.util.Controller.Inputs.*;
 import static frc.robot.util.Controller.Stick.LEFT_STICK;

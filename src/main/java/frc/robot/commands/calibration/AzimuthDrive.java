@@ -7,7 +7,7 @@ package frc.robot.commands.calibration;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.Swerve5990;
 
 import java.util.function.BooleanSupplier;

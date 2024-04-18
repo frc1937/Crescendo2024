@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.lib.Target;
-import frc.robot.Constants;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Swerve5990;
@@ -19,7 +19,7 @@ import frc.robot.subsystems.Swerve5990;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.ShootingConstants.*;
+import static frc.robot.constants.Constants.ShootingConstants.*;
 
 public class TeleOpShoot extends ParallelDeadlineGroup {
     public TeleOpShoot(Swerve5990 swerve5990, ShooterSubsystem shooter, LEDsSubsystem leds, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean shootingWhilstMoving, Measure<Time> deadline) {
