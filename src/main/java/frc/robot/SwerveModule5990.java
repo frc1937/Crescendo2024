@@ -27,12 +27,13 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.util.Conversions;
 import frc.robot.util.SwerveOptimization;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.Constants.Swerve.MAX_SPEED;
 import static frc.robot.Constants.Swerve.SWERVE_IN_PLACE_DRIVE_MPS;
 import static frc.robot.Constants.Swerve.VOLTAGE_COMPENSATION_SATURATION;
+import static frc.robot.util.Conversions.rotationsPerSecondToMetersPerSecond;
+import static frc.robot.util.Conversions.rotationsToMeters;
 
 public class SwerveModule5990 {
     public final SwerveModuleConstants swerveModuleConstants;
@@ -50,7 +51,11 @@ public class SwerveModule5990 {
     /**
      * Rotations
      */
-    private StatusSignal<Double> steerPositionSignal, drivePositionSignal;
+    private StatusSignal<Double> steerPositionSignal;
+    /**
+     * The position of the drive motor in rotations
+     */
+    private StatusSignal<Double> drivePositionSignal;
     /**
      * Rotations per second
      */
@@ -84,14 +89,14 @@ public class SwerveModule5990 {
 
     public SwerveModuleState getCurrentState() {
         return new SwerveModuleState(
-                MetersPerSecond.of(driveVelocitySignal.refresh().getValue()), //todo: THIS IS NOT CORRECT AT ALL LOL
+                rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue()), //todo: This MIGHT be correct
                 getCurrentAngle()
         );
     }
 
     public SwerveModulePosition getCurrentPosition() {
         return new SwerveModulePosition(
-                Meters.of(drivePositionSignal.refresh().getValue()), //TODO: I doubt this actually returns metres.
+                rotationsToMeters(drivePositionSignal.refresh().getValue()), //TODO: I doubt this actually returns metres.
                 getCurrentAngle()
         );
     }
@@ -129,7 +134,6 @@ public class SwerveModule5990 {
 
     private void setTargetClosedLoopVelocity(Measure<Velocity<Distance>> targetVelocity) {
         if (targetVelocity.in(MetersPerSecond) <= 0.01) {
-
             return;
         }
 
@@ -178,7 +182,7 @@ public class SwerveModule5990 {
     private void configureSteerEncoder() {
         CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
 
-        swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset.getRadians(); //TODO: THIS SHOULD BE IN REVOLUTIONS
+        swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset.getRotations();
         swerveCanCoderConfig.MagnetSensor.SensorDirection = Constants.Swerve.CAN_CODER_INVERT;
         swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1; //todo:
         //TODO XXX WARNING THIS HAS CHANGED FROM 0 - 360 TO 0 - 1. CODE MIGHT STILL USE OLD VALUES. PLEASE CHECK!

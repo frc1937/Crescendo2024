@@ -1,6 +1,13 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.robot.Constants.Swerve.WHEEL_CIRCUMFERENCE;
 
 public class Conversions {
     public static final double
@@ -26,6 +33,28 @@ public class Conversions {
      */
     public static double revolutionsToDegrees(double revolutions) {
         return revolutions * DEGREES_PER_REVOLUTIONS;
+    }
+
+    /**
+     * Converts rotations to meters.
+     *
+     * @param rotations rotations
+     * @return meters
+     */
+    public static Measure<Distance> rotationsToMeters(double rotations) {
+        return Meters.of(rotations * WHEEL_CIRCUMFERENCE.in(Meters));
+    }
+
+    /**
+     * Converts rotations per second to meters per second.
+     *
+     * @param rotationsPerSecond rotations per second
+     * @return meters per second
+     */
+
+
+    public static Measure<Velocity<Distance>> rotationsPerSecondToMetersPerSecond(double rotationsPerSecond) {
+        return MetersPerSecond.of(rotationsPerSecond * WHEEL_CIRCUMFERENCE.in(Meters));
     }
 
     /**

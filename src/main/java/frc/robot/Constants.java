@@ -282,11 +282,11 @@ public final class Constants {
         /* Drivetrain Constants */
         public static final double TRACK_WIDTH = 0.615;
         public static final double WHEEL_BASE = 0.565;
-        public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
+        public static final Measure<Distance> WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
         public static final Measure<Distance> DRIVE_BASE_RADIUS =
                 Meters.of(new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm());
 
-        public static final double WHEEL_DIAMETER_METRES = CHOSEN_MODULE.wheelDiameter;
+        public static final Measure<Distance> WHEEL_DIAMETER_METRES = CHOSEN_MODULE.wheelDiameter;
         public static final double VOLTAGE_COMPENSATION_SATURATION = 12;
 
         /* SwerveSubsystem Kinematics

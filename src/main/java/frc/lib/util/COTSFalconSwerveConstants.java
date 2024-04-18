@@ -1,11 +1,15 @@
 package frc.lib.util;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+
+import static edu.wpi.first.units.Units.Inch;
+import static edu.wpi.first.units.Units.Meters;
 
 /* Contains values and required settings for common COTS swerve modules. */
 public class COTSFalconSwerveConstants {
-    public final double wheelDiameter;
-    public final double wheelCircumference;
+    public final Measure<Distance> wheelDiameter;
+    public final Measure<Distance> wheelCircumference;
     public final double angleGearRatio;
     public final double driveGearRatio;
     public final double angleKP;
@@ -16,9 +20,9 @@ public class COTSFalconSwerveConstants {
     public final boolean angleMotorInvert;
     public final boolean canCoderInvert;
 
-    public COTSFalconSwerveConstants(double wheelDiameter, double angleGearRatio, double driveGearRatio, double angleKP, double angleKI, double angleKD, double angleKF, boolean driveMotorInvert, boolean angleMotorInvert, boolean canCoderInvert){
+    public COTSFalconSwerveConstants(Measure<Distance> wheelDiameter, double angleGearRatio, double driveGearRatio, double angleKP, double angleKI, double angleKD, double angleKF, boolean driveMotorInvert, boolean angleMotorInvert, boolean canCoderInvert){
         this.wheelDiameter = wheelDiameter;
-        this.wheelCircumference = wheelDiameter * Math.PI;
+        this.wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
         this.angleGearRatio = angleGearRatio;
         this.driveGearRatio = driveGearRatio;
         this.angleKP = angleKP;
@@ -32,7 +36,7 @@ public class COTSFalconSwerveConstants {
 
     /** SwerveSubsystem Drive Specialties - MK4i Module*/
     public static COTSFalconSwerveConstants SDSMK4i(double driveGearRatio){
-        double wheelDiameter = Units.inchesToMeters(4.0);
+        Measure<Distance> wheelDiameter = Inch.of(4);
 
         /** (150 / 7) : 1 */
         double angleGearRatio = (150.0 / 7.0);
