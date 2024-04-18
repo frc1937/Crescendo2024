@@ -57,7 +57,7 @@ public class CANSparkMaxUtil {
      * frame period of nonessential frames from 20ms to 500ms.
      *
      * <p>See
-     * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
+     * <a href="https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames">...</a>
      * for a description of the status frames.
      *
      * @param motor The motor to adjust the status frame periods on.
