@@ -24,7 +24,6 @@ public class PhotonCameraSource {
     private double lastUpdatedTimestamp;
     private Pose2d cachedPose = null;
 
-    /*TEST*/
     private boolean hasResult = false;
     private int visibleTags = 0;
     private double averageDistanceFromTags = 0;
@@ -94,11 +93,10 @@ public class PhotonCameraSource {
     }
 
     private Pose2d getUnCachedRobotPose() {
-        final Pose3d uncachedCameraPose = cameraPose;
-        if (uncachedCameraPose == null)
+        if (cameraPose == null)
             return null;
 
-        return uncachedCameraPose.transformBy(robotToCamera.inverse()).toPose2d();
+        return cameraPose.transformBy(robotToCamera.inverse()).toPose2d();
     }
 
     private boolean isNewTimestamp() {
