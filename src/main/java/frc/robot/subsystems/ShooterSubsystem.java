@@ -19,19 +19,8 @@ import frc.robot.Pitch;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static frc.robot.constants.Constants.ShootingConstants.CONSIDERED_NOISELESS_THRESHOLD;
-import static frc.robot.constants.Constants.ShootingConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.constants.Constants.ShootingConstants.FLYWHEEL_RIGHT_ID;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_A;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_P;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_S;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.LEFT_V;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_A;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_P;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_S;
-import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.RIGHT_V;
-import static frc.robot.constants.Constants.ShootingConstants.KICKER_ID;
-import static frc.robot.constants.Constants.ShootingConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.constants.Constants.ShootingConstants.*;
+import static frc.robot.constants.Constants.ShootingConstants.FlywheelControlConstants.*;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -39,6 +28,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
     private final Pitch pitch = new Pitch();
+
     private int consecutiveNoteInsideSamples = 0;
 
     public final Measure<Velocity<Angle>> theoreticalMaximumVelocity =
@@ -179,6 +169,8 @@ public class ShooterSubsystem extends SubsystemBase {
             this.spin = spin;
             this.force = force;
         }
+
+
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> flywheelVelocity,

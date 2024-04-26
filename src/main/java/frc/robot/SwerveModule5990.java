@@ -24,7 +24,7 @@ import frc.lib.util.SwerveModuleConstants;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.constants.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.constants.SwerveConstants.*;
+import static frc.robot.constants.Constants.SwerveConstants.*;
 
 public class SwerveModule5990 {
     public final SwerveModuleConstants swerveModuleConstants;

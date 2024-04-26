@@ -4,15 +4,15 @@
 
 package frc.lib;
 
-import static frc.robot.constants.Constants.ShootingConstants.POSE_HISTORY_DURATION;
-
-import java.util.Map;
-import java.util.NavigableMap;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
+import java.util.Map;
+import java.util.NavigableMap;
+
+import static frc.robot.constants.Constants.ShootingConstants.POSE_HISTORY_DURATION;
 
 public class RobotStateHistory {
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);

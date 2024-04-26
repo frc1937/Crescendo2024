@@ -9,6 +9,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 import static frc.robot.constants.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
 
+
 public class ShooterKick extends Command {
     private final ShooterSubsystem shooter;
     public ShooterKick(ShooterSubsystem shooter) {

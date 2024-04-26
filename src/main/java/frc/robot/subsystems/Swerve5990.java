@@ -20,8 +20,8 @@ import frc.robot.poseestimation.PoseEstimator5990;
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.constants.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.constants.Constants.ROTATION_NEUTRAL_DEADBAND;
-import static frc.robot.constants.SwerveConstants.*;
-import static frc.robot.constants.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.constants.Constants.SwerveConstants.*;
+import static frc.robot.constants.Constants.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.*;
 
 public class Swerve5990 extends SubsystemBase {
