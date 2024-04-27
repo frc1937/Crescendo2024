@@ -6,7 +6,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
@@ -20,9 +24,29 @@ import frc.robot.poseestimation.PoseEstimator5990;
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.constants.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.constants.Constants.ROTATION_NEUTRAL_DEADBAND;
-import static frc.robot.constants.Constants.SwerveConstants.*;
+import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
+import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_D;
+import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
+import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_I;
+import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_P;
+import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.constants.Constants.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.*;
+import static frc.robot.constants.Constants.SwerveConstants.INVERT_GYRO;
+import static frc.robot.constants.Constants.SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+import static frc.robot.constants.Constants.SwerveConstants.MAX_SPEED;
+import static frc.robot.constants.Constants.SwerveConstants.Module0;
+import static frc.robot.constants.Constants.SwerveConstants.Module1;
+import static frc.robot.constants.Constants.SwerveConstants.Module2;
+import static frc.robot.constants.Constants.SwerveConstants.Module3;
+import static frc.robot.constants.Constants.SwerveConstants.PIGEON_ID;
+import static frc.robot.constants.Constants.SwerveConstants.SWERVE_KINEMATICS;
+import static frc.robot.constants.Constants.SwerveConstants.TRANSLATION_CONTROLLER_P;
+import static frc.robot.constants.Constants.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
+import static frc.robot.constants.Constants.SwerveConstants.TRANSLATION_MAX_VELOCITY;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -120,14 +144,14 @@ public class Swerve5990 extends SubsystemBase {
     /**
      * Drive the robot according to the given inputs.
      *
-     * @param xPower - the translation power
-     * @param yPower - the strafe power
-     * @param thetaPower - the rotation power
+     * @param xPower       - the translation power
+     * @param yPower       - the strafe power
+     * @param thetaPower   - the rotation power
      * @param robotCentric - whether the robot should drive relative to itself or the field
      */
 
     public void drive(double xPower, double yPower, double thetaPower, boolean robotCentric) {
-        if(robotCentric) {
+        if (robotCentric) {
             driveSelfRelative(xPower, yPower, thetaPower);
         } else {
             driveFieldRelative(xPower, yPower, thetaPower);
@@ -135,7 +159,6 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     /**
-     *
      * @param targetPose - blue alliance form
      */
     public void pidToPose(Pose2d targetPose) {
@@ -185,14 +208,14 @@ public class Swerve5990 extends SubsystemBase {
         driveSelfRelative(speeds);
     }
 
-        /**
+    /**
      * Publish the current PID gains so they can be modified
      */
     public void publishControllerGains() {
         String path = "swerve/azimuth-controller";
 
-        if (!SmartDashboard.containsKey(path+"/p")) {
-            SmartDashboard.putNumber(path+"/p", AZIMUTH_CONTROLLER_P);
+        if (!SmartDashboard.containsKey(path + "/p")) {
+            SmartDashboard.putNumber(path + "/p", AZIMUTH_CONTROLLER_P);
         }
         if (!SmartDashboard.containsKey(path + "/i")) {
             SmartDashboard.putNumber(path + "/i", AZIMUTH_CONTROLLER_I);
@@ -215,7 +238,7 @@ public class Swerve5990 extends SubsystemBase {
     private void driveSelfRelative(ChassisSpeeds speeds) {
         ChassisSpeeds discretizedChassisSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
 
-        if(isStill(discretizedChassisSpeeds)) {
+        if (isStill(discretizedChassisSpeeds)) {
             stop();
             return;
         }

@@ -123,7 +123,7 @@ public class SwerveModule5990 {
     }
 
     private void setTargetClosedLoopVelocity(Measure<Velocity<Distance>> targetVelocity) {
-        if (targetVelocity.in(MetersPerSecond) <= 0.01) {
+        if (targetVelocity.in(MetersPerSecond) <= 0.01) { //todo: move to constants
             return;
         }
 
