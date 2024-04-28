@@ -9,8 +9,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class RobotState {
-    Pose2d pose;
-    ChassisSpeeds velocity;
+    private Pose2d pose;
+    private final ChassisSpeeds velocity;
 
     public RobotState(Pose2d pose, ChassisSpeeds fieldRelativeVelocity) {
         this.pose = pose;

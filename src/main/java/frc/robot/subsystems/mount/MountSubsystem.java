@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.mount;
 
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.constants.Constants.Mount.*;
+import static frc.robot.Constants.Mount.*;
 
 public class MountSubsystem extends SubsystemBase {
     private final CANSparkMax rightMotor = new CANSparkMax(MOUNT_RIGHT_MOTOR_ID, MotorType.kBrushless);

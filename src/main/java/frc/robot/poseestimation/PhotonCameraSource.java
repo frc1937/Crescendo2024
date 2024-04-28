@@ -11,7 +11,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import java.util.List;
 import java.util.Optional;
 
-import static frc.robot.constants.Constants.VisionConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
 
 /**
  * A pose source is a class that provides the robot's pose, from a camera.

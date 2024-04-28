@@ -13,11 +13,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.constants.Constants.ShootingConstants.FIELD_LENGTH;
+import static frc.robot.subsystems.shooter.ShooterConstants.FIELD_LENGTH;
 
 public class Target {
     private final Translation2d bluePosition;

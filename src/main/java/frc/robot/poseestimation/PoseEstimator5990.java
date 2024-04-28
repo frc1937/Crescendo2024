@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.Swerve5990;
+import frc.robot.subsystems.swerve.Swerve5990;
 import frc.robot.util.AlliancePose2d;
 
 import java.util.ArrayList;
@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static frc.robot.constants.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.constants.Constants.VisionConstants.*;
+import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.Constants.VisionConstants.*;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
 
 /**

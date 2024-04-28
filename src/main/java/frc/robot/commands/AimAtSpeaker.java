@@ -4,12 +4,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.RobotState;
-import frc.robot.subsystems.Swerve5990;
+import frc.robot.subsystems.swerve.Swerve5990;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.constants.Constants.ShootingConstants.SPEAKER_TARGET;
-import static frc.robot.constants.Constants.ShootingConstants.SHOOTING_DELAY;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
+import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_TARGET;
+import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
 
 /**
  * Should use TeleOpShoot OR make TeleOpShoot use this. No need for both.
@@ -51,6 +50,6 @@ public class AimAtSpeaker extends Command {
 
     @Override
     public boolean isFinished() {
-        return swerve5990.azimuthAtGoal(Radians.of(AZIMUTH_CONTROLLER_TOLERANCE));
+        return swerve5990.azimuthAtGoal(Radians.of(getAzimuthControllerTolerance()));
     }
 }

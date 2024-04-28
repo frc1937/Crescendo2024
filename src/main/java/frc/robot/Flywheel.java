@@ -15,7 +15,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.constants.Constants.ShootingConstants;
+import frc.robot.subsystems.shooter.ShooterConstants;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -43,7 +43,7 @@ public class Flywheel {
         motor.setIdleMode(IdleMode.kCoast);
         motor.setInverted(invert);
 
-        feedback.setTolerance(ShootingConstants.FlywheelControlConstants.TOLERANCE);
+        feedback.setTolerance(ShooterConstants.FlywheelControlConstants.TOLERANCE);
 
         encoder = motor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
 

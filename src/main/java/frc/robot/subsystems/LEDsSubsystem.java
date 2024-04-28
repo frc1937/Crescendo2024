@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants.LEDsConstants;
+import frc.robot.Constants.LEDsConstants;
 
 public class LEDsSubsystem extends SubsystemBase {
     private final AddressableLED leds = new AddressableLED(0);

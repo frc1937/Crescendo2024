@@ -10,14 +10,14 @@ public class CANSparkMaxUtil {
         kPositionOnly,
         kVelocityOnly,
         kMinimal
-    };
+    }
 
     /**
      * This function allows reducing a Spark Max's CAN bus utilization by reducing the periodic status
      * frame period of nonessential frames from 20ms to 500ms.
      *
      * <p>See
-     * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
+     * <a href="https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames">...</a>
      * for a description of the status frames.
      *
      * @param motor The motor to adjust the status frame periods on.

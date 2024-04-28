@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -18,31 +18,30 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.RobotStateHistory;
-import frc.robot.SwerveModule5990;
 import frc.robot.poseestimation.PoseEstimator5990;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.constants.Constants.DRIVE_NEUTRAL_DEADBAND;
-import static frc.robot.constants.Constants.ROTATION_NEUTRAL_DEADBAND;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_D;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_I;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_P;
-import static frc.robot.constants.Constants.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
-import static frc.robot.constants.Constants.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
-import static frc.robot.constants.Constants.SwerveConstants.INVERT_GYRO;
-import static frc.robot.constants.Constants.SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-import static frc.robot.constants.Constants.SwerveConstants.MAX_SPEED;
-import static frc.robot.constants.Constants.SwerveConstants.Module0;
-import static frc.robot.constants.Constants.SwerveConstants.Module1;
-import static frc.robot.constants.Constants.SwerveConstants.Module2;
-import static frc.robot.constants.Constants.SwerveConstants.Module3;
-import static frc.robot.constants.Constants.SwerveConstants.PIGEON_ID;
-import static frc.robot.constants.Constants.SwerveConstants.SWERVE_KINEMATICS;
-import static frc.robot.constants.Constants.SwerveConstants.TRANSLATION_CONTROLLER_P;
-import static frc.robot.constants.Constants.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
-import static frc.robot.constants.Constants.SwerveConstants.TRANSLATION_MAX_VELOCITY;
+import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
+import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_D;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_I;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_P;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
+import static frc.robot.subsystems.swerve.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.subsystems.swerve.SwerveConstants.INVERT_GYRO;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module0;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module1;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module2;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module3;
+import static frc.robot.subsystems.swerve.SwerveConstants.PIGEON_ID;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_VELOCITY;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
@@ -117,7 +116,7 @@ public class Swerve5990 extends SubsystemBase {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
         for (SwerveModule5990 mod : modules)
-            positions[mod.swerveModuleConstants.moduleNumber] = mod.getCurrentPosition();
+            positions[mod.swerveModuleConstants.moduleNumber()] = mod.getCurrentPosition();
 
         return new SwerveDriveWheelPositions(positions);
     }
@@ -247,7 +246,7 @@ public class Swerve5990 extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_SPEED);
 
         for (SwerveModule5990 mod : modules) {
-            mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber], true);
+            mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber()], true);
         }
     }
 
@@ -291,7 +290,7 @@ public class Swerve5990 extends SubsystemBase {
         SwerveModuleState[] states = new SwerveModuleState[4];
 
         for (SwerveModule5990 mod : modules) {
-            states[mod.swerveModuleConstants.moduleNumber] = mod.getCurrentState();
+            states[mod.swerveModuleConstants.moduleNumber()] = mod.getCurrentState();
         }
 
         return states;

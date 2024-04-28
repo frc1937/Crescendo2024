@@ -8,9 +8,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants.Constants;
 
-import static frc.robot.constants.Constants.INFREQUENT_PERIODIC_HERTZ;
+import static frc.robot.Constants.INFREQUENT_PERIODIC_HERTZ;
+
+//todo: Make some consants public instead of whole classes package protected
+// Make a constants class for all Can ID for the sake of unification (Except swerve I suppose)
+// go over all constants and see which are even needed
 
 public class Robot extends TimedRobot {
     private Command autonomousCommand;

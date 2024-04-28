@@ -7,7 +7,7 @@ import edu.wpi.first.units.Velocity;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.constants.Constants.SwerveConstants.WHEEL_CIRCUMFERENCE;
+import static frc.robot.subsystems.swerve.SwerveConstants.WHEEL_CIRCUMFERENCE;
 
 public class Conversions {
     public static final double

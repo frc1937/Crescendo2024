@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -20,14 +20,13 @@ import edu.wpi.first.units.Velocity;
 import frc.lib.math.Conversions;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
-import frc.lib.util.SwerveModuleConstants;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.constants.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.constants.Constants.SwerveConstants.*;
+import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 public class SwerveModule5990 {
-    public final SwerveModuleConstants swerveModuleConstants;
+    public final SwerveConstants.SwerveModuleConstants swerveModuleConstants;
 
     private final TalonFX driveMotor;
     private final CANSparkMax steerMotor;
@@ -55,12 +54,12 @@ public class SwerveModule5990 {
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
     //You will control driveMotor velocity using feedforward to get the voltage.
 
-    public SwerveModule5990(SwerveModuleConstants constants) {
+    public SwerveModule5990(SwerveConstants.SwerveModuleConstants constants) {
         this.swerveModuleConstants = constants;
 
-        this.driveMotor = new TalonFX(swerveModuleConstants.driveMotorID);
-        this.steerEncoder = new CANcoder(swerveModuleConstants.cancoderID);
-        this.steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        this.driveMotor = new TalonFX(swerveModuleConstants.driveMotorID());
+        this.steerEncoder = new CANcoder(swerveModuleConstants.canCoderID());
+        this.steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
 
         this.steerController = steerMotor.getPIDController();
         this.steerRelativeEncoder = steerMotor.getEncoder();
@@ -172,7 +171,7 @@ public class SwerveModule5990 {
     private void configureSteerEncoder() {
         CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
 
-        swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset.getRotations();
+        swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset().getRotations();
         swerveCanCoderConfig.MagnetSensor.SensorDirection = CAN_CODER_INVERT;
         swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1; //todo:
         //TODO XXX WARNING THIS HAS CHANGED FROM 0 - 360 TO 0 - 1. CODE MIGHT STILL USE OLD VALUES. PLEASE CHECK!

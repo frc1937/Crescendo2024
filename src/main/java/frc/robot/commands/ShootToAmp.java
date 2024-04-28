@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.LEDsSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.Swerve5990;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.swerve.Swerve5990;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.constants.Constants.ShootingConstants.AMP_INIT;
-import static frc.robot.constants.Constants.ShootingConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.subsystems.shooter.ShooterConstants.AMP_INIT;
+import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_FORWARD;
 
 public class ShootToAmp extends SequentialCommandGroup {
     /**

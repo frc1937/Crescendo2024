@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.RobotState;
 import frc.lib.Target;
-import frc.robot.constants.Constants;
+import frc.robot.Constants;
 import frc.robot.commands.TeleOpShoot;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.Swerve5990;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.constants.Constants.ShootingConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class TeleOpShootCalibration extends SequentialCommandGroup {
     public TeleOpShootCalibration(Swerve5990 swerve5990, ShooterSubsystem shooter, Target target, DoubleSupplier translationSup, DoubleSupplier strafeSup) {

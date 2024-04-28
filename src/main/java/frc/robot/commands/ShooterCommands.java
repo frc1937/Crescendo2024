@@ -4,12 +4,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.LEDsSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.constants.Constants.ShootingConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;

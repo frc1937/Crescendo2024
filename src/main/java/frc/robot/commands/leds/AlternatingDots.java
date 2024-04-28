@@ -7,9 +7,9 @@ package frc.robot.commands.leds;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.Constants.LEDsConstants;
+import frc.robot.Constants.LEDsConstants;
 import frc.robot.subsystems.LEDsSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 public class AlternatingDots extends Command {
     private final LEDsSubsystem leds;
