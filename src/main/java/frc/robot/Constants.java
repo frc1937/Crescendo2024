@@ -29,6 +29,8 @@ public final class Constants {
         public static final int MOUNT_LEFT_MOTOR_ID = 12;
 
         public static final int INTAKE_MOTOR_ID = 5;
+
+        public static final int PIGEON_ID = 30;
     }
 
     public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.54);

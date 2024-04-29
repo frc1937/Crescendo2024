@@ -25,7 +25,6 @@ public class SwerveConstants {
 
     static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);
 
-    static final int PIGEON_ID = 30;
     static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
 
     static final COTSFalconSwerveConstants CHOSEN_MODULE =
@@ -34,11 +33,11 @@ public class SwerveConstants {
     /* Drivetrain Constants */
     static final double WHEEL_BASE = 0.565;
     static final double TRACK_WIDTH = 0.615;
-    public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
     static final double DRIVE_BASE_RADIUS =
             new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm();
 
-    static final double WHEEL_DIAMETER_METRES = CHOSEN_MODULE.wheelDiameter;
+    public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
+
     static final double VOLTAGE_COMPENSATION_SATURATION = 12;
 
     /* SwerveSubsystem Kinematics
@@ -56,11 +55,11 @@ public class SwerveConstants {
     /* Motor Inverts */
     static final boolean ANGLE_MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
     static final InvertedValue DRIVE_MOTOR_INVERT = InvertedValue.CounterClockwise_Positive;//false;
-    //TODO XXX WARNING: Check if CounterCLockwise is IN FACT the equivalent of false!!!
+    //TODO XXX WARNING: Check if CounterClockwise is IN FACT the equivalent of false!!!
 
     /* Angle Encoder Invert */
     static final SensorDirectionValue CAN_CODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;// CHOSEN_MODULE.canCoderInvert;
-    //TODO XXX WARNING: Check if CounterCLockwise is IN FACT the equivalent of false!!!
+    //TODO XXX WARNING: Check if CounterClockwise is IN FACT the equivalent of false!!!
 
     /* SwerveSubsystem Current Limiting */
     static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 25;
