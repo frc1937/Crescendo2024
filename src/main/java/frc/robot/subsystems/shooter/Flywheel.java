@@ -59,11 +59,11 @@ public class Flywheel {
         motor.setVoltage(feedbackCorrection + feedforwardCorrection);
     }
 
-    public void setSpeed(Measure<Velocity<Angle>> speed, double force) {
+    public void setSpeed(Measure<Velocity<Angle>> speed, double pScalar) {
         setpoint = speed;
 
         feedback.setSetpoint(speed.in(RotationsPerSecond));
-        feedback.setP(p * force);
+        feedback.setP(p * pScalar);
         feedforwardCorrection = feedforward.calculate(speed.in(RotationsPerSecond));
     }
 

@@ -1,7 +1,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.path.PathConstraints;
-import com.revrobotics.CANSparkBase;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -14,19 +13,24 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.lib.Target;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.util.AlliancePose2d;
 import org.photonvision.PhotonPoseEstimator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
+    public static final class CanIDConstants {
+        public static final int MOUNT_RIGHT_MOTOR_ID = 7;
+        public static final int MOUNT_LEFT_MOTOR_ID = 12;
+
+        public static final int INTAKE_MOTOR_ID = 5;
+    }
+
     public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.54);
     public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
 
@@ -36,14 +40,13 @@ public final class Constants {
     public static final double INFREQUENT_PERIODIC_HERTZ = 10;
     public static final double PERIODIC_FREQUENCY_HERTZ = 50;
     public static final double ODOMETRY_FREQUENCY_HERTZ = 200;
+
     public static final double STICK_DEADBAND = 0.1;
 
     public static final double DRIVE_NEUTRAL_DEADBAND = 0.2;
     public static final double ROTATION_NEUTRAL_DEADBAND = 0.2;
 
     public static final class Mount { //todo: TUNE CONSTANTS TO SYSTEM SPECIFICS
-        public static final int MOUNT_RIGHT_MOTOR_ID = 7;
-        public static final int MOUNT_LEFT_MOTOR_ID = 12;
         public static final Measure<Angle> MOUNT_AT_TOP_LEFT_VALUE = Rotations.of(68);
         public static final Measure<Angle> MOUNT_AT_TOP_RIGHT_VALUE = Rotations.of(69);
 
@@ -63,10 +66,6 @@ public final class Constants {
                 new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
                 ROBOT_TO_REAR_CAMERA = REAR_CAMERA_TO_ROBOT.inverse();
         public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
-    }
-
-    public static class IntakeConstants {
-        public static final int INTAKE_MOTOR_ID = 5;
     }
 
     public static final class LEDsConstants {

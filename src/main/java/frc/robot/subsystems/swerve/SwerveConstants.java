@@ -16,10 +16,13 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSFalconSwerveConstants;
 
 public class SwerveConstants {
-    static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
-            AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_DEADBAND = 0.12;
     public static final double AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85);
-    static final double TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7, TRANSLATION_MAX_ACCELERATION = 3;
+
+    static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
+            AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_DEADBAND = 0.12,
+            TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7,
+            TRANSLATION_MAX_ACCELERATION = 3;
+
     static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);
 
     static final int PIGEON_ID = 30;
@@ -105,49 +108,50 @@ public class SwerveConstants {
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
-    static final class Module0 {
-        public static final int DRIVE_MOTOR_ID = 14;
-        public static final int ANGLE_MOTOR_ID = 11;
-        public static final int CAN_CODER_ID = 18;
-        public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(246.885);
-        public static final SwerveModuleConstants CONSTANTS =
+    public static final class Module0 {
+        static final int DRIVE_MOTOR_ID = 14;
+        static final int ANGLE_MOTOR_ID = 11;
+        static final int CAN_CODER_ID = 18;
+        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(246.885);
+        static final SwerveModuleConstants CONSTANTS =
                 new SwerveModuleConstants(0, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
     }
 
     /* Front Right Module - Module 1 */
-    static final  class Module1 {
-        public static final int DRIVE_MOTOR_ID = 3;
-        public static final int ANGLE_MOTOR_ID = 10;
-        public static final int CAN_CODER_ID = 20;
-        public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);
-        public static final SwerveModuleConstants CONSTANTS =
+    public static final class Module1 {
+        static final int DRIVE_MOTOR_ID = 3;
+        static final int ANGLE_MOTOR_ID = 10;
+        static final int CAN_CODER_ID = 20;
+        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);
+        static final SwerveModuleConstants CONSTANTS =
                 new SwerveModuleConstants(1, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
     }
 
     /* Back Left Module - Module 2 */
-    static final  class Module2 {
-        public static final int DRIVE_MOTOR_ID = 13;
-        public static final int ANGLE_MOTOR_ID = 6;
-        public static final int CAN_CODER_ID = 19;//
-        public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.459);
-        public static final SwerveModuleConstants CONSTANTS =
+    public static final class Module2 {
+        static final int DRIVE_MOTOR_ID = 13;
+        static final int ANGLE_MOTOR_ID = 6;
+        static final int CAN_CODER_ID = 19;//
+        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.459);
+        static final SwerveModuleConstants CONSTANTS =
                 new SwerveModuleConstants(2, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
     }
 
     /* Back Right Module - Module 3 */
-    static final  class Module3 {
-        public static final int DRIVE_MOTOR_ID = 2;
-        public static final int ANGLE_MOTOR_ID = 9;
-        public static final int CAN_CODER_ID = 21;
-        public static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(115.840);
-        public static final SwerveModuleConstants CONSTANTS =
+    public static final class Module3 {
+        static final int DRIVE_MOTOR_ID = 2;
+        static final int ANGLE_MOTOR_ID = 9;
+        static final int CAN_CODER_ID = 21;
+        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(115.840);
+        static final SwerveModuleConstants CONSTANTS =
                 new SwerveModuleConstants(3, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
     }
 
     static final boolean ANGLE_INVERT = true;
     static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
     static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
-    static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+    static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI * Math.PI;
+
     static final TrapezoidProfile.Constraints AZIMUTH_CONTROLLER_CONSTRAINTS =
             new TrapezoidProfile.Constraints(
                     MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
@@ -159,8 +163,8 @@ public class SwerveConstants {
      */
     static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.01 * MAX_SPEED;
 
-    static final  class AutoConstants {
-        public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
+    public static final class AutoConstants {
+        static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                 new PIDConstants(TRANSLATION_CONTROLLER_P, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                 MAX_SPEED,
@@ -168,7 +172,7 @@ public class SwerveConstants {
                 new ReplanningConfig(true, true));
     }
 
-    record SwerveModuleConstants(int moduleNumber, int driveMotorID, int steerMotorID, int canCoderID,
+    public record SwerveModuleConstants(int moduleNumber, int driveMotorID, int steerMotorID, int canCoderID,
                                         Rotation2d angleOffset) {
         /**
          * SwerveSubsystem Module Constants to be used when creating swerve modules.

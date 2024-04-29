@@ -9,17 +9,6 @@ import frc.lib.Target;
 import static edu.wpi.first.units.Units.RPM;
 
 public class ShooterConstants {
-    /**
-     * An initial presumption to the slope of the path from the robot's
-     * shooter to the virtual target
-     * <p>
-     * Since the slope to the virtual target depends on the time of flight,
-     * which itself depends on the slope to the virtual target, we provide
-     * an initial guess.
-     * <p>
-     * The value hereby is arbitrary and it depicts a common value for the
-     * slope.
-     */
     public static final int FLYWHEEL_MAX_RPM = 6400;
     public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
     public static final double POSE_HISTORY_DURATION = 0.3;
@@ -44,9 +33,11 @@ public class ShooterConstants {
             PITCH_KD = 0.0,
             PITCH_MAX_VELOCITY = 25,//1.05,
             PITCH_MAX_ACCELERATION = 35;//0.75;
+
     static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
-    static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
     static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
+
+    static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
     static final float PITCH_TRANSMISSION_RATIO = 150;
     static final double DEFAULT_PITCH_DEADBAND = 0.025, VERTICAL_PITCH_DEADBAND = 0.06;
 
@@ -121,12 +112,11 @@ public class ShooterConstants {
     public static final double KICKER_SPEED_FORWARD = 1;
 
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(50), RPM.of(2600));//50!
+            Rotation2d.fromDegrees(50), RPM.of(2600));
     public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(111.5), RPM.of(2500));
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(48), RPM.of(2500));//50!
-
+            Rotation2d.fromDegrees(48), RPM.of(2500));
     public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(-21.2), RPM.of(-3000), 0.75, 10);
 

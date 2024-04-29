@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.Constants.CanIDConstants.MOUNT_LEFT_MOTOR_ID;
+import static frc.robot.Constants.CanIDConstants.MOUNT_RIGHT_MOTOR_ID;
 import static frc.robot.Constants.Mount.*;
 
 public class MountSubsystem extends SubsystemBase {
@@ -28,6 +30,7 @@ public class MountSubsystem extends SubsystemBase {
 
         leftMotor.setSoftLimit(SoftLimitDirection.kForward, (float) MOUNT_AT_TOP_LEFT_VALUE.in(Rotations));
         leftMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+
         rightMotor.setSoftLimit(SoftLimitDirection.kForward, (float) MOUNT_AT_TOP_RIGHT_VALUE.in(Rotations));
         rightMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
     }
@@ -40,7 +43,6 @@ public class MountSubsystem extends SubsystemBase {
 
     public void manualMount(double leftSpeed, double rightSpeed) {
         leftMotor.set(leftSpeed);
-
         rightMotor.set(rightSpeed);
     }
 

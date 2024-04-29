@@ -13,9 +13,8 @@ public class AlliancePose2d {
     private final Pose2d bluePose;
     private final Pose2d redPose;
 
-
     public AlliancePose2d(Pose2d pose, boolean blueAlliance) {
-        if(blueAlliance) {
+        if (blueAlliance) {
             bluePose = pose;
             redPose = mirrorPose(pose);
         } else {
@@ -41,7 +40,6 @@ public class AlliancePose2d {
     }
 
     public static class AllianceUtils {
-
         private static boolean isBlueAlliance = true;
         private static double blueAllianceCheckTimestamp = -1;
 
@@ -61,6 +59,7 @@ public class AlliancePose2d {
 
         /**
          * Gets the pose, assuming it is on the current alliance
+         *
          * @return AlliancePose2d
          */
         public static AlliancePose2d fromCorrectPose(Pose2d pose2d) {
@@ -94,9 +93,9 @@ public class AlliancePose2d {
 
     private Pose2d mirrorPose(Pose2d pose) {
         return new Pose2d(
-            FIELD_LENGTH_METRES.in(Meters) - pose.getX(),
-            pose.getY(),
-            new Rotation2d(Math.PI).minus(pose.getRotation())
+                FIELD_LENGTH_METRES.in(Meters) - pose.getX(),
+                pose.getY(),
+                new Rotation2d(Math.PI).minus(pose.getRotation())
         );
     }
 }

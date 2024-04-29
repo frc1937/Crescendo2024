@@ -29,11 +29,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private int consecutiveNoteInsideSamples = 0;
 
-    public final Measure<Velocity<Angle>> theoreticalMaximumVelocity =
-        rightFlywheel.theoreticalMaximumVelocity.lt(leftFlywheel.theoreticalMaximumVelocity)
-        ? rightFlywheel.theoreticalMaximumVelocity
-        : leftFlywheel.theoreticalMaximumVelocity;
-    
     public ShooterSubsystem() {
         kickerMotor.configFactoryDefault();
         kickerMotor.setNeutralMode(NeutralMode.Brake);
@@ -91,7 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setReference(Reference reference) {
         pitch.setGoal(reference.pitchPosition, reference.pitchVelocity);
-        setFlywheelsSpeed(reference.flywheelVelocity, reference.spin, reference.force);
+        setFlywheelsSpeed(reference.flywheelVelocity, reference.spin, reference.pScalar);
     }
 
     public void setPitchConstraints(TrapezoidProfile.Constraints constraints) {
@@ -130,13 +125,14 @@ public class ShooterSubsystem extends SubsystemBase {
      *
      * @param speed the average target speed of both flywheels
      * @param spin  the ratio between the right and the left flywheel angular velocities.
+     * @param pScalar the scalar of the P part of the PID controller
      */
-    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin, double force) {
+    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin, double pScalar) {
         Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(spin + 1);
         Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(spin);
 
-        rightFlywheel.setSpeed(rightSpeed, force);
-        leftFlywheel.setSpeed(leftSpeed, force);
+        rightFlywheel.setSpeed(rightSpeed, pScalar);
+        leftFlywheel.setSpeed(leftSpeed, pScalar);
     }
 
     public static class Reference implements Interpolatable<Reference> {
@@ -144,31 +140,29 @@ public class ShooterSubsystem extends SubsystemBase {
         private Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
         private Measure<Velocity<Angle>> flywheelVelocity = RPM.of(0);
         private double spin = 1;
-        private double force = 1;
+        private double pScalar = 1;
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> pitchVelocity,
                          Measure<Velocity<Angle>> flywheelVelocity,
                          double spin,
-                         double force) {
+                         double pScalar) {
             this.pitchPosition = pitchPosition;
             this.pitchVelocity = pitchVelocity;
             this.flywheelVelocity = flywheelVelocity;
             this.spin = spin;
-            this.force = force;
+            this.pScalar = pScalar;
         }
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> flywheelVelocity,
                          double spin,
-                         double force) {
+                         double pScalar) {
             this.pitchPosition = pitchPosition;
             this.flywheelVelocity = flywheelVelocity;
             this.spin = spin;
-            this.force = force;
+            this.pScalar = pScalar;
         }
-
-
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> flywheelVelocity,
@@ -197,7 +191,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 MeasureUtils.interpolate(pitchVelocity, endValue.pitchVelocity, t),
                 MeasureUtils.interpolate(flywheelVelocity, endValue.flywheelVelocity, t),
                 Interpolator.forDouble().interpolate(spin, endValue.spin, t),
-                Interpolator.forDouble().interpolate(force, endValue.force, t)
+                Interpolator.forDouble().interpolate(pScalar, endValue.pScalar, t)
             );
         }
     }
