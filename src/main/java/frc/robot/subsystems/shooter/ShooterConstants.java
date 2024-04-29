@@ -8,7 +8,7 @@ import frc.lib.Target;
 
 import static edu.wpi.first.units.Units.RPM;
 
-class ShooterConstants {
+public class ShooterConstants {
     /**
      * An initial presumption to the slope of the path from the robot's
      * shooter to the virtual target
@@ -20,23 +20,23 @@ class ShooterConstants {
      * The value hereby is arbitrary and it depicts a common value for the
      * slope.
      */
-    public static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
     public static final int FLYWHEEL_MAX_RPM = 6400;
-
+    public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
     public static final double POSE_HISTORY_DURATION = 0.3;
 
-    public static final double PITCH_INTAKE_FLOOR_ANGLE = -21.583960;
-    public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
-    public static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
+    static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
+    static final double PITCH_INTAKE_FLOOR_ANGLE = -21.583960;
+    static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
+    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
 
-    public static final int
+    static final int
             FLYWHEEL_LEFT_ID = 16,
             FLYWHEEL_RIGHT_ID = 15,
             PIVOT_ID = 1,
             PIVOT_CAN_CODER = 22,
             KICKER_ID = 8;
-    public static final double PIVOT_ENCODER_OFFSET = 343;
-    public static final double PITCH_KS = 0.38398,
+    static final double PIVOT_ENCODER_OFFSET = 343,
+            PITCH_KS = 0.38398,
             PITCH_KG = 0.31481,
             PITCH_KV = 12.824,
             PITCH_KA = 3.995,
@@ -44,18 +44,17 @@ class ShooterConstants {
             PITCH_KD = 0.0,
             PITCH_MAX_VELOCITY = 25,//1.05,
             PITCH_MAX_ACCELERATION = 35;//0.75;
-    public static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
-    public static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
-    public static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
-    public static final float PITCH_TRANSMISSION_RATIO = 150;
-    public static final double DEFAULT_PITCH_DEADBAND = 0.025,
-            VERTICAL_PITCH_DEADBAND = 0.06;
+    static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
+    static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
+    static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
+    static final float PITCH_TRANSMISSION_RATIO = 150;
+    static final double DEFAULT_PITCH_DEADBAND = 0.025, VERTICAL_PITCH_DEADBAND = 0.06;
 
-    public static final class FlywheelControlConstants {
+    static final class FlywheelControlConstants {
         /**
          * All in rotations per second and voltages
          */
-        public static final double
+        static final double
                 RIGHT_P = 0.027796,
                 RIGHT_S = 0.025648,
                 RIGHT_V = 0.10953,
@@ -120,7 +119,7 @@ class ShooterConstants {
 
     public static final double KICKER_SPEED_BACKWARDS = -0.7;
     public static final double KICKER_SPEED_FORWARD = 1;
-    public static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
+
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(50), RPM.of(2600));//50!
     public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(

@@ -9,6 +9,7 @@ import frc.robot.subsystems.swerve.Swerve5990;
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_TARGET;
 import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
 
 /**
  * Should use TeleOpShoot OR make TeleOpShoot use this. No need for both.
@@ -50,6 +51,6 @@ public class AimAtSpeaker extends Command {
 
     @Override
     public boolean isFinished() {
-        return swerve5990.azimuthAtGoal(Radians.of(getAzimuthControllerTolerance()));
+        return swerve5990.azimuthAtGoal(Radians.of(AZIMUTH_CONTROLLER_TOLERANCE));
     }
 }

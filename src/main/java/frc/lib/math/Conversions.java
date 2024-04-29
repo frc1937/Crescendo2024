@@ -42,7 +42,7 @@ public class Conversions {
      * @return meters
      */
     public static Measure<Distance> rotationsToMeters(double rotations) {
-        return Meters.of(rotations * WHEEL_CIRCUMFERENCE.in(Meters));
+        return Meters.of(rotations * WHEEL_CIRCUMFERENCE);
     }
 
     /**
@@ -54,7 +54,7 @@ public class Conversions {
 
 
     public static Measure<Velocity<Distance>> rotationsPerSecondToMetersPerSecond(double rotationsPerSecond) {
-        return MetersPerSecond.of(rotationsPerSecond * WHEEL_CIRCUMFERENCE.in(Meters));
+        return MetersPerSecond.of(rotationsPerSecond * WHEEL_CIRCUMFERENCE);
     }
 
     /**
