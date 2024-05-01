@@ -31,6 +31,13 @@ public final class Constants {
         public static final int INTAKE_MOTOR_ID = 5;
 
         public static final int PIGEON_ID = 30;
+
+        public static final int
+                FLYWHEEL_LEFT_ID = 16,
+                FLYWHEEL_RIGHT_ID = 15,
+                PIVOT_ID = 1,
+                PIVOT_CAN_CODER = 22,
+                KICKER_ID = 8;
     }
 
     public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.54);

@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
+import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class Pitch {

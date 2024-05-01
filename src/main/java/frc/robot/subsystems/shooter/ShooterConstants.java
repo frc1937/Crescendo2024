@@ -18,12 +18,6 @@ public class ShooterConstants {
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
     static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
 
-    static final int
-            FLYWHEEL_LEFT_ID = 16,
-            FLYWHEEL_RIGHT_ID = 15,
-            PIVOT_ID = 1,
-            PIVOT_CAN_CODER = 22,
-            KICKER_ID = 8;
     static final double PIVOT_ENCODER_OFFSET = 343,
             PITCH_KS = 0.38398,
             PITCH_KG = 0.31481,

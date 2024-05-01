@@ -107,7 +107,7 @@ public class SwerveConstants {
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
-    public static final class Module0 {
+    static final class Module0 {
         static final int DRIVE_MOTOR_ID = 14;
         static final int ANGLE_MOTOR_ID = 11;
         static final int CAN_CODER_ID = 18;
@@ -117,7 +117,7 @@ public class SwerveConstants {
     }
 
     /* Front Right Module - Module 1 */
-    public static final class Module1 {
+    static final class Module1 {
         static final int DRIVE_MOTOR_ID = 3;
         static final int ANGLE_MOTOR_ID = 10;
         static final int CAN_CODER_ID = 20;
@@ -127,7 +127,7 @@ public class SwerveConstants {
     }
 
     /* Back Left Module - Module 2 */
-    public static final class Module2 {
+    static final class Module2 {
         static final int DRIVE_MOTOR_ID = 13;
         static final int ANGLE_MOTOR_ID = 6;
         static final int CAN_CODER_ID = 19;//
@@ -137,7 +137,7 @@ public class SwerveConstants {
     }
 
     /* Back Right Module - Module 3 */
-    public static final class Module3 {
+    static final class Module3 {
         static final int DRIVE_MOTOR_ID = 2;
         static final int ANGLE_MOTOR_ID = 9;
         static final int CAN_CODER_ID = 21;

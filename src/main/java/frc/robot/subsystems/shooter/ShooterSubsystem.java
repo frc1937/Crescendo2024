@@ -17,6 +17,7 @@ import frc.lib.math.MeasureUtils;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.robot.Constants.CanIDConstants.*;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.*;
 
