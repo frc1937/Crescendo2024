@@ -43,31 +43,31 @@ public class ShootToAmp extends SequentialCommandGroup {
                 release
         );
     }
-
-    @Deprecated
-    private static class DriveForward extends Command {
-        private final Swerve5990 swerve5990;
-        private final double translationValue;
-
-        public DriveForward(Swerve5990 swerve5990, double translationValue) {
-            this.swerve5990 = swerve5990;
-            this.translationValue = translationValue;
-
-            addRequirements(swerve5990);
-        }
-
-        @Override
-        public void execute() {
-            swerve5990.drive(
-                    -translationValue,
-                    0,
-                    0, true
-            );
-        }
-
-        @Override
-        public void end(boolean interrupt) {
-            swerve5990.stop();
-        }
-    }
+//
+//    @Deprecated
+//    private static class DriveForward extends Command {
+//        private final Swerve5990 swerve5990;
+//        private final double translationValue;
+//
+//        public DriveForward(Swerve5990 swerve5990, double translationValue) {
+//            this.swerve5990 = swerve5990;
+//            this.translationValue = translationValue;
+//
+//            addRequirements(swerve5990);
+//        }
+//
+//        @Override
+//        public void execute() {
+//            swerve5990.drive(
+//                    -translationValue,
+//                    0,
+//                    0, true
+//            );
+//        }
+//
+//        @Override
+//        public void end(boolean interrupt) {
+//            swerve5990.stop();
+//        }
+//    }
 }

@@ -30,7 +30,7 @@ public class Swerve5990 extends SubsystemBase {
     private final PoseEstimator5990 poseEstimator5990;
     private final SwerveModule5990[] modules;
 
-    private final RobotStateHistory history = new RobotStateHistory();
+    private final RobotStateHistory stateHistory = new RobotStateHistory();
 
     private final ProfiledPIDController azimuthController = new ProfiledPIDController(
             AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D,
@@ -98,8 +98,8 @@ public class Swerve5990 extends SubsystemBase {
         return new SwerveDriveWheelPositions(positions);
     }
 
-    public RobotStateHistory getHistory() {
-        return history;
+    public RobotStateHistory getStateHistory() {
+        return stateHistory;
     }
 
     public void infrequentPeriodic() {
@@ -295,6 +295,6 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     private void sampleRobotPose() {
-        history.addSample(Timer.getFPGATimestamp(), poseEstimator5990.getCurrentPose().getCorrectPose());
+        stateHistory.addSample(Timer.getFPGATimestamp(), poseEstimator5990.getCurrentPose().getCorrectPose());
     }
 }

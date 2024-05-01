@@ -3,9 +3,11 @@ package frc.robot.poseestimation;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
@@ -34,9 +36,9 @@ public class PoseEstimator6328 {
     private final TimeInterpolatableBuffer<Pose2d> poseBuffer =
             TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SECONDS);
 
+    //Kalman Filter
     private final Matrix<N3, N1> qStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
-    // odometry
-    private final SwerveDriveKinematics kinematics;
+
     private SwerveDriveWheelPositions lastWheelPositions =
             new SwerveDriveWheelPositions(
                     new SwerveModulePosition[]{
@@ -44,15 +46,15 @@ public class PoseEstimator6328 {
                             new SwerveModulePosition(),
                             new SwerveModulePosition(),
                             new SwerveModulePosition()
-                    });
+                    }
+                    );
+
     private Rotation2d lastGyroAngle = new Rotation2d();
 
     public PoseEstimator6328() {
         for (int i = 0; i < 3; ++i) {
             qStdDevs.set(i, 0, Math.pow(STATES_AMBIGUITY.get(i, 0), 2));
         }
-
-        kinematics = SWERVE_KINEMATICS;
     }
 
     /**
@@ -60,7 +62,7 @@ public class PoseEstimator6328 {
      */
     public void addOdometryObservation(OdometryObservation observation) {
         Pose2d lastOdometryPose = odometryPose;
-        Twist2d twist = kinematics.toTwist2d(lastWheelPositions, observation.wheelPositions());
+        Twist2d twist = SWERVE_KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
         lastWheelPositions = observation.wheelPositions();
         // Check gyro connected
         if (observation.gyroAngle != null) {
@@ -81,8 +83,7 @@ public class PoseEstimator6328 {
     public void addVisionObservation(VisionObservation observation) {
         // If measurement is old enough to be outside the pose buffer's timespan, skip.
         try {
-            if (poseBuffer.getInternalBuffer().lastKey() - POSE_BUFFER_SIZE_SECONDS
-                    > observation.timestamp()) {
+            if (poseBuffer.getInternalBuffer().lastKey() - POSE_BUFFER_SIZE_SECONDS > observation.timestamp()) {
                 return;
             }
         } catch (NoSuchElementException ex) {

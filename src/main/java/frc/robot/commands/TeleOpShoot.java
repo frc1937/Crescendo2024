@@ -62,7 +62,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             deadlineTimer.restart();
 
             // Predict the position the robot will be in when the NOTE is released
-            RobotState predictedState = swerve5990.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
+            RobotState predictedState = swerve5990.getStateHistory().predict(Timer.getFPGATimestamp() + SHOOTING_DELAY);
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
             Translation2d virtualTargetDisplacement = target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
@@ -79,7 +79,7 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
 
             // Predict the position the robot will be in when the NOTE is released
             // RobotState predictedState = drivetrain.getHistory().predict(Timer.getFPGATimestamp() + SHOOTING_PREDICTION_TIME);
-            RobotState predictedState = swerve5990.getHistory().estimate();
+            RobotState predictedState = swerve5990.getStateHistory().estimate();
             Translation2d targetDisplacement = target.calculateTargetDisplacement(predictedState);
 
             // Calculate the displacement of the virtual target, to which the robot so it can
