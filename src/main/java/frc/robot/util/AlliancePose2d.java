@@ -1,7 +1,9 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -89,6 +91,27 @@ public class AlliancePose2d {
                 return rotation;
             return new Rotation2d(Math.PI).minus(rotation);
         }
+
+        /**
+         * Mirrors a rotation across the center of the field if the current alliance is red.
+         *
+         * @param rotation the rotation to mirror if the current alliance is red
+         * @return the rotation
+         */
+        public static Rotation3d getCorrectRotation(Rotation3d rotation) {
+            if (isBlueAlliance())
+                return rotation;
+            return new Rotation3d(0, 0, Math.PI).minus(rotation);
+        }
+
+        public static Pose3d mirrorPose(Pose3d pose) {
+            return new Pose3d(
+                    FIELD_LENGTH_METRES.in(Meters) - pose.getX(),
+                    pose.getY(),
+                    pose.getZ(),
+                    getCorrectRotation(pose.getRotation())
+            );
+        } //TODO: cleanup this bullshit arse code
     }
 
     private Pose2d mirrorPose(Pose2d pose) {

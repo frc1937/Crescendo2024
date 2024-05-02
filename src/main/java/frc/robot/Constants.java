@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
@@ -42,6 +43,10 @@ public final class Constants {
 
     public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.54);
     public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
+
+    private static final Translation3d SPEAKER_TAG_TO_SPEAKER = new Translation3d(0.18, 0.0, 0.593979);
+    public static final Pose3d BLUE_SPEAKER = TAG_ID_TO_POSE.get(7).plus(new Transform3d(SPEAKER_TAG_TO_SPEAKER, new Rotation3d()));
+    public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
 
     /**
      * Once how much time, in Hertz (1/hertz = seconds), to run the infrequent periodic procedure

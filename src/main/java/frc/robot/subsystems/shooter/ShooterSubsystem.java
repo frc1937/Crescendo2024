@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.Interpolator;
@@ -17,9 +19,11 @@ import frc.lib.math.MeasureUtils;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
 import static frc.robot.Constants.CanIDConstants.*;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -50,6 +54,48 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("shooter/isLoaded", isLoaded());
         SmartDashboard.putBoolean("shooter/areFlywheelsReady", flywheelsAtReference());
         SmartDashboard.putBoolean("shooter/hasPitchArrived", pitchAtReference());
+    }
+
+    /**
+     * Get the needed pitch theta for the pivot using physics.
+     * <p>Formula is taken from
+     * <a href="https://en.wikipedia.org/wiki/Projectile_motion?useskin=vector#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">...</a>
+     * </p>
+     * @param pose - the target pose to hit
+     * @return - the required pitch angle
+     */
+
+    public Rotation2d getPitchAnglePhysics(Pose3d pose) {
+        double g = 9.8;
+        double v = tangentialVelocityFromRPM(3000, 0);//TODO Tangential velocity of 3000 RPM;
+        double vSquared = v*v;
+        double y = pose.getY();
+        double x = pose.getX();
+
+        double theta = Math.atan(
+                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*x*x + 2*vSquared*y)))
+                / (g*x)
+        );
+
+        return Rotation2d.fromRadians(theta);
+    }
+
+    /**
+     * We assume the robot isn't moving to get the time of flight
+     * @param currentPose - The starting pose of the note, using the correct alliance
+     * @param targetPose - The target pose of the note, using the correct alliance
+     * @param tangentialVelocity - The tangential velocity of the flywheels
+     * @return - the time of flight in seconds
+     */
+    public double getTimeOfFlight(Pose2d currentPose, Pose3d targetPose, double tangentialVelocity) {
+        Rotation2d theta = getPitchAnglePhysics(targetPose);
+
+        double xDiff = targetPose.getX() - currentPose.getX();
+        double yDiff = targetPose.getY() - currentPose.getY();
+
+        double distance = Math.hypot(xDiff, yDiff);
+
+        return distance / (tangentialVelocity * Math.cos(theta.getRadians()));
     }
 
     /**

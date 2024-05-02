@@ -36,6 +36,16 @@ public class Conversions {
     }
 
     /**
+     * Returns tangential velocity in metres per second.
+     * @param rpm - rotations per minute
+     * @param wheelDiameter - wheel diameter in metres
+     * @return the tangential velocity in metres per second
+     */
+    public static double tangentialVelocityFromRPM(double rpm, double wheelDiameter) {
+        return rpm * wheelDiameter * Math.PI / SEC_PER_MIN;
+    }
+
+    /**
      * Converts rotations to meters.
      *
      * @param rotations rotations
