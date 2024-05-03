@@ -16,7 +16,7 @@ import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class TeleOpShootCalibration extends SequentialCommandGroup {
@@ -73,7 +73,8 @@ public class TeleOpShootCalibration extends SequentialCommandGroup {
             shooter.setReference(
                     new ShooterSubsystem.Reference(
                             Rotation2d.fromDegrees(SmartDashboard.getNumber("calibration/angle [deg]", 0)),
-                            MetersPerSecond.of(SmartDashboard.getNumber("calibration/mps [MetresPerSecond]", 0))
+                            RPM.of(SmartDashboard.getNumber("calibration/rpm [RPM]", 0)),
+                            SmartDashboard.getNumber("calibration/spin [idk]", 1)
                     ));
         }
 

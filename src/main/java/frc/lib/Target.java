@@ -10,15 +10,14 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
-import static frc.robot.Constants.FIELD_LENGTH_METRES;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
+import static frc.robot.subsystems.shooter.ShooterConstants.FIELD_LENGTH;
 
 public class Target {
     private final Translation2d bluePosition;
@@ -30,7 +29,7 @@ public class Target {
 
     public Target(Translation2d bluePosition) {
         this.bluePosition = bluePosition;
-        redPosition = new Translation2d(FIELD_LENGTH_METRES.in(Meters) - bluePosition.getX(), bluePosition.getY());
+        redPosition = new Translation2d(FIELD_LENGTH - bluePosition.getX(), bluePosition.getY());
     }
 
     /** Calculate the displacement from the centre of the robot to the target */
@@ -40,8 +39,12 @@ public class Target {
         return targetPosition.minus(robotState.getPose().getTranslation());
     }
 
-    public void putMeasurement(double distanceMetres, double degrees, double rpm) {
-        distanceToReferenceMap.put(distanceMetres, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), tangentialVelocityFromRPM(rpm, Units.inchesToMeters(4.0))));
+    public void putMeasurement(double distanceMetres, double degrees, double rpm, double spin) {
+        distanceToReferenceMap.put(distanceMetres, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees), RPM.of(rpm), spin));
+    }
+
+    public void putTimeOfFlightMeasurement(double distanceMetres, double timeOfFlightSeconds) {
+        distanceToTimeOfFlightMap.put(distanceMetres, timeOfFlightSeconds);
     }
 
     public void putAzimuthToleranceMeasurement(double distanceMetres, double toleranceRadians) {

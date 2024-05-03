@@ -7,9 +7,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.interpolation.Interpolator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -18,10 +18,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.lib.math.Conversions.RPMFromTangentialVelocity;
+import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
 import static frc.robot.Constants.CanIDConstants.*;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
@@ -61,13 +62,13 @@ public class ShooterSubsystem extends SubsystemBase {
      * </p>
      * @param robotPose - The robot's pose, using the correct alliance
      * @param targetPose - the target pose to hit, using the correct alliance
-     * @param tangentialVelocity - the tangential velocity of the flywheel
      * @return - the required pitch angle
      */
 
-    public Rotation2d getPitchAnglePhysics(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
+    public Rotation2d getPitchAnglePhysics(Pose2d robotPose, Pose3d targetPose) {
         double g = 9.8;
-        double vSquared = tangentialVelocity * tangentialVelocity;
+        double v = tangentialVelocityFromRPM(3000, 0);//TODO Tangential velocity of 3000 RPM;
+        double vSquared = v*v;
 
         //This is the distance of the pivot off the floor when parallel to the ground
         double z = targetPose.getZ() - Inch.of(8.5).in(Meters);
@@ -89,7 +90,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return - the time of flight in seconds
      */
     public double getTimeOfFlight(Pose2d currentPose, Pose3d targetPose, double tangentialVelocity) {
-        Rotation2d theta = getPitchAnglePhysics(currentPose, targetPose, tangentialVelocity);
+        Rotation2d theta = getPitchAnglePhysics(currentPose, targetPose);
 
         double xDiff = targetPose.getX() - currentPose.getX();
         double yDiff = targetPose.getY() - currentPose.getY();
@@ -134,7 +135,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setReference(Reference reference) {
         pitch.setGoal(reference.pitchPosition, reference.pitchVelocity);
-        setTangentialFlywheelsVelocity(reference.flywheelTangentialVelocity);
+        setFlywheelsSpeed(reference.flywheelVelocity, reference.spin, reference.pScalar);
     }
 
     public void setPitchConstraints(TrapezoidProfile.Constraints constraints) {
@@ -166,19 +167,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public TrapezoidProfile.Constraints getPitchConstraints() {
         return pitch.getConstraints();
     }
-
-    /**
-     * Set the target tangential velocity of the flywheels.
-     * This method accounts for the difference in wheel size
-     * @param tangentialVelocity - the target tangential velocity in metres per second
-     */
-    public void setTangentialFlywheelsVelocity(Measure<Velocity<Distance>> tangentialVelocity) {
-        double leftFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity.in(MetersPerSecond), LEFT_FLYWHEEL_DIAMETER);
-        double rightFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity.in(MetersPerSecond), RIGHT_FLYWHEEL_DIAMETER);
-
-        leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
-        rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));
-    }
     
     /**
      * Rotate the flywheels to certain speeds s.t. NOTEs will be released with
@@ -199,20 +187,44 @@ public class ShooterSubsystem extends SubsystemBase {
     public static class Reference implements Interpolatable<Reference> {
         private Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
         private Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
-        private Measure<Velocity<Distance>> flywheelTangentialVelocity = MetersPerSecond.of(0);
+        private Measure<Velocity<Angle>> flywheelVelocity = RPM.of(0);
+        private double spin = 1;
+        private double pScalar = 1;
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Angle>> pitchVelocity,
-                         Measure<Velocity<Distance>> flywheelTangentialVelocity) {
+                         Measure<Velocity<Angle>> flywheelVelocity,
+                         double spin,
+                         double pScalar) {
             this.pitchPosition = pitchPosition;
             this.pitchVelocity = pitchVelocity;
-            this.flywheelTangentialVelocity = flywheelTangentialVelocity;
+            this.flywheelVelocity = flywheelVelocity;
+            this.spin = spin;
+            this.pScalar = pScalar;
         }
 
         public Reference(Rotation2d pitchPosition,
-                         Measure<Velocity<Distance>> flywheelTangentialVelocity) {
+                         Measure<Velocity<Angle>> flywheelVelocity,
+                         double spin,
+                         double pScalar) {
             this.pitchPosition = pitchPosition;
-            this.flywheelTangentialVelocity = flywheelTangentialVelocity;
+            this.flywheelVelocity = flywheelVelocity;
+            this.spin = spin;
+            this.pScalar = pScalar;
+        }
+
+        public Reference(Rotation2d pitchPosition,
+                         Measure<Velocity<Angle>> flywheelVelocity,
+                         double spin) {
+            this.pitchPosition = pitchPosition;
+            this.flywheelVelocity = flywheelVelocity;
+            this.spin = spin;
+        }
+        
+        public Reference(Rotation2d pitchPosition,
+                         Measure<Velocity<Angle>> flywheelVelocity) {
+            this.pitchPosition = pitchPosition;
+            this.flywheelVelocity = flywheelVelocity;
         }
                 
         public Reference(Rotation2d pitchPosition) {
@@ -226,7 +238,9 @@ public class ShooterSubsystem extends SubsystemBase {
             return new Reference(
                 pitchPosition.interpolate(endValue.pitchPosition, t),
                 MeasureUtils.interpolate(pitchVelocity, endValue.pitchVelocity, t),
-                MeasureUtils.interpolate(flywheelTangentialVelocity, endValue.flywheelTangentialVelocity, t)
+                MeasureUtils.interpolate(flywheelVelocity, endValue.flywheelVelocity, t),
+                Interpolator.forDouble().interpolate(spin, endValue.spin, t),
+                Interpolator.forDouble().interpolate(pScalar, endValue.pScalar, t)
             );
         }
     }
