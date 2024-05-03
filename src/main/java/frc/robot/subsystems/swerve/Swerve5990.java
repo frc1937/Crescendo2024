@@ -211,6 +211,18 @@ public class Swerve5990 extends SubsystemBase {
                 SmartDashboard.getNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D));
     }
 
+    /**
+     * Returns whether the given chassis speeds are considered to be "still" by the swerve neutral deadband.
+     *
+     * @param chassisSpeeds the chassis speeds to check
+     * @return true if the chassis speeds are considered to be "still"
+     */
+    public boolean isStill(ChassisSpeeds chassisSpeeds) {
+        return Math.abs(chassisSpeeds.vxMetersPerSecond) <= DRIVE_NEUTRAL_DEADBAND &&
+                Math.abs(chassisSpeeds.vyMetersPerSecond) <= DRIVE_NEUTRAL_DEADBAND &&
+                Math.abs(chassisSpeeds.omegaRadiansPerSecond) <= ROTATION_NEUTRAL_DEADBAND;
+    }
+
     private void driveSelfRelative(ChassisSpeeds speeds) {
         ChassisSpeeds discretizedChassisSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
 
@@ -273,17 +285,7 @@ public class Swerve5990 extends SubsystemBase {
         return states;
     }
 
-    /**
-     * Returns whether the given chassis speeds are considered to be "still" by the swerve neutral deadband.
-     *
-     * @param chassisSpeeds the chassis speeds to check
-     * @return true if the chassis speeds are considered to be "still"
-     */
-    private boolean isStill(ChassisSpeeds chassisSpeeds) {
-        return Math.abs(chassisSpeeds.vxMetersPerSecond) <= DRIVE_NEUTRAL_DEADBAND &&
-                Math.abs(chassisSpeeds.vyMetersPerSecond) <= DRIVE_NEUTRAL_DEADBAND &&
-                Math.abs(chassisSpeeds.omegaRadiansPerSecond) <= ROTATION_NEUTRAL_DEADBAND;
-    }
+
 
     private SwerveModule5990[] getModules() {
         return new SwerveModule5990[]{

@@ -11,10 +11,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import static frc.robot.Constants.INFREQUENT_PERIODIC_HERTZ;
 
-//todo:
-// Make a constants class for all Can ID for the sake of unification (Except swerve I suppose)
-// go over all constants and see which are even needed
-
 public class Robot extends TimedRobot {
     private Command autonomousCommand;
     private CommandScheduler commandScheduler;

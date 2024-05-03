@@ -9,16 +9,16 @@ public class IntakeCommand extends Command {
     private final double speed;
 
     public IntakeCommand(IntakeSubsystem intakeSubsystem, double speed) {
-        this.speed = speed;
         this.intakeSubsystem = intakeSubsystem;
+        this.speed = speed;
 
         addRequirements(intakeSubsystem);
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
         intakeSubsystem.setSpeedPercentage(speed);
-    }
+    } //todo: test if still works
 
     @Override
     public void end(boolean interrupted) {
