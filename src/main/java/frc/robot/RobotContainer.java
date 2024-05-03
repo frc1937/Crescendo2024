@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,22 +13,22 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.poseestimation.PhotonCameraSource;
+import frc.robot.poseestimation.PoseEstimator5990;
+import frc.robot.poseestimation.PoseEstimator6328;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.mount.MountSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
-import frc.robot.poseestimation.PhotonCameraSource;
-import frc.robot.poseestimation.PoseEstimator5990;
-import frc.robot.poseestimation.PoseEstimator6328;
 import frc.robot.util.Controller;
 
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static edu.wpi.first.units.Units.*;
+import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
 import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 import static frc.robot.util.Controller.Axis.*;
 import static frc.robot.util.Controller.Inputs.*;
 import static frc.robot.util.Controller.Stick.LEFT_STICK;
@@ -118,7 +119,6 @@ public class RobotContainer {
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
-        opXButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(100), RPM.of(-1000))));
 
         mountSubsystem.setDefaultCommand(
                 new MountCommand(mountSubsystem,
@@ -152,21 +152,23 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
 
+        double flywheelDiameter = Units.inchesToMeters(4);
+
         NamedCommands.registerCommand("AdjustShooter1", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.25), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.25), tangentialVelocityFromRPM(3000, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter2", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), tangentialVelocityFromRPM(3000, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter3", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(25.1), RPM.of(4000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(25.1), tangentialVelocityFromRPM(4000, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter4", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(109), RPM.of(4000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(109), tangentialVelocityFromRPM(4000, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter5", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(49), RPM.of(4000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(49), tangentialVelocityFromRPM(4000, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter6", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(28), RPM.of(4500))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(28), tangentialVelocityFromRPM(4500, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter7", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), RPM.of(4500))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), tangentialVelocityFromRPM(4500, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), RPM.of(3000))));
+                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), tangentialVelocityFromRPM(3000, flywheelDiameter))));
     }
 }

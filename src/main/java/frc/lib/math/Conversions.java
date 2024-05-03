@@ -41,8 +41,18 @@ public class Conversions {
      * @param wheelDiameter - wheel diameter in metres
      * @return the tangential velocity in metres per second
      */
-    public static double tangentialVelocityFromRPM(double rpm, double wheelDiameter) {
-        return rpm * wheelDiameter * Math.PI / SEC_PER_MIN;
+    public static Measure<Velocity<Distance>> tangentialVelocityFromRPM(double rpm, double wheelDiameter) {
+        return MetersPerSecond.of(rpm * wheelDiameter * Math.PI / SEC_PER_MIN);
+    }
+
+    /**
+     * Returns the rotations per minute
+     * @param tangentialVelocity - metres per second
+     * @param wheelDiameter - wheel diameter in metres
+     * @return rotations per minute
+     */
+    public static double RPMFromTangentialVelocity(double tangentialVelocity, double wheelDiameter) {
+        return SEC_PER_MIN * tangentialVelocity /  (wheelDiameter * Math.PI);
     }
 
     /**

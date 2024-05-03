@@ -41,7 +41,7 @@ public final class Constants {
                 KICKER_ID = 8;
     }
 
-    public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.54);
+    public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.48);
     public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
 
     private static final Translation3d SPEAKER_TAG_TO_SPEAKER = new Translation3d(0.18, 0.0, 0.593979);

@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.lib.Target;
 
-import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.*;
 
 public class ShooterConstants {
     public static final int FLYWHEEL_MAX_RPM = 6400;
@@ -34,6 +34,9 @@ public class ShooterConstants {
     static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
     static final float PITCH_TRANSMISSION_RATIO = 150;
     static final double DEFAULT_PITCH_DEADBAND = 0.025, VERTICAL_PITCH_DEADBAND = 0.06;
+
+    static final double LEFT_FLYWHEEL_DIAMETER = Inches.of(4).in(Meter);
+    static final double RIGHT_FLYWHEEL_DIAMETER = Inches.of(3).in(Meter);
 
     static final class FlywheelControlConstants {
         /**
@@ -63,25 +66,21 @@ public class ShooterConstants {
 
     public static final Target SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.3));
     public static final Target ASSIST_TARGET = new Target(new Translation2d(-0.5, 8.0));
-    public static final double FIELD_LENGTH = 16.48;
 
     static {
-        SPEAKER_TARGET.putMeasurement(1.24, 53, 2500, 1);
-        SPEAKER_TARGET.putMeasurement(1.56, 47, 2500, 1);
-        SPEAKER_TARGET.putMeasurement(1.85, 44, 2500, 1);
-        SPEAKER_TARGET.putMeasurement(2.08, 40, 2700, 1);
-        SPEAKER_TARGET.putMeasurement(2.33, 35, 3000, 0.85);
-        SPEAKER_TARGET.putMeasurement(2.72, 34, 3000, 0.85);
-        SPEAKER_TARGET.putMeasurement(2.95, 31, 3500, 0.85);
-        SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500, 0.85);
-        SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000, 0.8);
-        SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000, 0.9);
-        SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400, 0.9);
-        SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500, 0.9);
-        SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150, 1.1);
-
-        SPEAKER_TARGET.putTimeOfFlightMeasurement(1.d, 0.2);
-        SPEAKER_TARGET.putTimeOfFlightMeasurement(5.d, 0.4);
+        SPEAKER_TARGET.putMeasurement(1.24, 53, 2500);
+        SPEAKER_TARGET.putMeasurement(1.56, 47, 2500);
+        SPEAKER_TARGET.putMeasurement(1.85, 44, 2500);
+        SPEAKER_TARGET.putMeasurement(2.08, 40, 2700);
+        SPEAKER_TARGET.putMeasurement(2.33, 35, 3000);
+        SPEAKER_TARGET.putMeasurement(2.72, 34, 3000);
+        SPEAKER_TARGET.putMeasurement(2.95, 31, 3500);
+        SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500);
+        SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000);
+        SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000);
+        SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400);
+        SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500);
+        SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150);
 
         SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 3.8);
         SPEAKER_TARGET.putAzimuthToleranceMeasurement(4.d, 3.0);
@@ -89,14 +88,11 @@ public class ShooterConstants {
     }
 
     static {
-        ASSIST_TARGET.putMeasurement(5, 60, 1750, 0.7);
-        ASSIST_TARGET.putMeasurement(8, 50, 2350, 0.75);
-        ASSIST_TARGET.putMeasurement(11, 36, 2900, 0.8);
-        ASSIST_TARGET.putMeasurement(14, 36, 3500, 0.83);
-        ASSIST_TARGET.putMeasurement(17, 36, 4100, 0.85);
-
-        ASSIST_TARGET.putTimeOfFlightMeasurement(1.d, 1.5);
-        ASSIST_TARGET.putTimeOfFlightMeasurement(17.d, 2.6);
+        ASSIST_TARGET.putMeasurement(5, 60, 1750);
+        ASSIST_TARGET.putMeasurement(8, 50, 2350);
+        ASSIST_TARGET.putMeasurement(11, 36, 2900);
+        ASSIST_TARGET.putMeasurement(14, 36, 3500);
+        ASSIST_TARGET.putMeasurement(17, 36, 4100);
 
         ASSIST_TARGET.putAzimuthToleranceMeasurement(2.d, 5.d);
         ASSIST_TARGET.putAzimuthToleranceMeasurement(15.d, 3);
@@ -106,14 +102,14 @@ public class ShooterConstants {
     public static final double KICKER_SPEED_FORWARD = 1;
 
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(50), RPM.of(2600));
+            Rotation2d.fromDegrees(50), MetersPerSecond.of(16));
     public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(111.5), RPM.of(2500));
+            Rotation2d.fromDegrees(111.5), MetersPerSecond.of(14));
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(48), RPM.of(2500));
+            Rotation2d.fromDegrees(48), MetersPerSecond.of(15));
     public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(-21.2), RPM.of(-3000), 0.75, 10);
+            Rotation2d.fromDegrees(-21.2), MetersPerSecond.of(-16));
 
     public static final ShooterSubsystem.Reference AMP_INIT =
-            new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), RPM.of(500));
+            new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), MetersPerSecond.of(3));
 }
