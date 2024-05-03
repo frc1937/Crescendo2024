@@ -17,8 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.*;
 import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
 import static frc.robot.Constants.CanIDConstants.*;
 import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
@@ -61,20 +60,23 @@ public class ShooterSubsystem extends SubsystemBase {
      * <p>Formula is taken from
      * <a href="https://en.wikipedia.org/wiki/Projectile_motion?useskin=vector#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">...</a>
      * </p>
-     * @param pose - the target pose to hit
+     * @param robotPose - The robot's pose, using the correct alliance
+     * @param targetPose - the target pose to hit, using the correct alliance
      * @return - the required pitch angle
      */
 
-    public Rotation2d getPitchAnglePhysics(Pose3d pose) {
+    public Rotation2d getPitchAnglePhysics(Pose2d robotPose, Pose3d targetPose) {
         double g = 9.8;
         double v = tangentialVelocityFromRPM(3000, 0);//TODO Tangential velocity of 3000 RPM;
         double vSquared = v*v;
-        double y = pose.getY();
-        double x = pose.getX();
+
+        //This is the distance of the pivot off the floor when parallel to the ground
+        double z = targetPose.getZ() - Inch.of(8.5).in(Meters);
+        double distance = Math.hypot(robotPose.getX() - targetPose.getX(), robotPose.getY() - targetPose.getY());
 
         double theta = Math.atan(
-                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*x*x + 2*vSquared*y)))
-                / (g*x)
+                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z)))
+                / (g*distance)
         );
 
         return Rotation2d.fromRadians(theta);
@@ -82,13 +84,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     /**
      * We assume the robot isn't moving to get the time of flight
-     * @param currentPose - The starting pose of the note, using the correct alliance
+     * @param currentPose - The robot's pose, using the correct alliance
      * @param targetPose - The target pose of the note, using the correct alliance
      * @param tangentialVelocity - The tangential velocity of the flywheels
      * @return - the time of flight in seconds
      */
     public double getTimeOfFlight(Pose2d currentPose, Pose3d targetPose, double tangentialVelocity) {
-        Rotation2d theta = getPitchAnglePhysics(targetPose);
+        Rotation2d theta = getPitchAnglePhysics(currentPose, targetPose);
 
         double xDiff = targetPose.getX() - currentPose.getX();
         double yDiff = targetPose.getY() - currentPose.getY();
