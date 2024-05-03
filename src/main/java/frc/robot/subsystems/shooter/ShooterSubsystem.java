@@ -96,7 +96,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         double distance = Math.hypot(xDiff, yDiff);
 
-        return distance / (tangentialVelocity * Math.cos(theta.getRadians()));
+        return distance / (tangentialVelocity * theta.getCos());
     }
 
     /**
