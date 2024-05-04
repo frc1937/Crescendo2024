@@ -25,7 +25,6 @@ import frc.robot.util.Controller;
 
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
 import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
@@ -103,8 +102,8 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        drAButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
-        drBButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
+//        drAButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
+//        drBButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
         drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
@@ -145,8 +144,8 @@ public class RobotContainer {
     private void registerCommands() {
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
-        NamedCommands.registerCommand("Rotate", new AimAtSpeaker(swerve5990, 1));
-        NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(swerve5990, 0.5));
+//        NamedCommands.registerCommand("Rotate", new AimAtSpeaker(swerve5990, 1));
+//        NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(swerve5990, 0.5));
 
         NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake().withTimeout(2.7));
 

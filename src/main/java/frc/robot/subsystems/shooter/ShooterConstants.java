@@ -2,9 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.lib.Target;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -63,40 +61,6 @@ public class ShooterConstants {
      */
     public static final double POST_SHOOTING_DELAY = 0.25;
     public static final double SHOOTING_PREDICTION_TIME = 0.5;
-
-    public static final Target SPEAKER_TARGET = new Target(new Translation2d(0.03, 5.3));
-    public static final Target ASSIST_TARGET = new Target(new Translation2d(-0.5, 8.0));
-
-    static {
-        SPEAKER_TARGET.putMeasurement(1.24, 53, 2500);
-        SPEAKER_TARGET.putMeasurement(1.56, 47, 2500);
-        SPEAKER_TARGET.putMeasurement(1.85, 44, 2500);
-        SPEAKER_TARGET.putMeasurement(2.08, 40, 2700);
-        SPEAKER_TARGET.putMeasurement(2.33, 35, 3000);
-        SPEAKER_TARGET.putMeasurement(2.72, 34, 3000);
-        SPEAKER_TARGET.putMeasurement(2.95, 31, 3500);
-        SPEAKER_TARGET.putMeasurement(3.27, 27.8, 3500);
-        SPEAKER_TARGET.putMeasurement(3.7, 26.1, 4000);
-        SPEAKER_TARGET.putMeasurement(4.1, 22.9, 5000);
-        SPEAKER_TARGET.putMeasurement(4.35, 21.8, 5400);
-        SPEAKER_TARGET.putMeasurement(4.7, 21.5, 5500);
-        SPEAKER_TARGET.putMeasurement(4.82, 20.235, 6150);
-
-        SPEAKER_TARGET.putAzimuthToleranceMeasurement(2.d, 3.8);
-        SPEAKER_TARGET.putAzimuthToleranceMeasurement(4.d, 3.0);
-        SPEAKER_TARGET.putAzimuthToleranceMeasurement(7.d, 1.4);
-    }
-
-    static {
-        ASSIST_TARGET.putMeasurement(5, 60, 1750);
-        ASSIST_TARGET.putMeasurement(8, 50, 2350);
-        ASSIST_TARGET.putMeasurement(11, 36, 2900);
-        ASSIST_TARGET.putMeasurement(14, 36, 3500);
-        ASSIST_TARGET.putMeasurement(17, 36, 4100);
-
-        ASSIST_TARGET.putAzimuthToleranceMeasurement(2.d, 5.d);
-        ASSIST_TARGET.putAzimuthToleranceMeasurement(15.d, 3);
-    }
 
     public static final double KICKER_SPEED_BACKWARDS = -0.7;
     public static final double KICKER_SPEED_FORWARD = 1;
