@@ -107,6 +107,9 @@ public class RobotContainer {
         drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
+        //🎇 Physics 🌟 (This won't work prob lol)
+        drAButton.whileTrue(shooterCommands.shootPhysics(16));
+
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
