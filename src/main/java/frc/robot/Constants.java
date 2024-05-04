@@ -44,10 +44,8 @@ public final class Constants {
     public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.48);
     public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
 
-    private static final Translation3d SPEAKER_TAG_TO_SPEAKER = new Translation3d(0.18, 0.0, 2.045081);
-    public static final Pose3d BLUE_SPEAKER = TAG_ID_TO_POSE.get(7).plus(new Transform3d(SPEAKER_TAG_TO_SPEAKER, new Rotation3d()));
+    public static final Pose3d BLUE_SPEAKER = TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.18, 0.0, 2.045081), new Rotation3d()));
     public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
-//    public static final Target BLUE_SPEAKER = new Target(new Translation2d(0.03, 5.3));
 
     /**
      * Once how much time, in Hertz (1/hertz = seconds), to run the infrequent periodic procedure
