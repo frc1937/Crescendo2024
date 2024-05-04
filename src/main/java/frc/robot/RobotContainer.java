@@ -64,7 +64,7 @@ public class RobotContainer {
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
-    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds);
+    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, poseEstimator5990);
 
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);

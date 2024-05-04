@@ -1,10 +1,9 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
@@ -13,6 +12,7 @@ import frc.robot.util.AlliancePose2d;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.BLUE_SPEAKER;
 import static frc.robot.Constants.RED_SPEAKER;
+import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_FORWARD;
 
 public class ShootOnTheMove {
     private final ShooterSubsystem shooterSubsystem;
@@ -27,35 +27,46 @@ public class ShootOnTheMove {
         this.swerve5990 = swerve5990;
     }
 
-
-    public void shootStill(double tangentialVelocity) {
-        Rotation2d theta = getThetaFromSpeeds(tangentialVelocity);
-
-        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
-
-        shooterCommands.shootNote(reference);
-    }
-
-
     public void shootOnTheMove(double tangentialVelocity) {
+        //TODO: In no place here do you rotate towards the target
+
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
         ChassisSpeeds robotVelocity = swerve5990.getSelfRelativeVelocity();
         double timeOfFlight = shooterSubsystem.getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
 
-        Translation2d targetOffset = new Translation2d(
-            robotVelocity.vxMetersPerSecond * timeOfFlight,
-            robotVelocity.vyMetersPerSecond * timeOfFlight
+        Transform3d targetOffset = new Transform3d(
+                robotVelocity.vxMetersPerSecond * timeOfFlight,
+                robotVelocity.vyMetersPerSecond * timeOfFlight,
+                0,
+                new Rotation3d()
         );
 
+        Pose3d newTarget = targetPose.transformBy(targetOffset.inverse());
 
+        shootNote(robotPose, newTarget, tangentialVelocity);
     }
 
-    private Rotation2d getThetaFromSpeeds(double tangentialVelocity) {
-        Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
-        Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
+    public Command shootNote(ShooterSubsystem.Reference reference) {
+        return new FunctionalCommand(
+                () -> shooterSubsystem.setReference(reference),
+                () -> {
+                    if (shooterSubsystem.isLoaded() && shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference()) {
+                        shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
+                    }
+                },
+                interrupted -> shooterSubsystem.reset(),
+                () -> false,
 
-        return shooterSubsystem.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+                shooterSubsystem
+        );
+    }
+
+    private void shootNote(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
+        Rotation2d theta = shooterSubsystem.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
+
+        shooterCommands.shootNote(reference);
     }
 }
