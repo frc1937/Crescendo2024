@@ -42,7 +42,7 @@ public class ShootOnTheMove extends Command {
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
         ChassisSpeeds robotVelocity = swerve5990.getSelfRelativeVelocity();
-        double timeOfFlight = shooterSubsystem.getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
+        double timeOfFlight = ShooterPhysicsCalculations.getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
 
         Transform3d targetOffset = new Transform3d(
                 robotVelocity.vxMetersPerSecond * timeOfFlight,
