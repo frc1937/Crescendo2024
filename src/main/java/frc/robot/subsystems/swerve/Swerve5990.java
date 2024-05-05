@@ -135,6 +135,17 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     /**
+     * Drive the robot whilst rotating to a specific angle.
+     * @param xPower - the translation power
+     * @param yPower - the strafe power
+     * @param targetAzimuthAngle - the angle to rotate to
+     */
+    public void driveWithTargetAzimuth(double xPower, double yPower, Rotation2d targetAzimuthAngle) {
+        driveFieldRelative(xPower, yPower, calculateProfiledSpeedToAngle(targetAzimuthAngle));
+        //todo: check if works
+    }
+
+    /**
      * @param targetPose - blue alliance form
      */
     public void pidToPose(Pose2d targetPose) {
