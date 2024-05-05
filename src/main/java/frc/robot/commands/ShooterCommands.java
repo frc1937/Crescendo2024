@@ -25,18 +25,22 @@ public class ShooterCommands {
     private final IntakeSubsystem intakeSubsystem;
     private final PoseEstimator5990 poseEstimator5990;
 
+    private final ShooterPhysicsCalculations shooterPhysicsCalculations;
+
     public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem, LEDsSubsystem leds, PoseEstimator5990 poseEstimator5990) {
         this.shooterSubsystem = shooterSubsystem;
         this.intakeSubsystem = intakeSubsystem;
         this.leds = leds;
         this.poseEstimator5990 = poseEstimator5990;
+
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem);
     }
 
     public Command shootPhysics(double tangentialVelocity) {
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
-        Rotation2d theta = ShooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+        Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
         ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
 
         return shootNote(reference);

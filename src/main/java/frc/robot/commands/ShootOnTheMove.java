@@ -21,6 +21,7 @@ public class ShootOnTheMove extends Command {
     private final PoseEstimator5990 poseEstimator5990;
     private final ShooterCommands shooterCommands;
     private final Swerve5990 swerve5990;
+    private final ShooterPhysicsCalculations shooterPhysicsCalculations;
 
     private final DoubleSupplier translationSupplier, strafeSupplier;
     private final double tangentialVelocity;
@@ -34,6 +35,8 @@ public class ShootOnTheMove extends Command {
         this.translationSupplier = translationSupplier;
         this.strafeSupplier = strafeSupplier;
         this.tangentialVelocity = tangentialVelocity;
+
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem);
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ShootOnTheMove extends Command {
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
         ChassisSpeeds robotVelocity = swerve5990.getSelfRelativeVelocity();
-        double timeOfFlight = ShooterPhysicsCalculations.getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
+        double timeOfFlight = shooterPhysicsCalculations.getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
 
         Transform3d targetOffset = new Transform3d(
                 robotVelocity.vxMetersPerSecond * timeOfFlight,
@@ -54,7 +57,7 @@ public class ShootOnTheMove extends Command {
         Pose3d newTarget = targetPose.transformBy(targetOffset.inverse());
 
         //Target angle for the robot to face pose
-        Rotation2d targetAngle = Rotation2d.fromRadians(Math.atan2(Math.abs(newTarget.getY() - robotPose.getY()), Math.abs(newTarget.getX() - robotPose.getX())));
+        Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(robotPose, newTarget);
 
         swerve5990.driveWithTargetAzimuth(translationSupplier.getAsDouble(), strafeSupplier.getAsDouble(), targetAngle);
         shootNote(robotPose, newTarget, tangentialVelocity);
@@ -66,7 +69,7 @@ public class ShootOnTheMove extends Command {
     }
 
     private void shootNote(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        Rotation2d theta = ShooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+        Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
         ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
 
         shooterCommands.shootNote(reference);
