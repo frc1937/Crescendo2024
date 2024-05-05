@@ -1,7 +1,8 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
@@ -36,7 +37,7 @@ public class ShootOnTheMove extends Command {
         this.strafeSupplier = strafeSupplier;
         this.tangentialVelocity = tangentialVelocity;
 
-        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem);
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations();
     }
 
     @Override
@@ -44,17 +45,7 @@ public class ShootOnTheMove extends Command {
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
-        ChassisSpeeds robotVelocity = swerve5990.getSelfRelativeVelocity();
-        double timeOfFlight = shooterPhysicsCalculations.getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
-
-        Transform3d targetOffset = new Transform3d(
-                robotVelocity.vxMetersPerSecond * timeOfFlight,
-                robotVelocity.vyMetersPerSecond * timeOfFlight,
-                0,
-                new Rotation3d()
-        );
-
-        Pose3d newTarget = targetPose.transformBy(targetOffset.inverse());
+        Pose3d newTarget = shooterPhysicsCalculations.getNewTargetFromRobotVelocity(robotPose, targetPose, tangentialVelocity, swerve5990.getSelfRelativeVelocity());
 
         //Target angle for the robot to face pose
         Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(robotPose, newTarget);

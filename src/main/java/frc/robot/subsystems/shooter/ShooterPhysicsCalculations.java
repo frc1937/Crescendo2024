@@ -1,14 +1,9 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class ShooterPhysicsCalculations {
-    private final ShooterSubsystem shooterSubsystem;
-
-    public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem) {
-        this.shooterSubsystem = shooterSubsystem;
-    }
-
     /**
      * Get the needed pitch theta for the pivot using physics.
      * <p>Formula is taken from
@@ -27,9 +22,7 @@ public class ShooterPhysicsCalculations {
 
         //This is the distance of the pivot off the floor when parallel to the ground
         double z = targetPose.getZ() - exitPose.getZ();//Inch.of(8.5).in(Meters);
-//        double distance = Math.hypot(exitPose.getX() - targetPose.getX(), exitPose.getY() - targetPose.getY()); //this is wrong lol
         double distance = getDistanceToTarget(robotPose, targetPose);
-
 
         double theta = Math.atan(
                 (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z)))
@@ -68,6 +61,27 @@ public class ShooterPhysicsCalculations {
     public Rotation2d getAzimuthAngleToTarget(Pose2d robotPose, Pose3d targetPose) {
         Translation2d difference = targetPose.toPose2d().getTranslation().minus(robotPose.getTranslation());
         return Rotation2d.fromRadians(Math.atan2(Math.abs(difference.getY()), Math.abs(difference.getY())));
+    }
+
+    /**
+     * Get the target's offset after taking into account the robot's velocity
+     * @param robotPose - The robot's pose, using the correct alliance
+     * @param targetPose - The target pose, using the correct alliance
+     * @param tangentialVelocity - The tangential velocity of the flywheels
+     * @param robotVelocity - The robot's current velocity
+     * @return - The new pose of the target, after applying the offset
+     */
+    public Pose3d getNewTargetFromRobotVelocity(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity, ChassisSpeeds robotVelocity) {
+        double timeOfFlight = getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
+
+        Transform3d targetOffset = new Transform3d(
+                robotVelocity.vxMetersPerSecond * timeOfFlight,
+                robotVelocity.vyMetersPerSecond * timeOfFlight,
+                0,
+                new Rotation3d()
+        );
+
+        return targetPose.transformBy(targetOffset.inverse());
     }
 
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
