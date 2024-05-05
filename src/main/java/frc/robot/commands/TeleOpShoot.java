@@ -67,8 +67,6 @@ public class TeleOpShoot extends ParallelDeadlineGroup {
             Translation2d virtualTargetDisplacement = target.calculateVirtualTargetDisplacement(
                     targetDisplacement.getNorm(), targetDisplacement, predictedState.getVelocity());
             virtualTargetDistance = virtualTargetDisplacement.getNorm();
-
-            swerve5990.setupAzimuthController();
         }
 
         @Override

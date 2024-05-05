@@ -104,12 +104,12 @@ public class RobotContainer {
 
 //        drAButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
 //        drBButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
-        drYButton.whileTrue(shooterCommands.shootNote(ASSIST));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
         //🎇 Physics 🌟 (This won't work prob lol)
         drAButton.whileTrue(shooterCommands.shootPhysics(16));
         drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16));
+        drYButton.whileFalse(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));

@@ -55,7 +55,6 @@ public class ShootOnTheMove extends Command {
         //Target angle for the robot to face pose
         Rotation2d targetAngle = Rotation2d.fromRadians(Math.atan2(Math.abs(newTarget.getY() - robotPose.getY()), Math.abs(newTarget.getX() - robotPose.getX())));
 
-        //Todo here:
         swerve5990.driveWithTargetAzimuth(translationSupplier.getAsDouble(), strafeSupplier.getAsDouble(), targetAngle);
         shootNote(robotPose, newTarget, tangentialVelocity);
     }

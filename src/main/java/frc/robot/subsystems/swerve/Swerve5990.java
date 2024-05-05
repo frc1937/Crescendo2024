@@ -106,7 +106,7 @@ public class Swerve5990 extends SubsystemBase {
         sampleRobotPose();
     }
 
-    public void setupAzimuthController() {
+    private void setupAzimuthController() {
         azimuthController.reset(poseEstimator5990.getCurrentPose().getBluePose().getRotation().getRadians());
 
         azimuthController.setTolerance(AZIMUTH_CONTROLLER_TOLERANCE);

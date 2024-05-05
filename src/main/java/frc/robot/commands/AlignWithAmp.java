@@ -24,11 +24,6 @@ public class AlignWithAmp extends Command {
     }
 
     @Override
-    public void initialize() {
-        swerve5990.setupAzimuthController();
-    }
-
-    @Override
     public void execute() {
         //todo: deadbnad
         swerve5990.driveFieldRelative(
