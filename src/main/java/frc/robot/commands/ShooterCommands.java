@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.util.AlliancePose2d;
 
@@ -35,7 +36,7 @@ public class ShooterCommands {
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
-        Rotation2d theta = shooterSubsystem.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+        Rotation2d theta = ShooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
         ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
 
         return shootNote(reference);

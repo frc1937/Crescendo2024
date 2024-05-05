@@ -55,51 +55,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
-     * Get the needed pitch theta for the pivot using physics.
-     * <p>Formula is taken from
-     * <a href="https://en.wikipedia.org/wiki/Projectile_motion?useskin=vector#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">...</a>
-     * </p>
-     * @param robotPose - The robot's pose, using the correct alliance
-     * @param targetPose - the target pose to hit, using the correct alliance
-     * @param tangentialVelocity - the tangential velocity of the flywheel
-     * @return - the required pitch angle
-     */
-
-    public Rotation2d getPitchAnglePhysics(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        double g = 9.8;
-        double vSquared = tangentialVelocity * tangentialVelocity;
-
-        //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ() - Inch.of(8.5).in(Meters);
-        double distance = Math.hypot(robotPose.getX() - targetPose.getX(), robotPose.getY() - targetPose.getY());
-
-        double theta = Math.atan(
-                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z)))
-                / (g*distance)
-        );
-
-        return Rotation2d.fromRadians(theta);
-    }
-
-    /**
-     * We assume the robot isn't moving to get the time of flight
-     * @param currentPose - The robot's pose, using the correct alliance
-     * @param targetPose - The target pose of the note, using the correct alliance
-     * @param tangentialVelocity - The tangential velocity of the flywheels
-     * @return - the time of flight in seconds
-     */
-    public double getTimeOfFlight(Pose2d currentPose, Pose3d targetPose, double tangentialVelocity) {
-        Rotation2d theta = getPitchAnglePhysics(currentPose, targetPose, tangentialVelocity);
-
-        double xDiff = targetPose.getX() - currentPose.getX();
-        double yDiff = targetPose.getY() - currentPose.getY();
-
-        double distance = Math.hypot(xDiff, yDiff);
-
-        return distance / (tangentialVelocity * theta.getCos());
-    }
-
-    /**
      * @return whether a NOTE is present inside the shooter
      */
     public boolean isLoaded() {
