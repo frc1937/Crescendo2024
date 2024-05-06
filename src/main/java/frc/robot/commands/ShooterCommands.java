@@ -23,7 +23,6 @@ import static frc.robot.subsystems.shooter.ShooterConstants.*;
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
     private final LEDsSubsystem leds;
-    private final IntakeSubsystem intakeSubsystem;
     private final PoseEstimator5990 poseEstimator5990;
 
     private final IntakeCommands intakeCommands;
@@ -31,7 +30,6 @@ public class ShooterCommands {
 
     public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem, LEDsSubsystem leds, PoseEstimator5990 poseEstimator5990) {
         this.shooterSubsystem = shooterSubsystem;
-        this.intakeSubsystem = intakeSubsystem;
         this.leds = leds;
         this.poseEstimator5990 = poseEstimator5990;
 
