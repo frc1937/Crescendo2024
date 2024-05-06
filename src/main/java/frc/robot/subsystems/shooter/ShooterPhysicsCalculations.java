@@ -31,8 +31,7 @@ public class ShooterPhysicsCalculations {
         double distance = getDistanceToTarget(robotPose, targetPose);
 
         double theta = Math.atan(
-                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z)))
-                        / (g*distance)
+                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))) / (g*distance)
         );
 
         return Rotation2d.fromRadians(theta);
@@ -46,16 +45,8 @@ public class ShooterPhysicsCalculations {
      * @return - the time of flight in seconds
      */
     public double getTimeOfFlight(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        Pose3d exitPose = getNoteExitPosition(robotPose);
-
         Rotation2d theta = getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
-
-        double xDiff = targetPose.getX() - exitPose.getX();
-        double yDiff = targetPose.getY() - exitPose.getY();
-
-        double distance = Math.hypot(xDiff, yDiff);
-
-        return distance / (tangentialVelocity * theta.getCos());
+        return getDistanceToTarget(robotPose, targetPose) / (tangentialVelocity * theta.getCos());
     }
 
     /**
@@ -65,8 +56,8 @@ public class ShooterPhysicsCalculations {
      * @return - the target azimuth angle
      */
     public Rotation2d getAzimuthAngleToTarget(Pose2d robotPose, Pose3d targetPose) {
-        Translation2d difference = targetPose.toPose2d().getTranslation().minus(robotPose.getTranslation());
-        return Rotation2d.fromRadians(Math.atan2(Math.abs(difference.getY()), Math.abs(difference.getY())));
+        Translation2d differenceInXY = targetPose.toPose2d().getTranslation().minus(robotPose.getTranslation());
+        return Rotation2d.fromRadians(Math.atan2(Math.abs(differenceInXY.getY()), Math.abs(differenceInXY.getY())));
     }
 
     /**
@@ -90,11 +81,15 @@ public class ShooterPhysicsCalculations {
         return targetPose.transformBy(targetOffset.inverse());
     }
 
+    /**
+     * Get the distance from the note's exit position to the target
+     * @param robotPose - The robot's pose, using the correct alliance
+     * @param targetPose - The target pose, using the correct alliance
+     * @return - The distance in metres
+     */
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
-//        return robotPose.minus(targetPose.toPose2d()).getTranslation().getNorm();
-//        return Math.hypot(targetPose.getX() - robotPose.getX(), targetPose.getY() - robotPose.getY());
-        return robotPose.getTranslation().getDistance(targetPose.toPose2d().getTranslation());
-        //todo: TEST WHETHER THESE ARE ALL THE ~SAME~
+//        return robotPose.minus(targetPose.toPose2d()).getTranslation().getNorm(); //todo: This might be better, do check
+        return getNoteExitPosition(robotPose).getTranslation().getDistance(targetPose.getTranslation());
     }
 
     /**
@@ -112,7 +107,7 @@ public class ShooterPhysicsCalculations {
                 new Rotation3d(0, 0, 0)
         ); //TODO: Tune from CAD
 
-        double pitchLength = 0.5; //TODO: Tune from CAD
+        double pitchLength = 0.5; //TODO: Tune from CAD, TODO Move to constants
 
         Transform3d pitchEndFromPivot = new Transform3d(
                 pitchLength * robotPose.getRotation().getCos(),
