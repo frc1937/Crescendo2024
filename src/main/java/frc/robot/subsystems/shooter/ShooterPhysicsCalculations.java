@@ -100,7 +100,7 @@ public class ShooterPhysicsCalculations {
     private Pose3d getNoteExitPosition(Pose2d robotPose) {
         Rotation2d pitchAngle = shooterSubsystem.getPitchGoal();
 
-        Transform3d pivotFromRobot = new Transform3d(
+        Transform3d robotToPivot = new Transform3d(
                 0,
                 0,
                 0,
@@ -109,15 +109,15 @@ public class ShooterPhysicsCalculations {
 
         double pitchLength = 0.5; //TODO: Tune from CAD, TODO Move to constants
 
-        Transform3d pitchEndFromPivot = new Transform3d(
+        Transform3d pivotToPitchEnd = new Transform3d(
                 pitchLength * robotPose.getRotation().getCos(),
                 pitchLength * robotPose.getRotation().getCos(),
                 pitchLength * Math.sin(pitchAngle.getRadians()),
-                new Rotation3d(0, 0, 0)
+                new Rotation3d()
         ); //todo: This might be completely wrong! XXX TEST
 
         Pose3d robotPose3d = new Pose3d(robotPose);
 
-        return robotPose3d.transformBy(pivotFromRobot).transformBy(pitchEndFromPivot);
+        return robotPose3d.transformBy(robotToPivot).transformBy(pivotToPitchEnd);
     }
 }
