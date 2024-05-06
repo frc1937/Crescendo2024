@@ -21,13 +21,11 @@ public class ShooterPhysicsCalculations {
      * @return - the required pitch angle
      */
     public Rotation2d getPitchAnglePhysics(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        Pose3d exitPose = getNoteExitPosition(robotPose);
-
         double g = 9.8;
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ() - exitPose.getZ();//Inch.of(8.5).in(Meters);
+        double z = targetPose.getZ() - getNoteExitPosition(robotPose).getZ();//Inch.of(8.5).in(Meters);
         double distance = getDistanceToTarget(robotPose, targetPose);
 
         double theta = Math.atan(

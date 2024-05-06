@@ -102,8 +102,6 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-//        drAButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, false, Seconds.of(2.d)));
-//        drBButton.whileTrue(new TeleOpShoot(swerve5990, shooterSubsystem, leds, SPEAKER_TARGET, translationSup, strafeSup, true, Seconds.of(5)));
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
         //🎇 Physics 🌟 (This won't work prob lol)

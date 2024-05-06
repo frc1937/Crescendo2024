@@ -4,31 +4,35 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
 public class AlignWithAmp extends Command {
     private final Swerve5990 swerve5990;
-    private final DoubleSupplier translationSup,
-            strafeSup;
+    private final DoubleSupplier translationSupplier,
+            strafeSupplier;
 
-    public AlignWithAmp(Swerve5990 swerve5990, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public AlignWithAmp(Swerve5990 swerve5990, DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier) {
         this.swerve5990 = swerve5990;
-        this.translationSup = translationSup;
-        this.strafeSup = strafeSup;
+        this.translationSupplier = translationSupplier;
+        this.strafeSupplier = strafeSupplier;
 
         addRequirements(swerve5990);
     }
 
     @Override
     public void execute() {
-        //todo: deadbnad
+        double deadbandTranslation = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.STICK_DEADBAND);
+        double deadbandStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.STICK_DEADBAND);
+
         swerve5990.driveFieldRelative(
-                translationSup.getAsDouble(),
-                strafeSup.getAsDouble(),
+                deadbandTranslation,
+                deadbandStrafe,
                 Rotation2d.fromDegrees(90)
         );
     }
