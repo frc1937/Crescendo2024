@@ -3,8 +3,6 @@ package frc.robot.subsystems.shooter;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -77,6 +75,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public void stopFlywheels() {
         leftFlywheel.stopMotor();
         rightFlywheel.stopMotor();
+    }
+
+    public Rotation2d getPitchGoal() {
+        return pitch.getGoal();
     }
 
     public void setPitchGoal(Rotation2d goal) {

@@ -4,6 +4,12 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class ShooterPhysicsCalculations {
+    private final ShooterSubsystem shooterSubsystem;
+
+    public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem) {
+        this.shooterSubsystem = shooterSubsystem;
+    }
+
     /**
      * Get the needed pitch theta for the pivot using physics.
      * <p>Formula is taken from
@@ -97,9 +103,8 @@ public class ShooterPhysicsCalculations {
      * @param robotPose - The robot's pose, using the correct alliance
      */
     private Pose3d getNoteExitPosition(Pose2d robotPose) {
-        double theta = 0; //TODO: Get theta from physics
-        //How do you get Note exit pose without a theta? You'd need to run 2 calculations,
-        // one with estimated note position, one without
+        Rotation2d pitchAngle = shooterSubsystem.getPitchGoal();
+
         Transform3d pivotFromRobot = new Transform3d(
                 0,
                 0,
@@ -108,12 +113,13 @@ public class ShooterPhysicsCalculations {
         ); //TODO: Tune from CAD
 
         double pitchLength = 0.5; //TODO: Tune from CAD
+
         Transform3d pitchEndFromPivot = new Transform3d(
                 pitchLength * robotPose.getRotation().getCos(),
                 pitchLength * robotPose.getRotation().getCos(),
-                pitchLength * Math.sin(theta),
+                pitchLength * Math.sin(pitchAngle.getRadians()),
                 new Rotation3d(0, 0, 0)
-        ); //todo: This might be completely wrong! Lol do test
+        ); //todo: This might be completely wrong! XXX TEST
 
         Pose3d robotPose3d = new Pose3d(robotPose);
 

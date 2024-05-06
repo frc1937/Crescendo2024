@@ -37,7 +37,7 @@ public class ShootOnTheMove extends Command {
         this.strafeSupplier = strafeSupplier;
         this.tangentialVelocity = tangentialVelocity;
 
-        shooterPhysicsCalculations = new ShooterPhysicsCalculations();
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem);
     }
 
     @Override

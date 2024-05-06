@@ -33,7 +33,7 @@ public class ShooterCommands {
         this.leds = leds;
         this.poseEstimator5990 = poseEstimator5990;
 
-        shooterPhysicsCalculations = new ShooterPhysicsCalculations();
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem);
     }
 
     public Command shootPhysics(double tangentialVelocity) {

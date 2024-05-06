@@ -33,6 +33,7 @@ public class Pitch {
     private final ProfiledPIDController controller;
 
     private double deadband = DEFAULT_PITCH_DEADBAND;
+    private Rotation2d targetPitchAngle;
 
     public Pitch() {
         // Configure the motor
@@ -77,6 +78,8 @@ public class Pitch {
     }
 
     public void setGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
+        targetPitchAngle = position;
+
         controller.setGoal(new TrapezoidProfile.State(position.getRadians(), velocity.in(RadiansPerSecond)));
 
         boolean isTop = MathUtil.isNear(position.getRadians(), Math.PI / 2, 0.05);
@@ -84,6 +87,7 @@ public class Pitch {
     }
 
     public void setGoal(Rotation2d position) {
+        targetPitchAngle = position;
         setGoal(position, RadiansPerSecond.of(0));
     }
 
@@ -93,6 +97,10 @@ public class Pitch {
 
     public boolean atGoal() {
         return controller.atGoal() && Math.abs(controller.getGoal().velocity - getCurrentVelocity().in(RadiansPerSecond)) < 0.02;
+    }
+
+    public Rotation2d getGoal() {
+        return targetPitchAngle; //Todo: Use the controller to get the goal INSTEAD.
     }
 
     public Rotation2d getCurrentPosition() {
