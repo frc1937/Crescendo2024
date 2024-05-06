@@ -114,7 +114,7 @@ public class RobotContainer {
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-        drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9));
+        drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
 
         drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
         drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve));

@@ -12,11 +12,14 @@ public class IntakeCommands {
         this.intakeSubsystem = intakeSubsystem;
     }
 
-    public Command enableIntake(double speed) {
+    public Command enableIntake(double speed, boolean shouldStop) {
         return new FunctionalCommand(
                 () -> intakeSubsystem.setSpeedPercentage(speed),
                 () -> {},
-                interrupted -> {intakeSubsystem.stop();},
+                interrupted -> {
+                    if(shouldStop)
+                        intakeSubsystem.stop();
+                },
                 () -> false,
 
                 intakeSubsystem

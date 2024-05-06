@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -25,6 +26,7 @@ public class ShooterCommands {
     private final IntakeSubsystem intakeSubsystem;
     private final PoseEstimator5990 poseEstimator5990;
 
+    private final IntakeCommands intakeCommands;
     private final ShooterPhysicsCalculations shooterPhysicsCalculations;
 
     public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem, LEDsSubsystem leds, PoseEstimator5990 poseEstimator5990) {
@@ -34,6 +36,7 @@ public class ShooterCommands {
         this.poseEstimator5990 = poseEstimator5990;
 
         shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem);
+        intakeCommands = new IntakeCommands(intakeSubsystem);
     }
 
     public Command shootPhysics(double tangentialVelocity) {
@@ -62,36 +65,29 @@ public class ShooterCommands {
     }
 
     public Command postIntake() {
-        return new FunctionalCommand(
+        return new SequentialCommandGroup(new FunctionalCommand(
                 () -> {
                     shooterSubsystem.setFlywheelsSpeed(RPM.of(-2000));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-                    intakeSubsystem.setSpeedPercentage(0.4);
                 },
                 () -> {},
-                interrupted -> {
-                    shooterSubsystem.reset();
-                    intakeSubsystem.stop();
-                },
+                interrupted -> shooterSubsystem.reset(),
                 () -> false,
                 shooterSubsystem
-        );
+        ), intakeCommands.enableIntake(0.4, true));
     }
 
     public Command floorIntake() {
-        return new ParallelDeadlineGroup(
+        return new SequentialCommandGroup(new ParallelDeadlineGroup(
             new FunctionalCommand(
-                () -> {
-                    initializeShooter(true, INTAKE);
-                    intakeSubsystem.setSpeedPercentage(0.8);
-                },
+                () -> initializeShooter(true, INTAKE),
                 () -> {},
                 interrupted -> {},
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
             )//,
             //new OsculatingStrip(leds, shooterSubsystem)
-        );
+        ), intakeCommands.enableIntake(0.8, false));
     }
 
     private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {
