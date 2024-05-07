@@ -135,7 +135,7 @@ public class SwerveModule5990 {
     private void setTargetAngle(SwerveModuleState targetState) {
         Rotation2d angle =
                 (Math.abs(targetState.speedMetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS)
-                        ? lastAngle
+                        ? (lastAngle != null ? lastAngle : Rotation2d.fromDegrees(0))
                         : targetState.angle;
 
         steerController.setReference(angle.getDegrees(), CANSparkBase.ControlType.kPosition);
@@ -171,10 +171,9 @@ public class SwerveModule5990 {
     private void configureSteerEncoder() {
         CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
 
-        swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset().getRotations();
+        swerveCanCoderConfig.MagnetSensor.MagnetOffset = swerveModuleConstants.angleOffset();
         swerveCanCoderConfig.MagnetSensor.SensorDirection = CAN_CODER_INVERT;
-        swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1; //todo:
-        //TODO XXX WARNING THIS HAS CHANGED FROM 0 - 360 TO 0 - 1. CODE MIGHT STILL USE OLD VALUES. PLEASE CHECK!
+        swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
         applyConfig(steerEncoder, swerveCanCoderConfig);
 

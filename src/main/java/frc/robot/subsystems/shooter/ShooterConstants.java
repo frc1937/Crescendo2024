@@ -14,7 +14,7 @@ public class ShooterConstants {
     static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
     static final double PITCH_INTAKE_FLOOR_ANGLE = -21.583960;
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
-    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE);
+    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE+10);
 
     static final double PIVOT_ENCODER_OFFSET = 343,
             PITCH_KS = 0.38398,

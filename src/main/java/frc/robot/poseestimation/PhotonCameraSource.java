@@ -48,6 +48,8 @@ public class PhotonCameraSource {
     }
 
     public void update() {
+        if(!photonCamera.isConnected()) return;
+
         PhotonPipelineResult latestResult = photonCamera.getLatestResult();
         Optional<EstimatedRobotPose> optionalEstimatedRobotPose = photonPoseEstimator.update(latestResult);
 

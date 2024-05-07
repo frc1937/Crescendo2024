@@ -51,6 +51,11 @@ public class Pitch {
         relativeEncoder.setPosition(getCurrentPosition().getRotations() * PITCH_TRANSMISSION_RATIO);
 
         // Configure a soft limit
+        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float)PITCH_INTAKE_FLOOR_ANGLE+6);
+        motor.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
+
+        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, (float)PITCH_INTAKE_FLOOR_ANGLE+20);
+        motor.enableSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, true);
 //        motor.setSoftLimit(PIVOT_CONSTRAINT_DIRECTION, (float)Units.degreesToRotations(PIVOT_CONSTRAINT_DEGREES) * PITCH_TRANSMISSION_RATIO);
 //        motor.enableSoftLimit(PIVOT_CONSTRAINT_DIRECTION, true);
 
@@ -67,11 +72,11 @@ public class Pitch {
         SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
         SmartDashboard.putNumber("pitch/relativePosition", getPositionFromRelativeEncoder().getDegrees());
 
-        double velocitySetpoint = MathUtil.applyDeadband(
-                controller.calculate(getCurrentPosition().getRadians()), deadband);
-
-        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
-        motor.setVoltage(voltage);
+//        double velocitySetpoint = MathUtil.applyDeadband(
+//                controller.calculate(getCurrentPosition().getRadians()), deadband);
+//
+//        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
+//        motor.setVoltage(voltage);
 
         SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
     }

@@ -8,7 +8,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -54,8 +53,7 @@ public class SwerveConstants {
 
     /* Motor Inverts */
     static final boolean ANGLE_MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
-    static final InvertedValue DRIVE_MOTOR_INVERT = InvertedValue.CounterClockwise_Positive;//false;
-    //TODO XXX WARNING: Check if CounterClockwise is IN FACT the equivalent of false!!!
+    static final InvertedValue DRIVE_MOTOR_INVERT = InvertedValue.CounterClockwise_Positive;
 
     /* Angle Encoder Invert */
     static final SensorDirectionValue CAN_CODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;// CHOSEN_MODULE.canCoderInvert;
@@ -111,9 +109,9 @@ public class SwerveConstants {
         static final int DRIVE_MOTOR_ID = 14;
         static final int ANGLE_MOTOR_ID = 11;
         static final int CAN_CODER_ID = 18;
-        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(246.885);
+        static final double ROTATIONS_OFFSET = 0.182861+0.5;
         static final SwerveModuleConstants CONSTANTS =
-                new SwerveModuleConstants(0, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                new SwerveModuleConstants(0, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ROTATIONS_OFFSET);
     }
 
     /* Front Right Module - Module 1 */
@@ -121,9 +119,9 @@ public class SwerveConstants {
         static final int DRIVE_MOTOR_ID = 3;
         static final int ANGLE_MOTOR_ID = 10;
         static final int CAN_CODER_ID = 20;
-        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(100.898);
+        static final double ROTATIONS_OFFSET = 0.792480;
         static final SwerveModuleConstants CONSTANTS =
-                new SwerveModuleConstants(1, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                new SwerveModuleConstants(1, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ROTATIONS_OFFSET);
     }
 
     /* Back Left Module - Module 2 */
@@ -131,9 +129,9 @@ public class SwerveConstants {
         static final int DRIVE_MOTOR_ID = 13;
         static final int ANGLE_MOTOR_ID = 6;
         static final int CAN_CODER_ID = 19;//
-        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(190.459);
+        static final double ROTATIONS_OFFSET = 0.031250+0.5;
         static final SwerveModuleConstants CONSTANTS =
-                new SwerveModuleConstants(2, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                new SwerveModuleConstants(2, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ROTATIONS_OFFSET);
     }
 
     /* Back Right Module - Module 3 */
@@ -141,9 +139,9 @@ public class SwerveConstants {
         static final int DRIVE_MOTOR_ID = 2;
         static final int ANGLE_MOTOR_ID = 9;
         static final int CAN_CODER_ID = 21;
-        static final Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(115.840);
+        static final double ROTATIONS_OFFSET = 0.814209;
         static final SwerveModuleConstants CONSTANTS =
-                new SwerveModuleConstants(3, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET);
+                new SwerveModuleConstants(3, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ROTATIONS_OFFSET);
     }
 
     static final boolean ANGLE_INVERT = true;
@@ -172,7 +170,7 @@ public class SwerveConstants {
     }
 
     public record SwerveModuleConstants(int moduleNumber, int driveMotorID, int steerMotorID, int canCoderID,
-                                        Rotation2d angleOffset) {
+                                        double angleOffset) {
         /**
          * SwerveSubsystem Module Constants to be used when creating swerve modules.
          *

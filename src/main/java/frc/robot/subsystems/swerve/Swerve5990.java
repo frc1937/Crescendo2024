@@ -49,10 +49,11 @@ public class Swerve5990 extends SubsystemBase {
 
         modules = getModules();
 
-        Timer.delay(0.1); //todo: Check without this, if this is even needed
+        Timer.delay(1); //todo: Check without this, if this is even needed
 
         configurePathPlanner();
         setupAzimuthController();
+        initializeSwerve();
     }
 
     public ChassisSpeeds getSelfRelativeVelocity() {
@@ -61,6 +62,15 @@ public class Swerve5990 extends SubsystemBase {
 
     public void setHeading(Rotation2d heading) {
         gyro.setYaw(heading.getDegrees());
+    }
+
+    public void initializeSwerve() {
+        final SwerveModuleState zeroState = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
+
+        modules[0].setTargetState(zeroState, true);
+        modules[1].setTargetState(zeroState, true);
+        modules[2].setTargetState(zeroState, true);
+        modules[3].setTargetState(zeroState, true);
     }
 
     public void lockSwerve() {
@@ -246,7 +256,7 @@ public class Swerve5990 extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_SPEED);
 
         for (SwerveModule5990 mod : modules) {
-            mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber()], true);
+            mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber()], false);
         }
     }
 
