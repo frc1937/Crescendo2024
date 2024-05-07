@@ -52,7 +52,8 @@ public class SwerveModule5990 {
 
     private final VoltageOut driveVoltageRequest = new VoltageOut(0);
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
-    //You will control driveMotor velocity using feedforward to get the voltage.
+
+    private SwerveModuleState targetState;
 
     public SwerveModule5990(SwerveConstants.SwerveModuleConstants constants) {
         this.swerveModuleConstants = constants;
@@ -65,8 +66,9 @@ public class SwerveModule5990 {
         this.steerRelativeEncoder = steerMotor.getEncoder();
 
         configureSteerEncoder();
-        configureSteerMotor();
         configureDriveMotor();
+        configureSteerMotor();
+        configureSteerRelativeEncoder();
     }
 
     public void setTargetState(SwerveModuleState targetState, boolean closedLoop) {
@@ -74,6 +76,8 @@ public class SwerveModule5990 {
 
         setTargetVelocity(targetState, closedLoop);
         setTargetAngle(targetState);
+
+        this.targetState = targetState;
     }
 
     public SwerveModuleState getCurrentState() {
@@ -81,6 +85,10 @@ public class SwerveModule5990 {
                 Conversions.rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue()), //todo: This MIGHT be correct
                 getCurrentAngle()
         );
+    }
+
+    public SwerveModuleState getTargetState() {
+        return targetState;
     }
 
     public SwerveModulePosition getCurrentPosition() {
@@ -92,7 +100,7 @@ public class SwerveModule5990 {
 
 
     public Rotation2d getCurrentAngle() {
-        return new Rotation2d(steerPositionSignal.refresh().getValue());
+        return Rotation2d.fromRotations(steerPositionSignal.refresh().getValue());
     }
 
     public void stop() {
@@ -133,17 +141,20 @@ public class SwerveModule5990 {
     }
 
     private void setTargetAngle(SwerveModuleState targetState) {
-        Rotation2d angle =
-                (Math.abs(targetState.speedMetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS)
+        Rotation2d angle = (Math.abs(targetState.speedMetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS)
                         ? (lastAngle != null ? lastAngle : Rotation2d.fromDegrees(0))
                         : targetState.angle;
 
-        steerController.setReference(angle.getDegrees(), CANSparkBase.ControlType.kPosition);
+        steerController.setReference(angle.getRotations(), CANSparkBase.ControlType.kPosition);
 
         lastAngle = angle;
     }
 
-    //Configure canCoder, steer motor, and drive motor
+    private void configureSteerRelativeEncoder() {
+        steerRelativeEncoder.setPosition(steerPositionSignal.refresh().getValue());
+        //steerRelativeEncoder.setPositionConversionFactor(ANGLE_CONVERSION_FACTOR); //wtf is this lol? is this even correct bruh
+    }
+
     private void configureSteerMotor() {
         steerMotor.restoreFactoryDefaults();
 
@@ -154,8 +165,6 @@ public class SwerveModule5990 {
         steerMotor.setInverted(ANGLE_INVERT);
         steerMotor.setIdleMode(ANGLE_NEUTRAL_MODE);
 
-        steerRelativeEncoder.setPositionConversionFactor(ANGLE_CONVERSION_FACTOR);
-
         steerController.setP(ANGLE_KP);
         steerController.setI(ANGLE_KI);
         steerController.setD(ANGLE_KD);
@@ -163,9 +172,6 @@ public class SwerveModule5990 {
 
         steerMotor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
         steerMotor.burnFlash();
-
-        steerRelativeEncoder.setPosition(steerPositionSignal.refresh().getValue()); //This might be in the wrong units
-        //This resets the relative encoder position to the steer pos. However, idk if this is correct usage.
     }
 
     private void configureSteerEncoder() {
@@ -191,6 +197,7 @@ public class SwerveModule5990 {
 
         swerveDriveFXConfig.Audio.BeepOnConfig = false;
         swerveDriveFXConfig.Audio.BeepOnBoot = false;
+        swerveDriveFXConfig.Audio.AllowMusicDurDisable = false;
 
         swerveDriveFXConfig.MotorOutput.Inverted = DRIVE_MOTOR_INVERT;
         swerveDriveFXConfig.MotorOutput.NeutralMode = DRIVE_NEUTRAL_MODE;

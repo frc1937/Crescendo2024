@@ -6,8 +6,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.Timer;
@@ -20,9 +26,28 @@ import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_D;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_I;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_P;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.subsystems.swerve.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.INVERT_GYRO;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module0;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module1;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module2;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module3;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_VELOCITY;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
+import static frc.robot.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -41,6 +66,12 @@ public class Swerve5990 extends SubsystemBase {
             new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION)
     );
 
+
+    private final StructArrayPublisher<SwerveModuleState> currentStates = NetworkTableInstance.getDefault()
+            .getStructArrayTopic("CurrentStates", SwerveModuleState.struct).publish();
+    private final StructArrayPublisher<SwerveModuleState> targetStates = NetworkTableInstance.getDefault()
+            .getStructArrayTopic("TargetStates", SwerveModuleState.struct).publish();
+
     public Swerve5990(PoseEstimator5990 poseEstimator5990) {
         this.poseEstimator5990 = poseEstimator5990;
 
@@ -51,9 +82,15 @@ public class Swerve5990 extends SubsystemBase {
 
         Timer.delay(1); //todo: Check without this, if this is even needed
 
-        configurePathPlanner();
         setupAzimuthController();
-        initializeSwerve();
+        configurePathPlanner();
+    }
+
+    @Override
+    public void periodic() {
+        //logging data n shit
+        currentStates.set(getModuleStates());
+        targetStates.set(getModuleTargetStates());
     }
 
     public ChassisSpeeds getSelfRelativeVelocity() {
@@ -64,14 +101,6 @@ public class Swerve5990 extends SubsystemBase {
         gyro.setYaw(heading.getDegrees());
     }
 
-    public void initializeSwerve() {
-        final SwerveModuleState zeroState = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
-
-        modules[0].setTargetState(zeroState, true);
-        modules[1].setTargetState(zeroState, true);
-        modules[2].setTargetState(zeroState, true);
-        modules[3].setTargetState(zeroState, true);
-    }
 
     public void lockSwerve() {
         final SwerveModuleState
@@ -301,6 +330,16 @@ public class Swerve5990 extends SubsystemBase {
 
         for (SwerveModule5990 mod : modules) {
             states[mod.swerveModuleConstants.moduleNumber()] = mod.getCurrentState();
+        }
+
+        return states;
+    }
+
+    private SwerveModuleState[] getModuleTargetStates() {
+        SwerveModuleState[] states = new SwerveModuleState[4];
+
+        for (SwerveModule5990 mod : modules) {
+            states[mod.swerveModuleConstants.moduleNumber()] = mod.getTargetState();
         }
 
         return states;
