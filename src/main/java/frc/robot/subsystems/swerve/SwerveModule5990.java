@@ -190,8 +190,8 @@ public class SwerveModule5990 {
     private void configureDriveMotor() {
         TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
 
-        swerveDriveFXConfig.Audio.BeepOnConfig = true;
-        swerveDriveFXConfig.Audio.BeepOnBoot = true;
+        swerveDriveFXConfig.Audio.BeepOnConfig = false;
+        swerveDriveFXConfig.Audio.BeepOnBoot = false;
 
         swerveDriveFXConfig.MotorOutput.Inverted = DRIVE_MOTOR_INVERT;
         swerveDriveFXConfig.MotorOutput.NeutralMode = DRIVE_NEUTRAL_MODE;

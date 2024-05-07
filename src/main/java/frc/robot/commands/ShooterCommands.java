@@ -16,8 +16,8 @@ import frc.robot.util.AlliancePose2d;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
-import static frc.robot.Constants.BLUE_SPEAKER;
-import static frc.robot.Constants.RED_SPEAKER;
+import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
+import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class ShooterCommands {

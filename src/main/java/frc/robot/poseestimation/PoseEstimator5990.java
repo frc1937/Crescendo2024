@@ -23,7 +23,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
+import static frc.robot.Constants.VisionConstants.ROTATION_STD_EXPONENT;
+import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
+import static frc.robot.Constants.VisionConstants.TRANSLATION_STD_EXPONENT;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
 
 /**
@@ -33,7 +36,7 @@ public class PoseEstimator5990 implements AutoCloseable {
     private final Field2d field = new Field2d();
     private final PhotonCameraSource[] photonCameraSources;
     private final PoseEstimator6328 swerveDrivePoseEstimator;
-    private final Swerve5990 swerve5990;
+    private Swerve5990 swerve5990;
 
     private final Lock updateLock = new ReentrantLock();
     private final Notifier updateFromOdometryNotifier;
@@ -45,16 +48,22 @@ public class PoseEstimator5990 implements AutoCloseable {
      *
      * @param photonCameraSources the sources that should update the pose estimator apart from the odometry. This should be cameras etc.
      */
-    public PoseEstimator5990(PoseEstimator6328 swerveDrivePoseEstimator, Swerve5990 swerve5990, PhotonCameraSource... photonCameraSources) {
-        this.swerve5990 = swerve5990;
+    public PoseEstimator5990(PoseEstimator6328 swerveDrivePoseEstimator, PhotonCameraSource... photonCameraSources) {
         this.photonCameraSources = photonCameraSources;
         this.swerveDrivePoseEstimator = swerveDrivePoseEstimator;
 
         putAprilTagsOnFieldWidget();
         SmartDashboard.putData("Field", field);
 
+        //Run the lines below in 1s delay to allow the swerve to initialize
+        Timer.delay(0.3);
+
         updateFromOdometryNotifier = new Notifier(this::updateFromOdometry);
         updateFromOdometryNotifier.startPeriodic(1 / ODOMETRY_FREQUENCY_HERTZ);
+    }
+
+    public void setSwerve(Swerve5990 swerve5990) {
+        this.swerve5990 = swerve5990;
     }
 
     @Override
@@ -89,6 +98,8 @@ public class PoseEstimator5990 implements AutoCloseable {
     }
 
     private void updateFromOdometry() {
+        if(swerve5990 == null) return;
+
         updateLock.lock();
 
         final SwerveDriveWheelPositions swerveDriveWheelPositions = swerve5990.getModulePositions();

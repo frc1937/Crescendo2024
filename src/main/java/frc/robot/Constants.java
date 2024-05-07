@@ -4,8 +4,17 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.*;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -21,7 +30,6 @@ import java.util.Map;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
 import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
@@ -43,10 +51,6 @@ public final class Constants {
 
     public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.48);
     public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
-
-    public static final Pose3d BLUE_SPEAKER = TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.18, 0.0, 2.045081), new Rotation3d()));
-    public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
-
     /**
      * Once how much time, in Hertz (1/hertz = seconds), to run the infrequent periodic procedure
      */
@@ -144,8 +148,12 @@ public final class Constants {
                 TAG_ID_TO_POSE.put(aprilTag.ID, aprilTag.pose);
         }
 
+        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.18, 0.0, 2.045081), new Rotation3d()));
+        public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
+
         public static final PhotonPoseEstimator.PoseStrategy PRIMARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
         public static final PhotonPoseEstimator.PoseStrategy SECONDARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
     }
+
 
 }

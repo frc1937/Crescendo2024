@@ -16,8 +16,8 @@ import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Constants.BLUE_SPEAKER;
-import static frc.robot.Constants.RED_SPEAKER;
+import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
+import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
 
 public class ShootOnTheMove extends Command {
     private final ShooterSubsystem shooterSubsystem;

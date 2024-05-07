@@ -55,31 +55,35 @@ public class RobotContainer {
     private final Trigger opBButton = operatorController.getButton(B);
     private final Trigger opXButton = operatorController.getButton(X);
     /* Subsystems */
-    private PoseEstimator5990 poseEstimator5990;
+    private final PoseEstimator5990 poseEstimator5990;
 
-    public final Swerve5990 swerve5990 = new Swerve5990(poseEstimator5990);
+    private final Swerve5990 swerve5990;
 
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
-    private final ShooterCommands shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, poseEstimator5990);
+    private final ShooterCommands shooterCommands;
 
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
-        registerCommands();
-
         PoseEstimator6328 poseEstimator6328 = new PoseEstimator6328();
 
-        poseEstimator5990 = new PoseEstimator5990(poseEstimator6328, swerve5990,
+        poseEstimator5990 = new PoseEstimator5990(poseEstimator6328,
                 new PhotonCameraSource("Front1937", FRONT_CAMERA_TO_ROBOT)
         );
+
+        swerve5990 = new Swerve5990(poseEstimator5990);
+        poseEstimator5990.setSwerve(swerve5990);
+
+        shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, poseEstimator5990);
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
+        registerCommands();
     }
 
 
