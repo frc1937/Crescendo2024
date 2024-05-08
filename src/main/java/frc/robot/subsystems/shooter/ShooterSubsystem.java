@@ -15,11 +15,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.lib.math.Conversions.RPMFromTangentialVelocity;
-import static frc.robot.Constants.CanIDConstants.*;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.*;
+import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
+import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
+import static frc.robot.Constants.CanIDConstants.KICKER_ID;
+import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_A;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_P;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_S;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_V;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_A;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_P;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_S;
+import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_V;
+import static frc.robot.subsystems.shooter.ShooterConstants.LEFT_FLYWHEEL_DIAMETER;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.subsystems.shooter.ShooterConstants.RIGHT_FLYWHEEL_DIAMETER;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);

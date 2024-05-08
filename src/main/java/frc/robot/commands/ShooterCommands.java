@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.LEDsSubsystem;
@@ -15,10 +14,11 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.util.AlliancePose2d;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
 import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.INTAKE;
+import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_BACKWARDS;
+import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_FORWARD;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -65,27 +65,27 @@ public class ShooterCommands {
     public Command postIntake() {
         return new SequentialCommandGroup(new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setFlywheelsSpeed(RPM.of(-2000));
+                    shooterSubsystem.setTangentialFlywheelsVelocity(MetersPerSecond.of(-0.1));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {},
                 interrupted -> shooterSubsystem.reset(),
                 () -> false,
                 shooterSubsystem
-        ), intakeCommands.enableIntake(0.4, true));
+        )).alongWith(intakeCommands.stopIntake(0.4));
     }
 
     public Command floorIntake() {
-        return new SequentialCommandGroup(new ParallelDeadlineGroup(
-            new FunctionalCommand(
-                () -> initializeShooter(true, INTAKE),
+        return new FunctionalCommand(
+                () -> {
+                    initializeShooter(true, INTAKE);
+                    intakeCommands.enableIntake(0.8, false).schedule();
+                },
                 () -> {},
                 interrupted -> {},
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
-            )//,
-            //new OsculatingStrip(leds, shooterSubsystem)
-        ), intakeCommands.enableIntake(0.8, false));
+            );
     }
 
     private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {

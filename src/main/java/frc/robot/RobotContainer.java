@@ -102,16 +102,16 @@ public class RobotContainer {
                 )
         );
 
-        driveController.rumbleController(5, 5);
+//        driveController.rumbleController(5, 5);
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
         //🎇 Physics 🌟 (This won't work prob lol)
-        drAButton.whileTrue(shooterCommands.shootPhysics(16));
+        drAButton.whileTrue(shooterCommands.shootPhysics(2));
         drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16));
-        drYButton.whileFalse(new AlignWithAmp(swerve5990, translationSup, strafeSup));
+        drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));

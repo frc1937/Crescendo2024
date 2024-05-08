@@ -7,21 +7,26 @@ import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.*;
 
 public class ShooterConstants {
+    static final Rotation2d FORWARD_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(10);
+    static final Rotation2d REVERSE_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(-15);
+
     public static final int FLYWHEEL_MAX_RPM = 6400;
     public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
     public static final double POSE_HISTORY_DURATION = 0.3;
 
     static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
-    static final double PITCH_INTAKE_FLOOR_ANGLE = -21.583960;
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
-    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(PITCH_INTAKE_FLOOR_ANGLE+10);
 
-    static final double PIVOT_ENCODER_OFFSET = 343,
+    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);
+    static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(-24.785156);
+    static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-16.787110);
+
+    static final double
             PITCH_KS = 0.38398,
             PITCH_KG = 0.31481,
             PITCH_KV = 12.824,
             PITCH_KA = 3.995,
-            PITCH_KP = 1.5,//1.d / 0.02,
+            PITCH_KP = 1,//1.d / 0.02,
             PITCH_KD = 0.0,
             PITCH_MAX_VELOCITY = 25,//1.05,
             PITCH_MAX_ACCELERATION = 35;//0.75;
@@ -72,7 +77,7 @@ public class ShooterConstants {
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(48), MetersPerSecond.of(15));
     public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(-21.2), MetersPerSecond.of(-16));
+            PIVOT_BOTTOM_ANGLE.plus(Rotation2d.fromDegrees(1)), MetersPerSecond.of(-3));
 
     public static final ShooterSubsystem.Reference AMP_INIT =
             new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), MetersPerSecond.of(3));

@@ -20,11 +20,25 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.DEFAULT_PITCH_DEADBAND;
+import static frc.robot.subsystems.shooter.ShooterConstants.FORWARD_PITCH_SOFT_LIMIT;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KP;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KS;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KV;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATION;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
+import static frc.robot.subsystems.shooter.ShooterConstants.REVERSE_PITCH_SOFT_LIMIT;
+import static frc.robot.subsystems.shooter.ShooterConstants.VERTICAL_PITCH_DEADBAND;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
@@ -54,14 +68,9 @@ public class Pitch {
         SmartDashboard.putNumber("pitch/CurrentAngle", getCurrentPosition().getDegrees());
         SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
         SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
-
-//        double velocitySetpoint = MathUtil.applyDeadband(
-//                controller.calculate(getCurrentPosition().getRadians()), deadband);
-//
-//        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
-//        motor.setVoltage(voltage);
-
         SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
+
+        drivePitch();
     }
 
     public void setGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
@@ -88,13 +97,13 @@ public class Pitch {
     }
 
     public Rotation2d getCurrentPosition() {
-        double angle = (Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).getDegrees() - PIVOT_ENCODER_OFFSET);
+        Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).minus(PIVOT_ENCODER_OFFSET);
 
-        if (angle < -30) {
-            angle += 360;
-        } //todo: check if needed.
+        if(angle.getDegrees() > 300) { //This ensure the cancoder doesn't freak out and set a wrong starting pos
+            angle.minus(Rotation2d.fromDegrees(360));
+        }
 
-        return Rotation2d.fromDegrees(angle);
+        return angle;
     }
 
     public Measure<Velocity<Angle>> getCurrentVelocity() {
@@ -110,17 +119,20 @@ public class Pitch {
         motor.stopMotor();
     }
 
+    private void drivePitch() {
+        double velocitySetpoint = MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), deadband);
+        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
+
+        if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
+        if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
+
+        if (Math.abs(voltage) < 0.31) return;
+
+        motor.setVoltage(voltage);
+    }
+
     private void configureSoftLimits() {
-        motor.getEncoder().setPosition(getCurrentPosition().getRotations()); //initialize to current position
-
-        Rotation2d FORWARD_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(90);
-        Rotation2d REVERSE_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(-20);
-
-        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float)FORWARD_PITCH_SOFT_LIMIT.getRotations());
-        motor.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
-
-        motor.setSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, (float)REVERSE_PITCH_SOFT_LIMIT.getRotations());
-        motor.enableSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, true);
+        motor.getEncoder().setPosition(getCurrentPosition().getRotations());
     }
 
     private void configureSteerEncoder() {

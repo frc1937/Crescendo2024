@@ -154,6 +154,4 @@ public final class Constants {
         public static final PhotonPoseEstimator.PoseStrategy PRIMARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
         public static final PhotonPoseEstimator.PoseStrategy SECONDARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
     }
-
-
 }
