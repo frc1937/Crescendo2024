@@ -82,8 +82,15 @@ public class Swerve5990 extends SubsystemBase {
 
         Timer.delay(1); //todo: Check without this, if this is even needed
 
+        resetModulesToAbsolute();
         setupAzimuthController();
         configurePathPlanner();
+    }
+
+    public void resetModulesToAbsolute() {
+        for (SwerveModule5990 mod : modules) {
+            mod.configureSteerRelativeEncoder();
+        }
     }
 
     @Override
