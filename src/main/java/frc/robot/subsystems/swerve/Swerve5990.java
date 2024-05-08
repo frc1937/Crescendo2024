@@ -66,7 +66,6 @@ public class Swerve5990 extends SubsystemBase {
             new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION)
     );
 
-
     private final StructArrayPublisher<SwerveModuleState> currentStates = NetworkTableInstance.getDefault()
             .getStructArrayTopic("CurrentStates", SwerveModuleState.struct).publish();
     private final StructArrayPublisher<SwerveModuleState> targetStates = NetworkTableInstance.getDefault()
@@ -82,15 +81,8 @@ public class Swerve5990 extends SubsystemBase {
 
         Timer.delay(1); //todo: Check without this, if this is even needed
 
-        resetModulesToAbsolute();
         setupAzimuthController();
         configurePathPlanner();
-    }
-
-    public void resetModulesToAbsolute() {
-        for (SwerveModule5990 mod : modules) {
-            mod.configureSteerRelativeEncoder();
-        }
     }
 
     @Override

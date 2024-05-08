@@ -32,11 +32,8 @@ public class SwerveModule5990 {
     private final TalonFX driveMotor;
     private final CANSparkMax steerMotor;
     private final PIDController steerController = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD);
-//    private final RelativeEncoder steerRelativeEncoder;
     private final CANcoder steerEncoder;
     private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(DRIVE_KS, DRIVE_KV, DRIVE_KA);
-
-//    private Rotation2d lastAngle = ne;
 
     /**
      * Rotations
@@ -63,13 +60,9 @@ public class SwerveModule5990 {
         this.steerEncoder = new CANcoder(swerveModuleConstants.canCoderID());
         this.steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
 
-//        this.steerController = steerMotor.getPIDController();
-//        this.steerRelativeEncoder = steerMotor.getEncoder();
-
         configureSteerEncoder();
         configureDriveMotor();
         configureSteerMotor();
-        configureSteerRelativeEncoder();
     }
 
     public void setTargetState(SwerveModuleState targetState, boolean closedLoop) {
@@ -77,7 +70,6 @@ public class SwerveModule5990 {
 
         setTargetVelocity(targetState, closedLoop);
         setTargetAngle(targetState);
-//        setTargetAngle(new SwerveModuleState(0, Rotation2d.fromRotations(0.358)));
 
         this.targetState = targetState;
     }
@@ -99,7 +91,6 @@ public class SwerveModule5990 {
                 getCurrentAngle()
         );
     }
-
 
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRotations(steerPositionSignal.refresh().getValue() - swerveModuleConstants.angleOffset());
@@ -143,19 +134,7 @@ public class SwerveModule5990 {
     }
 
     private void setTargetAngle(SwerveModuleState targetState) {
-//        Rotation2d angle = (Math.abs(targetState.speedMetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS)
-//                        ? lastAngle
-//                        : targetState.angle;
-
-        steerController.setSetpoint(targetState.angle.getDegrees());
-
         steerMotor.setVoltage(steerController.calculate(getCurrentAngle().getDegrees(), targetState.angle.getDegrees()));
-//        lastAngle = angle;
-    }
-
-    public void configureSteerRelativeEncoder() {
-//        steerRelativeEncoder.setPosition(steerPositionSignal.refresh().getValue());
-        //steerRelativeEncoder.setPositionConversionFactor(ANGLE_CONVERSION_FACTOR); //wtf is this lol? is this even correct bruh
     }
 
     private void configureSteerMotor() {
@@ -171,7 +150,6 @@ public class SwerveModule5990 {
         steerController.setP(ANGLE_KP);
         steerController.setI(ANGLE_KI);
         steerController.setD(ANGLE_KD);
-//        steerController.setFF(ANGLE_KFF);
 
         steerMotor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
         steerMotor.burnFlash();
