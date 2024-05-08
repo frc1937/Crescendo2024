@@ -1,6 +1,5 @@
 package frc.robot.subsystems.swerve;
 
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -9,7 +8,8 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.*;
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,6 +23,7 @@ import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
@@ -215,22 +216,5 @@ public class SwerveModule5990 {
         driveVelocitySignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
 
         driveMotor.optimizeBusUtilization();
-    }
-
-    private void applyConfig(Object device, Object config) {
-        int counter = 10;
-        StatusCode statusCode = null;
-
-        while (statusCode != StatusCode.OK && counter > 0) {
-            if (device instanceof TalonFX talonFX && config instanceof TalonFXConfiguration swerveDriveFXConfig) {
-                statusCode = talonFX.getConfigurator().apply(swerveDriveFXConfig);
-            }
-
-            if (device instanceof CANcoder canCoder && config instanceof CANcoderConfiguration swerveCanCoderConfig) {
-                statusCode = canCoder.getConfigurator().apply(swerveCanCoderConfig);
-            }
-
-            counter--;
-        }
     }
 }
