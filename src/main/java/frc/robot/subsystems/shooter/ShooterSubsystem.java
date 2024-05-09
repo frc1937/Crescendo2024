@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
+import frc.robot.util.Controller;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
@@ -36,6 +37,8 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
 import static frc.robot.subsystems.shooter.ShooterConstants.RIGHT_FLYWHEEL_DIAMETER;
 
 public class ShooterSubsystem extends SubsystemBase {
+    private final Controller driverController;
+
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
@@ -44,13 +47,20 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private int consecutiveNoteInsideSamples = 0;
 
-    public ShooterSubsystem() {
+    public ShooterSubsystem(Controller driverController) {
+        this.driverController = driverController;
+
         kickerMotor.configFactoryDefault();
         kickerMotor.setNeutralMode(NeutralMode.Brake);
     }
 
     @Override
     public void periodic() {
+        //if previously not loaded and now is
+        if (!isLoaded() && (!beamBreaker.get() && consecutiveNoteInsideSamples+1 >= CONSIDERED_NOISELESS_THRESHOLD)) {
+            driverController.rumble(10, 2);
+        }
+
         if (!beamBreaker.get()) {
             consecutiveNoteInsideSamples++;
         } else {
@@ -61,9 +71,8 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.periodic();
         pitch.periodic();
 
-        SmartDashboard.putBoolean("shooter/isLoaded", isLoaded());
-        SmartDashboard.putBoolean("shooter/areFlywheelsReady", flywheelsAtReference());
-        SmartDashboard.putBoolean("shooter/hasPitchArrived", pitchAtReference());
+        logShooter();
+
     }
 
     /**
@@ -150,22 +159,6 @@ public class ShooterSubsystem extends SubsystemBase {
         leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
         rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));
     }
-    
-    /**
-     * Rotate the flywheels to certain speeds s.t. NOTEs will be released with
-     * certain speed and rotation
-     *
-     * @param speed the average target speed of both flywheels
-     * @param spin  the ratio between the right and the left flywheel angular velocities.
-     * @param pScalar the scalar of the P part of the PID controller
-     */
-    public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed, double spin, double pScalar) {
-        Measure<Velocity<Angle>> leftSpeed = speed.times(2).divide(spin + 1);
-        Measure<Velocity<Angle>> rightSpeed = leftSpeed.times(spin);
-
-        rightFlywheel.setSpeed(rightSpeed, pScalar);
-        leftFlywheel.setSpeed(leftSpeed, pScalar);
-    }
 
     public static class Reference implements Interpolatable<Reference> {
         private Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
@@ -200,5 +193,11 @@ public class ShooterSubsystem extends SubsystemBase {
                 MeasureUtils.interpolate(flywheelTangentialVelocity, endValue.flywheelTangentialVelocity, t)
             );
         }
+    }
+
+    private void logShooter() {
+        SmartDashboard.putBoolean("shooter/isLoaded", isLoaded());
+        SmartDashboard.putBoolean("shooter/areFlywheelsReady", flywheelsAtReference());
+        SmartDashboard.putBoolean("shooter/hasPitchArrived", pitchAtReference());
     }
 }

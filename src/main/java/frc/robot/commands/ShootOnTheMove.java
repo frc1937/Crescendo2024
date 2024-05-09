@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
 import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_AZIMUTH_TOLERANCE;
 
 public class ShootOnTheMove extends Command {
     private final ShooterSubsystem shooterSubsystem;
@@ -67,7 +68,7 @@ public class ShootOnTheMove extends Command {
 
     @Override
     public boolean isFinished() {
-        return swerve5990.azimuthAtGoal(Radians.of(1)) && shooterSubsystem.atReference(); //TODO: Move tolerance to constants
+        return swerve5990.azimuthAtGoal(Radians.of(SWERVE_AZIMUTH_TOLERANCE)) && shooterSubsystem.atReference();
     }
 
     private void shootNote(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {

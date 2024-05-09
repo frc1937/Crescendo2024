@@ -65,7 +65,7 @@ public class ShooterCommands {
     public Command postIntake() {
         return new SequentialCommandGroup(new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setTangentialFlywheelsVelocity(MetersPerSecond.of(-0.1));
+                    shooterSubsystem.setTangentialFlywheelsVelocity(MetersPerSecond.of(-2));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {},

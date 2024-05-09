@@ -16,9 +16,10 @@ public class IntakeCommands {
     public Command enableIntake(double speed, boolean shouldStop) {
         return new FunctionalCommand(
                 () -> intakeSubsystem.setSpeedPercentage(speed),
-                () -> {},
+                () -> {
+                },
                 interrupted -> {
-                    if(shouldStop)
+                    if (shouldStop)
                         intakeSubsystem.stop();
                 },
                 () -> false,
@@ -30,8 +31,10 @@ public class IntakeCommands {
     public Command stopIntake(double delay) {
         return new WaitCommand(delay).andThen(new FunctionalCommand(
                 intakeSubsystem::stop,
-                () -> {},
-                interrupted -> {},
+                () -> {
+                },
+                interrupted -> {
+                },
                 () -> false,
 
                 intakeSubsystem

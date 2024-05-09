@@ -60,7 +60,7 @@ public class RobotContainer {
     private final Swerve5990 swerve5990;
 
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(driveController);
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
@@ -145,7 +145,7 @@ public class RobotContainer {
     public void frequentPeriodic() {
         shooterSubsystem.periodic();
         poseEstimator5990.periodic();
-    }
+    } //TODO this is a HUGE mistake. PLEASE TEST
 
     private void registerCommands() {
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));

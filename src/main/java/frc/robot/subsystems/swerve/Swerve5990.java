@@ -297,7 +297,6 @@ public class Swerve5990 extends SubsystemBase {
         );
     }
 
-
     private double calculateProfiledSpeedToAngle(Rotation2d angle) {
         double currentAngle = poseEstimator5990.getCurrentPose().getCorrectPose().getRotation().getRadians();
         double yawCorrection = azimuthController.calculate(

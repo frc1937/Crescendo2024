@@ -16,6 +16,7 @@ import frc.lib.util.COTSFalconSwerveConstants;
 
 public class SwerveConstants {
     public static final double AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85);
+    public static final double SWERVE_AZIMUTH_TOLERANCE = 1;
 
     static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
             AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_DEADBAND = 0.12,

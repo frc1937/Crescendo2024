@@ -25,51 +25,29 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.DEFAULT_PITCH_DEADBAND;
-import static frc.robot.subsystems.shooter.ShooterConstants.FORWARD_PITCH_SOFT_LIMIT;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KP;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KS;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KV;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATION;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
-import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
-import static frc.robot.subsystems.shooter.ShooterConstants.REVERSE_PITCH_SOFT_LIMIT;
-import static frc.robot.subsystems.shooter.ShooterConstants.VERTICAL_PITCH_DEADBAND;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
-    private final ProfiledPIDController controller;
+
+    private ProfiledPIDController controller;
 
     private double deadband = DEFAULT_PITCH_DEADBAND;
     private StatusSignal<Double> encoderPositionSignal, encoderVelocitySignal;
 
     public Pitch() {
-        // Configure the motor
         motor.restoreFactoryDefaults();
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
         configureSteerEncoder();
         configureSoftLimits();
-
-        controller = new ProfiledPIDController(
-                PITCH_KP, 0, PITCH_KD,
-                new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION));
-
-        controller.setTolerance(PIVOT_TOLERANCE);
+        configurePitchController();
     }
 
     public void periodic() {
-        SmartDashboard.putNumber("pitch/CurrentAngle", getCurrentPosition().getDegrees());
-        SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
-        SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
-        SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
-
+        logPitch();
         drivePitch();
     }
 
@@ -99,9 +77,9 @@ public class Pitch {
     public Rotation2d getCurrentPosition() {
         Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).minus(PIVOT_ENCODER_OFFSET);
 
-        if(angle.getDegrees() > 300) { //This ensure the cancoder doesn't freak out and set a wrong starting pos
+        //Ensure the encoder always has the same starting angle.
+        if(angle.getDegrees() > 300)
             angle.minus(Rotation2d.fromDegrees(360));
-        }
 
         return angle;
     }
@@ -129,6 +107,21 @@ public class Pitch {
         if (Math.abs(voltage) < 0.31) return;
 
         motor.setVoltage(voltage);
+    }
+
+    private void logPitch() {
+        SmartDashboard.putNumber("pitch/CurrentAngle", getCurrentPosition().getDegrees());
+        SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
+        SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
+        SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
+    }
+
+    private void configurePitchController() {
+        controller = new ProfiledPIDController(PITCH_KP, PITCH_KI, PITCH_KD,
+                new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION)
+        );
+
+        controller.setTolerance(PIVOT_TOLERANCE);
     }
 
     private void configureSoftLimits() {

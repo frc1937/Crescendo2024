@@ -29,6 +29,7 @@ public class ShooterConstants {
             PITCH_KV = 12.824,
             PITCH_KA = 3.995,
             PITCH_KP = 1,//1.d / 0.02,
+            PITCH_KI = 0.0,
             PITCH_KD = 0.0,
             PITCH_MAX_VELOCITY = 25,//1.05,
             PITCH_MAX_ACCELERATION = 35;//0.75;
