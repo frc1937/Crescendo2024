@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -38,8 +40,8 @@ public class ShooterConstants {
     static final float PITCH_TRANSMISSION_RATIO = 150;
     static final double DEFAULT_PITCH_DEADBAND = 0.025, VERTICAL_PITCH_DEADBAND = 0.06;
 
-    static final double LEFT_FLYWHEEL_DIAMETER = Inches.of(4).in(Meter);
-    static final double RIGHT_FLYWHEEL_DIAMETER = Inches.of(3).in(Meter);
+    static final Measure<Distance> LEFT_FLYWHEEL_DIAMETER = Inches.of(4);
+    static final Measure<Distance> RIGHT_FLYWHEEL_DIAMETER = Inches.of(3);
 
     static final class FlywheelControlConstants {
         /**

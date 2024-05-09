@@ -5,8 +5,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.swerve.SwerveConstants.WHEEL_CIRCUMFERENCE;
 
 public class Conversions {
@@ -48,11 +47,11 @@ public class Conversions {
     /**
      * Returns the rotations per minute
      * @param tangentialVelocity - metres per second
-     * @param wheelDiameter - wheel diameter in metres
+     * @param wheelDiameter - wheel diameter in inches
      * @return rotations per minute
      */
-    public static double RPMFromTangentialVelocity(double tangentialVelocity, double wheelDiameter) {
-        return SEC_PER_MIN * tangentialVelocity /  (wheelDiameter * Math.PI);
+    public static double RPMFromTangentialVelocity(Measure<Velocity<Distance>> tangentialVelocity, Measure<Distance> wheelDiameter) {
+        return SEC_PER_MIN * ((tangentialVelocity.in(MetersPerSecond) / wheelDiameter.in(Meters)) / Math.PI );
     }
 
     /**

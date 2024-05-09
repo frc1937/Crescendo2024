@@ -144,8 +144,8 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param tangentialVelocity - the target tangential velocity in metres per second
      */
     public void setTangentialFlywheelsVelocity(Measure<Velocity<Distance>> tangentialVelocity) {
-        double leftFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity.in(MetersPerSecond), LEFT_FLYWHEEL_DIAMETER);
-        double rightFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity.in(MetersPerSecond), RIGHT_FLYWHEEL_DIAMETER);
+        double leftFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
+        double rightFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
 
         leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
         rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));
