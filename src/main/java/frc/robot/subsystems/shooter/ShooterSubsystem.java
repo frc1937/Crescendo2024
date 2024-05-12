@@ -100,6 +100,10 @@ public class ShooterSubsystem extends SubsystemBase {
         rightFlywheel.stopMotor();
     }
 
+    public double getFlywheelsSpeed() {
+        return Math.max(rightFlywheel.getSpeed().in(RPM), leftFlywheel.getSpeed().in(RPM));
+    }
+
     public Rotation2d getPitchGoal() {
         return pitch.getGoal();
     }
