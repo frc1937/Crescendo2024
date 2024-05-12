@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -27,7 +26,7 @@ import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
-public class Pitch {
+public final class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
@@ -46,6 +45,9 @@ public class Pitch {
         configurePitchController();
     }
 
+    /**
+     * Periodic, ran by the main robot thread.
+     */
     public void periodic() {
         logPitch();
         drivePitch();
