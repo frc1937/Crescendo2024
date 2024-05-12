@@ -1,5 +1,6 @@
 package frc.robot.commands.calibration;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.Swerve5990;
 
@@ -25,6 +26,9 @@ public class MaxDrivetrainSpeedCharacterization extends Command {
 
         double currentXVelocity = swerve5990.getSelfRelativeVelocity().vxMetersPerSecond;
 
+        SmartDashboard.putNumber("/Characterization/Swerve/CurrentVelocity", currentXVelocity);
+        SmartDashboard.putNumber("/Characterization/Swerve/MaxVelocity", maxSpeed);
+
         if(currentXVelocity > maxSpeed) {
             maxSpeed = currentXVelocity;
         }
@@ -32,6 +36,6 @@ public class MaxDrivetrainSpeedCharacterization extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("Max Speed: " + maxSpeed);
+        SmartDashboard.putNumber("/Characterization/Swerve/MaxVelocity", maxSpeed);
     }
 }

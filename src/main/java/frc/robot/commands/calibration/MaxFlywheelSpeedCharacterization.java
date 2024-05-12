@@ -1,5 +1,6 @@
 package frc.robot.commands.calibration;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
@@ -23,6 +24,9 @@ public class MaxFlywheelSpeedCharacterization extends Command {
     public void execute() {
         double currentVelocity = shooterSubsystem.getFlywheelsSpeed();
 
+        SmartDashboard.putNumber("/Characterization/Flywheel/CurrentVelocity", currentVelocity);
+        SmartDashboard.putNumber("/Characterization/Flywheel/MaxVelocity", maxSpeed);
+
         if(currentVelocity > maxSpeed) {
             maxSpeed = currentVelocity;
         }
@@ -31,7 +35,6 @@ public class MaxFlywheelSpeedCharacterization extends Command {
     @Override
     public void end(boolean interrupted) {
         shooterSubsystem.stopFlywheels();
-
-        System.out.println("Max Speed: " + maxSpeed);
+        SmartDashboard.putNumber("/Characterization/Swerve/MaxVelocity", maxSpeed);
     }
 }
