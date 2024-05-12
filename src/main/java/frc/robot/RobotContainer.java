@@ -10,8 +10,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
+import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
+import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
 import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.poseestimation.PhotonCameraSource;
 import frc.robot.poseestimation.PoseEstimator5990;
@@ -88,6 +91,14 @@ public class RobotContainer {
 
 
     private void configureBindings() {
+        //Temporary Characterization buttons
+        drRightTrigger.whileTrue(
+                new SequentialCommandGroup(
+                        new MaxDrivetrainSpeedCharacterization(swerve5990),
+                        new MaxFlywheelSpeedCharacterization(shooterSubsystem)
+                )
+        );
+
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(LEFT_Y);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
         DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), Constants.STICK_DEADBAND);
@@ -127,8 +138,8 @@ public class RobotContainer {
 
         mountSubsystem.setDefaultCommand(
                 new MountCommand(mountSubsystem,
-                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(LEFT_Y), Constants.STICK_DEADBAND*0.5),
-                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(RIGHT_Y), Constants.STICK_DEADBAND*0.5)
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(LEFT_Y), Constants.STICK_DEADBAND * 0.5),
+                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(RIGHT_Y), Constants.STICK_DEADBAND * 0.5)
                 )
         );
     }
