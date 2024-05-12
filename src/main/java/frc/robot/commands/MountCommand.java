@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.mount.MountSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -20,16 +21,30 @@ public class MountCommand extends Command {
         addRequirements(this.mountSubsystem);
     }
 
-    @Override
-    public void execute() {
-        mountSubsystem.manualMount(
-                leftSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR,
-                rightSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR
+    public Command powerMount() {
+        return new FunctionalCommand(
+                () -> {},
+                () -> mountSubsystem.manualMount(
+                        leftSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR,
+                        rightSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR
+                ),
+                interrupted -> mountSubsystem.stop(),
+                () -> false,
+
+                mountSubsystem
         );
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        mountSubsystem.stop();
-    }
+//    @Override
+//    public void execute() {
+//        mountSubsystem.manualMount(
+//                leftSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR,
+//                rightSpeedSup.getAsDouble() * MOUNT_SPEED_SCALAR
+//        );
+//    }
+//
+//    @Override
+//    public void end(boolean interrupted) {
+//        mountSubsystem.stop();
+//    }
 }
