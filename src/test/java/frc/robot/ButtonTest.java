@@ -102,6 +102,7 @@ class ButtonTest {
 
         Pose3d pivotPoint = new Pose3d().transformBy(robotToPivotTransform);
 
+
         Transform3d pivotToEndEffector = new Transform3d(shooterLength, 0, 0, new Rotation3d());
 
         Pose3d endEffectorSelfRelativePose = pivotPoint.plus(pivotToEndEffector);
