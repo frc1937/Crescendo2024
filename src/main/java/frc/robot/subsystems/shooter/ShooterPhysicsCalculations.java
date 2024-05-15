@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
+
 public class ShooterPhysicsCalculations {
     private final ShooterSubsystem shooterSubsystem;
 
@@ -25,7 +27,7 @@ public class ShooterPhysicsCalculations {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ() - getNoteExitPosition(robotPose).getZ();//Inch.of(8.5).in(Meters);
+        double z = targetPose.getZ() - getNoteExitPoseRobodox599(robotPose, targetPose).getZ();//Inch.of(8.5).in(Meters);
         double distance = getDistanceToTarget(robotPose, targetPose);
 
         double theta = Math.atan(
@@ -87,8 +89,45 @@ public class ShooterPhysicsCalculations {
      */
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
 //        return robotPose.minus(targetPose.toPose2d()).getTranslation().getNorm(); //todo: This might be better, do check
-        return getNoteExitPosition(robotPose).getTranslation().getDistance(targetPose.getTranslation());
+        return getNoteExitPoseRobodox599(robotPose, targetPose).getTranslation().getDistance(targetPose.getTranslation());
     }
+
+    /**
+     * Get the field-relative end of the shooter, AKA the note's point of exit, from field-relative robot pose.
+     * Using the correct alliance.
+     * @param robotPose - The robot's pose, using the correct alliance
+     */
+    private Pose3d getNoteExitPoseRobodox599(Pose2d robotPose, Pose3d targetPose) {
+        Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), targetPose.getRotation().toRotation2d()));
+
+        Transform3d robotToPivot = new Transform3d(
+                PIVOT_POINT_X_OFFSET_METRES, 0, PIVOT_POINT_Z_OFFSET_METRES,
+                new Rotation3d(0, -shooterSubsystem.getPitchGoal().getRadians(), 0)
+        );
+
+        Transform3d pivotToShooterEnd = new Transform3d(SHOOTER_LENGTH_METRES, 0, 0, new Rotation3d());
+
+        Pose3d shooterEndPose = new Pose3d().transformBy(robotToPivot).plus(pivotToShooterEnd);
+        Transform3d robotToShooterEnd = shooterEndPose.minus(new Pose3d());
+
+        return robotPose3d.transformBy(robotToShooterEnd);
+    }
+
+    /** 71 עד 140
+     * תנועת המרי העברי - סיבות הקמת התנועה, פעולות התנועה(ליל הגשרים, הרכבות, פריצה למחנה).
+     * העפלה והתיישבות - אקסודוס(העפלה79), התיישבות(11 נק בנגב). קשיים בהעפלה
+     * העברת שאלת א"י לאו"ם - סיבות(למה), אינטרסים(ארה"ב ברה"מ)
+     * תוכנית החלוקה - הישוב היהודי(בעד ונגד).
+     *  מלחמת העצמאות - 6 מאפיינים. 4 ,תקופות
+     *  ללמוד רק אירוע אחד בכל תקופה!!!!
+     * תקופה 1 - מאפיינים. ערים מעורבות, חזית ועורף. מלחמת מגננה. (שיירת ל"ה!) תכנית ד.
+     * תקופה 2 - מעבר מהגנה להתקפה. אירועי כפר יסין. הקרב על ירושלים. העברת אספקה. (מבצע נחשון!)
+     * +_  תקופה 3 - הכרזה על הקמת המדינה. (בעד ונגד הטיימינג). הצטרפות של 5 צבאות ערב. (הקרב על קיבו. ניצנים!)+ הפוגה
+     *  תקופה 4 - צהל כובש ומשתלט על נקודות ישוב.  כיבוש אילת.(מבצע עובדה!)
+     *  הקמת צהך + קשיים + פרשת אלטלנה.
+     *
+     *
+     */
 
     /**
      * Get the field-relative end of the shooter, AKA the note's point of exit, from field-relative robot pose.

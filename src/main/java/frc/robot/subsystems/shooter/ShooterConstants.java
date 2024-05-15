@@ -60,6 +60,10 @@ public class ShooterConstants {
                 TOLERANCE = 3;
     }
 
+    public static final double PIVOT_POINT_Z_OFFSET_METRES = 0.5;
+    public static final double PIVOT_POINT_X_OFFSET_METRES = -1;
+    public static final double SHOOTER_LENGTH_METRES = 2;
+
     /**
      * In seconds
      */

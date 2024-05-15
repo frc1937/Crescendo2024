@@ -1,17 +1,9 @@
 package frc.robot;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.lib.math.Conversions;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 
 class ButtonTest {
     private  double shooterLength = 2;
@@ -37,19 +29,28 @@ class ButtonTest {
 //
 //        //Testing noteExitPos
 
-        Pose2d robotPose = new Pose2d(5, 5, Rotation2d.fromDegrees(0));
-        double targetPitchAngle = 90;
+        int[] testValuesYaw = {0, 90, 180, 270};
+        int[] testValuesPitch = {0, 20, 40, 90};
 
-        System.out.println("Initial parameters:");
-        System.out.println("Robot (x, y, azimuth): " + robotPose.getX() + ", " + robotPose.getY() + ", " + robotPose.getRotation().getDegrees());
-        System.out.println("Pitch angle: " + targetPitchAngle + "\n");
+        for (int i = 0; i < 4; i++) {
+            Pose2d robotPose = new Pose2d(5, 5, Rotation2d.fromDegrees(testValuesYaw[i]));
+            for (int j = 0; j < 4; j++) {
+                double targetPitchAngle = testValuesPitch[j];
 
-        Pose3d noteExitPos = calculateShooterEndEffectorFieldRelativePose(robotPose, targetPitchAngle);
-        Pose3d noteExitPose2 = getNoteEXITPOSETrigon599(robotPose, targetPitchAngle);
+                System.out.println("Initial parameters:");
+                System.out.println("Robot (x, y, azimuth): " + robotPose.getX() + ", " + robotPose.getY() + ", " + robotPose.getRotation().getDegrees());
+                System.out.println("Pitch angle: " + targetPitchAngle + "\n");
 
-        printPose3dNicely(noteExitPos, "verifiedExitPos");
-        System.out.println();
-        printPose3dNicely(noteExitPose2, "elysiumExitPose");
+                Pose3d noteExitPos = calculateShooterEndEffectorFieldRelativePose(robotPose, targetPitchAngle);
+                Pose3d noteExitPose2 = getNoteExitPoseRobodox599(robotPose, targetPitchAngle);
+
+                printPose3dNicely(noteExitPos, "verifiedExitPos");
+                System.out.println();
+                printPose3dNicely(noteExitPose2, "elysiumExitPose");
+
+                Assertions.assertEquals(noteExitPos, noteExitPose2);
+            }
+        }
     }
 
     private void printPose3dNicely(Pose3d pose, String name) {
@@ -63,7 +64,6 @@ class ButtonTest {
     private double toDegrees(double radians) {
         return Math.round(radians * 180 / Math.PI);
     }
-
 //    private Pose3d getNoteExitPoseTEST(Pose2d robotPose, double targetAngle) {
 //        Rotation2d pitchAngle = Rotation2d.fromDegrees(targetAngle);
 //        Pose3d robotPose3d = new Pose3d(robotPose);
@@ -91,27 +91,26 @@ class ButtonTest {
 //        return noteExitPos;
 //    }
 
-    private Pose3d getNoteEXITPOSETrigon599(Pose2d robotPose, double targetAngle) {
+    private Pose3d getNoteExitPoseRobodox599(Pose2d robotPose, double targetAngle) {
         Rotation2d azimuthAngleToSpeaker = robotPose.getRotation();
         Rotation2d pitchAngle = Rotation2d.fromDegrees(targetAngle);
 
-        Transform3d robotToPivotTransform = new Transform3d(
-                -1, 0, 0.5,
+        Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), azimuthAngleToSpeaker));
+
+        double PIVOT_POINT_Z_OFFSET = 0.5;
+        double PIVOT_POINT_X_OFFSET = -1;
+
+        Transform3d robotToPivot = new Transform3d(
+                PIVOT_POINT_X_OFFSET, 0, PIVOT_POINT_Z_OFFSET,
                 new Rotation3d(0, -pitchAngle.getRadians(), 0)
         );
 
-        Pose3d pivotPoint = new Pose3d().transformBy(robotToPivotTransform);
-
-
         Transform3d pivotToEndEffector = new Transform3d(shooterLength, 0, 0, new Rotation3d());
 
-        Pose3d endEffectorSelfRelativePose = pivotPoint.plus(pivotToEndEffector);
-        //wtf is this line bruh
-        Transform3d robotToEndEffector = endEffectorSelfRelativePose.minus(new Pose3d());
+        Pose3d shooterEndPose = new Pose3d().transformBy(robotToPivot).plus(pivotToEndEffector);
+        Transform3d robotToShooterEnd = shooterEndPose.minus(new Pose3d());
 
-        Pose3d predictedPose = new Pose3d(new Pose2d(robotPose.getTranslation(), azimuthAngleToSpeaker));
-
-        return predictedPose.transformBy(robotToEndEffector);
+        return robotPose3d.transformBy(robotToShooterEnd);
     }
 
     private Pose3d calculateShooterEndEffectorFieldRelativePose(Pose2d robotPose, double targetAngle) {
