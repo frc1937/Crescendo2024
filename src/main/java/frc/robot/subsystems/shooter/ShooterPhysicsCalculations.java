@@ -27,7 +27,7 @@ public class ShooterPhysicsCalculations {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ() - getNoteExitPoseRobodox599(robotPose, targetPose).getZ();//Inch.of(8.5).in(Meters);
+        double z = targetPose.getZ() - getNoteExitPoseRobodox599(robotPose, targetPose).getZ();
         double distance = getDistanceToTarget(robotPose, targetPose);
 
         double theta = Math.atan(
@@ -88,7 +88,6 @@ public class ShooterPhysicsCalculations {
      * @return - The distance in metres
      */
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
-//        return robotPose.minus(targetPose.toPose2d()).getTranslation().getNorm(); //todo: This might be better, do check
         return getNoteExitPoseRobodox599(robotPose, targetPose).getTranslation().getDistance(targetPose.getTranslation());
     }
 
@@ -96,6 +95,8 @@ public class ShooterPhysicsCalculations {
      * Get the field-relative end of the shooter, AKA the note's point of exit, from field-relative robot pose.
      * Using the correct alliance.
      * @param robotPose - The robot's pose, using the correct alliance
+     * @param targetPose - The target's pose, using the correct alliance
+     * @return the shooter's end, AKA the note's existion point
      */
     private Pose3d getNoteExitPoseRobodox599(Pose2d robotPose, Pose3d targetPose) {
         Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), targetPose.getRotation().toRotation2d()));
@@ -125,36 +126,5 @@ public class ShooterPhysicsCalculations {
      * +_  תקופה 3 - הכרזה על הקמת המדינה. (בעד ונגד הטיימינג). הצטרפות של 5 צבאות ערב. (הקרב על קיבו. ניצנים!)+ הפוגה
      *  תקופה 4 - צהל כובש ומשתלט על נקודות ישוב.  כיבוש אילת.(מבצע עובדה!)
      *  הקמת צהך + קשיים + פרשת אלטלנה.
-     *
-     *
      */
-
-    /**
-     * Get the field-relative end of the shooter, AKA the note's point of exit, from field-relative robot pose.
-     * Using the correct alliance.
-     * @param robotPose - The robot's pose, using the correct alliance
-     */
-    private Pose3d getNoteExitPosition(Pose2d robotPose) {
-        Rotation2d pitchAngle = shooterSubsystem.getPitchGoal();
-
-        Transform3d robotToPivot = new Transform3d(
-                0,
-                0,
-                0,
-                new Rotation3d(0, 0, 0)
-        ); //TODO: Tune from CAD
-
-        double pitchLength = 0.5; //TODO: Tune from CAD, TODO Move to constants
-
-        Transform3d pivotToPitchEnd = new Transform3d(
-                pitchLength * robotPose.getRotation().getCos(),
-                pitchLength * robotPose.getRotation().getCos(),
-                pitchLength * Math.sin(pitchAngle.getRadians()),
-                new Rotation3d()
-        ); //todo: This might be completely wrong! XXX TEST
-
-        Pose3d robotPose3d = new Pose3d(robotPose);
-
-        return robotPose3d.transformBy(robotToPivot).transformBy(pivotToPitchEnd);
-    }
 }
