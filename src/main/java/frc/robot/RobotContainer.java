@@ -63,7 +63,7 @@ public class RobotContainer {
     private final Swerve5990 swerve5990;
 
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(driveController);
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */

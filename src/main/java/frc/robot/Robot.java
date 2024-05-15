@@ -6,6 +6,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -15,6 +16,7 @@ public class Robot extends TimedRobot {
     private Command autonomousCommand;
     private CommandScheduler commandScheduler;
     private RobotContainer robotContainer;
+    Timer m_gcTimer = new edu.wpi.first.wpilibj.Timer();
 
     public Robot() {
         addPeriodic(() -> robotContainer.infrequentPeriodic(), 1/ INFREQUENT_PERIODIC_HERTZ);
@@ -25,11 +27,17 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         robotContainer = new RobotContainer();
         commandScheduler = CommandScheduler.getInstance();
+
+        m_gcTimer.start();
     }
 
     @Override
     public void robotPeriodic() {
         commandScheduler.run();
+
+        if (m_gcTimer.advanceIfElapsed(5)) {
+            System.gc();
+        }
     }
 
 

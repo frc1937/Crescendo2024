@@ -106,9 +106,17 @@ public final class Pitch {
         if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
         if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
 
-        if (Math.abs(voltage) < 0.31) return;
+        if(roundAvoid(voltage, 3) == 0.315) voltage = 0.2;
 
         motor.setVoltage(voltage);
+
+        SmartDashboard.putNumber("pitch/Voltage", voltage);
+//        System.out.println("VOLTAGE: " + voltage);
+    }
+
+    private static double roundAvoid(double value, int places) {
+        double scale = Math.pow(10, places);
+        return Math.round(value * scale) / scale;
     }
 
     private void logPitch() {
