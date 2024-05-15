@@ -55,7 +55,7 @@ public class PoseEstimator5990 implements AutoCloseable {
         putAprilTagsOnFieldWidget();
         SmartDashboard.putData("Field", field);
 
-        //Run the lines below in 1s delay to allow the swerve to initialize
+        //Run the lines below in 0.3s delay to allow the swerve to initialize
         Timer.delay(0.3);
 
         updateFromOdometryNotifier = new Notifier(this::updateFromOdometry);

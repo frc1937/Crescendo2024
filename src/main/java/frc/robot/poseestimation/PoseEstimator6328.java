@@ -20,8 +20,8 @@ import static frc.robot.Constants.VisionConstants.STATES_AMBIGUITY;
 import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
 
 public class PoseEstimator6328 {
-    public record OdometryObservation(
-            SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle, double timestamp) {
+    public record OdometryObservation(SwerveDriveWheelPositions wheelPositions, Rotation2d gyroAngle,
+                                      double timestamp) {
     }
 
     public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {
@@ -47,7 +47,7 @@ public class PoseEstimator6328 {
                             new SwerveModulePosition(),
                             new SwerveModulePosition()
                     }
-                    );
+            );
 
     private Rotation2d lastGyroAngle = new Rotation2d();
 
@@ -147,15 +147,3 @@ public class PoseEstimator6328 {
         return odometryPose;
     }
 }
-
-/*
-Hi. For my FRC project, I do constants in the following way.
-I create a constants class in a folder alongside the matching subsystem.
-However, sometimes unrelated classes require the use of the subsystem constants, which are package protected.
-How should I solve this?
-I can either:
-1. Make one big constants class for all subsystems (UGLY)
-2. Keep the current architecture but make a general-constants class with all of the cross-constants. (UGLY TOO)
-- Sometihng else
-Please help! thanks.
- */

@@ -14,9 +14,7 @@ public class ShooterPhysicsCalculations {
 
     /**
      * Get the needed pitch theta for the pivot using physics.
-     * <p>Formula is taken from
-     * <a href="https://en.wikipedia.org/wiki/Projectile_motion?useskin=vector#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">Projectile Motion Wikipedia</a>
-     * </p>
+     * @link <a href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">Formula is taken from wikipedia</a>
      * @param robotPose - The robot's pose, using the correct alliance
      * @param targetPose - the target pose to hit, using the correct alliance
      * @param tangentialVelocity - the tangential velocity of the flywheel
