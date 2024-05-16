@@ -32,7 +32,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.mount.MountSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
-import frc.robot.util.Controller;
+import frc.lib.util.Controller;
 
 import java.util.function.DoubleSupplier;
 
@@ -42,20 +42,20 @@ import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
-import static frc.robot.util.Controller.Axis.LEFT_X;
-import static frc.robot.util.Controller.Axis.LEFT_Y;
-import static frc.robot.util.Controller.Axis.RIGHT_X;
-import static frc.robot.util.Controller.Axis.RIGHT_Y;
-import static frc.robot.util.Controller.Inputs.A;
-import static frc.robot.util.Controller.Inputs.B;
-import static frc.robot.util.Controller.Inputs.BACK;
-import static frc.robot.util.Controller.Inputs.LEFT_BUMPER;
-import static frc.robot.util.Controller.Inputs.RIGHT_BUMPER;
-import static frc.robot.util.Controller.Inputs.START;
-import static frc.robot.util.Controller.Inputs.X;
-import static frc.robot.util.Controller.Inputs.Y;
-import static frc.robot.util.Controller.Stick.LEFT_STICK;
-import static frc.robot.util.Controller.Stick.RIGHT_STICK;
+import static frc.lib.util.Controller.Axis.LEFT_X;
+import static frc.lib.util.Controller.Axis.LEFT_Y;
+import static frc.lib.util.Controller.Axis.RIGHT_X;
+import static frc.lib.util.Controller.Axis.RIGHT_Y;
+import static frc.lib.util.Controller.Inputs.A;
+import static frc.lib.util.Controller.Inputs.B;
+import static frc.lib.util.Controller.Inputs.BACK;
+import static frc.lib.util.Controller.Inputs.LEFT_BUMPER;
+import static frc.lib.util.Controller.Inputs.RIGHT_BUMPER;
+import static frc.lib.util.Controller.Inputs.START;
+import static frc.lib.util.Controller.Inputs.X;
+import static frc.lib.util.Controller.Inputs.Y;
+import static frc.lib.util.Controller.Stick.LEFT_STICK;
+import static frc.lib.util.Controller.Stick.RIGHT_STICK;
 
 public class RobotContainer {
     private static final Controller driveController = new Controller(0);
@@ -141,8 +141,6 @@ public class RobotContainer {
                         () -> false
                 )
         );
-
-//        driveController.rumbleController(5, 5);
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 

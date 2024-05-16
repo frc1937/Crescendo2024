@@ -22,7 +22,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.util.AlliancePose2d;
+import frc.lib.util.AlliancePose2d;
 import org.photonvision.PhotonPoseEstimator;
 
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
     public static final class CanIDConstants {

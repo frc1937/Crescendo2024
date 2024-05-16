@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.lib.util;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;

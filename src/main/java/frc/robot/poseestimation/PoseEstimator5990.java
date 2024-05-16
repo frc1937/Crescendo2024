@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swerve.Swerve5990;
-import frc.robot.util.AlliancePose2d;
+import frc.lib.util.AlliancePose2d;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +27,7 @@ import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
 import static frc.robot.Constants.VisionConstants.ROTATION_STD_EXPONENT;
 import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
 import static frc.robot.Constants.VisionConstants.TRANSLATION_STD_EXPONENT;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.fromBluePose;
 
 /**
  * A class that estimates the robot's pose using team 6328's custom pose estimator.

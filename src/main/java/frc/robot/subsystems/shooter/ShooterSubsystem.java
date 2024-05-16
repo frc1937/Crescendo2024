@@ -51,11 +51,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-//        //if previously not loaded and now is
-//        if (!isLoaded() && (!beamBreaker.get() && consecutiveNoteInsideSamples+1 >= CONSIDERED_NOISELESS_THRESHOLD)) {
-//            driverController.rumble(10, 2);
-//        }
-
         if (!beamBreaker.get()) {
             consecutiveNoteInsideSamples++;
         } else {
@@ -67,7 +62,6 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.periodic();
 
         logShooter();
-
     }
 
     /**

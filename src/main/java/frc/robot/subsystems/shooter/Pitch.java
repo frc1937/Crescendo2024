@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.lib.math.MathUtils.round;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
@@ -33,7 +34,7 @@ public final class Pitch {
 
     private ProfiledPIDController controller;
 
-    private double deadband = DEFAULT_PITCH_DEADBAND;
+    private double deadband = DEFAULT_PITCH_DEADBAND, voltage = 0;
     private StatusSignal<Double> encoderPositionSignal, encoderVelocitySignal;
 
     public Pitch() {
@@ -101,22 +102,14 @@ public final class Pitch {
 
     private void drivePitch() {
         double velocitySetpoint = MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), deadband);
-        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
+        voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
 
         if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
         if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
 
-        if(roundAvoid(voltage, 3) == 0.315) voltage = 0.3;
+        if(round(voltage, 3) == 0.315) voltage = 0.3;
 
         motor.setVoltage(voltage);
-
-        SmartDashboard.putNumber("pitch/Voltage", voltage);
-//        System.out.println("VOLTAGE: " + voltage);
-    }
-
-    private static double roundAvoid(double value, int places) {
-        double scale = Math.pow(10, places);
-        return Math.round(value * scale) / scale;
     }
 
     private void logPitch() {
@@ -124,6 +117,7 @@ public final class Pitch {
         SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
         SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
         SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
+        SmartDashboard.putNumber("pitch/Voltage", voltage);
     }
 
     private void configurePitchController() {

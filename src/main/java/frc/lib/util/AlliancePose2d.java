@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.lib.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.Constants.FIELD_LENGTH_METRES;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 
 public class AlliancePose2d {
     private final Pose2d bluePose;

@@ -44,10 +44,10 @@ import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
 import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
 import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
 import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_VELOCITY;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.fromBluePose;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
-import static frc.robot.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.fromBluePose;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);

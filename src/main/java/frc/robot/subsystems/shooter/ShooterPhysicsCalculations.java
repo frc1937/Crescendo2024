@@ -25,7 +25,7 @@ public class ShooterPhysicsCalculations {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ() - getNoteExitPoseRobodox599(robotPose, targetPose).getZ();
+        double z = targetPose.getZ() - getNoteExitPose(robotPose, targetPose).getZ();
         double distance = getDistanceToTarget(robotPose, targetPose);
 
         double theta = Math.atan(
@@ -38,13 +38,17 @@ public class ShooterPhysicsCalculations {
     /**
      * We assume the robot isn't moving to get the time of flight
      * @param robotPose - The robot's pose, using the correct alliance
-     * @param targetPose - The target pose of the note, using the correct alliance
+     * @param targetPose - The target pose of the NOTE, using the correct alliance
      * @param tangentialVelocity - The tangential velocity of the flywheels
      * @return - the time of flight in seconds
      */
     public double getTimeOfFlight(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
         Rotation2d theta = getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
-        return getDistanceToTarget(robotPose, targetPose) / (tangentialVelocity * theta.getCos());
+
+        double distance = getDistanceToTarget(robotPose, targetPose);
+        double speed = tangentialVelocity * theta.getCos();
+
+        return distance / speed;
     }
 
     /**
@@ -80,23 +84,23 @@ public class ShooterPhysicsCalculations {
     }
 
     /**
-     * Get the distance from the note's exit position to the target
+     * Get the distance from the NOTE's exit position to the target
      * @param robotPose - The robot's pose, using the correct alliance
      * @param targetPose - The target pose, using the correct alliance
      * @return - The distance in metres
      */
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
-        return getNoteExitPoseRobodox599(robotPose, targetPose).getTranslation().getDistance(targetPose.getTranslation());
+        return getNoteExitPose(robotPose, targetPose).getTranslation().getDistance(targetPose.getTranslation());
     }
 
     /**
-     * Get the field-relative end of the shooter, AKA the note's point of exit, from field-relative robot pose.
+     * Get the field-relative end of the shooter, AKA the NOTE's point of exit, from field-relative robot pose.
      * Using the correct alliance.
      * @param robotPose - The robot's pose, using the correct alliance
      * @param targetPose - The target's pose, using the correct alliance
-     * @return the shooter's end, AKA the note's existion point
+     * @return the shooter's end, AKA the NOTE's point of exit
      */
-    private Pose3d getNoteExitPoseRobodox599(Pose2d robotPose, Pose3d targetPose) {
+    private Pose3d getNoteExitPose(Pose2d robotPose, Pose3d targetPose) {
         Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), targetPose.getRotation().toRotation2d()));
 
         Transform3d robotToPivot = new Transform3d(

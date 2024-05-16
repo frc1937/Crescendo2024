@@ -11,7 +11,7 @@ import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.util.AlliancePose2d;
+import frc.lib.util.AlliancePose2d;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;

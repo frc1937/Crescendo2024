@@ -72,7 +72,7 @@ public class Flywheel {
     }
 
     public Measure<Velocity<Angle>> getSetpoint() {
-        if(setpoint != null)
+        if (setpoint != null)
             return setpoint;
         return RPM.of(0);
     }
