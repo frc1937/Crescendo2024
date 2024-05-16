@@ -115,13 +115,9 @@ public class PoseEstimator5990 implements AutoCloseable {
     }
 
     private void updateFromVision() {
-        updateLock.lock();
-
         getViableVisionObservations().stream()
                 .sorted(Comparator.comparingDouble(PoseEstimator6328.VisionObservation::timestamp))
                 .forEach(swerveDrivePoseEstimator::addVisionObservation);
-
-        updateLock.unlock();
     }
 
     private List<PoseEstimator6328.VisionObservation> getViableVisionObservations() {

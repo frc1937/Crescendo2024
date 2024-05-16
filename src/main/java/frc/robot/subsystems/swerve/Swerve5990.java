@@ -79,8 +79,6 @@ public class Swerve5990 extends SubsystemBase {
 
         modules = getModules();
 
-        Timer.delay(1); //todo: Check without this, if this is even needed
-
         setupAzimuthController();
         configurePathPlanner();
     }

@@ -12,7 +12,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.*;
+import frc.robot.commands.AlignWithAmp;
+import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.MountCommand;
+import frc.robot.commands.PrepareShooter;
+import frc.robot.commands.ShootOnTheMove;
+import frc.robot.commands.ShootToAmp;
+import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ShooterKick;
+import frc.robot.commands.TeleOpDrive;
 import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
 import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
 import frc.robot.commands.leds.ColourByShooter;
@@ -30,9 +38,22 @@ import java.util.function.DoubleSupplier;
 
 import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
 import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
-import static frc.robot.util.Controller.Axis.*;
-import static frc.robot.util.Controller.Inputs.*;
+import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
+import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
+import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
+import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
+import static frc.robot.util.Controller.Axis.LEFT_X;
+import static frc.robot.util.Controller.Axis.LEFT_Y;
+import static frc.robot.util.Controller.Axis.RIGHT_X;
+import static frc.robot.util.Controller.Axis.RIGHT_Y;
+import static frc.robot.util.Controller.Inputs.A;
+import static frc.robot.util.Controller.Inputs.B;
+import static frc.robot.util.Controller.Inputs.BACK;
+import static frc.robot.util.Controller.Inputs.LEFT_BUMPER;
+import static frc.robot.util.Controller.Inputs.RIGHT_BUMPER;
+import static frc.robot.util.Controller.Inputs.START;
+import static frc.robot.util.Controller.Inputs.X;
+import static frc.robot.util.Controller.Inputs.Y;
 import static frc.robot.util.Controller.Stick.LEFT_STICK;
 import static frc.robot.util.Controller.Stick.RIGHT_STICK;
 
@@ -69,13 +90,19 @@ public class RobotContainer {
     /* Commands */
     private final ShooterCommands shooterCommands;
 
+
+    /* CONTROLS */
+    private final Trigger hasNote = new Trigger(shooterSubsystem::isLoaded);
+
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
         PoseEstimator6328 poseEstimator6328 = new PoseEstimator6328();
 
         poseEstimator5990 = new PoseEstimator5990(poseEstimator6328,
-                new PhotonCameraSource("Front1937", FRONT_CAMERA_TO_ROBOT)
+                new PhotonCameraSource(FRONT_CAMERA_NAME, FRONT_CAMERA_TO_ROBOT)
         );
+
+//        Transform3d nice = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(25), 0));
 
         swerve5990 = new Swerve5990(poseEstimator5990);
         poseEstimator5990.setSwerve(swerve5990);
@@ -91,6 +118,8 @@ public class RobotContainer {
 
 
     private void configureBindings() {
+        hasNote.toggleOnTrue(new InstantCommand(() -> driveController.rumble(10, 2)));
+
         //Temporary Characterization buttons
         drRightTrigger.whileTrue(
                 new SequentialCommandGroup(
