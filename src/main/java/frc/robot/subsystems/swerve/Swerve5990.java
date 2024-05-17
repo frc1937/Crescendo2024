@@ -23,6 +23,9 @@ import frc.lib.RobotStateHistory;
 import frc.robot.poseestimation.PoseEstimator5990;
 
 import static edu.wpi.first.units.Units.Radians;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
@@ -44,10 +47,6 @@ import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
 import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
 import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
 import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_VELOCITY;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.fromBluePose;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -122,7 +121,7 @@ public class Swerve5990 extends SubsystemBase {
 
     public void resetGyro() {
         Pose2d pose = new Pose2d(0, 0, new Rotation2d());
-        gyro.setYaw(fromBluePose(pose).getCorrectPose().getRotation().getDegrees());
+        gyro.setYaw(0);
     }
 
     public SwerveDriveWheelPositions getModulePositions() {
@@ -132,10 +131,6 @@ public class Swerve5990 extends SubsystemBase {
             positions[mod.swerveModuleConstants.moduleNumber()] = mod.getCurrentPosition();
 
         return new SwerveDriveWheelPositions(positions);
-    }
-
-    public RobotStateHistory getStateHistory() {
-        return stateHistory;
     }
 
     public void infrequentPeriodic() {
@@ -285,7 +280,6 @@ public class Swerve5990 extends SubsystemBase {
             mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber()], false);
         }
     }
-
 
     private ChassisSpeeds powersToSpeeds(double xPower, double yPower, double thetaPower) {
         return new ChassisSpeeds(

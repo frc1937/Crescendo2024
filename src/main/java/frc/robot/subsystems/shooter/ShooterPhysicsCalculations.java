@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
@@ -25,12 +26,21 @@ public class ShooterPhysicsCalculations {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ() - getNoteExitPose(robotPose, targetPose).getZ();
+        double z = targetPose.getZ(); //- getNoteExitPose(robotPose, targetPose).getZ();
         double distance = getDistanceToTarget(robotPose, targetPose);
 
+        SmartDashboard.putNumber("physics/ZedDistance", z);
+        SmartDashboard.putNumber("physics/distance", distance);
+
+        SmartDashboard.putNumber("physics/DivNumerator", (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))));
+        SmartDashboard.putNumber("physics/DivDenominator", g*distance);
+        SmartDashboard.putNumber("physics/DivResult", (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))) / (g*distance));
+
         double theta = Math.atan(
-                (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))) / (g*distance)
+                (vSquared - Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))) / (g*distance)
         );
+
+        SmartDashboard.putNumber("physics/FunctionTheta", theta);
 
         return Rotation2d.fromRadians(theta);
     }

@@ -10,10 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Controller;
 import frc.robot.commands.AlignWithAmp;
-import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.MountCommand;
 import frc.robot.commands.PrepareShooter;
 import frc.robot.commands.ShootOnTheMove;
@@ -21,8 +20,6 @@ import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
-import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
-import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
 import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.poseestimation.PhotonCameraSource;
 import frc.robot.poseestimation.PoseEstimator5990;
@@ -32,16 +29,10 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.mount.MountSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
-import frc.lib.util.Controller;
 
 import java.util.function.DoubleSupplier;
 
 import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
-import static frc.robot.Constants.Transforms.FRONT_CAMERA_TO_ROBOT;
-import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
-import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
-import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
-import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 import static frc.lib.util.Controller.Axis.LEFT_X;
 import static frc.lib.util.Controller.Axis.LEFT_Y;
 import static frc.lib.util.Controller.Axis.RIGHT_X;
@@ -56,6 +47,11 @@ import static frc.lib.util.Controller.Inputs.X;
 import static frc.lib.util.Controller.Inputs.Y;
 import static frc.lib.util.Controller.Stick.LEFT_STICK;
 import static frc.lib.util.Controller.Stick.RIGHT_STICK;
+import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
+import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
+import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
+import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
+import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 
 public class RobotContainer {
     private static final Controller driveController = new Controller(0);
@@ -99,7 +95,7 @@ public class RobotContainer {
         PoseEstimator6328 poseEstimator6328 = new PoseEstimator6328();
 
         poseEstimator5990 = new PoseEstimator5990(poseEstimator6328,
-                new PhotonCameraSource(FRONT_CAMERA_NAME, FRONT_CAMERA_TO_ROBOT)
+                new PhotonCameraSource(FRONT_CAMERA_NAME, ROBOT_TO_FRONT_CAMERA)
         );
 
 //        Transform3d nice = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(25), 0));
@@ -121,16 +117,17 @@ public class RobotContainer {
         hasNote.toggleOnTrue(new InstantCommand(() -> driveController.rumble(10, 2)));
 
         //Temporary Characterization buttons
-        drRightTrigger.whileTrue(
-                new SequentialCommandGroup(
-                        new MaxDrivetrainSpeedCharacterization(swerve5990),
-                        new MaxFlywheelSpeedCharacterization(shooterSubsystem)
-                )
-        );
 
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(LEFT_Y);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
         DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), Constants.STICK_DEADBAND);
+
+//        drRightTrigger.whileTrue(
+//                new ParallelCommandGroup(
+////                new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false)//, 5.1m/s
+////                new MaxFlywheelSpeedCharacterization(shooterSubsystem) //5500 rpm flywheel
+//                )
+//        );
 
         swerve5990.setDefaultCommand(
                 new TeleOpDrive(
@@ -147,14 +144,14 @@ public class RobotContainer {
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
         //🎇 Physics 🌟 (This won't work prob lol)
-        drAButton.whileTrue(shooterCommands.shootPhysics(2));
+        drAButton.whileTrue(shooterCommands.shootPhysics(13));
         drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16));
         drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-        drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
+//        drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
 
         drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
         drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve));

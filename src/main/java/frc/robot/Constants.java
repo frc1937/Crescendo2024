@@ -76,8 +76,7 @@ public final class Constants {
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
         public static final Transform3d
-                FRONT_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(-0.31, -0.13, 0.27), new Rotation3d(0, Units.degreesToRadians(-25), 0)),
-                ROBOT_TO_FRONT_CAMERA = FRONT_CAMERA_TO_ROBOT.inverse();
+           ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(-30), 0));
         public static final Transform3d
                 REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.355, 0.11, 0.41),
                 new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
@@ -148,7 +147,7 @@ public final class Constants {
                 TAG_ID_TO_POSE.put(aprilTag.ID, aprilTag.pose);
         }
 
-        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.18, 0.0, 2.045081), new Rotation3d()));
+        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.18, 0.0, 0.49081), new Rotation3d()));
         public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
 
         public static final PhotonPoseEstimator.PoseStrategy PRIMARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;

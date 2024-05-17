@@ -149,6 +149,9 @@ public class ShooterSubsystem extends SubsystemBase {
         double leftFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
         double rightFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
 
+        SmartDashboard.putNumber("physics/SPEEDLEFT", leftFlywheelRPM);
+        SmartDashboard.putNumber("physics/SPEEDIRGHT", rightFlywheelRPM);
+
         leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
         rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));
     }

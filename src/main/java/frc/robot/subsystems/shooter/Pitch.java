@@ -21,11 +21,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.lib.math.MathUtils.round;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.DEFAULT_PITCH_DEADBAND;
+import static frc.robot.subsystems.shooter.ShooterConstants.FORWARD_PITCH_SOFT_LIMIT;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KI;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KP;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KS;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KV;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATION;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
+import static frc.robot.subsystems.shooter.ShooterConstants.REVERSE_PITCH_SOFT_LIMIT;
+import static frc.robot.subsystems.shooter.ShooterConstants.VERTICAL_PITCH_DEADBAND;
 
 public final class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
@@ -56,13 +69,13 @@ public final class Pitch {
 
     public void setGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
         controller.setGoal(new TrapezoidProfile.State(position.getRadians(), velocity.in(RadiansPerSecond)));
-
-        boolean isTop = MathUtil.isNear(position.getRadians(), Math.PI / 2, 0.05);
-        deadband = isTop ? VERTICAL_PITCH_DEADBAND : DEFAULT_PITCH_DEADBAND;
     }
 
     public void setGoal(Rotation2d position) {
-        setGoal(position, RadiansPerSecond.of(0));
+        controller.setGoal(new TrapezoidProfile.State(position.getRadians(), 0));
+
+        boolean isTop = MathUtil.isNear(position.getRadians(), Math.PI / 2, 0.05);
+        deadband = isTop ? VERTICAL_PITCH_DEADBAND : DEFAULT_PITCH_DEADBAND;
     }
 
     public void setConstraints(TrapezoidProfile.Constraints constraints) {
@@ -70,7 +83,7 @@ public final class Pitch {
     }
 
     public boolean atGoal() {
-        return controller.atGoal() && Math.abs(controller.getGoal().velocity - getCurrentVelocity().in(RadiansPerSecond)) < 0.02;
+        return controller.atGoal();// && Math.abs(controller.getGoal().velocity - getCurrentVelocity().in(RadiansPerSecond)) < 0.02;
     }
 
     public Rotation2d getGoal() {
@@ -107,7 +120,14 @@ public final class Pitch {
         if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
         if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
 
-        if(round(voltage, 3) == 0.315) voltage = 0.3;
+//        if(round(voltage, 3) == 0.315) voltage = 0.3;
+
+        if (voltage > 12) System.out.println("What the FUCK " + voltage);
+
+        if(voltage > 6) {
+            System.out.println("Shut the fuck. " + voltage);
+            voltage = 6;
+        }
 
         motor.setVoltage(voltage);
     }

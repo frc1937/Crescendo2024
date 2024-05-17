@@ -3,15 +3,16 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.util.AlliancePose2d;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.lib.util.AlliancePose2d;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
@@ -39,10 +40,17 @@ public class ShooterCommands {
 
     public Command shootPhysics(double tangentialVelocity) {
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
-        Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
+        Pose2d robotPose = poseEstimator5990.getCurrentPose().getBluePose();
 
         Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
         ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
+
+        System.out.println("Button is pressed");
+
+        SmartDashboard.putString("physics/targetPose", targetPose.toString());
+        SmartDashboard.putString("physics/robotPose", robotPose.toString());
+        SmartDashboard.putNumber("physics/theta", theta.getDegrees());
+        SmartDashboard.putNumber("physics/tangentialVelocity", tangentialVelocity);
 
         return shootNote(reference);
     }
