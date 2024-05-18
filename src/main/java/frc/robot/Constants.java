@@ -131,9 +131,9 @@ public final class Constants {
          * The vector represents how ambiguous each value is.
          * The first value represents how ambiguous is the x,
          * the second one for the y, and the third one is for the theta (rotation).
-         * Increase these numbers to trust the estimate less.
+         * Increase these numbers to trust the odometry less.
          */
-        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.003, 0.003, 0.0002);
+        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.002, 0.002, 0.00002);
 
         public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(5, 5, Rotation2d.fromDegrees(0));
 
