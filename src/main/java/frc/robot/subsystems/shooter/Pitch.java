@@ -69,13 +69,13 @@ public final class Pitch {
 
     public void setGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
         controller.setGoal(new TrapezoidProfile.State(position.getRadians(), velocity.in(RadiansPerSecond)));
-    }
-
-    public void setGoal(Rotation2d position) {
-        controller.setGoal(new TrapezoidProfile.State(position.getRadians(), 0));
 
         boolean isTop = MathUtil.isNear(position.getRadians(), Math.PI / 2, 0.05);
         deadband = isTop ? VERTICAL_PITCH_DEADBAND : DEFAULT_PITCH_DEADBAND;
+    }
+
+    public void setGoal(Rotation2d position) {
+        setGoal(position, RadiansPerSecond.of(0));
     }
 
     public void setConstraints(TrapezoidProfile.Constraints constraints) {
@@ -138,6 +138,7 @@ public final class Pitch {
         SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
         SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
         SmartDashboard.putNumber("pitch/Voltage", voltage);
+        SmartDashboard.putNumber("pitch/Current", motor.getOutputCurrent());
     }
 
     private void configurePitchController() {
