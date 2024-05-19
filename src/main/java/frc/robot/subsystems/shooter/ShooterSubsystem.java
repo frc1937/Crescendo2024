@@ -17,7 +17,6 @@ import frc.lib.math.MeasureUtils;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.lib.math.Conversions.RPMFromTangentialVelocity;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
@@ -45,8 +44,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private int consecutiveNoteInsideSamples = 0;
 
     public ShooterSubsystem() {
-        kickerMotor.configFactoryDefault();
-        kickerMotor.setNeutralMode(NeutralMode.Brake);
+        configureKickerMotor();
     }
 
     @Override
@@ -101,12 +99,8 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.setGoal(goal);
     }
 
-    public void setPitchGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
-        pitch.setGoal(position, velocity);
-    }
-
     public void setReference(Reference reference) {
-        pitch.setGoal(reference.pitchPosition, reference.pitchVelocity);
+        pitch.setGoal(reference.pitchPosition);
         setTangentialFlywheelsVelocity(reference.flywheelTangentialVelocity);
     }
 
@@ -149,25 +143,13 @@ public class ShooterSubsystem extends SubsystemBase {
         double leftFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
         double rightFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
 
-        SmartDashboard.putNumber("physics/SPEEDLEFT", leftFlywheelRPM);
-        SmartDashboard.putNumber("physics/SPEEDIRGHT", rightFlywheelRPM);
-
         leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
         rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));
     }
 
     public static class Reference implements Interpolatable<Reference> {
         private Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
-        private Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0);
         private Measure<Velocity<Distance>> flywheelTangentialVelocity = MetersPerSecond.of(0);
-
-        public Reference(Rotation2d pitchPosition,
-                         Measure<Velocity<Angle>> pitchVelocity,
-                         Measure<Velocity<Distance>> flywheelTangentialVelocity) {
-            this.pitchPosition = pitchPosition;
-            this.pitchVelocity = pitchVelocity;
-            this.flywheelTangentialVelocity = flywheelTangentialVelocity;
-        }
 
         public Reference(Rotation2d pitchPosition,
                          Measure<Velocity<Distance>> flywheelTangentialVelocity) {
@@ -185,10 +167,14 @@ public class ShooterSubsystem extends SubsystemBase {
         public Reference interpolate(Reference endValue, double t) {
             return new Reference(
                 pitchPosition.interpolate(endValue.pitchPosition, t),
-                MeasureUtils.interpolate(pitchVelocity, endValue.pitchVelocity, t),
                 MeasureUtils.interpolate(flywheelTangentialVelocity, endValue.flywheelTangentialVelocity, t)
             );
         }
+    }
+
+    private void configureKickerMotor() {
+        kickerMotor.configFactoryDefault();
+        kickerMotor.setNeutralMode(NeutralMode.Brake);
     }
 
     private void logShooter() {

@@ -16,7 +16,7 @@ public class Robot extends TimedRobot {
     private Command autonomousCommand;
     private CommandScheduler commandScheduler;
     private RobotContainer robotContainer;
-    Timer m_gcTimer = new edu.wpi.first.wpilibj.Timer();
+    Timer gcTimer = new edu.wpi.first.wpilibj.Timer();
 
     public Robot() {
         addPeriodic(() -> robotContainer.infrequentPeriodic(), 1/ INFREQUENT_PERIODIC_HERTZ);
@@ -28,14 +28,14 @@ public class Robot extends TimedRobot {
         robotContainer = new RobotContainer();
         commandScheduler = CommandScheduler.getInstance();
 
-        m_gcTimer.start();
+        gcTimer.start();
     }
 
     @Override
     public void robotPeriodic() {
         commandScheduler.run();
 
-        if (m_gcTimer.advanceIfElapsed(5)) {
+        if (gcTimer.advanceIfElapsed(5)) {
             System.gc();
         }
     }

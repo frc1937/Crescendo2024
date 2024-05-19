@@ -19,7 +19,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
@@ -38,7 +37,6 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
 import static frc.robot.subsystems.shooter.ShooterConstants.REVERSE_PITCH_SOFT_LIMIT;
-import static frc.robot.subsystems.shooter.ShooterConstants.VERTICAL_PITCH_DEADBAND;
 
 public final class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
@@ -67,15 +65,8 @@ public final class Pitch {
         drivePitch();
     }
 
-    public void setGoal(Rotation2d position, Measure<Velocity<Angle>> velocity) {
-        controller.setGoal(new TrapezoidProfile.State(position.getRadians(), velocity.in(RadiansPerSecond)));
-
-        boolean isTop = MathUtil.isNear(position.getRadians(), Math.PI / 2, 0.05);
-        deadband = isTop ? VERTICAL_PITCH_DEADBAND : DEFAULT_PITCH_DEADBAND;
-    }
-
     public void setGoal(Rotation2d position) {
-        setGoal(position, RadiansPerSecond.of(0));
+        controller.setGoal(new TrapezoidProfile.State(position.getRadians(), 0));
     }
 
     public void setConstraints(TrapezoidProfile.Constraints constraints) {
@@ -83,7 +74,7 @@ public final class Pitch {
     }
 
     public boolean atGoal() {
-        return controller.atGoal();// && Math.abs(controller.getGoal().velocity - getCurrentVelocity().in(RadiansPerSecond)) < 0.02;
+        return controller.atGoal();
     }
 
     public Rotation2d getGoal() {
