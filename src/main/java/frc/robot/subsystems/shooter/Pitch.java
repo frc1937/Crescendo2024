@@ -111,8 +111,6 @@ public final class Pitch {
         if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
         if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
 
-//        if(round(voltage, 3) == 0.315) voltage = 0.3;
-
         if (voltage > 12) System.out.println("What the FUCK " + voltage);
 
         if(voltage > 6) {

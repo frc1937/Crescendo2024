@@ -28,6 +28,7 @@ public class Flywheel {
 
     private double feedforwardCorrection = 0;
     private Measure<Velocity<Angle>> setpoint;
+    private Measure<Velocity<Angle>> velocity;
 
     public final Measure<Velocity<Angle>> theoreticalMaximumVelocity;
 
@@ -37,26 +38,17 @@ public class Flywheel {
         feedback = new PIDController(p, 0, 0);
         feedforward = new SimpleMotorFeedforward(s, v, a);
 
-        motor = new CANSparkFlex(motorId, MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
-        motor.setIdleMode(IdleMode.kCoast);
-        motor.setInverted(invert);
-
         feedback.setTolerance(ShooterConstants.FlywheelControlConstants.TOLERANCE);
 
+        motor = configureMotor(motorId, invert);
         encoder = motor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
 
         theoreticalMaximumVelocity = RotationsPerSecond.of(feedforward.maxAchievableVelocity(12, 0));
     }
 
     public void periodic() {
-        Measure<Velocity<Angle>> velocity = RPM.of(encoder.getVelocity());
-        double feedbackCorrection = feedback.calculate(velocity.in(RotationsPerSecond));
-
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/velocity [rpm]", velocity.in(RPM));
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/setpoint [rpm]", feedback.getSetpoint() * 60);
-
-        motor.setVoltage(feedbackCorrection + feedforwardCorrection);
+        logFlywheel();
+        driveFlywheel();
     }
 
     public void setSpeed(Measure<Velocity<Angle>> speed, double pScalar) {
@@ -74,6 +66,7 @@ public class Flywheel {
     public Measure<Velocity<Angle>> getSetpoint() {
         if (setpoint != null)
             return setpoint;
+
         return RPM.of(0);
     }
 
@@ -88,5 +81,26 @@ public class Flywheel {
     public void stopMotor() {
         setSpeed(RPM.of(0));
         motor.stopMotor();
+    }
+
+    private CANSparkFlex configureMotor(int motorId, boolean invert) {
+        CANSparkFlex sparkFlexMotor = new CANSparkFlex(motorId, MotorType.kBrushless);
+        sparkFlexMotor.restoreFactoryDefaults();
+        sparkFlexMotor.setIdleMode(IdleMode.kCoast);
+        sparkFlexMotor.setInverted(invert);
+
+        return sparkFlexMotor;
+    }
+
+    private void driveFlywheel() {
+        velocity = RPM.of(encoder.getVelocity());
+        double feedbackCorrection = feedback.calculate(velocity.in(RotationsPerSecond));
+
+        motor.setVoltage(feedbackCorrection + feedforwardCorrection);
+    }
+
+    private void logFlywheel() {
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/velocity [rpm]", velocity.in(RPM));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/setpoint [rpm]", feedback.getSetpoint() * 60);
     }
 }
