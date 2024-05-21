@@ -100,7 +100,9 @@ public class Flywheel {
     }
 
     private void logFlywheel() {
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/velocity [rpm]", velocity.in(RPM));
+        if(velocity != null)
+            SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/velocity [rpm]", velocity.in(RPM));
+
         SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/setpoint [rpm]", feedback.getSetpoint() * 60);
     }
 }

@@ -4,9 +4,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
@@ -76,7 +72,7 @@ public final class Constants {
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
         public static final Transform3d
-           ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(-30), 0));
+           ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(25), 0));
         public static final Transform3d
                 REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.355, 0.11, 0.41),
                 new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
@@ -99,33 +95,12 @@ public final class Constants {
     public static class VisionConstants {
         public static final String FRONT_CAMERA_NAME = "Front1937";
         public static final String REAR_CAMERA_NAME = "Rear1937";
-        public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
-                AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+        public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
         /**
          * Minimum target ambiguity. Targets with higher ambiguity will be discarded
          */
         public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
-        public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
-        public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
-        public static final double NOISY_DISTANCE_METERS = 2.5;
-        public static final double DISTANCE_WEIGHT = 7;
-        public static final int TAG_PRESENCE_WEIGHT = 10;
-
-        /**
-         * Standard deviations of the vision measurements. Increase these numbers to
-         * trust global measurements from vision less.
-         * This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians.
-         */
-        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 1.d, 1.d, 1.d);
-
-        /**
-         * Standard deviations of model states. Increase these numbers to trust your
-         * model's state estimates less. This
-         * matrix is in the form [x, y, theta]ᵀ, with units in meters and radians, then
-         * meters.
-         */
-        public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(), 0.1, 0.1, 0.03);
 
         /**
          * The vector represents how ambiguous each value is.
@@ -133,7 +108,8 @@ public final class Constants {
          * the second one for the y, and the third one is for the theta (rotation).
          * Increase these numbers to trust the odometry less.
          */
-        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.002, 0.002, 0.00002);
+        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.003, 0.003, 0.000002);
+        public static final double POSE_BUFFER_SIZE_SECONDS = 2.0;
 
         public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(5, 5, Rotation2d.fromDegrees(0));
 

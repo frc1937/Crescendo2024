@@ -43,7 +43,9 @@ public class ShooterCommands {
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getBluePose();
 
         Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
-        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
+        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(0)
+                //MetersPerSecond.of(tangentialVelocity)
+        );
 
         System.out.println("Button is pressed");
 
