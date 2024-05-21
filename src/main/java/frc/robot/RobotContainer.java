@@ -10,9 +10,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.Controller;
 import frc.robot.commands.AlignWithAmp;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.MountCommand;
 import frc.robot.commands.PrepareShooter;
 import frc.robot.commands.ShootOnTheMove;
@@ -20,6 +23,9 @@ import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
+import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
+import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
+import frc.robot.commands.calibration.PitchCharacterization;
 import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.poseestimation.PhotonCameraSource;
 import frc.robot.poseestimation.PoseEstimator5990;
@@ -116,18 +122,9 @@ public class RobotContainer {
     private void configureBindings() {
         hasNote.toggleOnTrue(new InstantCommand(() -> driveController.rumble(10, 2)));
 
-        //Temporary Characterization buttons
-
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(LEFT_Y);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
         DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), Constants.STICK_DEADBAND);
-
-//        drRightTrigger.whileTrue(
-//                new ParallelCommandGroup(
-////                new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false)//, 5.1m/s
-////                new MaxFlywheelSpeedCharacterization(shooterSubsystem) //5500 rpm flywheel
-//                )
-//        );
 
         swerve5990.setDefaultCommand(
                 new TeleOpDrive(
@@ -141,31 +138,14 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
-
-        //🎇 Physics 🌟 (This won't work prob lol)
-        drAButton.whileTrue(shooterCommands.shootPhysics(13));
-        drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16));
-        drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
-
-        drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
-        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
-        drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
-//        drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
-
-        drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
-        drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve));
-
-        //Operator buttons:
-        opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
-        opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
-
         mountSubsystem.setDefaultCommand(
                 new MountCommand(mountSubsystem,
                         () -> MathUtil.applyDeadband(-operatorController.getRawAxis(LEFT_Y), Constants.STICK_DEADBAND * 0.5),
                         () -> MathUtil.applyDeadband(-operatorController.getRawAxis(RIGHT_Y), Constants.STICK_DEADBAND * 0.5)
                 )
         );
+
+        initializeButtons(translationSup, strafeSup, rotationSup, "");
     }
 
 
@@ -178,16 +158,12 @@ public class RobotContainer {
     }
 
     public void frequentPeriodic() {
-        shooterSubsystem.periodic();
         poseEstimator5990.periodic();
     } //TODO this is a HUGE mistake. PLEASE TEST
 
     private void registerCommands() {
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
-//        NamedCommands.registerCommand("Rotate", new AimAtSpeaker(swerve5990, 1));
-//        NamedCommands.registerCommand("Half-Rotate", new AimAtSpeaker(swerve5990, 0.5));
-
         NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake().withTimeout(2.7));
 
         NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
@@ -210,5 +186,55 @@ public class RobotContainer {
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), tangentialVelocityFromRPM(4500, flywheelDiameter))));
         NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), tangentialVelocityFromRPM(3000, flywheelDiameter))));
+    }
+
+    private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, String identification) {
+        switch (identification) {
+            case "pitch characterization" -> pitchCharacterizationLayout();
+            case "max speeds characterization" -> maxSpeedsCharacterizationLayout(translationSup, strafeSup, rotationSup);
+            default -> teleopButtonsLayout(translationSup, strafeSup);
+        }
+    }
+
+    private void teleopButtonsLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+        drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
+
+        drAButton.whileTrue(shooterCommands.shootPhysics(13));
+        drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16));
+        drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
+
+        drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
+
+        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
+        drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
+        drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
+
+        drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
+        drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve));
+
+        //Operator buttons:
+        opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
+        opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
+    }
+
+    private void pitchCharacterizationLayout() {
+        PitchCharacterization pitchCharacterization = new PitchCharacterization(shooterSubsystem);
+
+        SysIdRoutine.Direction forward = SysIdRoutine.Direction.kForward;
+        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kForward;
+
+        drAButton.whileTrue(pitchCharacterization.sysIdDynamicTest(forward));
+        drBButton.whileTrue(pitchCharacterization.sysIdDynamicTest(reverse));
+        drYButton.whileTrue(pitchCharacterization.sysIdQuastaticTest(forward));
+        drXButton.whileTrue(pitchCharacterization.sysIdQuastaticTest(reverse));
+    }
+
+    private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
+        drRightTrigger.whileTrue(
+                new ParallelCommandGroup(
+                        new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false),//, 5.1m/s
+                        new MaxFlywheelSpeedCharacterization(shooterSubsystem) //5500 rpm flywheel
+                )
+        );
     }
 }

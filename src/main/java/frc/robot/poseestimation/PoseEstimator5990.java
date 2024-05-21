@@ -123,8 +123,11 @@ public class PoseEstimator5990 implements AutoCloseable {
     private List<PoseEstimator6328.VisionObservation> getViableVisionObservations() {
         List<PoseEstimator6328.VisionObservation> viableVisionObservations = new ArrayList<>();
 
+        PoseEstimator6328.VisionObservation visionObservation;
+
         for (PhotonCameraSource photonCameraSource : photonCameraSources) {
-            final PoseEstimator6328.VisionObservation visionObservation = getVisionObservation(photonCameraSource);
+            visionObservation = getVisionObservation(photonCameraSource);
+
             if (visionObservation != null)
                 viableVisionObservations.add(visionObservation);
         }

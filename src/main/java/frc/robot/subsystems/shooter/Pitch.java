@@ -17,9 +17,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volt;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
@@ -45,13 +47,12 @@ public final class Pitch {
 
     private ProfiledPIDController controller;
 
-    private double deadband = DEFAULT_PITCH_DEADBAND, voltage = 0;
+    private double pitchMaxCurrent = 0;
+
     private StatusSignal<Double> encoderPositionSignal, encoderVelocitySignal;
 
     public Pitch() {
-        motor.restoreFactoryDefaults();
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-
+        configurePitchMotor();
         configureSteerEncoder();
         configureSoftLimits();
         configurePitchController();
@@ -85,7 +86,7 @@ public final class Pitch {
         Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).minus(PIVOT_ENCODER_OFFSET);
 
         //Ensure the encoder always has the same starting angle.
-        if(angle.getDegrees() > 300)
+        if (angle.getDegrees() > 300)
             angle.minus(Rotation2d.fromDegrees(360));
 
         return angle;
@@ -104,30 +105,44 @@ public final class Pitch {
         motor.stopMotor();
     }
 
+    public Measure<Voltage> getVoltage() {
+        return Volt.of(motor.getAppliedOutput() * motor.getBusVoltage());
+    }
+
     private void drivePitch() {
-        double velocitySetpoint = MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), deadband);
-        voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
+        double velocitySetpoint = MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), DEFAULT_PITCH_DEADBAND);
+        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
 
         if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
         if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
 
-        if (voltage > 12) System.out.println("What the FUCK " + voltage);
-
-        if(voltage > 6) {
-            System.out.println("Shut the fuck. " + voltage);
+        if (voltage > 6) {
             voltage = 6;
         }
 
+        drivePitch(voltage);
+    }
+
+    public void drivePitch(double voltage) {
         motor.setVoltage(voltage);
     }
 
     private void logPitch() {
+        if (pitchMaxCurrent < motor.getOutputCurrent()) pitchMaxCurrent = motor.getOutputCurrent();
+
         SmartDashboard.putNumber("pitch/CurrentAngle", getCurrentPosition().getDegrees());
         SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
         SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
         SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
-        SmartDashboard.putNumber("pitch/Voltage", voltage);
-        SmartDashboard.putNumber("pitch/Current", motor.getOutputCurrent());
+        SmartDashboard.putNumber("pitch/ElectricityVoltage", getVoltage().in(Volt));
+        SmartDashboard.putNumber("pitch/ElectricityCurrent", motor.getOutputCurrent());
+        SmartDashboard.putNumber("pitch/MaxCurrent", pitchMaxCurrent);
+    }
+
+    private void configurePitchMotor() {
+        motor.restoreFactoryDefaults();
+        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        motor.setSmartCurrentLimit(40);
     }
 
     private void configurePitchController() {

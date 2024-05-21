@@ -10,13 +10,17 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.math.Conversions.RPMFromTangentialVelocity;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
@@ -60,6 +64,17 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.periodic();
 
         logShooter();
+    }
+
+    public void setPitchVoltage(Measure<Voltage> volts) {
+        pitch.drivePitch(volts.in(Volts));
+    }
+
+    public void logPitch(SysIdRoutineLog log) {
+        log.motor("Pitcher")
+                .voltage(pitch.getVoltage())
+                .angularPosition(Degree.of(pitch.getCurrentPosition().getDegrees()))
+                .angularVelocity(pitch.getCurrentVelocity());
     }
 
     /**
