@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -44,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
-    private final Pitch pitch = new Pitch();
+    private final FixedPitch pitch = new FixedPitch();
 
     private int consecutiveNoteInsideSamples = 0;
 
@@ -74,8 +73,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public void logPitch(SysIdRoutineLog log) {
         log.motor("Pitcher")
                 .voltage(pitch.getVoltage())
-                .angularPosition(Rotations.of(pitch.getCurrentPosition().getRotations()))
-                .angularVelocity(RotationsPerSecond.of(pitch.getCurrentVelocity()));
+                .angularPosition(Rotations.of(pitch.getPosition().getRotations()))
+                .angularVelocity(RotationsPerSecond.of(pitch.getVelocity()));
     }
 
     /**
@@ -108,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getPitchGoal() {
-        return pitch.getPositionGoal();
+        return pitch.getGoalPosition();
     }
 
     public void setPitchGoal(Rotation2d goal) {
@@ -120,10 +119,6 @@ public class ShooterSubsystem extends SubsystemBase {
         setTangentialFlywheelsVelocity(reference.flywheelTangentialVelocity);
     }
 
-    public void setPitchConstraints(TrapezoidProfile.Constraints constraints) {
-        pitch.setConstraints(constraints);
-    }
-    
     public void reset() {
         setReference(new Reference());
         stopFlywheels();
@@ -131,7 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     
     public Rotation2d getPitchPosition() {
-        return pitch.getCurrentPosition();
+        return pitch.getPosition();
     }
 
     public boolean flywheelsAtReference() {
@@ -139,15 +134,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean pitchAtReference() {
-        return pitch.atGoal();
+        return pitch.isAtGoal();
     }
 
     public boolean atReference() {
         return pitchAtReference() && flywheelsAtReference();
-    }
-
-    public TrapezoidProfile.Constraints getPitchConstraints() {
-        return pitch.getConstraints();
     }
 
     /**

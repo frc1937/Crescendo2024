@@ -41,7 +41,7 @@ public class ShooterConstants {
     static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
     static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
 
-    static final double PIVOT_TOLERANCE = Units.degreesToRadians(1);
+    static final double PIVOT_TOLERANCE = Units.degreesToRotations(1);
     static final float PITCH_TRANSMISSION_RATIO = 150;
     static final double DEFAULT_PITCH_DEADBAND = 0.025, VERTICAL_PITCH_DEADBAND = 0.06;
 
