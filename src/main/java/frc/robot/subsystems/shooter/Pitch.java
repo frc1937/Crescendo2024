@@ -14,14 +14,12 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
@@ -92,8 +90,8 @@ public final class Pitch {
         return angle;
     }
 
-    public Measure<Velocity<Angle>> getCurrentVelocity() {
-        return RotationsPerSecond.of(encoderVelocitySignal.refresh().getValue());
+    public double getCurrentVelocity() {
+        return encoderVelocitySignal.refresh().getValue();
     }
 
     public TrapezoidProfile.Constraints getConstraints() {
@@ -106,7 +104,7 @@ public final class Pitch {
     }
 
     public Measure<Voltage> getVoltage() {
-        return Volt.of(motor.getAppliedOutput() * motor.getBusVoltage());
+        return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
     }
 
     private void drivePitch() {

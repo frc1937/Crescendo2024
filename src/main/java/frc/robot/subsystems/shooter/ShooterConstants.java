@@ -24,11 +24,15 @@ public class ShooterConstants {
     static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-16.787110);
 
     static final double
-            PITCH_KS = 0.38398,
-            PITCH_KG = 0.31481,
-            PITCH_KV = 12.824,
-            PITCH_KA = 3.995,
-            PITCH_KP = 0.8 ,//1.d / 0.02,
+            PITCH_KS = 0.30251,
+            PITCH_KG = 0.31481,//0.16648,
+            PITCH_KV = 13.181,
+            PITCH_KA = 4.0663,
+//            PITCH_KS = 0.38398,
+//            PITCH_KG = 0.31481,
+//            PITCH_KV = 12.824,
+//            PITCH_KA = 3.995,
+            PITCH_KP = 0.0 ,//1.d / 0.02,
             PITCH_KI = 0.0,
             PITCH_KD = 0.0,
             PITCH_MAX_VELOCITY = 25,//1.05,

@@ -14,8 +14,8 @@ public class PitchCharacterization {
 
     public PitchCharacterization(ShooterSubsystem shooterSubsystem) {
         SysIdRoutine.Config config = new SysIdRoutine.Config(
-                Volts.per(Second).of(1),
-                Volts.of(5),
+                Volts.per(Second).of(0.5),
+                Volts.of(3),
                 Seconds.of(10)
         );
 

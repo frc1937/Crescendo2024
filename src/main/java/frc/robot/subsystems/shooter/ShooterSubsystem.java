@@ -17,9 +17,10 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
 
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.math.Conversions.RPMFromTangentialVelocity;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
@@ -73,8 +74,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public void logPitch(SysIdRoutineLog log) {
         log.motor("Pitcher")
                 .voltage(pitch.getVoltage())
-                .angularPosition(Degree.of(pitch.getCurrentPosition().getDegrees()))
-                .angularVelocity(pitch.getCurrentVelocity());
+                .angularPosition(Rotations.of(pitch.getCurrentPosition().getRotations()))
+                .angularVelocity(RotationsPerSecond.of(pitch.getCurrentVelocity()));
     }
 
     /**

@@ -104,8 +104,6 @@ public class RobotContainer {
                 new PhotonCameraSource(FRONT_CAMERA_NAME, ROBOT_TO_FRONT_CAMERA)
         );
 
-//        Transform3d nice = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(25), 0));
-
         swerve5990 = new Swerve5990(poseEstimator5990);
         poseEstimator5990.setSwerve(swerve5990);
 
@@ -145,7 +143,7 @@ public class RobotContainer {
                 )
         );
 
-        initializeButtons(translationSup, strafeSup, rotationSup, "");
+        initializeButtons(translationSup, strafeSup, rotationSup, "pitch characterization");
     }
 
 
@@ -221,7 +219,7 @@ public class RobotContainer {
         PitchCharacterization pitchCharacterization = new PitchCharacterization(shooterSubsystem);
 
         SysIdRoutine.Direction forward = SysIdRoutine.Direction.kForward;
-        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kForward;
+        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kReverse;
 
         drAButton.whileTrue(pitchCharacterization.sysIdDynamicTest(forward));
         drBButton.whileTrue(pitchCharacterization.sysIdDynamicTest(reverse));
