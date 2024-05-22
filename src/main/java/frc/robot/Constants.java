@@ -72,7 +72,7 @@ public final class Constants {
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
         public static final Transform3d
-           ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(25), 0));
+           ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(-25), 0));
         public static final Transform3d
                 REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.355, 0.11, 0.41),
                 new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),

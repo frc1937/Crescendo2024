@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -29,6 +30,7 @@ import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
+import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
 import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
 import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_D;
 import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
@@ -70,6 +72,10 @@ public class Swerve5990 extends SubsystemBase {
     private final StructArrayPublisher<SwerveModuleState> targetStates = NetworkTableInstance.getDefault()
             .getStructArrayTopic("TargetStates", SwerveModuleState.struct).publish();
 
+    private final StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault()
+            .getStructArrayTopic("CameraPoses", Pose3d.struct).publish();
+
+
     public Swerve5990(PoseEstimator5990 poseEstimator5990) {
         this.poseEstimator5990 = poseEstimator5990;
 
@@ -87,6 +93,14 @@ public class Swerve5990 extends SubsystemBase {
         //logging data n shit
         currentStates.set(getModuleStates());
         targetStates.set(getModuleTargetStates());
+
+        Pose3d robotPose = new Pose3d(poseEstimator5990.getCurrentPose().getCorrectPose());
+
+        cameraPoses.set(
+                new Pose3d[]{
+                        robotPose.plus(ROBOT_TO_FRONT_CAMERA.inverse())
+                }
+        );
     }
 
     public ChassisSpeeds getSelfRelativeVelocity() {
@@ -166,8 +180,9 @@ public class Swerve5990 extends SubsystemBase {
 
     /**
      * Drive the robot whilst rotating to a specific angle.
-     * @param xPower - the translation power
-     * @param yPower - the strafe power
+     *
+     * @param xPower             - the translation power
+     * @param yPower             - the strafe power
      * @param targetAzimuthAngle - the angle to rotate to
      */
     public void driveWithTargetAzimuth(double xPower, double yPower, Rotation2d targetAzimuthAngle) {
@@ -333,7 +348,6 @@ public class Swerve5990 extends SubsystemBase {
 
         return states;
     }
-
 
 
     private SwerveModule5990[] getModules() {

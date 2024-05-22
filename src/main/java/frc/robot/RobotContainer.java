@@ -159,7 +159,7 @@ public class RobotContainer {
 
     public void frequentPeriodic() {
         poseEstimator5990.periodic();
-    } //TODO this is a HUGE mistake. PLEASE TEST
+    }
 
     private void registerCommands() {
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
