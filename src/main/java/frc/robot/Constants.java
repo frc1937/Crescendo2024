@@ -73,11 +73,6 @@ public final class Constants {
          */
         public static final Transform3d
            ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20, new Rotation3d(0, Units.degreesToRadians(-25), 0));
-        public static final Transform3d
-                REAR_CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0.355, 0.11, 0.41),
-                new Rotation3d(0, Units.degreesToRadians(-25), Units.degreesToRadians(180))),
-                ROBOT_TO_REAR_CAMERA = REAR_CAMERA_TO_ROBOT.inverse();
-        public static final Translation3d ROBOT_TO_PIVOT = new Translation3d(-0.275, 0, 0.285);
     }
 
     public static final class LEDsConstants {
