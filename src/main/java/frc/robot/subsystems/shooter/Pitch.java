@@ -7,43 +7,44 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.FORWARD_PITCH_SOFT_LIMIT;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KI;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KP;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KS;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KV;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATION;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
-import static frc.robot.subsystems.shooter.ShooterConstants.REVERSE_PITCH_SOFT_LIMIT;
 
-public final class Pitch {
-    private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, MotorType.kBrushless);
+public class Pitch {
+    private static final double TIME_DIFFERENCE = 0.02;
+
+    private TrapezoidProfile.State state;
+    private TrapezoidProfile.State goal;
+
+    private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
+
+    private final RelativeEncoder relativeEncoder;
+    private final SparkPIDController controller;
+
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
-    private ProfiledPIDController controller;
-
-    private double pitchMaxCurrent = 0;
+    private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(4, 6);
+    private final TrapezoidProfile profile = new TrapezoidProfile(constraints);
 
     private StatusSignal<Double> encoderPositionSignal, encoderVelocitySignal;
 
@@ -51,34 +52,63 @@ public final class Pitch {
         configurePitchMotor();
         configureSteerEncoder();
         configureSoftLimits();
-        configurePitchController();
+
+        controller = motor.getPIDController();
+        controller.setP(1);
+        controller.setI(0);
+        controller.setD(0);
+        controller.setOutputRange(-12, 12);
+
+        relativeEncoder = motor.getEncoder();
+        relativeEncoder.setPosition(getPosition().getRotations());
+
+        state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
+        setGoal(getPosition());
     }
 
-    /**
-     * Periodic, ran by the main robot thread.
-     */
     public void periodic() {
-        logPitch();
-        drivePitch();
+        state = profile.calculate(TIME_DIFFERENCE, state, goal);
+        drivePitchToSetpoint(state);
+
+        SmartDashboard.putNumber("pitch/currentRelativePosition", Rotation2d.fromRotations(relativeEncoder.getPosition()).getDegrees());
+        SmartDashboard.putNumber("pitch/currentAbsolutePosition", getPosition().getDegrees());
+        SmartDashboard.putNumber("pitch/goalPosition [DEG]", Rotation2d.fromRotations(goal.position).getDegrees());
+        SmartDashboard.putNumber("pitch/goalVelocity [RPS]", goal.velocity);
+        SmartDashboard.putBoolean("pitch/isAtGoal", isAtGoal());
+        SmartDashboard.putNumber("pitch/ElectricityCurrent [A]", motor.getOutputCurrent());
+        SmartDashboard.putNumber("pitch/ElectricityVoltage [V]", getVoltage().in(Volts));
+
+        relativeEncoder.setPosition(getPosition().getRotations());
     }
 
-    public void setGoal(Rotation2d position) {
-        controller.setGoal(new TrapezoidProfile.State(position.getRadians(), 0));
+    public void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
+        double feedforwardOutput = applyDeadband(feedforward.calculate(setpoint.position, setpoint.velocity), 0.02);
+
+        controller.setReference(
+                setpoint.position,
+                CANSparkBase.ControlType.kPosition,
+                0,
+                feedforwardOutput
+        );
     }
 
-    public void setConstraints(TrapezoidProfile.Constraints constraints) {
-        controller.setConstraints(constraints);
+    public final Rotation2d getGoalPosition() {
+        return Rotation2d.fromRotations(goal.position);
     }
 
-    public boolean atGoal() {
-        return controller.atGoal();
+    public final void setGoal(Rotation2d targetPosition) {
+        setGoal(new TrapezoidProfile.State(targetPosition.getRotations(), 0));
     }
 
-    public Rotation2d getPositionGoal() {
-        return Rotation2d.fromRadians(controller.getGoal().position);
+    public final void setGoal(TrapezoidProfile.State goal) {
+        this.goal = goal;
     }
 
-    public Rotation2d getCurrentPosition() {
+    public boolean isAtGoal() {
+        return Math.abs(getPosition().getRotations() - goal.position) < PIVOT_TOLERANCE;
+    }
+
+    public Rotation2d getPosition() {
         Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).minus(PIVOT_ENCODER_OFFSET);
 
         //Ensure the encoder always has the same starting angle.
@@ -88,70 +118,16 @@ public final class Pitch {
         return angle;
     }
 
-    public double getCurrentVelocity() {
+    public double getVelocity() {
         return encoderVelocitySignal.refresh().getValue();
-    }
-
-    public TrapezoidProfile.Constraints getConstraints() {
-        return controller.getConstraints();
-    }
-
-    public void stopMotor() {
-        setGoal(Rotation2d.fromDegrees(0));
-        motor.stopMotor();
     }
 
     public Measure<Voltage> getVoltage() {
         return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
     }
 
-    private void drivePitch() {
-        double velocitySetpoint = getSetpoint().velocity;//MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), DEFAULT_PITCH_DEADBAND);
-        double voltage = feedforward.calculate(getPositionGoal().getRotations(), velocitySetpoint);
-
-        if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
-        if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
-
-        drivePitch(voltage);
-    }
-
     public void drivePitch(double voltage) {
         motor.setVoltage(voltage);
-    }
-
-    private void logPitch() {
-        if (pitchMaxCurrent < motor.getOutputCurrent()) pitchMaxCurrent = motor.getOutputCurrent();
-
-        SmartDashboard.putNumber("pitch/CurrentAngle", getCurrentPosition().getDegrees());
-        SmartDashboard.putNumber("pitch/Goal", Units.radiansToDegrees(controller.getGoal().position));
-        SmartDashboard.putNumber("pitch/VelocitySetpoint", Units.radiansToDegrees(controller.getSetpoint().velocity));
-        SmartDashboard.putBoolean("pitch/AtGoal", atGoal());
-        SmartDashboard.putNumber("pitch/ElectricityVoltage", getVoltage().in(Volt));
-        SmartDashboard.putNumber("pitch/ElectricityCurrent", motor.getOutputCurrent());
-        SmartDashboard.putNumber("pitch/MaxCurrent", pitchMaxCurrent);
-    }
-
-
-    private TrapezoidProfile.State getSetpoint() {
-        return controller.getSetpoint();
-    }
-
-    private void configurePitchMotor() {
-        motor.restoreFactoryDefaults();
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        motor.setSmartCurrentLimit(40);
-    }
-
-    private void configurePitchController() {
-        controller = new ProfiledPIDController(PITCH_KP, PITCH_KI, PITCH_KD,
-                new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION)
-        );
-
-        controller.setTolerance(PIVOT_TOLERANCE);
-    }
-
-    private void configureSoftLimits() {
-        motor.getEncoder().setPosition(getCurrentPosition().getRotations());
     }
 
     private void configureSteerEncoder() {
@@ -170,5 +146,19 @@ public final class Pitch {
 
         absoluteEncoder.optimizeBusUtilization();
     }
+
+    private void configurePitchMotor() {
+        motor.restoreFactoryDefaults();
+        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        motor.setSmartCurrentLimit(40);
+        motor.burnFlash();
+    }
+
+    private void configureSoftLimits() {
+        motor.getEncoder().setPosition(getPosition().getRotations());
+    }
 }
 
+/*
+
+ */

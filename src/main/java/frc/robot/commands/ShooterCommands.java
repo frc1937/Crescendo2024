@@ -72,6 +72,16 @@ public class ShooterCommands {
         );
     }
 
+    public Command setPitchPosition(double degrees) {
+        return new FunctionalCommand(
+                () -> initializeShooter(false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees))),
+                () -> {},
+                interrupted -> {},
+                () -> false,
+                shooterSubsystem
+        );
+    }
+
     public Command postIntake() {
         return new SequentialCommandGroup(new FunctionalCommand(
                 () -> {

@@ -134,6 +134,10 @@ public class RobotContainer {
                 )
         );
 
+        shooterSubsystem.setDefaultCommand(
+                shooterCommands.setPitchPosition(50)
+        );
+
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
         mountSubsystem.setDefaultCommand(

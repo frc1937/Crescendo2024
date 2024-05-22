@@ -43,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
     private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
     private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
-    private final FixedPitch pitch = new FixedPitch();
+    private final Pitch pitch = new Pitch();
 
     private int consecutiveNoteInsideSamples = 0;
 
