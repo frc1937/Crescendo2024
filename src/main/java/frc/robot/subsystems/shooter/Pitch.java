@@ -8,7 +8,6 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +22,6 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.DEFAULT_PITCH_DEADBAND;
 import static frc.robot.subsystems.shooter.ShooterConstants.FORWARD_PITCH_SOFT_LIMIT;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
@@ -76,7 +74,7 @@ public final class Pitch {
         return controller.atGoal();
     }
 
-    public Rotation2d getGoal() {
+    public Rotation2d getPositionGoal() {
         return Rotation2d.fromRadians(controller.getGoal().position);
     }
 
@@ -108,15 +106,11 @@ public final class Pitch {
     }
 
     private void drivePitch() {
-        double velocitySetpoint = MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), DEFAULT_PITCH_DEADBAND);
-        double voltage = feedforward.calculate(getCurrentPosition().getRadians(), velocitySetpoint);
+        double velocitySetpoint = getSetpoint().velocity;//MathUtil.applyDeadband(controller.calculate(getCurrentPosition().getRadians()), DEFAULT_PITCH_DEADBAND);
+        double voltage = feedforward.calculate(getPositionGoal().getRotations(), velocitySetpoint);
 
         if (voltage > 0 && getCurrentPosition().getDegrees() > FORWARD_PITCH_SOFT_LIMIT.getDegrees()) return;
         if (voltage < 0 && getCurrentPosition().getDegrees() < REVERSE_PITCH_SOFT_LIMIT.getDegrees()) return;
-
-        if (voltage > 6) {
-            voltage = 6;
-        }
 
         drivePitch(voltage);
     }
@@ -135,6 +129,11 @@ public final class Pitch {
         SmartDashboard.putNumber("pitch/ElectricityVoltage", getVoltage().in(Volt));
         SmartDashboard.putNumber("pitch/ElectricityCurrent", motor.getOutputCurrent());
         SmartDashboard.putNumber("pitch/MaxCurrent", pitchMaxCurrent);
+    }
+
+
+    private TrapezoidProfile.State getSetpoint() {
+        return controller.getSetpoint();
     }
 
     private void configurePitchMotor() {

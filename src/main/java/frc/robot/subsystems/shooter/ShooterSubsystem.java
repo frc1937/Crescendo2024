@@ -108,7 +108,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getPitchGoal() {
-        return pitch.getGoal();
+        return pitch.getPositionGoal();
     }
 
     public void setPitchGoal(Rotation2d goal) {
