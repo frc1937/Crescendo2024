@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.junit.jupiter.api.Assertions;
@@ -51,6 +52,8 @@ class ButtonTest {
                 Assertions.assertEquals(noteExitPos, noteExitPose2);
             }
         }
+
+        AprilTag.generate36h11AprilTagImage(3);
     }
 
     private void printPose3dNicely(Pose3d pose, String name) {

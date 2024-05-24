@@ -147,6 +147,8 @@ public class RobotContainer {
                 )
         );
 
+        shooterSubsystem.setDefaultCommand(shooterCommands.setPitchPosition(40));
+
         initializeButtons(translationSup, strafeSup, rotationSup, "pitch characterization");
     }
 
@@ -229,6 +231,11 @@ public class RobotContainer {
         drBButton.whileTrue(pitchCharacterization.sysIdDynamicTest(reverse));
         drYButton.whileTrue(pitchCharacterization.sysIdQuastaticTest(forward));
         drXButton.whileTrue(pitchCharacterization.sysIdQuastaticTest(reverse));
+
+        drLeftTrigger.whileTrue(shooterCommands.setPitchPosition(30));
+        drRightTrigger.whileTrue(shooterCommands.setPitchPosition(90));
+        drLeftBumper.whileTrue(shooterCommands.setPitchPosition(60));
+        drRightBumper.whileTrue(shooterCommands.setPitchPosition(69));
     }
 
     private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {

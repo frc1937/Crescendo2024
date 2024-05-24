@@ -53,17 +53,17 @@ public class Pitch {
 
     public Pitch() {
         configurePitchMotor();
-        configureSteerEncoder();
-        configureSoftLimits();
+        configureExternalEncoder();
 
         controller = motor.getPIDController();
-        controller.setP(1, SMART_MOTION_SLOT);
+        controller.setP(2.5, SMART_MOTION_SLOT);
         controller.setI(0, SMART_MOTION_SLOT);
         controller.setD(0, SMART_MOTION_SLOT);
         controller.setOutputRange(-12, 12);
 
         relativeEncoder = motor.getEncoder();
         relativeEncoder.setPosition(getPosition().getRotations());
+        relativeEncoder.setPositionConversionFactor(1/150.0);
 
         state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
         setGoal(getPosition());
@@ -126,7 +126,7 @@ public class Pitch {
         motor.setVoltage(voltage);
     }
 
-    private void configureSteerEncoder() {
+    private void configureExternalEncoder() {
         CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
 
         canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
@@ -169,6 +169,7 @@ public class Pitch {
 
     private void drivePitchPeriodic() {
         state = profile.calculate(TIME_DIFFERENCE, state, goal);
+
         drivePitchToSetpoint(state);
 
         relativeEncoder.setPosition(getPosition().getRotations());
