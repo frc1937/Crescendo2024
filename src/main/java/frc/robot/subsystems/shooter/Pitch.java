@@ -31,9 +31,9 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
 
 public class Pitch {
     private static final double TIME_DIFFERENCE = 0.02;
-
-    private TrapezoidProfile.State state;
-    private TrapezoidProfile.State goal;
+    private static final double MAX_VELOCITY = 1;
+    private static final double MAX_ACCELERATION = 1;
+    private static final int SMART_MOTION_SLOT = 0;
 
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
@@ -43,10 +43,13 @@ public class Pitch {
 
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
-    private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(4, 6);
+    private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCELERATION);
     private final TrapezoidProfile profile = new TrapezoidProfile(constraints);
 
     private StatusSignal<Double> encoderPositionSignal, encoderVelocitySignal;
+
+    private TrapezoidProfile.State state;
+    private TrapezoidProfile.State goal;
 
     public Pitch() {
         configurePitchMotor();
@@ -54,9 +57,9 @@ public class Pitch {
         configureSoftLimits();
 
         controller = motor.getPIDController();
-        controller.setP(1);
-        controller.setI(0);
-        controller.setD(0);
+        controller.setP(1, SMART_MOTION_SLOT);
+        controller.setI(0, SMART_MOTION_SLOT);
+        controller.setD(0, SMART_MOTION_SLOT);
         controller.setOutputRange(-12, 12);
 
         relativeEncoder = motor.getEncoder();
@@ -67,22 +70,15 @@ public class Pitch {
     }
 
     public void periodic() {
-        state = profile.calculate(TIME_DIFFERENCE, state, goal);
-        drivePitchToSetpoint(state);
-
-        SmartDashboard.putNumber("pitch/currentRelativePosition", Rotation2d.fromRotations(relativeEncoder.getPosition()).getDegrees());
-        SmartDashboard.putNumber("pitch/currentAbsolutePosition", getPosition().getDegrees());
-        SmartDashboard.putNumber("pitch/goalPosition [DEG]", Rotation2d.fromRotations(goal.position).getDegrees());
-        SmartDashboard.putNumber("pitch/goalVelocity [RPS]", goal.velocity);
-        SmartDashboard.putBoolean("pitch/isAtGoal", isAtGoal());
-        SmartDashboard.putNumber("pitch/ElectricityCurrent [A]", motor.getOutputCurrent());
-        SmartDashboard.putNumber("pitch/ElectricityVoltage [V]", getVoltage().in(Volts));
-
-        relativeEncoder.setPosition(getPosition().getRotations());
+        drivePitchPeriodic();
+        logPitch();
     }
 
     public void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
-        double feedforwardOutput = applyDeadband(feedforward.calculate(setpoint.position, setpoint.velocity), 0.02);
+        //I assume the angle is needed in radians. I have no idea because they don't explicitly tell me FFS
+        double feedforwardOutput = applyDeadband(feedforward.calculate(
+                Rotation2d.fromRotations(setpoint.position).getRadians(), setpoint.velocity
+        ), 0.02);
 
         controller.setReference(
                 setpoint.position,
@@ -149,16 +145,32 @@ public class Pitch {
 
     private void configurePitchMotor() {
         motor.restoreFactoryDefaults();
+
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        motor.setSmartCurrentLimit(40);
+        motor.setSmartCurrentLimit(60);
+        motor.enableVoltageCompensation(12);
+
         motor.burnFlash();
     }
 
     private void configureSoftLimits() {
         motor.getEncoder().setPosition(getPosition().getRotations());
     }
+
+    private void logPitch() {
+        SmartDashboard.putNumber("pitch/currentRelativePosition", Rotation2d.fromRotations(relativeEncoder.getPosition()).getDegrees());
+        SmartDashboard.putNumber("pitch/currentAbsolutePosition", getPosition().getDegrees());
+        SmartDashboard.putNumber("pitch/goalPosition [DEG]", Rotation2d.fromRotations(goal.position).getDegrees());
+        SmartDashboard.putNumber("pitch/goalVelocity [RPS]", goal.velocity);
+        SmartDashboard.putBoolean("pitch/isAtGoal", isAtGoal());
+        SmartDashboard.putNumber("pitch/ElectricityCurrent [A]", motor.getOutputCurrent());
+        SmartDashboard.putNumber("pitch/ElectricityVoltage [V]", getVoltage().in(Volts));
+    }
+
+    private void drivePitchPeriodic() {
+        state = profile.calculate(TIME_DIFFERENCE, state, goal);
+        drivePitchToSetpoint(state);
+
+        relativeEncoder.setPosition(getPosition().getRotations());
+    }
 }
-
-/*
-
- */
