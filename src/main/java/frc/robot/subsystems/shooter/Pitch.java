@@ -9,9 +9,10 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,14 +35,12 @@ public class Pitch {
     private static final double MAX_VELOCITY = 2;
     private static final double MAX_ACCELERATION = 0.5;
     private static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.05).getRotations();
-    private static final double PITCH_KP = 0;
-    //offset for P = 0.1: 30 - 29 = 1
-    //offset for P = 0: 30 - 30.14 = .14
+    private static final double PITCH_KP = 1;
 
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
 
-    private final ProfiledPIDController controller;
+    private final PIDController controller;
 
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
@@ -61,8 +60,8 @@ public class Pitch {
         configurePitchMotor();
         configureExternalEncoder();
 
-        controller = new ProfiledPIDController(PITCH_KP, 0, 0, constraints);
-        controller.reset(0);
+        controller = new PIDController(PITCH_KP, 0, 0);
+        controller.reset();
         controller.setTolerance(PITCH_TOLERANCE);
 
         state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
@@ -77,8 +76,9 @@ public class Pitch {
     public void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
         //I assume the angle is needed in radians. I have no idea because they don't explicitly tell me FFS
         double feedforwardOutput = applyDeadband(feedforward.calculate(
-                Rotation2d.fromRotations(setpoint.position).getRadians(),
-                setpoint.velocity //this is presumably in the correct units? tried to convert to RadPS and worked poorly.
+                Units.rotationsToRadians(setpoint.position),
+                setpoint.velocity
+                //this is presumably in the correct units? tried to convert to RadPS and worked poorly.
                 //Fuck you rev.
         ), 0.02);
 
