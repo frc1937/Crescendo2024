@@ -135,7 +135,7 @@ public class RobotContainer {
         );
 
         shooterSubsystem.setDefaultCommand(
-                shooterCommands.setPitchPosition(50)
+                shooterCommands.setPitchPosition(30)
         );
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
@@ -146,8 +146,6 @@ public class RobotContainer {
                         () -> MathUtil.applyDeadband(-operatorController.getRawAxis(RIGHT_Y), Constants.STICK_DEADBAND * 0.5)
                 )
         );
-
-        shooterSubsystem.setDefaultCommand(shooterCommands.setPitchPosition(40));
 
         initializeButtons(translationSup, strafeSup, rotationSup, "pitch characterization");
     }
