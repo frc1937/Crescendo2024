@@ -29,9 +29,14 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
 
 public class Pitch {
+    //TODO: move to constants
     private static final double TIME_DIFFERENCE = 0.02;
     private static final double MAX_VELOCITY = 2;
     private static final double MAX_ACCELERATION = 0.5;
+    private static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.05).getRotations();
+    private static final double PITCH_KP = 0;
+    //offset for P = 0.1: 30 - 29 = 1
+    //offset for P = 0: 30 - 30.14 = .14
 
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
@@ -56,8 +61,9 @@ public class Pitch {
         configurePitchMotor();
         configureExternalEncoder();
 
-        controller = new ProfiledPIDController(0, 0, 0, constraints);
+        controller = new ProfiledPIDController(PITCH_KP, 0, 0, constraints);
         controller.reset(0);
+        controller.setTolerance(PITCH_TOLERANCE);
 
         state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
         setGoal(getPosition());
@@ -72,8 +78,8 @@ public class Pitch {
         //I assume the angle is needed in radians. I have no idea because they don't explicitly tell me FFS
         double feedforwardOutput = applyDeadband(feedforward.calculate(
                 Rotation2d.fromRotations(setpoint.position).getRadians(),
-                setpoint.velocity
-//                RadiansPerSecond.convertFrom(setpoint.velocity, RotationsPerSecond)
+                setpoint.velocity //this is presumably in the correct units? tried to convert to RadPS and worked poorly.
+                //Fuck you rev.
         ), 0.02);
 
         double controllerOutput = applyDeadband(controller.calculate(
@@ -82,7 +88,6 @@ public class Pitch {
         ), 0.02);
 
         SmartDashboard.putNumber("NIGGERffOutput", feedforwardOutput);
-        SmartDashboard.putNumber("NIGGERffOutput*12", feedforwardOutput*12);
         SmartDashboard.putNumber("NIGGERcntrlOutput", controllerOutput);
 
         motor.setVoltage(feedforwardOutput + controllerOutput);
@@ -150,6 +155,7 @@ public class Pitch {
         motor.setSmartCurrentLimit(60);
         motor.enableVoltageCompensation(12);
 
+        //TODO: adapt function to sparkmax too.
 //        CANSparkMaxUtil.setCANSparkMaxBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
 
         motor.burnFlash();
