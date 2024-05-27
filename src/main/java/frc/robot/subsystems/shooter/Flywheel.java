@@ -15,6 +15,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.util.CANSparkMaxUtil;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -85,9 +86,12 @@ public class Flywheel {
 
     private CANSparkFlex configureMotor(int motorId, boolean invert) {
         CANSparkFlex sparkFlexMotor = new CANSparkFlex(motorId, MotorType.kBrushless);
+
         sparkFlexMotor.restoreFactoryDefaults();
         sparkFlexMotor.setIdleMode(IdleMode.kCoast);
         sparkFlexMotor.setInverted(invert);
+
+        CANSparkMaxUtil.setCANSparkBusUsage(sparkFlexMotor, CANSparkMaxUtil.Usage.kVelocityOnly);
 
         return sparkFlexMotor;
     }

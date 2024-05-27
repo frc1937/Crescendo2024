@@ -141,7 +141,7 @@ public class SwerveModule5990 {
     private void configureSteerMotor() {
         steerMotor.restoreFactoryDefaults();
 
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(steerMotor, CANSparkMaxUtil.Usage.kPositionOnly);
+        CANSparkMaxUtil.setCANSparkBusUsage(steerMotor, CANSparkMaxUtil.Usage.kPositionOnly);
 
         steerMotor.setSmartCurrentLimit(ANGLE_CONTINUOUS_CURRENT_LIMIT);
 
