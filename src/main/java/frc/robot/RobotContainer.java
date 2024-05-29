@@ -143,7 +143,7 @@ public class RobotContainer {
                 )
         );
 
-        initializeButtons(translationSup, strafeSup, rotationSup, "");//"pitch characterization");
+        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
     }
 
 
@@ -186,11 +186,11 @@ public class RobotContainer {
                 new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), tangentialVelocityFromRPM(3000, flywheelDiameter))));
     }
 
-    private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, String identification) {
-        switch (identification) {
-            case "pitch characterization" -> pitchCharacterizationLayout();
-            case "max speeds characterization" -> maxSpeedsCharacterizationLayout(translationSup, strafeSup, rotationSup);
-            default -> teleopButtonsLayout(translationSup, strafeSup);
+    private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, ButtonLayout layout) {
+        switch (layout) {
+            case PITCH_CHARACTERIZATION -> pitchCharacterizationLayout();
+            case MAX_SPEEDS_CHARACTERIZATION -> maxSpeedsCharacterizationLayout(translationSup, strafeSup, rotationSup);
+            case TELEOP -> teleopButtonsLayout(translationSup, strafeSup);
         }
     }
 
@@ -239,5 +239,11 @@ public class RobotContainer {
                         new MaxFlywheelSpeedCharacterization(shooterSubsystem) //5500 rpm flywheel
                 )
         );
+    }
+
+    private enum ButtonLayout {
+        PITCH_CHARACTERIZATION,
+        MAX_SPEEDS_CHARACTERIZATION,
+        TELEOP
     }
 }

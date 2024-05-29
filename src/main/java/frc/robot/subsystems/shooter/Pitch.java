@@ -43,8 +43,7 @@ public class Pitch {
 
     private final RelativeEncoder encoder;
 
-    private PIDController controller;
-
+    private final PIDController controller = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
     private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION);
@@ -78,13 +77,15 @@ public class Pitch {
     }
 
     public void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
-        //I assume the angle is needed in radians.
+        //Angle: radians
+        //Vel: rad/s
         double feedforwardOutput = applyDeadband(feedforward.calculate(
                 Units.rotationsToRadians(setpoint.position),
                 setpoint.velocity
-                //this is presumably in the correct units? tried to convert to RadPS and it smashed into the floor.
         ), 0.02);
 
+        //Current angle: rot
+        //Target angle: rot
         double controllerOutput = applyDeadband(controller.calculate(
                 getPosition().getRotations(),
                 goal.position
@@ -182,8 +183,8 @@ public class Pitch {
     }
 
     private void configureController() {
-        controller = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
         controller.setTolerance(PITCH_TOLERANCE);
+        controller.reset();
     }
 
     private void drivePitchPeriodic() {
