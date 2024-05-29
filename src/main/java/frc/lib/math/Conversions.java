@@ -24,6 +24,10 @@ public class Conversions {
         return degrees / DEGREES_PER_REVOLUTIONS;
     }
 
+    public static double RPMToRotationsPerSecond(double RPM, double gearRatio) {
+        return RPM / (SEC_PER_MIN) * gearRatio;
+    }
+
     /**
      * Converts revolutions to degrees.
      *

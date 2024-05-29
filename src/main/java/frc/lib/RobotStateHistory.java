@@ -12,7 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import static frc.robot.subsystems.shooter.ShooterConstants.POSE_HISTORY_DURATION;
+import static frc.robot.Constants.POSE_HISTORY_DURATION;
 
 public class RobotStateHistory {
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(POSE_HISTORY_DURATION);

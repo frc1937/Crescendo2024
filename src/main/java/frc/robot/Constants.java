@@ -29,6 +29,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
+    public static final double POSE_HISTORY_DURATION = 0.3;
+
     public static final class CanIDConstants {
         public static final int MOUNT_RIGHT_MOTOR_ID = 7;
         public static final int MOUNT_LEFT_MOTOR_ID = 12;

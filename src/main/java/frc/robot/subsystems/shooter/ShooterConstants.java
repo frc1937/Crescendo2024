@@ -11,11 +11,8 @@ public class ShooterConstants {
     static final Rotation2d FORWARD_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(10);
     static final Rotation2d REVERSE_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(-15);
 
-    public static final int FLYWHEEL_MAX_RPM = 6400;
-    public static final double PITCH_INTAKE_FEEDER_ANGLE = 51;
-    public static final double POSE_HISTORY_DURATION = 0.3;
+    public static final int FLYWHEEL_MAX_RPM = 5400;
 
-    static final double DEFAULT_SLOPE_TO_VIRTUAL_TARGET = 0.5;
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
 
     static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);

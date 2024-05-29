@@ -32,12 +32,14 @@ public class ShooterPhysicsCalculations {
         SmartDashboard.putNumber("physics/ZedDistance", z);
         SmartDashboard.putNumber("physics/distance", distance);
 
-        SmartDashboard.putNumber("physics/DivNumerator", (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))));
+        double sqrt = Math.sqrt(vSquared * vSquared - g * (g * distance * distance + 2 * vSquared * z));
+
+        SmartDashboard.putNumber("physics/DivNumerator", (vSquared + sqrt));
         SmartDashboard.putNumber("physics/DivDenominator", g*distance);
-        SmartDashboard.putNumber("physics/DivResult", (vSquared + Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))) / (g*distance));
+        SmartDashboard.putNumber("physics/DivResult", (vSquared + sqrt) / (g*distance));
 
         double theta = Math.atan(
-                (vSquared - Math.sqrt(vSquared*vSquared - g*(g*distance*distance + 2*vSquared*z))) / (g*distance)
+                (vSquared - sqrt) / (g*distance)
         );
 
         SmartDashboard.putNumber("physics/FunctionTheta", theta);

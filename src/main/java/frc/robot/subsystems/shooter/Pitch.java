@@ -21,6 +21,7 @@ import frc.lib.util.CANSparkMaxUtil;
 
 import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.lib.math.Conversions.RPMToRotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
@@ -40,7 +41,6 @@ import static frc.robot.subsystems.shooter.ShooterConstants.TIME_DIFFERENCE;
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
-
     private final RelativeEncoder encoder;
 
     private final PIDController controller = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
@@ -64,11 +64,13 @@ public class Pitch {
         configureController();
 
         encoder = motor.getEncoder();
-        encoder.setVelocityConversionFactor(1/150.0);
-
         state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
     }
 
+    /**
+     * This method should be called periodically for the pitch to maintain its position. <br>
+     * If no goal is set, this method will do nothing.
+     */
     public void periodic() {
         if(goal != null) {
             drivePitchPeriodic();
@@ -76,24 +78,11 @@ public class Pitch {
         }
     }
 
-    public void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
-        //Angle: radians
-        //Vel: rad/s
-        double feedforwardOutput = applyDeadband(feedforward.calculate(
-                Units.rotationsToRadians(setpoint.position),
-                setpoint.velocity
-        ), 0.02);
-
-        //Current angle: rot
-        //Target angle: rot
-        double controllerOutput = applyDeadband(controller.calculate(
-                getPosition().getRotations(),
-                goal.position
-        ), 0.02);
-
-        motor.setVoltage(feedforwardOutput + controllerOutput);
-    }
-
+    /**
+     * Get the commanded goal position, in {@link Rotation2d} <p>
+     * If no goal is set, return 0 degrees.
+     * @return the commanded position
+     */
     public final Rotation2d getGoalPosition() {
         if(goal != null)
             return Rotation2d.fromRotations(goal.position);
@@ -101,17 +90,19 @@ public class Pitch {
         return Rotation2d.fromDegrees(0);
     }
 
-    public final void setGoal(Rotation2d targetPosition) {
+    /**
+     * Set the target position goal, from {@link Rotation2d}
+     * Target velocity defaults to 0.
+     * @param targetPosition The goal position
+     */
+    public void setGoal(Rotation2d targetPosition) {
         setGoal(new TrapezoidProfile.State(targetPosition.getRotations(), 0));
     }
 
-    public final void setGoal(TrapezoidProfile.State goal) {
-        controller.reset();
-        state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
-
-        this.goal = goal;
-    }
-
+    /**
+     * Returns whether the pitch is at the given goal. If no goal is set, defaults to false.
+     * @return whether the pitch is at its goal position.
+     */
     public boolean isAtGoal() {
         if(goal == null) return false;
 
@@ -121,6 +112,11 @@ public class Pitch {
         return Math.abs(getPosition().getRotations() - goal.position) < PITCH_TOLERANCE;
     }
 
+
+    /**
+     * Returns the current position of the pitch. This is measured considering the horizontal as 0.
+     * @return The current position of the pitch.
+     */
     public Rotation2d getPosition() {
         Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).plus(PIVOT_ENCODER_OFFSET);
 
@@ -131,14 +127,29 @@ public class Pitch {
         return angle;
     }
 
+    /**
+     * Return the velocity of the Pitch. Uses the Relative encoder for reduced latency.
+     * @Units Rotations per second
+     * @return the velocity
+     */
     public double getVelocity() {
-        return encoderVelocitySignal.refresh().getValue();
+        return RPMToRotationsPerSecond(encoder.getVelocity(), 1.0/150);
     }
 
+    /**
+     * Returns the voltage the motor
+     * @Units Volts
+     * @return the amount of voltage the motor uses
+     */
     public Measure<Voltage> getVoltage() {
         return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
     }
 
+    /**
+     * Give the motor a voltage amount. Can be between -12 and 12.
+     * @Units Volts
+     * @param voltage the amount of voltage to give the motor
+     */
     public void drivePitch(double voltage) {
         motor.setVoltage(voltage);
     }
@@ -190,5 +201,28 @@ public class Pitch {
     private void drivePitchPeriodic() {
         state = profile.calculate(TIME_DIFFERENCE, state, goal);
         drivePitchToSetpoint(state);
+    }
+
+    private void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
+        double feedforwardOutput = feedforward.calculate(
+                Units.rotationsToRadians(setpoint.position),
+                setpoint.velocity
+        );
+
+        double controllerOutput = controller.calculate(
+                getPosition().getRotations(),
+                goal.position
+        );
+
+        double voltageOutput = applyDeadband(feedforwardOutput + controllerOutput, 0.02);
+
+        motor.setVoltage(voltageOutput);
+    }
+
+    private void setGoal(TrapezoidProfile.State goal) {
+        controller.reset();
+        state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
+
+        this.goal = goal;
     }
 }
