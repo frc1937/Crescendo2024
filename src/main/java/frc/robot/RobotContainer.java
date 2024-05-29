@@ -134,10 +134,6 @@ public class RobotContainer {
                 )
         );
 
-        shooterSubsystem.setDefaultCommand(
-                shooterCommands.setPitchPosition(30)
-        );
-
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
         mountSubsystem.setDefaultCommand(
@@ -147,7 +143,7 @@ public class RobotContainer {
                 )
         );
 
-        initializeButtons(translationSup, strafeSup, rotationSup, "pitch characterization");
+        initializeButtons(translationSup, strafeSup, rotationSup, "");//"pitch characterization");
     }
 
 

@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,12 +35,13 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATI
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_TOLERANCE;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_TOLERANCE;
 import static frc.robot.subsystems.shooter.ShooterConstants.TIME_DIFFERENCE;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
+
+    private final RelativeEncoder encoder;
 
     private PIDController controller;
 
@@ -62,13 +64,17 @@ public class Pitch {
         configureExternalEncoder();
         configureController();
 
+        encoder = motor.getEncoder();
+        encoder.setVelocityConversionFactor(1/150.0);
+
         state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
-        setGoal(getPosition());
     }
 
     public void periodic() {
-        drivePitchPeriodic();
-        logPitch();
+        if(goal != null) {
+            drivePitchPeriodic();
+            logPitch();
+        }
     }
 
     public void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
@@ -81,14 +87,17 @@ public class Pitch {
 
         double controllerOutput = applyDeadband(controller.calculate(
                 getPosition().getRotations(),
-                setpoint.position
+                goal.position
         ), 0.02);
 
         motor.setVoltage(feedforwardOutput + controllerOutput);
     }
 
     public final Rotation2d getGoalPosition() {
-        return Rotation2d.fromRotations(goal.position);
+        if(goal != null)
+            return Rotation2d.fromRotations(goal.position);
+
+        return Rotation2d.fromDegrees(0);
     }
 
     public final void setGoal(Rotation2d targetPosition) {
@@ -97,15 +106,22 @@ public class Pitch {
 
     public final void setGoal(TrapezoidProfile.State goal) {
         controller.reset();
+        state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
+
         this.goal = goal;
     }
 
     public boolean isAtGoal() {
-        return Math.abs(getPosition().getRotations() - goal.position) < PIVOT_TOLERANCE;
+        if(goal == null) return false;
+
+        SmartDashboard.putNumber("pitch/Distance From Goal [ROT]", getPosition().getRotations() - goal.position);
+        SmartDashboard.putNumber("pitch/Distance to Goal Tolerance [ROT]", PITCH_TOLERANCE);
+
+        return Math.abs(getPosition().getRotations() - goal.position) < PITCH_TOLERANCE;
     }
 
     public Rotation2d getPosition() {
-        Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).minus(PIVOT_ENCODER_OFFSET);
+        Rotation2d angle = Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue()).plus(PIVOT_ENCODER_OFFSET);
 
         //Ensure the encoder always has the same starting angle.
         if (angle.getDegrees() > 300)
@@ -157,6 +173,7 @@ public class Pitch {
 
     private void logPitch() {
         SmartDashboard.putNumber("pitch/currentAbsolutePosition", getPosition().getDegrees());
+        SmartDashboard.putNumber("pitch/velocity [ DEG ]", getVelocity() * 360);
         SmartDashboard.putNumber("pitch/goalPosition [DEG]", Rotation2d.fromRotations(goal.position).getDegrees());
         SmartDashboard.putNumber("pitch/goalVelocity [RotPS]", goal.velocity);
         SmartDashboard.putBoolean("pitch/isAtGoal", isAtGoal());

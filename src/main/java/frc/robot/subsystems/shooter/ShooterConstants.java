@@ -1,12 +1,11 @@
 package frc.robot.subsystems.shooter;
 
-import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 public class ShooterConstants {
     static final Rotation2d FORWARD_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(10);
@@ -20,24 +19,21 @@ public class ShooterConstants {
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
 
     static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);
-    static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(-24.785156);
+    static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(20.478516);
     static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-16.787110);
 
     static final double
             PITCH_KS = 0.31251,
-            PITCH_KV = 13.181,
-            PITCH_KA = 4.0663,
+            PITCH_KV = 10.587,
+            PITCH_KA = 3.7663,
             PITCH_KG = 0.31481,
-            PITCH_KP = 1.0,
+
+            PITCH_KP = 0.0,
             PITCH_KI = 0.0,
             PITCH_KD = 0.0,
-            PITCH_MAX_VELOCITY = 2,
+
+            PITCH_MAX_VELOCITY = 2.2,
             PITCH_MAX_ACCELERATION = 0.5;
-
-    static final float PIVOT_CONSTRAINT_DEGREES = 130;  // TODO This is not the final value
-    static final CANSparkBase.SoftLimitDirection PIVOT_CONSTRAINT_DIRECTION = CANSparkBase.SoftLimitDirection.kForward;
-
-    static final double PIVOT_TOLERANCE = Units.degreesToRotations(1);
 
     static final double TIME_DIFFERENCE = 0.02;
     static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.05).getRotations();

@@ -74,7 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
         log.motor("Pitcher")
                 .voltage(pitch.getVoltage())
                 .angularPosition(Rotations.of(pitch.getPosition().getRotations()))
-                .angularVelocity(RotationsPerSecond.of(pitch.getVelocity()));
+                .angularVelocity(RotationsPerSecond.of(pitch.getVelocity()));//.of(RPM.of(pitch.getVelocity()).in(DegreesPerSecond)));
     }
 
     /**
