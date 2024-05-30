@@ -74,7 +74,8 @@ public final class Constants {
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
         public static final Transform3d
-           ROBOT_TO_FRONT_CAMERA = new Transform3d(0.335, 0.15, 0.20,
+           ROBOT_TO_FRONT_CAMERA = new Transform3d(
+                   0.335, -0.15, 0.20,
                 new Rotation3d(0, Units.degreesToRadians(-20), 0));
     }
 
@@ -106,13 +107,13 @@ public final class Constants {
          * the second one for the y, and the third one is for the theta (rotation).
          * Increase these numbers to trust the odometry less.
          */
-        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.3, 0.3, 0.2);
+        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.03, 0.03, 0.2);
         public static final double POSE_BUFFER_SIZE_SECONDS = 2.0;
 
-        public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(5, 5, Rotation2d.fromDegrees(0));
+        public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(10, 5, Rotation2d.fromDegrees(0));
 
         public static final double TRANSLATION_STD_EXPONENT = 0.005;
-        public static final double ROTATION_STD_EXPONENT = 0.01;
+        public static final double ROTATION_STD_EXPONENT = 0.001;
 
         public static final Map<Integer, Pose3d> TAG_ID_TO_POSE = new HashMap<>();
 

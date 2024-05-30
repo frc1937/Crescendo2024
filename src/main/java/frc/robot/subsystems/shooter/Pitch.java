@@ -64,6 +64,9 @@ public class Pitch {
         configureController();
 
         encoder = motor.getEncoder();
+        encoder.setPositionConversionFactor(1/150.0);
+        encoder.setPosition(getPosition().getRotations());
+
         state = new TrapezoidProfile.State(getPosition().getRotations(), 0);
     }
 
@@ -175,7 +178,7 @@ public class Pitch {
         motor.restoreFactoryDefaults();
 
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        motor.setSmartCurrentLimit(60);
+        motor.setSmartCurrentLimit(40);
         motor.enableVoltageCompensation(12);
 
         CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);

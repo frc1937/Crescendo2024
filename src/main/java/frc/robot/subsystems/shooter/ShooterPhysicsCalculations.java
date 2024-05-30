@@ -1,16 +1,26 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.poseestimation.PoseEstimator5990;
 
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_POINT_X_OFFSET_METRES;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_POINT_Z_OFFSET_METRES;
+import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_LENGTH_METRES;
 
 public class ShooterPhysicsCalculations {
     private final ShooterSubsystem shooterSubsystem;
+    private final PoseEstimator5990 poseEstimator5990;
 
-    public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem) {
+    public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem, PoseEstimator5990 poseEstimator5990) {
         this.shooterSubsystem = shooterSubsystem;
+        this.poseEstimator5990 = poseEstimator5990;
     }
 
     /**
@@ -26,7 +36,7 @@ public class ShooterPhysicsCalculations {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = targetPose.getZ(); //- getNoteExitPose(robotPose, targetPose).getZ();
+        double z = (targetPose.getZ() + 0.2) - getNoteExitPose(robotPose, targetPose).getZ();
         double distance = getDistanceToTarget(robotPose, targetPose);
 
         SmartDashboard.putNumber("physics/ZedDistance", z);
@@ -102,7 +112,10 @@ public class ShooterPhysicsCalculations {
      * @return - The distance in metres
      */
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
-        return getNoteExitPose(robotPose, targetPose).getTranslation().getDistance(targetPose.getTranslation());
+
+
+        return getNoteExitPose(robotPose, targetPose).getTranslation()
+                .getDistance(targetPose.getTranslation());
     }
 
     /**

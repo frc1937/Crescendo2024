@@ -17,15 +17,14 @@ public class ShooterConstants {
 
     static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);
     static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(20.478516);
-    static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-16.787110);
-
+    static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-18.984374625);
     static final double
-            PITCH_KS = 0.31251,
-            PITCH_KV = 10.587,
-            PITCH_KA = 3.7663,
-            PITCH_KG = 0.31481,
+            PITCH_KS = 0.16175,
+            PITCH_KV = 11.567,
+            PITCH_KA = 0.30988,
+            PITCH_KG = 0.19896,
 
-            PITCH_KP = 0.0,
+            PITCH_KP = 50.0,
             PITCH_KI = 0.0,
             PITCH_KD = 0.0,
 
@@ -33,7 +32,7 @@ public class ShooterConstants {
             PITCH_MAX_ACCELERATION = 0.5;
 
     static final double TIME_DIFFERENCE = 0.02;
-    static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.05).getRotations();
+    static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.3).getRotations();
 
     static final Measure<Distance> LEFT_FLYWHEEL_DIAMETER = Inches.of(4);
     static final Measure<Distance> RIGHT_FLYWHEEL_DIAMETER = Inches.of(3);
@@ -68,8 +67,8 @@ public class ShooterConstants {
     public static final double POST_SHOOTING_DELAY = 0.25;
     public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
-    public static final double KICKER_SPEED_BACKWARDS = -0.7;
-    public static final double KICKER_SPEED_FORWARD = 1;
+    public static final double KICKER_SPEED_BACKWARDS = -0.6;
+    public static final double KICKER_SPEED_FORWARD = 0.6;
 
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(50), MetersPerSecond.of(16));

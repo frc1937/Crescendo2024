@@ -107,7 +107,7 @@ public class RobotContainer {
         swerve5990 = new Swerve5990(poseEstimator5990);
         poseEstimator5990.setSwerve(swerve5990);
 
-        shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, poseEstimator5990);
+        shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, poseEstimator5990, swerve5990);
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -208,7 +208,7 @@ public class RobotContainer {
         drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
 
         drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
-        drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve));
+        drBackButton.onTrue(new InstantCommand(swerve5990::lockSwerve)); //todo: this doesnt work
 
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));

@@ -34,7 +34,7 @@ class ButtonTest {
         int[] testValuesPitch = {0, 20, 40, 90};
 
         for (int i = 0; i < 4; i++) {
-            Pose2d robotPose = new Pose2d(5, 5, Rotation2d.fromDegrees(testValuesYaw[i]));
+            Pose2d robotPose = new Pose2d(100, 5, Rotation2d.fromDegrees(testValuesYaw[i]));
             for (int j = 0; j < 4; j++) {
                 double targetPitchAngle = testValuesPitch[j];
 
