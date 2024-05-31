@@ -24,8 +24,8 @@ public class Conversions {
         return degrees / DEGREES_PER_REVOLUTIONS;
     }
 
-    public static double RPMToRotationsPerSecond(double RPM, double gearRatio) {
-        return RPM / (SEC_PER_MIN) * gearRatio;
+    public static double rpmToRotationsPerSecond(double rpm) {
+        return rpm / (SEC_PER_MIN);
     }
 
     /**
@@ -54,7 +54,7 @@ public class Conversions {
      * @param wheelDiameter - wheel diameter in inches
      * @return rotations per minute
      */
-    public static double RPMFromTangentialVelocity(Measure<Velocity<Distance>> tangentialVelocity, Measure<Distance> wheelDiameter) {
+    public static double rpmFromTangentialVelocity(Measure<Velocity<Distance>> tangentialVelocity, Measure<Distance> wheelDiameter) {
         return SEC_PER_MIN * ((tangentialVelocity.in(MetersPerSecond) / wheelDiameter.in(Meters)) / Math.PI );
     }
 
@@ -74,8 +74,6 @@ public class Conversions {
      * @param rotationsPerSecond rotations per second
      * @return meters per second
      */
-
-
     public static Measure<Velocity<Distance>> rotationsPerSecondToMetersPerSecond(double rotationsPerSecond) {
         return MetersPerSecond.of(rotationsPerSecond * WHEEL_CIRCUMFERENCE);
     }
@@ -84,13 +82,13 @@ public class Conversions {
      * Converts motor data to system data.
      * This can be velocity, position, acceleration, etc.
      *
-     * @param motorData the motor data
+     * @param value the value you want to multiply
      * @param gearRatio the gear ratio between the motor and the system. 2 means that 2 motor rotations are 1 system
      *                  rotation.
      * @return the system data
      */
-    public static double motorToSystem(double motorData, double gearRatio) {
-        return motorData / gearRatio;
+    public static double applyGearingRatio(double value, double gearRatio) {
+        return value / gearRatio;
     }
 
     /**

@@ -15,14 +15,16 @@ public class ShooterConstants {
 
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
 
+    static final double GRAVITY_FORCE = 9.8;
+
     static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);
     static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(20.478516);
     static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-18.984374625);
     static final double
-            PITCH_KS = 0.16175,
-            PITCH_KV = 11.567,
-            PITCH_KA = 0.30988,
-            PITCH_KG = 0.19896,
+            PITCH_KS = 0.16255,
+            PITCH_KV = 15.528,
+            PITCH_KA = 0.41253,
+            PITCH_KG = 0.17103,
 
             PITCH_KP = 50.0,
             PITCH_KI = 0.0,
@@ -72,6 +74,7 @@ public class ShooterConstants {
 
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(50), MetersPerSecond.of(16));
+
     public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(111.5), MetersPerSecond.of(14));
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(

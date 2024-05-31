@@ -53,7 +53,7 @@ public class ShootOnTheMove extends Command {
 
         Pose3d newTarget = shooterPhysicsCalculations.getNewTargetFromRobotVelocity(robotPose, targetPose, tangentialVelocity, swerve5990.getSelfRelativeVelocity());
 
-        Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(robotPose, newTarget);
+        Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(newTarget);
 
         swerve5990.driveWithTargetAzimuth(targetTranslation, targetStrafe, targetAngle);
         shootNote(robotPose, newTarget, tangentialVelocity);
@@ -72,7 +72,7 @@ public class ShootOnTheMove extends Command {
     }
 
     private void shootNote(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+        Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(targetPose, tangentialVelocity);
         ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
 
         shooterCommands.shootNote(reference);

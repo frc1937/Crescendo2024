@@ -21,7 +21,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.lib.math.Conversions.RPMFromTangentialVelocity;
+import static frc.lib.math.Conversions.rpmFromTangentialVelocity;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.CanIDConstants.KICKER_ID;
@@ -147,8 +147,8 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param tangentialVelocity - the target tangential velocity in metres per second
      */
     public void setTangentialFlywheelsVelocity(Measure<Velocity<Distance>> tangentialVelocity) {
-        double leftFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
-        double rightFlywheelRPM = RPMFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
+        double leftFlywheelRPM = rpmFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
+        double rightFlywheelRPM = rpmFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
 
         leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
         rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));

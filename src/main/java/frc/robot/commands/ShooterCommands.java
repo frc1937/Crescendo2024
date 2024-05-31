@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,40 +42,19 @@ public class ShooterCommands {
 
     public Command shootPhysics(double tangentialVelocity) {
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
+        Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(targetPose, tangentialVelocity);
 
-        return new FunctionalCommand(
-                () -> {
-                    Pose2d robotPose = poseEstimator5990.getCurrentPose().getBluePose();
-
-                    Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
-                    ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta,
-                            MetersPerSecond.of(tangentialVelocity)
-                    );
-
-                    SmartDashboard.putString("physics/robotPose", robotPose.toString());
-                    SmartDashboard.putString("physics/targetPose", targetPose.toString());
-                    SmartDashboard.putNumber("physics/theta", theta.getDegrees());
-
-                    Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(robotPose, targetPose);
-
-                    swerve5990.driveWithTargetAzimuth(0, 0, targetAngle);
-
-                    initializeShooter(false, reference);
-                },
-                () -> {
-                    SmartDashboard.putBoolean("shooter/isLoaded", shooterSubsystem.isLoaded());
-                    SmartDashboard.putBoolean("shooter/flywheelsAtReference", shooterSubsystem.flywheelsAtReference());
-                    SmartDashboard.putBoolean("shooter/pitchAtReference", shooterSubsystem.pitchAtReference());
-
-                    if (shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference()) {
-                        shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
-                    }
-                },
-                interrupted -> shooterSubsystem.reset(),
-                () -> false,
-
-                shooterSubsystem
+        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(
+                theta, MetersPerSecond.of(tangentialVelocity)
         );
+
+        SmartDashboard.putString("physics/targetPose", targetPose.toString());
+        SmartDashboard.putNumber("physics/theta", theta.getDegrees());
+
+        Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(targetPose);
+
+        swerve5990.driveWithTargetAzimuth(0, 0, targetAngle);
+        return shootNote(reference);
     }
 
     public Command shootNote(ShooterSubsystem.Reference reference) {

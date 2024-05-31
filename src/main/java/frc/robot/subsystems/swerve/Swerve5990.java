@@ -117,10 +117,10 @@ public class Swerve5990 extends SubsystemBase {
                 right = new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
                 left = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
 
-        modules[0].setTargetState(left, false);
-        modules[1].setTargetState(right, false);
-        modules[2].setTargetState(right, false);
-        modules[3].setTargetState(left, false);
+        modules[0].setTargetState(left, true);
+        modules[1].setTargetState(right, true);
+        modules[2].setTargetState(right, true);
+        modules[3].setTargetState(left, true);
     }
 
     public Rotation2d getGyroAzimuth() {

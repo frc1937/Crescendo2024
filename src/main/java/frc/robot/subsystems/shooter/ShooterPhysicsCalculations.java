@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.poseestimation.PoseEstimator5990;
 
+import static frc.robot.subsystems.shooter.ShooterConstants.GRAVITY_FORCE;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_POINT_X_OFFSET_METRES;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_POINT_Z_OFFSET_METRES;
 import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTER_LENGTH_METRES;
@@ -25,33 +26,31 @@ public class ShooterPhysicsCalculations {
 
     /**
      * Get the needed pitch theta for the pivot using physics.
-     * @link <a href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">Formula is taken from wikipedia</a>
-     * @param robotPose - The robot's pose, using the correct alliance
-     * @param targetPose - the target pose to hit, using the correct alliance
+     *
+     * @param targetPose         - the target pose to hit, using the correct alliance
      * @param tangentialVelocity - the tangential velocity of the flywheel
      * @return - the required pitch angle
+     * @link <a href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">Formula is taken from wikipedia</a>
+     * //     * @param robotPose - The robot's pose, using the correct alliance
      */
-    public Rotation2d getPitchAnglePhysics(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        double g = 9.8;
+    public Rotation2d getPitchAnglePhysics(Pose3d targetPose, double tangentialVelocity) {
+        Pose2d robotPose = poseEstimator5990.getCurrentPose().getBluePose();
+
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = (targetPose.getZ() + 0.2) - getNoteExitPose(robotPose, targetPose).getZ();
+        double z = (targetPose.getZ()) - getNoteExitPose(robotPose, targetPose).getZ();
         double distance = getDistanceToTarget(robotPose, targetPose);
 
-        SmartDashboard.putNumber("physics/ZedDistance", z);
-        SmartDashboard.putNumber("physics/distance", distance);
-
-        double sqrt = Math.sqrt(vSquared * vSquared - g * (g * distance * distance + 2 * vSquared * z));
+        double sqrt = Math.sqrt(vSquared * vSquared - GRAVITY_FORCE * (GRAVITY_FORCE * distance * distance + 2 * vSquared * z));
+        double theta = Math.atan((vSquared - sqrt) / (GRAVITY_FORCE * distance));
 
         SmartDashboard.putNumber("physics/DivNumerator", (vSquared + sqrt));
-        SmartDashboard.putNumber("physics/DivDenominator", g*distance);
-        SmartDashboard.putNumber("physics/DivResult", (vSquared + sqrt) / (g*distance));
-
-        double theta = Math.atan(
-                (vSquared - sqrt) / (g*distance)
-        );
-
+        SmartDashboard.putNumber("physics/DivDenominator", GRAVITY_FORCE * distance);
+        SmartDashboard.putNumber("physics/DivResult", (vSquared + sqrt) / (GRAVITY_FORCE * distance));
+        SmartDashboard.putNumber("physics/ZedDistance", z);
+        SmartDashboard.putNumber("physics/distance", distance);
+        SmartDashboard.putString("physics/robotPose", robotPose.toString());
         SmartDashboard.putNumber("physics/FunctionTheta", theta);
 
         return Rotation2d.fromRadians(theta);
@@ -59,13 +58,14 @@ public class ShooterPhysicsCalculations {
 
     /**
      * We assume the robot isn't moving to get the time of flight
-     * @param robotPose - The robot's pose, using the correct alliance
-     * @param targetPose - The target pose of the NOTE, using the correct alliance
+     * //     * @param robotPose - The robot's pose, using the correct alliance
+     *
+     * @param targetPose         - The target pose of the NOTE, using the correct alliance
      * @param tangentialVelocity - The tangential velocity of the flywheels
      * @return - the time of flight in seconds
      */
     public double getTimeOfFlight(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
-        Rotation2d theta = getPitchAnglePhysics(robotPose, targetPose, tangentialVelocity);
+        Rotation2d theta = getPitchAnglePhysics(targetPose, tangentialVelocity);
 
         double distance = getDistanceToTarget(robotPose, targetPose);
         double speed = tangentialVelocity * theta.getCos();
@@ -75,21 +75,24 @@ public class ShooterPhysicsCalculations {
 
     /**
      * Returns the required angle the robot has to rotate to face the target
-     * @param robotPose - The robot's pose, using the correct alliance
+     *
      * @param targetPose - The target pose, using the correct alliance
      * @return - the target azimuth angle
      */
-    public Rotation2d getAzimuthAngleToTarget(Pose2d robotPose, Pose3d targetPose) {
-        Translation2d differenceInXY = targetPose.toPose2d().getTranslation().minus(robotPose.getTranslation());
+    public Rotation2d getAzimuthAngleToTarget(Pose3d targetPose) {
+        Translation2d robotTranslation = poseEstimator5990.getCurrentPose().getBluePose().getTranslation();
+        Translation2d differenceInXY = targetPose.toPose2d().getTranslation().minus(robotTranslation);
+
         return Rotation2d.fromRadians(Math.atan2(Math.abs(differenceInXY.getY()), Math.abs(differenceInXY.getY())));
     }
 
     /**
      * Get the target's offset after taking into account the robot's velocity
-     * @param robotPose - The robot's pose, using the correct alliance
-     * @param targetPose - The target pose, using the correct alliance
+     *
+     * @param robotPose          - The robot's pose, using the correct alliance
+     * @param targetPose         - The target pose, using the correct alliance
      * @param tangentialVelocity - The tangential velocity of the flywheels
-     * @param robotVelocity - The robot's current velocity
+     * @param robotVelocity      - The robot's current velocity
      * @return - The new pose of the target, after applying the offset
      */
     public Pose3d getNewTargetFromRobotVelocity(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity, ChassisSpeeds robotVelocity) {
@@ -107,7 +110,8 @@ public class ShooterPhysicsCalculations {
 
     /**
      * Get the distance from the NOTE's exit position to the target
-     * @param robotPose - The robot's pose, using the correct alliance
+     *
+     * @param robotPose  - The robot's pose, using the correct alliance
      * @param targetPose - The target pose, using the correct alliance
      * @return - The distance in metres
      */
@@ -121,7 +125,8 @@ public class ShooterPhysicsCalculations {
     /**
      * Get the field-relative end of the shooter, AKA the NOTE's point of exit, from field-relative robot pose.
      * Using the correct alliance.
-     * @param robotPose - The robot's pose, using the correct alliance
+     *
+     * @param robotPose  - The robot's pose, using the correct alliance
      * @param targetPose - The target's pose, using the correct alliance
      * @return the shooter's end, AKA the NOTE's point of exit
      */
