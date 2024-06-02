@@ -23,6 +23,7 @@ import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
+import frc.robot.commands.calibration.GearRatioCharacterization;
 import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
 import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
 import frc.robot.commands.calibration.PitchCharacterization;
@@ -230,6 +231,8 @@ public class RobotContainer {
         drRightTrigger.whileTrue(shooterCommands.setPitchPosition(90));
         drLeftBumper.whileTrue(shooterCommands.setPitchPosition(60));
         drRightBumper.whileTrue(shooterCommands.setPitchPosition(69));
+
+        drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 1.0, 5.0));
     }
 
     private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {

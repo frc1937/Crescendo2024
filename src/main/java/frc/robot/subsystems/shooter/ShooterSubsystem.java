@@ -124,6 +124,10 @@ public class ShooterSubsystem extends SubsystemBase {
         stopFlywheels();
         stopKicker();
     }
+
+    public Pitch getPitch() {
+        return pitch;
+    }
     
     public Rotation2d getPitchPosition() {
         return pitch.getPosition();

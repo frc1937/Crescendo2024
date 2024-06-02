@@ -169,7 +169,6 @@ public class Swerve5990 extends SubsystemBase {
      * @param thetaPower   - the rotation power
      * @param robotCentric - whether the robot should drive relative to itself or the field
      */
-
     public void drive(double xPower, double yPower, double thetaPower, boolean robotCentric) {
         if (robotCentric) {
             driveSelfRelative(xPower, yPower, thetaPower);
@@ -186,7 +185,7 @@ public class Swerve5990 extends SubsystemBase {
      * @param targetAzimuthAngle - the angle to rotate to
      */
     public void driveWithTargetAzimuth(double xPower, double yPower, Rotation2d targetAzimuthAngle) {
-        driveFieldRelative(xPower, yPower, calculateProfiledSpeedToAngle(targetAzimuthAngle));
+        driveFieldRelative(xPower, yPower, determineProfiledSpeedToAngle(targetAzimuthAngle));
         //todo: check if works
     }
 
@@ -204,7 +203,7 @@ public class Swerve5990 extends SubsystemBase {
         ChassisSpeeds speeds = new ChassisSpeeds(
                 xSpeed * direction,
                 ySpeed * direction,
-                calculateProfiledSpeedToAngle(targetPose.getRotation())
+                determineProfiledSpeedToAngle(targetPose.getRotation())
         );
 
         driveSelfRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, currentPose.getRotation()));
@@ -214,10 +213,9 @@ public class Swerve5990 extends SubsystemBase {
         targetAngle = getCorrectRotation(targetAngle);
 
         Rotation2d currentAngle = poseEstimator5990.getCurrentPose().getCorrectPose().getRotation();
-
         ChassisSpeeds selfRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(powersToSpeeds(xPower, yPower, 0), currentAngle);
 
-        selfRelativeSpeeds.omegaRadiansPerSecond = calculateProfiledSpeedToAngle(targetAngle);
+        selfRelativeSpeeds.omegaRadiansPerSecond = determineProfiledSpeedToAngle(targetAngle);
 
         driveSelfRelative(selfRelativeSpeeds);
     }
@@ -235,7 +233,7 @@ public class Swerve5990 extends SubsystemBase {
 
     public void driveSelfRelative(double xPower, double yPower, Rotation2d targetAngle) {
         ChassisSpeeds speeds = powersToSpeeds(xPower, yPower, 0);
-        speeds.omegaRadiansPerSecond = calculateProfiledSpeedToAngle(targetAngle);
+        speeds.omegaRadiansPerSecond = determineProfiledSpeedToAngle(targetAngle);
 
         driveSelfRelative(speeds);
     }
@@ -303,7 +301,7 @@ public class Swerve5990 extends SubsystemBase {
         );
     }
 
-    private double calculateProfiledSpeedToAngle(Rotation2d angle) {
+    private double determineProfiledSpeedToAngle(Rotation2d angle) {
         double currentAngle = poseEstimator5990.getCurrentPose().getCorrectPose().getRotation().getRadians();
         double yawCorrection = azimuthController.calculate(
                 currentAngle,

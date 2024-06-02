@@ -24,6 +24,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
@@ -65,8 +66,8 @@ public class Pitch {
         configureController();
 
         encoder = motor.getEncoder();
-        encoder.setPositionConversionFactor(1 / 150.0);
-        encoder.setVelocityConversionFactor(1 / 150.0 / 60);
+//        encoder.setPositionConversionFactor(1 / 150.0);
+//        encoder.setVelocityConversionFactor(1 / 150.0 / 60);
         encoder.setPosition(getPosition().getRotations());
 
         state = new TrapezoidProfile.State(getPosition().getRotations(), getVelocity());
@@ -93,7 +94,7 @@ public class Pitch {
         if (goal != null)
             return Rotation2d.fromRotations(goal.position);
 
-        return Rotation2d.fromDegrees(0);
+        return PITCH_DEFAULT_ANGLE;
     }
 
     /**
@@ -147,6 +148,16 @@ public class Pitch {
      */
     public Measure<Voltage> getVoltage() {
         return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
+    }
+
+    /**
+     * Returns the relative encoder's position
+     *
+     * @return the position of the relative encoder
+     * @Units Rotations of the motor
+     */
+    public double getRelativeEncoderPosition() {
+        return encoder.getPosition();
     }
 
     /**
