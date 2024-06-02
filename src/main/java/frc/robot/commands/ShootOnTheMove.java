@@ -30,7 +30,7 @@ public class ShootOnTheMove extends Command {
     private final DoubleSupplier translationSupplier, strafeSupplier;
     private final double tangentialVelocity;
 
-    public ShootOnTheMove(ShooterSubsystem shooterSubsystem, PoseEstimator5990 poseEstimator5990, ShooterCommands shooterCommands, Swerve5990 swerve5990, DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier, double tangentialVelocity) {
+    public ShootOnTheMove(ShooterSubsystem shooterSubsystem, PoseEstimator5990 poseEstimator5990, ShooterCommands shooterCommands, Swerve5990 swerve5990, DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier, double tangentialVelocity, ShooterPhysicsCalculations shooterPhysicsCalculations) {
         this.shooterSubsystem = shooterSubsystem;
         this.poseEstimator5990 = poseEstimator5990;
         this.shooterCommands = shooterCommands;
@@ -40,7 +40,7 @@ public class ShootOnTheMove extends Command {
         this.strafeSupplier = strafeSupplier;
         this.tangentialVelocity = tangentialVelocity;
 
-        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, poseEstimator5990);
+        this.shooterPhysicsCalculations = shooterPhysicsCalculations;
     }
 
     @Override

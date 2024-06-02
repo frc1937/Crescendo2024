@@ -70,7 +70,7 @@ public class ShooterConstants {
     public static final double SHOOTING_PREDICTION_TIME = 0.5;
 
     public static final double KICKER_SPEED_BACKWARDS = -0.6;
-    public static final double KICKER_SPEED_FORWARD = 0.6;
+    public static final double KICKER_SPEED_FORWARD = 0.9;
 
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(50), MetersPerSecond.of(16));
@@ -80,7 +80,7 @@ public class ShooterConstants {
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(48), MetersPerSecond.of(15));
     public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-            PIVOT_BOTTOM_ANGLE.plus(Rotation2d.fromDegrees(1)), MetersPerSecond.of(-3));
+            PIVOT_BOTTOM_ANGLE, MetersPerSecond.of(-3));
 
     public static final ShooterSubsystem.Reference AMP_INIT =
             new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), MetersPerSecond.of(3));

@@ -91,6 +91,8 @@ public class Flywheel {
         sparkFlexMotor.setIdleMode(IdleMode.kCoast);
         sparkFlexMotor.setInverted(invert);
 
+        sparkFlexMotor.setSmartCurrentLimit(40);
+
         CANSparkMaxUtil.setCANSparkBusUsage(sparkFlexMotor, CANSparkMaxUtil.Usage.kVelocityOnly);
 
         return sparkFlexMotor;

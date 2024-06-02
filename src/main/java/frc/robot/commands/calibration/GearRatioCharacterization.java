@@ -28,8 +28,8 @@ public class GearRatioCharacterization extends Command {
     public void initialize() {
         pitch.drivePitch(voltage);
 
-        externalMeasure = pitch.getPosition().getRotations();
-        internalMeasure = pitch.getRelativeEncoderPosition();
+        externalMeasure = pitch.getPosition().getDegrees();
+        internalMeasure = pitch.getRelativeEncoderPosition() * 360;
 
         startTimestamp = Timer.getFPGATimestamp();
     }
@@ -43,11 +43,14 @@ public class GearRatioCharacterization extends Command {
     public void end(boolean interrupted) {
         pitch.drivePitch(0.0);
 
-        final double externalAccumulation = pitch.getPosition().getRotations() - externalMeasure;
-        final double internalAccumulation = pitch.getPosition().getRotations() - internalMeasure;
+        final double externalAccumulation = pitch.getPosition().getDegrees() - externalMeasure;
+        final double internalAccumulation = pitch.getRelativeEncoderPosition() * 360 - internalMeasure;
 
-        SmartDashboard.putNumber("GearRatioCharacterization/ExternalToInternalRatio", externalAccumulation / internalAccumulation);
+        SmartDashboard.putNumber("GearRatioCharacterization/RATIOExternalToInternal", externalAccumulation / internalAccumulation);
+        SmartDashboard.putNumber("GearRatioCharacterization/RATIOInternalToExternal", internalAccumulation / externalAccumulation);
         SmartDashboard.putNumber("GearRatioCharacterization/ExternalValue", externalAccumulation);
         SmartDashboard.putNumber("GearRatioCharacterization/InternalValue", internalAccumulation);
     }
 }
+//147.847088
+//147.978402

@@ -75,8 +75,8 @@ public final class Constants {
          */
         public static final Transform3d
            ROBOT_TO_FRONT_CAMERA = new Transform3d(
-                   0.335, -0.15, 0.20,
-                new Rotation3d(0, Units.degreesToRadians(-20), 0));
+                0.346407, -0.175245, 0.397225,
+                new Rotation3d(0,-17.5, 0));
     }
 
     public static final class LEDsConstants {
@@ -122,7 +122,7 @@ public final class Constants {
                 TAG_ID_TO_POSE.put(aprilTag.ID, aprilTag.pose);
         }
 
-        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.18, 0.0, 0.49081), new Rotation3d()));
+        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.2, 0.0, 0.49081+0.18), new Rotation3d()));
         public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
 
         public static final PhotonPoseEstimator.PoseStrategy PRIMARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;

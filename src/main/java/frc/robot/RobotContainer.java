@@ -34,6 +34,7 @@ import frc.robot.poseestimation.PoseEstimator6328;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.mount.MountSubsystem;
+import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
 
@@ -92,6 +93,7 @@ public class RobotContainer {
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands;
+    private final ShooterPhysicsCalculations shooterPhysicsCalculations;
 
 
     /* CONTROLS */
@@ -108,13 +110,14 @@ public class RobotContainer {
         swerve5990 = new Swerve5990(poseEstimator5990);
         poseEstimator5990.setSwerve(swerve5990);
 
-        shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, poseEstimator5990, swerve5990);
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, poseEstimator5990);
+        shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, swerve5990, shooterPhysicsCalculations);
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        registerCommands();
+        registerNamedCommands();
     }
 
 
@@ -158,9 +161,10 @@ public class RobotContainer {
 
     public void frequentPeriodic() {
         poseEstimator5990.periodic();
+        shooterPhysicsCalculations.feedRobotPose(poseEstimator5990.getCurrentPose().getBluePose());
     }
 
-    private void registerCommands() {
+    private void registerNamedCommands() {
         NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
         NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
         NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake().withTimeout(2.7));
@@ -198,8 +202,8 @@ public class RobotContainer {
     private void teleopButtonsLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
 
-        drAButton.whileTrue(shooterCommands.shootPhysics(13));
-        drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16));
+        drAButton.whileTrue(shooterCommands.shootPhysics(16));
+        drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16, shooterPhysicsCalculations));
         drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
@@ -232,7 +236,7 @@ public class RobotContainer {
         drLeftBumper.whileTrue(shooterCommands.setPitchPosition(60));
         drRightBumper.whileTrue(shooterCommands.setPitchPosition(69));
 
-        drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 1.0, 5.0));
+        drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 0.5, 4));
     }
 
     private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {

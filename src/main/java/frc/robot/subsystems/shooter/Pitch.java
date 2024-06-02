@@ -66,8 +66,8 @@ public class Pitch {
         configureController();
 
         encoder = motor.getEncoder();
-//        encoder.setPositionConversionFactor(1 / 150.0);
-//        encoder.setVelocityConversionFactor(1 / 150.0 / 60);
+        encoder.setPositionConversionFactor(1 / 149.0);
+        encoder.setVelocityConversionFactor(1 / 149.0 / 60);
         encoder.setPosition(getPosition().getRotations());
 
         state = new TrapezoidProfile.State(getPosition().getRotations(), getVelocity());
@@ -175,7 +175,7 @@ public class Pitch {
 
         canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        canCoderConfig.MagnetSensor.MagnetOffset = -PIVOT_ENCODER_OFFSET.getRotations();
+        canCoderConfig.MagnetSensor.MagnetOffset = PIVOT_ENCODER_OFFSET.getRotations();
 
         applyConfig(absoluteEncoder, canCoderConfig);
 

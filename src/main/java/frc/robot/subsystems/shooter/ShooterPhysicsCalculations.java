@@ -19,9 +19,17 @@ public class ShooterPhysicsCalculations {
     private final ShooterSubsystem shooterSubsystem;
     private final PoseEstimator5990 poseEstimator5990;
 
+    private Pose2d robotPose;
+
     public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem, PoseEstimator5990 poseEstimator5990) {
         this.shooterSubsystem = shooterSubsystem;
         this.poseEstimator5990 = poseEstimator5990;
+
+        robotPose = poseEstimator5990.getCurrentPose().getBluePose();
+    }
+
+    public void feedRobotPose(Pose2d robotPose) {
+        this.robotPose = robotPose;
     }
 
     /**
@@ -34,8 +42,6 @@ public class ShooterPhysicsCalculations {
      * //     * @param robotPose - The robot's pose, using the correct alliance
      */
     public Rotation2d getPitchAnglePhysics(Pose3d targetPose, double tangentialVelocity) {
-        Pose2d robotPose = poseEstimator5990.getCurrentPose().getBluePose();
-
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
@@ -116,8 +122,6 @@ public class ShooterPhysicsCalculations {
      * @return - The distance in metres
      */
     private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
-
-
         return getNoteExitPose(robotPose, targetPose).getTranslation()
                 .getDistance(targetPose.getTranslation());
     }
