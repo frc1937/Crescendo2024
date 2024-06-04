@@ -35,13 +35,6 @@ public class Flywheel {
         configureEncoder();
     }
 
-    private void seedFeeders(double kP, double kS, double kV, double kA) {
-        feedback = new PIDController(kP, 0, 0);
-        feedback.setTolerance(FLYWHEEL_TOLERANCE.in(RPM));
-
-        feedforward = new SimpleMotorFeedforward(kS, kV, kA);
-    }
-
     public void periodic() {
         logFlywheel();
         driveFlywheel();
@@ -49,7 +42,9 @@ public class Flywheel {
 
     public void setGoal(Measure<Velocity<Angle>> speed) {
         goal = speed;
+
         feedback.reset();
+        feedback.setSetpoint(speed.in(RPM));
     }
 
     public Measure<Velocity<Angle>> getGoal() {
@@ -81,11 +76,17 @@ public class Flywheel {
         double currentVelocityRPM = getVelocity().in(RPM);
         double goalVelocityRPM = goal.in(RPM);
 
-        double feedbackOutput = feedback.calculate(currentVelocityRPM, goalVelocityRPM);
-        double feedforwardOutput = feedforward.calculate(currentVelocityRPM, goalVelocityRPM, TIME_DIFFERENCE);
-        //todo: This might be incorrect
+        double feedbackOutput = feedback.calculate(currentVelocityRPM);
+        double feedforwardOutput = feedforward.calculate(goalVelocityRPM);
 
         motor.setVoltage(feedbackOutput + feedforwardOutput);
+    }
+
+    private void seedFeeders(double kP, double kS, double kV, double kA) {
+        feedback = new PIDController(kP, 0, 0);
+        feedback.setTolerance(FLYWHEEL_TOLERANCE.in(RPM));
+
+        feedforward = new SimpleMotorFeedforward(kS, kV, kA);
     }
 
     private void logFlywheel() {
@@ -105,7 +106,7 @@ public class Flywheel {
         motor.setInverted(invert);
 
         motor.enableVoltageCompensation(12);
-        motor.setSmartCurrentLimit(40);
+        motor.setSmartCurrentLimit(30);
 
         CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kVelocityOnly);
 

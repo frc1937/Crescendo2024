@@ -15,8 +15,10 @@ public class ShooterConstants {
     public static final int FLYWHEEL_MAX_RPM = 5400;
 
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
-
     static final double GRAVITY_FORCE = 9.8;
+
+    static final double PITCH_GEAR_RATIO = 1.0 / 149;
+    static final double FLYWHEEL_GEAR_RATIO = 1.0;
 
     static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);
     static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(20.478516);

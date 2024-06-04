@@ -21,27 +21,16 @@ import frc.lib.util.CANSparkMaxUtil;
 
 import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.lib.math.Conversions.SEC_PER_MIN;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KI;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KP;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KS;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KV;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATION;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_TOLERANCE;
-import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
-import static frc.robot.subsystems.shooter.ShooterConstants.TIME_DIFFERENCE;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
-    private final RelativeEncoder encoder;
+    private RelativeEncoder encoder;
 
     private final PIDController feedback = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
@@ -64,11 +53,7 @@ public class Pitch {
         configurePitchMotor();
         configureExternalEncoder();
         configureController();
-
-        encoder = motor.getEncoder();
-        encoder.setPositionConversionFactor(1 / 149.0);
-        encoder.setVelocityConversionFactor(1 / 149.0 / 60);
-        encoder.setPosition(getPosition().getRotations());
+        configureInternalEncoder();
 
         state = new TrapezoidProfile.State(getPosition().getRotations(), getVelocity());
     }
@@ -244,5 +229,12 @@ public class Pitch {
 
         previousVelocitySetpoint = currentVelocity;
         this.goal = goal;
+    }
+
+    private void configureInternalEncoder() {
+        encoder = motor.getEncoder();
+        encoder.setPositionConversionFactor(PITCH_GEAR_RATIO);
+        encoder.setVelocityConversionFactor(PITCH_GEAR_RATIO / SEC_PER_MIN);
+        encoder.setPosition(getPosition().getRotations());
     }
 }
