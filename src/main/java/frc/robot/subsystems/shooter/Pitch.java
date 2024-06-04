@@ -43,7 +43,7 @@ public class Pitch {
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
     private final RelativeEncoder encoder;
 
-    private final PIDController controller = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
+    private final PIDController feedback = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
     private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION);
@@ -208,8 +208,8 @@ public class Pitch {
     }
 
     private void configureController() {
-        controller.setTolerance(PITCH_TOLERANCE);
-        controller.reset();
+        feedback.setTolerance(PITCH_TOLERANCE);
+        feedback.reset();
     }
 
     private void drivePitchPeriodic() {
@@ -226,7 +226,7 @@ public class Pitch {
                 (setpoint.velocity - previousVelocitySetpoint) / TIME_DIFFERENCE
         );
 
-        final double controllerOutput = controller.calculate(
+        final double controllerOutput = feedback.calculate(
                 getPosition().getRotations(),
                 setpoint.position
         );
@@ -239,7 +239,7 @@ public class Pitch {
     private void setGoal(TrapezoidProfile.State goal) {
         final double currentVelocity = getVelocity();
 
-        controller.reset();
+        feedback.reset();
         state = new TrapezoidProfile.State(getPosition().getRotations(), currentVelocity);
 
         previousVelocitySetpoint = currentVelocity;

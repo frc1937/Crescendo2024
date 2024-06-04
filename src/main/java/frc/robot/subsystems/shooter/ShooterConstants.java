@@ -1,11 +1,12 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 public class ShooterConstants {
     static final Rotation2d FORWARD_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(10);
@@ -34,7 +35,9 @@ public class ShooterConstants {
             PITCH_MAX_ACCELERATION = 0.5;
 
     static final double TIME_DIFFERENCE = 0.02;
+
     static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.3).getRotations();
+    static final Measure<Velocity<Angle>> FLYWHEEL_TOLERANCE = RPM.of(10);
 
     static final Measure<Distance> LEFT_FLYWHEEL_DIAMETER = Inches.of(4);
     static final Measure<Distance> RIGHT_FLYWHEEL_DIAMETER = Inches.of(3);

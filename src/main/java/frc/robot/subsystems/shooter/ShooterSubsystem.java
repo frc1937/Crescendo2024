@@ -93,8 +93,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelsSpeed(Measure<Velocity<Angle>> speed) {
-        rightFlywheel.setSpeed(speed);
-        leftFlywheel.setSpeed(speed);
+        rightFlywheel.setGoal(speed);
+        leftFlywheel.setGoal(speed);
     }
 
     public void stopFlywheels() {
@@ -103,7 +103,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getFlywheelsSpeed() {
-        return Math.max(rightFlywheel.getSpeed().in(RPM), leftFlywheel.getSpeed().in(RPM));
+        return Math.max(rightFlywheel.getVelocity().in(RPM), leftFlywheel.getVelocity().in(RPM));
     }
 
     public Rotation2d getPitchGoal() {
@@ -121,8 +121,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void reset() {
         setReference(new Reference());
-        stopFlywheels();
-        stopKicker();
+//        stopFlywheels();
+//        stopKicker();
     }
 
     public Pitch getPitch() {
@@ -134,7 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean flywheelsAtReference() {
-        return leftFlywheel.atSetpoint() && rightFlywheel.atSetpoint();
+        return leftFlywheel.isAtGoal() && rightFlywheel.isAtGoal();
     }
 
     public boolean pitchAtReference() {
@@ -154,8 +154,8 @@ public class ShooterSubsystem extends SubsystemBase {
         double leftFlywheelRPM = rpmFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
         double rightFlywheelRPM = rpmFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
 
-        leftFlywheel.setSpeed(RPM.of(leftFlywheelRPM));
-        rightFlywheel.setSpeed(RPM.of(rightFlywheelRPM));
+        leftFlywheel.setGoal(RPM.of(leftFlywheelRPM));
+        rightFlywheel.setGoal(RPM.of(rightFlywheelRPM));
     }
 
     public static class Reference implements Interpolatable<Reference> {
