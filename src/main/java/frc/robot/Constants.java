@@ -107,13 +107,13 @@ public final class Constants {
          * the second one for the y, and the third one is for the theta (rotation).
          * Increase these numbers to trust the odometry less.
          */
-        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.03, 0.03, 0.2);
+        public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.003, 0.003, 0.0002);
         public static final double POSE_BUFFER_SIZE_SECONDS = 2.0;
 
         public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(10, 5, Rotation2d.fromDegrees(0));
 
         public static final double TRANSLATION_STD_EXPONENT = 0.005;
-        public static final double ROTATION_STD_EXPONENT = 0.001;
+        public static final double ROTATION_STD_EXPONENT = 0.01;
 
         public static final Map<Integer, Pose3d> TAG_ID_TO_POSE = new HashMap<>();
 

@@ -41,22 +41,22 @@ public class ShooterConstants {
     static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.3).getRotations();
     static final Measure<Velocity<Angle>> FLYWHEEL_TOLERANCE = RPM.of(10);
 
-    static final Measure<Distance> LEFT_FLYWHEEL_DIAMETER = Inches.of(4);
-    static final Measure<Distance> RIGHT_FLYWHEEL_DIAMETER = Inches.of(3);
+    static final Measure<Distance> LEFT_FLYWHEEL_DIAMETER = Inches.of(3);
+    static final Measure<Distance> RIGHT_FLYWHEEL_DIAMETER = Inches.of(4);
 
     static final class FlywheelControlConstants {
         /**
          * All in rotations per second and voltages
          */
         static final double
-                RIGHT_P = 0.027796,
-                RIGHT_S = 0.025648,
-                RIGHT_V = 0.10953,
-                RIGHT_A = 0.02502,
-                LEFT_P = 0.03,  // NOTE: This value was not provided by SysId
-                LEFT_S = 0.2426,
-                LEFT_V = 0.11243,
-                LEFT_A = 0.014245,
+                RIGHT_P = 0.003,//0.027796,
+                RIGHT_S = 0.022648,
+                RIGHT_V = 0.097728,
+
+                LEFT_P = 0.003,//0.03,  // NOTE: This value was not provided by SysId
+                LEFT_S = 0.02426,
+                LEFT_V = 0.0969743,
+
                 TOLERANCE = 3;
     }
 

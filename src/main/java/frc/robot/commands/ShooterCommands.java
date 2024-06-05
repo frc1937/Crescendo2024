@@ -114,14 +114,28 @@ public class ShooterCommands {
         );
     }
 
+    public Command setFlywheelSetpoint(double targetTangentialVelocity) {
+        return new FunctionalCommand(
+                () -> initializeShooter(
+                        false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(0),
+                        MetersPerSecond.of(targetTangentialVelocity))),
+                () -> {},
+                interrupted -> shooterSubsystem.stopFlywheels(),
+                () -> false,
+
+                shooterSubsystem
+        );
+    }
+
     public Command postIntake() {
         return new SequentialCommandGroup(new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setTangentialFlywheelsVelocity(MetersPerSecond.of(-2));
+                    shooterSubsystem.setTangentialFlywheelsVelocity(MetersPerSecond.of(-6));
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {},
-                interrupted -> shooterSubsystem.reset(),
+                interrupted ->
+                        shooterSubsystem.reset(),
                 () -> false,
                 shooterSubsystem
         )).alongWith(intakeCommands.stopIntake(0.4));

@@ -23,6 +23,7 @@ import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.ShooterKick;
 import frc.robot.commands.TeleOpDrive;
+import frc.robot.commands.calibration.FlywheelCharacterization;
 import frc.robot.commands.calibration.GearRatioCharacterization;
 import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
 import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
@@ -194,6 +195,7 @@ public class RobotContainer {
     private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, ButtonLayout layout) {
         switch (layout) {
             case PITCH_CHARACTERIZATION -> pitchCharacterizationLayout();
+            case FLYWHEEL_CHARACTERIZATION -> flywheelCharacterizationLayout();
             case MAX_SPEEDS_CHARACTERIZATION -> maxSpeedsCharacterizationLayout(translationSup, strafeSup, rotationSup);
             case TELEOP -> teleopButtonsLayout(translationSup, strafeSup);
         }
@@ -201,8 +203,7 @@ public class RobotContainer {
 
     private void teleopButtonsLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
-
-        drAButton.whileTrue(shooterCommands.shootPhysics(16));
+        drAButton.whileTrue(shooterCommands.shootPhysics(19));
         drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16, shooterPhysicsCalculations));
         drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
@@ -210,6 +211,7 @@ public class RobotContainer {
 
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
+
         drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
 
         drStartButton.onTrue(new InstantCommand(swerve5990::resetGyro));
@@ -218,6 +220,23 @@ public class RobotContainer {
         //Operator buttons:
         opAButton.whileTrue(shooterCommands.shootNote(SPEAKER_FRONT));
         opBButton.whileTrue(shooterCommands.shootNote(SPEAKER_BACK));
+    }
+
+    private void flywheelCharacterizationLayout() {
+        FlywheelCharacterization flywheelCharacterization = new FlywheelCharacterization(shooterSubsystem);
+
+        SysIdRoutine.Direction forward = SysIdRoutine.Direction.kForward;
+        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kReverse;
+
+        drAButton.whileTrue(flywheelCharacterization.sysIdDynamicTest(forward));
+        drBButton.whileTrue(flywheelCharacterization.sysIdDynamicTest(reverse));
+        drYButton.whileTrue(flywheelCharacterization.sysIdQuastaticTest(forward));
+        drXButton.whileTrue(flywheelCharacterization.sysIdQuastaticTest(reverse));
+
+        drLeftBumper.whileTrue(shooterCommands.setFlywheelSetpoint(
+                14
+        ));
+
     }
 
     private void pitchCharacterizationLayout() {
@@ -250,6 +269,7 @@ public class RobotContainer {
 
     private enum ButtonLayout {
         PITCH_CHARACTERIZATION,
+        FLYWHEEL_CHARACTERIZATION,
         MAX_SPEEDS_CHARACTERIZATION,
         TELEOP
     }

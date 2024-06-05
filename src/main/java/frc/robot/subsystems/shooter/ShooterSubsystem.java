@@ -26,11 +26,9 @@ import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
 import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
 import static frc.robot.Constants.CanIDConstants.KICKER_ID;
 import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_A;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_P;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_S;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_V;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_A;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_P;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_S;
 import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_V;
@@ -41,8 +39,9 @@ import static frc.robot.subsystems.shooter.ShooterConstants.RIGHT_FLYWHEEL_DIAME
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
-    private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V, RIGHT_A);
-    private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V, LEFT_A);
+
+    private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V);
+    private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V);
     private final Pitch pitch = new Pitch();
 
     private int consecutiveNoteInsideSamples = 0;
@@ -70,11 +69,22 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.drivePitch(volts.in(Volts));
     }
 
+    public void setFlywheelVoltage(Measure<Voltage> volts) {
+        rightFlywheel.drivePitch(volts.in(Volts));
+    }
+
     public void logPitch(SysIdRoutineLog log) {
         log.motor("Pitcher")
                 .voltage(pitch.getVoltage())
                 .angularPosition(Rotations.of(pitch.getPosition().getRotations()))
                 .angularVelocity(RotationsPerSecond.of(pitch.getVelocity()));
+    }
+
+    public void logFlywheels(SysIdRoutineLog log) {
+        log.motor("FlywheelRight")
+                .voltage(rightFlywheel.getVoltage())
+                .angularPosition(rightFlywheel.getPosition())
+                .angularVelocity(rightFlywheel.getVelocity());
     }
 
     /**
@@ -121,8 +131,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void reset() {
         setReference(new Reference());
-//        stopFlywheels();
-//        stopKicker();
+        stopFlywheels();
+        stopKicker();
     }
 
     public Pitch getPitch() {
