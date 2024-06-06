@@ -16,7 +16,7 @@ public class MaxDrivetrainSpeedCharacterization extends Command {
             strafeSupplier,
             rotationSup;
     private final BooleanSupplier robotCentricSup;
-    private double maxSpeed = 0;
+    private double maxXSpeed = 0, maxOmegaSpeed = 0;
 
     public MaxDrivetrainSpeedCharacterization(Swerve5990 swerve5990, DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
         this.swerve5990 = swerve5990;
@@ -36,17 +36,20 @@ public class MaxDrivetrainSpeedCharacterization extends Command {
         swerve5990.drive(deadbandTranslation, deadbandStrafe, rotationSup.getAsDouble(), robotCentricSup.getAsBoolean());
 
         double currentXVelocity = swerve5990.getSelfRelativeVelocity().vxMetersPerSecond;
+        double currentOmegaVelocity = swerve5990.getSelfRelativeVelocity().omegaRadiansPerSecond;
 
-        SmartDashboard.putNumber("/Characterization/Swerve/CurrentVelocity", currentXVelocity);
-        SmartDashboard.putNumber("/Characterization/Swerve/MaxVelocity", maxSpeed);
+        SmartDashboard.putNumber("Characterization/Swerve/CurrentVXelocity", currentXVelocity);
+        SmartDashboard.putNumber("Characterization/Swerve/MaxXVelocity", maxXSpeed);
+        SmartDashboard.putNumber("Characterization/Swerve/CurrentOmegaVelocity", currentOmegaVelocity);
+        SmartDashboard.putNumber("Characterization/Swerve/MaxOmegaVelocity", maxOmegaSpeed);
 
-        if(currentXVelocity > maxSpeed) {
-            maxSpeed = currentXVelocity;
-        }
+        if(currentXVelocity > maxXSpeed) maxXSpeed = currentXVelocity;
+        if(currentOmegaVelocity > maxOmegaSpeed) maxOmegaSpeed = currentXVelocity;
     }
 
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putNumber("/Characterization/Swerve/MaxVelocity", maxSpeed);
+        SmartDashboard.putNumber("Characterization/Swerve/MaxXVelocity", maxXSpeed);
+        SmartDashboard.putNumber("Characterization/Swerve/MaxOmegaVelocity", maxOmegaSpeed);
     }
 }

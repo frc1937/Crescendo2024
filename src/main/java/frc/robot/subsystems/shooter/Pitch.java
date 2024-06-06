@@ -25,6 +25,8 @@ import static frc.lib.math.Conversions.SEC_PER_MIN;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
+import static frc.robot.Constants.ROBORIO_LOOP_TIME_SECONDS;
+import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class Pitch {
@@ -151,7 +153,7 @@ public class Pitch {
      * @param voltage the amount of voltage to give the motor
      * @Units Volts
      */
-    public void drivePitch(double voltage) {
+    public void setRawVoltage(double voltage) {
         motor.setVoltage(voltage);
     }
 
@@ -170,21 +172,9 @@ public class Pitch {
         absoluteEncoder.optimizeBusUtilization();
     }
 
-    private void configurePitchMotor() {
-        motor.restoreFactoryDefaults();
-
-        motor.enableVoltageCompensation(12);
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        motor.setSmartCurrentLimit(40);
-
-        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
-
-        motor.burnFlash();
-    }
-
     private void logPitch() {
         SmartDashboard.putNumber("pitch/currentAbsolutePosition", getPosition().getDegrees());
-        SmartDashboard.putNumber("pitch/velocity [ DEG ]", getVelocity() * 360);
+        SmartDashboard.putNumber("pitch/CurrentVelocity [RotPS]", getVelocity() * 360);
         SmartDashboard.putNumber("pitch/goalPosition [DEG]", Rotation2d.fromRotations(goal.position).getDegrees());
         SmartDashboard.putNumber("pitch/goalVelocity [RotPS]", goal.velocity);
         SmartDashboard.putBoolean("pitch/isAtGoal", isAtGoal());
@@ -198,7 +188,7 @@ public class Pitch {
     }
 
     private void drivePitchPeriodic() {
-        state = profile.calculate(TIME_DIFFERENCE, state, goal);
+        state = profile.calculate(ROBORIO_LOOP_TIME_SECONDS, state, goal);
         drivePitchToSetpoint(state);
 
         previousVelocitySetpoint = state.velocity;
@@ -208,7 +198,7 @@ public class Pitch {
         final double feedforwardOutput = feedforward.calculate(
                 Units.rotationsToRadians(setpoint.position),
                 setpoint.velocity,
-                (setpoint.velocity - previousVelocitySetpoint) / TIME_DIFFERENCE
+                (setpoint.velocity - previousVelocitySetpoint) / ROBORIO_LOOP_TIME_SECONDS
         );
 
         final double controllerOutput = feedback.calculate(
@@ -236,5 +226,17 @@ public class Pitch {
         encoder.setPositionConversionFactor(PITCH_GEAR_RATIO);
         encoder.setVelocityConversionFactor(PITCH_GEAR_RATIO / SEC_PER_MIN);
         encoder.setPosition(getPosition().getRotations());
+    }
+
+    private void configurePitchMotor() {
+        motor.restoreFactoryDefaults();
+
+        motor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
+        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        motor.setSmartCurrentLimit(40);
+
+        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
+
+        motor.burnFlash();
     }
 }

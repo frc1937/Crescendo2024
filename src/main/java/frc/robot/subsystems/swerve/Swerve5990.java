@@ -18,10 +18,11 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.RobotStateHistory;
 import frc.robot.poseestimation.PoseEstimator5990;
+
+import java.util.stream.IntStream;
 
 import static edu.wpi.first.units.Units.Radians;
 import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
@@ -31,24 +32,8 @@ import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_D;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_I;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_P;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 import static frc.robot.subsystems.swerve.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
-import static frc.robot.subsystems.swerve.SwerveConstants.INVERT_GYRO;
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module0;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module1;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module2;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module3;
-import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
-import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
-import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_VELOCITY;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -138,7 +123,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     public SwerveDriveWheelPositions getModulePositions() {
-        SwerveModulePosition[] positions = new SwerveModulePosition[4];
+        SwerveModulePosition[] positions = new SwerveModulePosition[NUMBER_OF_MODULES];
 
         for (SwerveModule5990 mod : modules)
             positions[mod.swerveModuleConstants.moduleNumber()] = mod.getCurrentPosition();
@@ -238,32 +223,11 @@ public class Swerve5990 extends SubsystemBase {
         driveSelfRelative(speeds);
     }
 
-    /**
-     * Publish the current PID gains so they can be modified
-     */
-    public void publishControllerGains() {
-        String path = "swerve/azimuth-controller";
-
-        if (!SmartDashboard.containsKey(path + "/p")) {
-            SmartDashboard.putNumber(path + "/p", AZIMUTH_CONTROLLER_P);
-        }
-        if (!SmartDashboard.containsKey(path + "/i")) {
-            SmartDashboard.putNumber(path + "/i", AZIMUTH_CONTROLLER_I);
-        }
-        if (!SmartDashboard.containsKey(path + "/d")) {
-            SmartDashboard.putNumber(path + "/d", AZIMUTH_CONTROLLER_D);
-        }
+    /** Get the position of all drive wheels in radians. */
+    public double[] getWheelRadiusCharacterizationPosition() {
+        return IntStream.range(0, NUMBER_OF_MODULES).mapToDouble(i -> modules[i].getCurrentAngle().getRadians()).toArray();
     }
 
-    /**
-     * Re-read the PID gains without re-deploying the code.
-     */
-    public void rereadControllerGains() {
-        azimuthController.setPID(
-                SmartDashboard.getNumber("swerve/azimuth-controller/p", AZIMUTH_CONTROLLER_P),
-                SmartDashboard.getNumber("swerve/azimuth-controller/i", AZIMUTH_CONTROLLER_I),
-                SmartDashboard.getNumber("swerve/azimuth-controller/d", AZIMUTH_CONTROLLER_D));
-    }
 
     /**
      * Returns whether the given chassis speeds are considered to be "still" by the swerve neutral deadband.
@@ -277,7 +241,7 @@ public class Swerve5990 extends SubsystemBase {
                 Math.abs(chassisSpeeds.omegaRadiansPerSecond) <= ROTATION_NEUTRAL_DEADBAND;
     }
 
-    private void driveSelfRelative(ChassisSpeeds speeds) {
+    public void driveSelfRelative(ChassisSpeeds speeds) {
         ChassisSpeeds discretizedChassisSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
 
         if (isStill(discretizedChassisSpeeds)) {
@@ -328,7 +292,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     private SwerveModuleState[] getModuleStates() {
-        SwerveModuleState[] states = new SwerveModuleState[4];
+        SwerveModuleState[] states = new SwerveModuleState[NUMBER_OF_MODULES];
 
         for (SwerveModule5990 mod : modules) {
             states[mod.swerveModuleConstants.moduleNumber()] = mod.getCurrentState();
@@ -338,7 +302,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     private SwerveModuleState[] getModuleTargetStates() {
-        SwerveModuleState[] states = new SwerveModuleState[4];
+        SwerveModuleState[] states = new SwerveModuleState[NUMBER_OF_MODULES];
 
         for (SwerveModule5990 mod : modules) {
             states[mod.swerveModuleConstants.moduleNumber()] = mod.getTargetState();
@@ -346,7 +310,6 @@ public class Swerve5990 extends SubsystemBase {
 
         return states;
     }
-
 
     private SwerveModule5990[] getModules() {
         return new SwerveModule5990[]{

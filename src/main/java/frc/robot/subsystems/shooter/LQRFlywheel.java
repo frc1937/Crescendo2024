@@ -18,7 +18,7 @@ import edu.wpi.first.units.Velocity;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static frc.robot.subsystems.shooter.ShooterConstants.TIME_DIFFERENCE;
+import static frc.robot.Constants.ROBORIO_LOOP_TIME_SECONDS;
 //TODO: Idk if this will even work. Worth testing tho!
 public class LQRFlywheel {
     private final CANSparkFlex motor;
@@ -50,7 +50,7 @@ public class LQRFlywheel {
                 flywheelPlant,
                 VecBuilder.fill(3.0), // How accurate we think our model is
                 VecBuilder.fill(0.01), // How accurate we think our encoder data is
-                TIME_DIFFERENCE);
+                ROBORIO_LOOP_TIME_SECONDS);
 
         controller = new LinearQuadraticRegulator<>(
                         flywheelPlant,
@@ -60,9 +60,9 @@ public class LQRFlywheel {
                         VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
                         // heavily penalize control effort, or make the controller less aggressive. 12 is a good
                         // starting point because that is the (approximate) maximum voltage of a battery.
-                        TIME_DIFFERENCE); // Nominal time between loops. 0.020 for TimedRobot, but can be lower
+                ROBORIO_LOOP_TIME_SECONDS); // Nominal time between loops. 0.020 for TimedRobot, but can be lower
 
-        loop = new LinearSystemLoop<>(flywheelPlant, controller, observer, 12.0, TIME_DIFFERENCE);
+        loop = new LinearSystemLoop<>(flywheelPlant, controller, observer, 12.0, ROBORIO_LOOP_TIME_SECONDS);
 
         motor = new CANSparkFlex(id, CANSparkLowLevel.MotorType.kBrushless);
         encoder = motor.getEncoder(SparkRelativeEncoder.Type.kNoSensor, 7168);
@@ -78,7 +78,7 @@ public class LQRFlywheel {
 
         // Update our LQR to generate new voltage commands and use the voltages to predict the next
         // state without Kalman filter.
-        loop.predict(TIME_DIFFERENCE);
+        loop.predict(ROBORIO_LOOP_TIME_SECONDS);
 
         // Send the new calculated voltage to the motors.
         // voltage = duty cycle * battery voltage, so

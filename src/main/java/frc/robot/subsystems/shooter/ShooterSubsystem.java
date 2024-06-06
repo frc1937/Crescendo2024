@@ -5,43 +5,24 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.MeasureUtils;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 import static frc.lib.math.Conversions.rpmFromTangentialVelocity;
-import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
-import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
-import static frc.robot.Constants.CanIDConstants.KICKER_ID;
-import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_P;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_S;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.LEFT_V;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_P;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_S;
-import static frc.robot.subsystems.shooter.ShooterConstants.FlywheelControlConstants.RIGHT_V;
-import static frc.robot.subsystems.shooter.ShooterConstants.LEFT_FLYWHEEL_DIAMETER;
-import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
-import static frc.robot.subsystems.shooter.ShooterConstants.RIGHT_FLYWHEEL_DIAMETER;
+import static frc.robot.Constants.CanIDConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
 
-    private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, RIGHT_P, RIGHT_S, RIGHT_V);
-    private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, LEFT_P, LEFT_S, LEFT_V);
+    private final Flywheel rightFlywheel = new Flywheel(FLYWHEEL_RIGHT_ID, true, FLYWHEEL_RIGHT_P, FLYWHEEL_RIGHT_S, FLYWHEEL_RIGHT_V);
+    private final Flywheel leftFlywheel = new Flywheel(FLYWHEEL_LEFT_ID, false, FLYWHEEL_LEFT_P, FLYWHEEL_LEFT_S, FLYWHEEL_LEFT_V);
     private final Pitch pitch = new Pitch();
 
     private int consecutiveNoteInsideSamples = 0;
@@ -52,11 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!beamBreaker.get()) {
-            consecutiveNoteInsideSamples++;
-        } else {
-            consecutiveNoteInsideSamples = 0;
-        }
+        accountForBreakerNoise();
 
         leftFlywheel.periodic();
         rightFlywheel.periodic();
@@ -66,11 +43,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setPitchVoltage(Measure<Voltage> volts) {
-        pitch.drivePitch(volts.in(Volts));
+        pitch.setRawVoltage(volts.in(Volts));
     }
 
     public void setFlywheelVoltage(Measure<Voltage> volts) {
-        rightFlywheel.drivePitch(volts.in(Volts));
+        rightFlywheel.setRawVoltage(volts.in(Volts));
     }
 
     public void logPitch(SysIdRoutineLog log) {
@@ -138,7 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public Pitch getPitch() {
         return pitch;
     }
-    
+
     public Rotation2d getPitchPosition() {
         return pitch.getPosition();
     }
@@ -177,7 +154,7 @@ public class ShooterSubsystem extends SubsystemBase {
             this.pitchPosition = pitchPosition;
             this.flywheelTangentialVelocity = flywheelTangentialVelocity;
         }
-                
+
         public Reference(Rotation2d pitchPosition) {
             this.pitchPosition = pitchPosition;
         }
@@ -187,8 +164,8 @@ public class ShooterSubsystem extends SubsystemBase {
         @Override
         public Reference interpolate(Reference endValue, double t) {
             return new Reference(
-                pitchPosition.interpolate(endValue.pitchPosition, t),
-                MeasureUtils.interpolate(flywheelTangentialVelocity, endValue.flywheelTangentialVelocity, t)
+                    pitchPosition.interpolate(endValue.pitchPosition, t),
+                    MeasureUtils.interpolate(flywheelTangentialVelocity, endValue.flywheelTangentialVelocity, t)
             );
         }
     }
@@ -202,5 +179,14 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("shooter/isLoaded", isLoaded());
         SmartDashboard.putBoolean("shooter/areFlywheelsReady", flywheelsAtReference());
         SmartDashboard.putBoolean("shooter/hasPitchArrived", pitchAtReference());
+    }
+
+    private void accountForBreakerNoise() {
+        if (!beamBreaker.get()) {
+            consecutiveNoteInsideSamples++;
+            return;
+        }
+
+        consecutiveNoteInsideSamples = 0;
     }
 }

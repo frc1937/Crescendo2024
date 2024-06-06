@@ -25,6 +25,7 @@ import frc.lib.util.CTREModuleState;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 public class SwerveModule5990 {
@@ -34,6 +35,7 @@ public class SwerveModule5990 {
     private final CANSparkMax steerMotor;
     private final PIDController steerController = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD);
     private final CANcoder steerEncoder;
+
     private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(DRIVE_KS, DRIVE_KV, DRIVE_KA);
 
     /**
@@ -60,6 +62,10 @@ public class SwerveModule5990 {
         this.driveMotor = new TalonFX(swerveModuleConstants.driveMotorID());
         this.steerEncoder = new CANcoder(swerveModuleConstants.canCoderID());
         this.steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
+
+        steerController.setP(ANGLE_KP);
+        steerController.setI(ANGLE_KI);
+        steerController.setD(ANGLE_KD);
 
         configureSteerEncoder();
         configureDriveMotor();
@@ -124,7 +130,7 @@ public class SwerveModule5990 {
     }
 
     private void setTargetClosedLoopVelocity(Measure<Velocity<Distance>> targetVelocity) {
-        if (targetVelocity.in(MetersPerSecond) <= 0.01) { //todo: move to constants
+        if (targetVelocity.in(MetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS) {
             return;
         }
 
@@ -141,18 +147,13 @@ public class SwerveModule5990 {
     private void configureSteerMotor() {
         steerMotor.restoreFactoryDefaults();
 
-        CANSparkMaxUtil.setCANSparkBusUsage(steerMotor, CANSparkMaxUtil.Usage.kPositionOnly);
+        steerMotor.setSmartCurrentLimit(ANGLE_CURRENT_LIMIT);
 
-        steerMotor.setSmartCurrentLimit(ANGLE_CONTINUOUS_CURRENT_LIMIT);
-
-        steerMotor.setInverted(ANGLE_INVERT);
+        steerMotor.setInverted(ANGLE_MOTOR_INVERT);
         steerMotor.setIdleMode(ANGLE_NEUTRAL_MODE);
-
-        steerController.setP(ANGLE_KP);
-        steerController.setI(ANGLE_KI);
-        steerController.setD(ANGLE_KD);
-
         steerMotor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
+
+        CANSparkMaxUtil.setCANSparkBusUsage(steerMotor, CANSparkMaxUtil.Usage.kPositionOnly);
         steerMotor.burnFlash();
     }
 
@@ -177,8 +178,10 @@ public class SwerveModule5990 {
         TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
 
         swerveDriveFXConfig.Audio.BeepOnConfig = false;
-        swerveDriveFXConfig.Audio.BeepOnBoot = false;
+        swerveDriveFXConfig.Audio.BeepOnBoot = false; //WHY DOES THIS NOT WORK!!!!!!
         swerveDriveFXConfig.Audio.AllowMusicDurDisable = false;
+        swerveDriveFXConfig.Audio.withBeepOnBoot(false);
+        swerveDriveFXConfig.Audio.withBeepOnConfig(false);
 
         swerveDriveFXConfig.MotorOutput.Inverted = DRIVE_MOTOR_INVERT;
         swerveDriveFXConfig.MotorOutput.NeutralMode = DRIVE_NEUTRAL_MODE;
@@ -196,6 +199,7 @@ public class SwerveModule5990 {
         swerveDriveFXConfig.Slot0.kP = DRIVE_KP;
         swerveDriveFXConfig.Slot0.kI = DRIVE_KI;
         swerveDriveFXConfig.Slot0.kD = DRIVE_KD;
+
         swerveDriveFXConfig.Slot0.kV = DRIVE_KV;
         swerveDriveFXConfig.Slot0.kA = DRIVE_KA;
         swerveDriveFXConfig.Slot0.kS = DRIVE_KS;

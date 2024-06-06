@@ -1,10 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,51 +11,26 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.Controller;
-import frc.robot.commands.AlignWithAmp;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.MountCommand;
-import frc.robot.commands.PrepareShooter;
-import frc.robot.commands.ShootOnTheMove;
-import frc.robot.commands.ShootToAmp;
-import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ShooterKick;
-import frc.robot.commands.TeleOpDrive;
-import frc.robot.commands.calibration.FlywheelCharacterization;
-import frc.robot.commands.calibration.GearRatioCharacterization;
-import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
-import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
-import frc.robot.commands.calibration.PitchCharacterization;
+import frc.robot.commands.*;
+import frc.robot.commands.calibration.*;
 import frc.robot.commands.leds.ColourByShooter;
 import frc.robot.poseestimation.PhotonCameraSource;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.poseestimation.PoseEstimator6328;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.mount.MountSubsystem;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
-import static frc.lib.math.Conversions.tangentialVelocityFromRPM;
-import static frc.lib.util.Controller.Axis.LEFT_X;
-import static frc.lib.util.Controller.Axis.LEFT_Y;
-import static frc.lib.util.Controller.Axis.RIGHT_X;
-import static frc.lib.util.Controller.Axis.RIGHT_Y;
-import static frc.lib.util.Controller.Inputs.A;
-import static frc.lib.util.Controller.Inputs.B;
-import static frc.lib.util.Controller.Inputs.BACK;
-import static frc.lib.util.Controller.Inputs.LEFT_BUMPER;
-import static frc.lib.util.Controller.Inputs.RIGHT_BUMPER;
-import static frc.lib.util.Controller.Inputs.START;
-import static frc.lib.util.Controller.Inputs.X;
-import static frc.lib.util.Controller.Inputs.Y;
+import static frc.lib.util.Controller.Axis.*;
+import static frc.lib.util.Controller.Inputs.*;
 import static frc.lib.util.Controller.Stick.LEFT_STICK;
 import static frc.lib.util.Controller.Stick.RIGHT_STICK;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
 import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
-import static frc.robot.subsystems.shooter.ShooterConstants.SHOOTING_DELAY;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 
@@ -90,7 +62,6 @@ public class RobotContainer {
 
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final MountSubsystem mountSubsystem = new MountSubsystem();
     private final LEDsSubsystem leds = new LEDsSubsystem();
     /* Commands */
     private final ShooterCommands shooterCommands;
@@ -118,7 +89,6 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        registerNamedCommands();
     }
 
 
@@ -141,13 +111,6 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        mountSubsystem.setDefaultCommand(
-                new MountCommand(mountSubsystem,
-                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(LEFT_Y), Constants.STICK_DEADBAND * 0.5),
-                        () -> MathUtil.applyDeadband(-operatorController.getRawAxis(RIGHT_Y), Constants.STICK_DEADBAND * 0.5)
-                )
-        );
-
         initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
     }
 
@@ -163,33 +126,6 @@ public class RobotContainer {
     public void frequentPeriodic() {
         poseEstimator5990.periodic();
         shooterPhysicsCalculations.feedRobotPose(poseEstimator5990.getCurrentPose().getBluePose());
-    }
-
-    private void registerNamedCommands() {
-        NamedCommands.registerCommand("Intake", shooterCommands.floorIntake().withTimeout(2));
-        NamedCommands.registerCommand("PostIntake", shooterCommands.postIntake());
-        NamedCommands.registerCommand("IntakeUnicorn", shooterCommands.floorIntake().withTimeout(2.7));
-
-        NamedCommands.registerCommand("ShooterKick", new ShooterKick(shooterSubsystem).withTimeout(SHOOTING_DELAY));
-
-        double flywheelDiameter = Units.inchesToMeters(4);
-
-        NamedCommands.registerCommand("AdjustShooter1", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(108.25), tangentialVelocityFromRPM(3000, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter2", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(114), tangentialVelocityFromRPM(3000, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter3", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(25.1), tangentialVelocityFromRPM(4000, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter4", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(109), tangentialVelocityFromRPM(4000, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter5", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(49), tangentialVelocityFromRPM(4000, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter6", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(28), tangentialVelocityFromRPM(4500, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter7", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(26.5), tangentialVelocityFromRPM(4500, flywheelDiameter))));
-        NamedCommands.registerCommand("AdjustShooter8", new PrepareShooter(shooterSubsystem,
-                new ShooterSubsystem.Reference(Rotation2d.fromDegrees(110.75), tangentialVelocityFromRPM(3000, flywheelDiameter))));
     }
 
     private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, ButtonLayout layout) {
@@ -223,37 +159,21 @@ public class RobotContainer {
     }
 
     private void flywheelCharacterizationLayout() {
-        FlywheelCharacterization flywheelCharacterization = new FlywheelCharacterization(shooterSubsystem);
+        FlywheelSysIdCharacterization flywheelCharacterization = new FlywheelSysIdCharacterization(shooterSubsystem);
+        characterizeByCharacterization(flywheelCharacterization);
 
-        SysIdRoutine.Direction forward = SysIdRoutine.Direction.kForward;
-        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kReverse;
-
-        drAButton.whileTrue(flywheelCharacterization.sysIdDynamicTest(forward));
-        drBButton.whileTrue(flywheelCharacterization.sysIdDynamicTest(reverse));
-        drYButton.whileTrue(flywheelCharacterization.sysIdQuastaticTest(forward));
-        drXButton.whileTrue(flywheelCharacterization.sysIdQuastaticTest(reverse));
-
-        drLeftBumper.whileTrue(shooterCommands.setFlywheelSetpoint(
-                14
-        ));
+        drLeftBumper.whileTrue(shooterCommands.setFlywheelSetpoint(14));
 
     }
 
     private void pitchCharacterizationLayout() {
-        PitchCharacterization pitchCharacterization = new PitchCharacterization(shooterSubsystem);
+        PitchSysIdCharacterization pitchCharacterization = new PitchSysIdCharacterization(shooterSubsystem);
+        characterizeByCharacterization(pitchCharacterization);
 
-        SysIdRoutine.Direction forward = SysIdRoutine.Direction.kForward;
-        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kReverse;
-
-        drAButton.whileTrue(pitchCharacterization.sysIdDynamicTest(forward));
-        drBButton.whileTrue(pitchCharacterization.sysIdDynamicTest(reverse));
-        drYButton.whileTrue(pitchCharacterization.sysIdQuastaticTest(forward));
-        drXButton.whileTrue(pitchCharacterization.sysIdQuastaticTest(reverse));
-
-        drLeftTrigger.whileTrue(shooterCommands.setPitchPosition(30));
-        drRightTrigger.whileTrue(shooterCommands.setPitchPosition(90));
-        drLeftBumper.whileTrue(shooterCommands.setPitchPosition(60));
-        drRightBumper.whileTrue(shooterCommands.setPitchPosition(69));
+        drLeftTrigger.whileTrue(shooterCommands.setPitchPosition(-10));
+        drLeftBumper.whileTrue(shooterCommands.setPitchPosition(30));
+        drRightTrigger.whileTrue(shooterCommands.setPitchPosition(75));
+        drRightBumper.whileTrue(shooterCommands.setPitchPosition(100));
 
         drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 0.5, 4));
     }
@@ -272,5 +192,15 @@ public class RobotContainer {
         FLYWHEEL_CHARACTERIZATION,
         MAX_SPEEDS_CHARACTERIZATION,
         TELEOP
+    }
+
+    private void characterizeByCharacterization(SysIdCharacterization characterization) {
+        SysIdRoutine.Direction forward = SysIdRoutine.Direction.kForward;
+        SysIdRoutine.Direction reverse = SysIdRoutine.Direction.kReverse;
+
+        drAButton.whileTrue(characterization.sysIdDynamicTest(forward));
+        drBButton.whileTrue(characterization.sysIdDynamicTest(reverse));
+        drYButton.whileTrue(characterization.sysIdQuastaticTest(forward));
+        drXButton.whileTrue(characterization.sysIdQuastaticTest(reverse));
     }
 }

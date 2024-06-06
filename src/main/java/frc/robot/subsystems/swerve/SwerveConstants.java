@@ -18,12 +18,18 @@ public class SwerveConstants {
     public static final double AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85);
     public static final double SWERVE_AZIMUTH_TOLERANCE = 1;
 
-    static final double AZIMUTH_CONTROLLER_P = 9.4, AZIMUTH_CONTROLLER_I = 0,
-            AZIMUTH_CONTROLLER_D = 0, AZIMUTH_CONTROLLER_DEADBAND = 0.12,
-            TRANSLATION_CONTROLLER_P = 1.366, TRANSLATION_MAX_VELOCITY = 2.7,
-            TRANSLATION_MAX_ACCELERATION = 3;
+    static final int NUMBER_OF_MODULES = 4;
 
-    static final TrapezoidProfile.Constraints TRANSLATION_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(TRANSLATION_MAX_VELOCITY, TRANSLATION_MAX_ACCELERATION);
+    static final double
+            AZIMUTH_CONTROLLER_P = 9.4,
+            AZIMUTH_CONTROLLER_I = 0,
+            AZIMUTH_CONTROLLER_D = 0,
+            AZIMUTH_CONTROLLER_DEADBAND = 0.12,
+
+            TRANSLATION_CONTROLLER_P = 1.366,
+
+            TRANSLATION_MAX_VELOCITY = 2.7,
+            TRANSLATION_MAX_ACCELERATION = 3;
 
     static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
 
@@ -33,12 +39,9 @@ public class SwerveConstants {
     /* Drivetrain Constants */
     static final double WHEEL_BASE = 0.565;
     static final double TRACK_WIDTH = 0.615;
-    static final double DRIVE_BASE_RADIUS =
-            new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm();
 
+    public static final double DRIVE_BASE_RADIUS = new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2).getNorm();
     public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
-
-    static final double VOLTAGE_COMPENSATION_SATURATION = 12;
 
     /* SwerveSubsystem Kinematics
      * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
@@ -61,7 +64,7 @@ public class SwerveConstants {
     //TODO XXX WARNING: Check if CounterClockwise is IN FACT the equivalent of false!!!
 
     /* SwerveSubsystem Current Limiting */
-    static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 25;
+    static final int ANGLE_CURRENT_LIMIT = 25;
     static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 35;
     static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
     static final double DRIVE_PEAK_CURRENT_DURATION = 0.1;
@@ -73,28 +76,27 @@ public class SwerveConstants {
     static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    static final double ANGLE_KFF = 0;
     static final double ANGLE_KP = 0.1;
     static final double ANGLE_KI = 0;
     static final double ANGLE_KD = 0;
 
     /* Drive Motor PID Values */
-    static final double DRIVE_KP = 0.053067;
-    static final double DRIVE_KI = 0.0;
-    static final double DRIVE_KD = 0;
-    static final double DRIVE_KF = 0.0;
+    static final double
+            DRIVE_KP = 0.053067,
+            DRIVE_KI = 0.0,
+            DRIVE_KD = 0.0,
 
     /* Drive Motor Characterization Values */
     // Convert the values calculated by SysId from volts to [-1, 1], which TalonFX uses.
-    static final double DRIVE_KS = 0.27053 / 12.d;
-    static final double DRIVE_KV = 0.10861 / 12.d;
-    static final double DRIVE_KA = 0.023132 / 12.d;
+    DRIVE_KS = 0.27053 / 12.d,
+    DRIVE_KV = 0.10861 / 12.d,
+    DRIVE_KA = 0.023132 / 12.d;
 
-    /* SwerveSubsystem Profiling Values */
     /**
      * Radians per Second
      */
-    static final double MAX_ANGULAR_VELOCITY = 9.2;  // up to 9.5 in the start of the match
+    static final double MAX_ANGULAR_VELOCITY = 9.2;  //TODO: Get this from SYSID. idk how we got this value lmfao
+
     /**
      * Meters per Second
      */
@@ -146,8 +148,6 @@ public class SwerveConstants {
                 new SwerveModuleConstants(3, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ROTATIONS_OFFSET);
     }
 
-    static final boolean ANGLE_INVERT = true;
-    static final double ANGLE_CONVERSION_FACTOR = 360.0 / ANGLE_GEAR_RATIO;
     static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
     static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI * Math.PI;
 

@@ -8,24 +8,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.CanIDConstants.INTAKE_MOTOR_ID;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private final WPI_TalonSRX talonSRX = new WPI_TalonSRX(INTAKE_MOTOR_ID);
+    private final WPI_TalonSRX motor = new WPI_TalonSRX(INTAKE_MOTOR_ID);
 
     public IntakeSubsystem() {
-        configureTalonMotor(talonSRX);
+        configureMotor();
     }
 
     public void setSpeedPercentage(double percentage) {
-        talonSRX.set(ControlMode.PercentOutput, percentage);
+        motor.set(ControlMode.PercentOutput, percentage);
     }
 
     public void stop() {
-        talonSRX.stopMotor();
+        motor.stopMotor();
     }
 
-    private void configureTalonMotor(WPI_TalonSRX motor) {
+    private void configureMotor() {
         motor.configFactoryDefault();
 
         motor.setNeutralMode(NeutralMode.Coast);
-        talonSRX.setInverted(true);
+        motor.setInverted(true);
     }
 }

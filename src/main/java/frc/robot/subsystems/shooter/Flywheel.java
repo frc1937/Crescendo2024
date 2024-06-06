@@ -22,6 +22,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
 import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_TOLERANCE;
 
 public class Flywheel {
@@ -33,7 +34,7 @@ public class Flywheel {
 
     private Measure<Velocity<Angle>> goal;
 
-    private double feedforwardOutput;
+    private double feedforwardOutput, feedbackOutput;
 
     public Flywheel(int motorId, boolean invert, double kP, double kS, double kV) {
         seedFeeders(kP, kS, kV);
@@ -53,13 +54,6 @@ public class Flywheel {
         feedback.setSetpoint(speed.in(RotationsPerSecond));
 
         feedforwardOutput = feedforward.calculate(goal.in(RotationsPerSecond));
-    }
-
-    public Measure<Velocity<Angle>> getGoal() {
-        if (goal == null)
-            return RotationsPerSecond.of(0);
-
-        return goal;
     }
 
     public boolean isAtGoal() {
@@ -87,7 +81,7 @@ public class Flywheel {
         return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
     }
 
-    public void drivePitch(double voltage) {
+    public void setRawVoltage(double voltage) {
         motor.setVoltage(voltage);
     }
 
@@ -100,12 +94,7 @@ public class Flywheel {
 
         double currentVelocityRPS = getVelocity().in(RotationsPerSecond);
 
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/currentVelocity [RPS]", currentVelocityRPS);
-
-        double feedbackOutput = feedback.calculate(currentVelocityRPS);
-
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/feedbackOutput [Volts]", feedbackOutput);
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/feedforwardOutput [Volts]", feedforwardOutput);
+        feedbackOutput = feedback.calculate(currentVelocityRPS);
 
         motor.setVoltage(feedbackOutput + feedforwardOutput);
     }
@@ -118,8 +107,9 @@ public class Flywheel {
     }
 
     private void logFlywheel() {
-//        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/current velocity [RPM]", getVelocity().in(RPM));
-//        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/goal [RPM]", getGoal().in(RPM));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/currentVelocity [RPS]", getVelocity().in(RotationsPerSecond));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/feedbackOutput [Volts]", feedbackOutput);
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/feedforwardOutput [Volts]", feedforwardOutput);
         SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/voltage", getVoltage().in(Volt));
     }
 
@@ -134,7 +124,7 @@ public class Flywheel {
         motor.setIdleMode(IdleMode.kCoast);
         motor.setInverted(invert);
 
-        motor.enableVoltageCompensation(12);
+        motor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
         motor.setSmartCurrentLimit(30);
 
         CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kVelocityOnly);
