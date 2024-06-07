@@ -1,6 +1,7 @@
 package frc.lib.math;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -40,22 +41,24 @@ public class Conversions {
 
     /**
      * Returns tangential velocity in metres per second.
-     * @param rpm - rotations per minute
+     *
+     * @param rpm           - rotations per minute
      * @param wheelDiameter - wheel diameter in metres
      * @return the tangential velocity in metres per second
      */
-    public static Measure<Velocity<Distance>> tangentialVelocityFromRPM(double rpm, double wheelDiameter) {
-        return MetersPerSecond.of(rpm * wheelDiameter * Math.PI / SEC_PER_MIN);
+    public static double tangentialVelocityFromRPM(double rpm, double wheelDiameter) {
+        return rotationsPerSecondToMetersPerSecond(rpm / SEC_PER_MIN, wheelDiameter);
     }
 
     /**
      * Returns the rotations per minute
-     * @param tangentialVelocity - metres per second
-     * @param wheelDiameter - wheel diameter in inches
+     *
+     * @param tangentialVelocityMPS - metres per second
+     * @param wheelDiameterMeters         - wheel diameter in meters
      * @return rotations per minute
      */
-    public static double rpmFromTangentialVelocity(Measure<Velocity<Distance>> tangentialVelocity, Measure<Distance> wheelDiameter) {
-        return SEC_PER_MIN * ((tangentialVelocity.in(MetersPerSecond) / wheelDiameter.in(Meters)) / Math.PI );
+    public static double rpmFromTangentialVelocity(double tangentialVelocityMPS, double wheelDiameterMeters) {
+        return SEC_PER_MIN * metersPerSecondToRotationsPerSecond(tangentialVelocityMPS, wheelDiameterMeters);
     }
 
     /**
@@ -64,161 +67,29 @@ public class Conversions {
      * @param rotations rotations
      * @return meters
      */
-    public static Measure<Distance> rotationsToMeters(double rotations) {
-        return Meters.of(rotations * WHEEL_CIRCUMFERENCE);
+    public static double rotationsToMeters(double rotations, double wheelDiameter) {
+        return rotations * wheelDiameter * Math.PI;
+    }
+
+    /**
+     * Converts rotations per second to meters per second.
+     * This is the same as converting rotations to metres.
+     *
+     * @param rotationsPerSecond rotations per second
+     * @return meters per second
+     */
+    public static double rotationsPerSecondToMetersPerSecond(double rotationsPerSecond, double wheelDiameter) {
+        return rotationsToMeters(rotationsPerSecond, wheelDiameter);
     }
 
     /**
      * Converts rotations per second to meters per second.
      *
-     * @param rotationsPerSecond rotations per second
+     * @param velocityMetersPerSecond rotations per second
      * @return meters per second
      */
-    public static Measure<Velocity<Distance>> rotationsPerSecondToMetersPerSecond(double rotationsPerSecond) {
-        return MetersPerSecond.of(rotationsPerSecond * WHEEL_CIRCUMFERENCE);
-    }
-
-    /**
-     * Converts motor data to system data.
-     * This can be velocity, position, acceleration, etc.
-     *
-     * @param value the value you want to multiply
-     * @param gearRatio the gear ratio between the motor and the system. 2 means that 2 motor rotations are 1 system
-     *                  rotation.
-     * @return the system data
-     */
-    public static double applyGearingRatio(double value, double gearRatio) {
-        return value / gearRatio;
-    }
-
-    /**
-     * Converts system data to motor data.
-     * This can be velocity, position, acceleration, etc.
-     *
-     * @param systemData the system data
-     * @param gearRatio  the gear ratio between the motor and the system. 2 means that 2 motor rotations are 1 system
-     *                   rotation.
-     * @return the motor data
-     */
-    public static double systemToMotor(double systemData, double gearRatio) {
-        return systemData * gearRatio;
-    }
-
-    /**
-     * Applies an offset to a target position in order to compensate for a sensor offset.
-     *
-     * @param position the target position of the motor.
-     * @param offset   the encoder value when the system is on zero position.
-     * @return the offsetted position to give to the motor.
-     */
-    public static double offsetWrite(double position, double offset) {
-        return position + offset;
-    }
-
-    /**
-     * Applies an offset to the position read from the motor in order to compensate for a sensor offset.
-     *
-     * @param position the target position of the motor.
-     * @param offset   the encoder value when the system is on zero position.
-     * @return the actual position of the motor offset.
-     */
-    public static double offsetRead(double position, double offset) {
-        return position - offset;
-    }
-
-    /**
-     * Converts a frequency from per 100ms to per second.
-     *
-     * @param frequency the frequency per 100ms
-     * @return the frequency per second
-     */
-    public static double perHundredMsToPerSecond(double frequency) {
-        return frequency * HUNDRED_MS_PER_SEC;
-    }
-
-    /**
-     * Converts a frequency from per second to per 100ms.
-     *
-     * @param frequency the frequency per second
-     * @return the frequency per 100ms
-     */
-    public static double perSecondToPerHundredMs(double frequency) {
-        return frequency / HUNDRED_MS_PER_SEC;
-    }
-
-    /**
-     * Converts a frequency from per second to per minute.
-     *
-     * @param frequency the frequency per second
-     * @return the frequency per minute
-     */
-    public static double perSecondToPerMinute(double frequency) {
-        return frequency * SEC_PER_MIN;
-    }
-
-    /**
-     * Converts a frequency from per minute to per second.
-     *
-     * @param frequency the frequency per minute
-     * @return the frequency per second
-     */
-    public static double perMinuteToPerSecond(double frequency) {
-        return frequency / SEC_PER_MIN;
-    }
-
-    /**
-     * Converts a frequency from per 100ms to per minute.
-     *
-     * @param frequency the frequency per 100ms
-     * @return the frequency per minute
-     */
-    public static double perHundredMsToPerMinute(double frequency) {
-        return perSecondToPerMinute(perHundredMsToPerSecond(frequency));
-    }
-
-    /**
-     * Converts a frequency from per minute to per 100ms.
-     *
-     * @param frequency the frequency per minute
-     * @return the frequency per 100ms
-     */
-    public static double perMinToPerSec(double frequency) {
-        return perSecondToPerHundredMs(frequency) / SEC_PER_MIN;
-    }
-
-    /**
-     * Converts revolutions to distance.
-     *
-     * @param revolutions   the revolutions
-     * @param wheelDiameter the wheel diameter
-     * @return the distance
-     */
-    public static double revolutionsToDistance(double revolutions, double wheelDiameter) {
-        return revolutions * wheelDiameter * Math.PI;
-    }
-
-    /**
-     * Converts distance to revolutions.
-     *
-     * @param distance      the distance
-     * @param wheelDiameter the wheel diameter
-     * @return the revolutions
-     */
-    public static double distanceToRevolutions(double distance, double wheelDiameter) {
-        return distance / (wheelDiameter * Math.PI);
-    }
-
-    /**
-     * Converts a target output voltage to a percentage output when voltage compensation is enabled.
-     * The voltage compensation saturation determines what voltage represents 100% output.
-     * The compensated power is the voltage represented by a percentage of the saturation voltage.
-     *
-     * @param voltage    the target voltage output
-     * @param saturation the configured saturation which represents 100% output
-     * @return the percentage output to achieve the target voltage
-     */
-    public static double voltageToCompensatedPower(double voltage, double saturation) {
-        return voltage / saturation;
+    public static double metersPerSecondToRotationsPerSecond(double velocityMetersPerSecond, double wheelDiameterMeters) {
+        return velocityMetersPerSecond / (Math.PI * wheelDiameterMeters);
     }
 
     /**

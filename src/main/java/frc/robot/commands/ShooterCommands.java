@@ -56,10 +56,7 @@ public class ShooterCommands {
         return new FunctionalCommand(
                 () -> {
                     Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(targetPose, tangentialVelocity);
-
-                    ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(
-                            theta, MetersPerSecond.of(tangentialVelocity)
-                    );
+                    ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, tangentialVelocity);
 
                     SmartDashboard.putString("physics/targetPose", targetPose.toString());
                     SmartDashboard.putNumber("physics/theta", theta.getDegrees());
@@ -107,8 +104,10 @@ public class ShooterCommands {
     public Command setPitchPosition(double degrees) {
         return new FunctionalCommand(
                 () -> initializeShooter(false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees))),
-                () -> {},
-                interrupted -> {},
+                () -> {
+                },
+                interrupted -> {
+                },
                 () -> false,
                 shooterSubsystem
         );
@@ -117,8 +116,7 @@ public class ShooterCommands {
     public Command setFlywheelSetpoint(double targetTangentialVelocity) {
         return new FunctionalCommand(
                 () -> initializeShooter(
-                        false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(0),
-                        MetersPerSecond.of(targetTangentialVelocity))),
+                        false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(0), targetTangentialVelocity)),
                 () -> {},
                 interrupted -> shooterSubsystem.stopFlywheels(),
                 () -> false,
@@ -130,10 +128,11 @@ public class ShooterCommands {
     public Command postIntake() {
         return new SequentialCommandGroup(new FunctionalCommand(
                 () -> {
-                    shooterSubsystem.setTangentialFlywheelsVelocity(MetersPerSecond.of(-6));
+                    shooterSubsystem.setTangentialFlywheelsVelocity(-6);
                     shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
-                () -> {},
+                () -> {
+                },
                 interrupted ->
                         shooterSubsystem.reset(),
                 () -> false,
@@ -147,15 +146,17 @@ public class ShooterCommands {
                     initializeShooter(true, INTAKE);
                     intakeCommands.enableIntake(0.8, false).schedule();
                 },
-                () -> {},
-                interrupted -> {},
+                () -> {
+                },
+                interrupted -> {
+                },
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
-            );
+        );
     }
 
     private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {
-        if(shouldUseKicker)
+        if (shouldUseKicker)
             shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
 
         shooterSubsystem.setReference(reference);

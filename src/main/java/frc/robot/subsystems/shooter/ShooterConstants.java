@@ -39,8 +39,8 @@ public class ShooterConstants {
     static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.3).getRotations();
     static final Measure<Velocity<Angle>> FLYWHEEL_TOLERANCE = RPM.of(70);
 
-    static final Measure<Distance> LEFT_FLYWHEEL_DIAMETER = Inches.of(3);
-    static final Measure<Distance> RIGHT_FLYWHEEL_DIAMETER = Inches.of(4);
+    static final double LEFT_FLYWHEEL_DIAMETER = Inches.of(3).in(Meters);
+    static final double RIGHT_FLYWHEEL_DIAMETER = Inches.of(4).in(Meters);
 
     /**
      * All in rotations per second and voltages
@@ -63,14 +63,14 @@ public class ShooterConstants {
 
     //Some presets.
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(50), MetersPerSecond.of(16));
+            Rotation2d.fromDegrees(50), 16);
 
     public static final ShooterSubsystem.Reference SPEAKER_BACK = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(111.5), MetersPerSecond.of(14));
+            Rotation2d.fromDegrees(111.5), 14);
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(
-            Rotation2d.fromDegrees(48), MetersPerSecond.of(15));
+            Rotation2d.fromDegrees(48), 15);
     public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-            PIVOT_BOTTOM_ANGLE, MetersPerSecond.of(-3));
+            PIVOT_BOTTOM_ANGLE, -3);
     public static final ShooterSubsystem.Reference AMP_INIT =
-            new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), MetersPerSecond.of(3));
+            new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), 3);
 }

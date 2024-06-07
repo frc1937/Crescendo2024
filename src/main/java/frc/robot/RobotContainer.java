@@ -200,12 +200,11 @@ public class RobotContainer {
     }
 
     private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
-        drRightTrigger.whileTrue(
-                new ParallelCommandGroup(
-                        new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false),//, 5.1m/s
-                        new MaxFlywheelSpeedCharacterization(shooterSubsystem) //5500 rpm flywheel
-                )
-        );
+        drAButton.whileTrue( new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false));//, 5.1m/s
+        drBButton.whileTrue(new MaxFlywheelSpeedCharacterization(shooterSubsystem)); //5500 rpm flywheel
+
+        drXButton.whileTrue(new WheelRadiusCharacterization(swerve5990, WheelRadiusCharacterization.Direction.CLOCKWISE));
+        drYButton.whileTrue(new WheelRadiusCharacterization(swerve5990, WheelRadiusCharacterization.Direction.COUNTER_CLOCKWISE));
     }
 
     private enum ButtonLayout {

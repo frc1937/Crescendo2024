@@ -250,7 +250,7 @@ public class Swerve5990 extends SubsystemBase {
         }
 
         SwerveModuleState[] swerveModuleStates = SWERVE_KINEMATICS.toSwerveModuleStates(discretizedChassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_SPEED);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_SPEED_MPS);
 
         for (SwerveModule5990 mod : modules) {
             mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber()], false);
@@ -259,8 +259,8 @@ public class Swerve5990 extends SubsystemBase {
 
     private ChassisSpeeds powersToSpeeds(double xPower, double yPower, double thetaPower) {
         return new ChassisSpeeds(
-                xPower * MAX_SPEED,
-                yPower * MAX_SPEED,
+                xPower * MAX_SPEED_MPS,
+                yPower * MAX_SPEED_MPS,
                 Math.pow(thetaPower, 2) * Math.signum(thetaPower) * MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
         );
     }

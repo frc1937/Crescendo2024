@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_BASE_RADIUS;
 
 public class WheelRadiusCharacterization extends Command {
-    private static final double characterizationSpeed = 0.1; // ("WheelRadiusCharacterization/SpeedRadsPerSec",
+    private static final double characterizationSpeed = 0.1; // SpeedRadsPerSec
     private static final double driveRadius = DRIVE_BASE_RADIUS;
 
     private static DoubleSupplier gyroYawRadsSupplier;
@@ -22,13 +22,18 @@ public class WheelRadiusCharacterization extends Command {
         CLOCKWISE(-1),
         COUNTER_CLOCKWISE(1);
 
-        private final int value = 0;
+        private final int value;
 
         Direction(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
         }
     }
 
-    private final Swerve5990 swerve5990;
+        private final Swerve5990 swerve5990;
     private final Direction omegaDirection;
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(1.0);
 
@@ -63,7 +68,7 @@ public class WheelRadiusCharacterization extends Command {
     public void execute() {
         // Run drive at velocity
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0,
-                omegaLimiter.calculate(omegaDirection.value * characterizationSpeed)
+                omegaLimiter.calculate(omegaDirection.getValue() * characterizationSpeed)
         );
 
         swerve5990.driveSelfRelative(chassisSpeeds);

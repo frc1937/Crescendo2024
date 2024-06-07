@@ -14,7 +14,6 @@ import frc.lib.util.AlliancePose2d;
 
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
 import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
@@ -56,7 +55,7 @@ public class ShootOnTheMove extends Command {
         Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(newTarget);
 
         swerve5990.driveWithTargetAzimuth(targetTranslation, targetStrafe, targetAngle);
-        shootNote(robotPose, newTarget, tangentialVelocity);
+        shootNote(newTarget, tangentialVelocity);
     }
 
     @Override
@@ -71,9 +70,9 @@ public class ShootOnTheMove extends Command {
         return swerve5990.azimuthAtGoal(Radians.of(SWERVE_AZIMUTH_TOLERANCE)) && shooterSubsystem.atReference();
     }
 
-    private void shootNote(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
+    private void shootNote(Pose3d targetPose, double tangentialVelocity) {
         Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(targetPose, tangentialVelocity);
-        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, MetersPerSecond.of(tangentialVelocity));
+        ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, tangentialVelocity);
 
         shooterCommands.shootNote(reference);
     }

@@ -3,54 +3,26 @@ package frc.robot.subsystems.swerve;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
 import frc.lib.math.Conversions;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KD;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KI;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
-import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
-import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KD;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KI;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KP;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KS;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KV;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_MOTOR_INVERT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_NEUTRAL_MODE;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_STATOR_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED;
-import static frc.robot.subsystems.swerve.SwerveConstants.OPEN_LOOP_RAMP;
-import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_IN_PLACE_DRIVE_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 public class SwerveModule5990 {
     public final SwerveConstants.SwerveModuleConstants swerveModuleConstants;
@@ -60,8 +32,7 @@ public class SwerveModule5990 {
     private final PIDController steerController = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD);
     private final CANcoder steerEncoder;
 
-    private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(DRIVE_KS, DRIVE_KV, DRIVE_KA);
-
+    private final double wheelDiameter = WHEEL_CIRCUMFERENCE / Math.PI;
     /**
      * Rotations
      */
@@ -70,12 +41,9 @@ public class SwerveModule5990 {
      * The position of the drive motor in rotations
      */
     private StatusSignal<Double> drivePositionSignal;
-    /**
-     * Rotations per second
-     */
-    private StatusSignal<Double> steerVelocitySignal, driveVelocitySignal;
+    private StatusSignal<Double> driveVelocitySignal;
 
-    private final VoltageOut driveVoltageRequest = new VoltageOut(0);
+    private final DutyCycleOut driveDutyCycleRequest = new DutyCycleOut(0);
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
 
     private SwerveModuleState targetState;
@@ -105,20 +73,20 @@ public class SwerveModule5990 {
         this.targetState = targetState;
     }
 
-    public SwerveModuleState getCurrentState() {
-        return new SwerveModuleState(
-                Conversions.rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue()),
-                getCurrentAngle()
-        );
-    }
-
     public SwerveModuleState getTargetState() {
         return targetState;
     }
 
+    public SwerveModuleState getCurrentState() {
+        return new SwerveModuleState(
+                Conversions.rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue(), wheelDiameter),
+                getCurrentAngle()
+        );
+    }
+
     public SwerveModulePosition getCurrentPosition() {
         return new SwerveModulePosition(
-                Conversions.rotationsToMeters(drivePositionSignal.refresh().getValue()),
+                Conversions.rotationsToMeters(drivePositionSignal.refresh().getValue(), wheelDiameter),
                 getCurrentAngle()
         );
     }
@@ -136,29 +104,28 @@ public class SwerveModule5990 {
      * Sets the target velocity for the module.
      */
     private void setTargetVelocity(SwerveModuleState targetState, boolean closedLoop) {
-        Measure<Velocity<Distance>> targetVelocity = CTREModuleState.reduceSkew(MetersPerSecond.of(targetState.speedMetersPerSecond), targetState.angle, getCurrentAngle());
+        double targetVelocityMPS = CTREModuleState.reduceSkew(targetState.speedMetersPerSecond, targetState.angle, getCurrentAngle());
 
         if (closedLoop)
-            setTargetClosedLoopVelocity(targetVelocity);
+            setTargetClosedLoopVelocity(targetVelocityMPS);
         else
-            setTargetOpenLoopVelocity(targetVelocity);
+            setTargetOpenLoopVelocity(targetVelocityMPS);
     }
 
-    private void setTargetOpenLoopVelocity(Measure<Velocity<Distance>> targetVelocity) {
+    private void setTargetOpenLoopVelocity(double targetVelocityMPS) {
         // Scale metres per second to [-1, 1]
-        double power = targetVelocity.in(MetersPerSecond) / MAX_SPEED;
-        // Scale [-1, 1] to [-12, 12]
-        double voltage = Conversions.compensatedPowerToVoltage(power, VOLTAGE_COMPENSATION_SATURATION);
+        double power = targetVelocityMPS / MAX_SPEED_MPS;
 
-        driveMotor.setControl(driveVoltageRequest.withOutput(voltage));
+        driveMotor.setControl(driveDutyCycleRequest.withOutput(power));
     }
 
-    private void setTargetClosedLoopVelocity(Measure<Velocity<Distance>> targetVelocity) {
-        if (targetVelocity.in(MetersPerSecond) <= SWERVE_IN_PLACE_DRIVE_MPS) {
+    private void setTargetClosedLoopVelocity(double targetVelocityMPS) {
+        if (targetVelocityMPS <= SWERVE_IN_PLACE_DRIVE_MPS) {
             return;
         }
+        double targetVelocityRPS = metersPerSecondToRotationsPerSecond(targetVelocityMPS, wheelDiameter);
 
-        driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocity.in(MetersPerSecond)));
+        driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocityRPS));
     }
 
     private void setTargetAngle(SwerveModuleState targetState) {
@@ -187,10 +154,7 @@ public class SwerveModule5990 {
         steerEncoder.optimizeBusUtilization();
 
         steerPositionSignal = steerEncoder.getPosition().clone();
-        steerVelocitySignal = steerEncoder.getVelocity().clone();
-
         steerPositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
-        steerVelocitySignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
     }
 
     private void configureDriveMotor() {

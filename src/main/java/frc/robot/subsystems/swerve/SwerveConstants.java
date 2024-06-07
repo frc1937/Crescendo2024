@@ -14,6 +14,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSFalconSwerveConstants;
 
+import static edu.wpi.first.units.Units.Meters;
+
 public class SwerveConstants {
     public static final double AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85);
     public static final double SWERVE_AZIMUTH_TOLERANCE = 1;
@@ -104,7 +106,8 @@ public class SwerveConstants {
     /**
      * Meters per Second
      */
-    static final double MAX_SPEED = 5;  //MAX_ANGULAR_VELOCITY / DRIVE_BASE_RADIUS.in(Meters);
+    public static final double MAX_SPEED_MPS = 5.1;
+    // MAX_ANGULAR_VELOCITY / DRIVE_BASE_RADIUS; //This gives like 22Mps lmfao no it's not true
 
     /* Neutral Modes */
     static final com.revrobotics.CANSparkBase.IdleMode ANGLE_NEUTRAL_MODE = CANSparkBase.IdleMode.kBrake;
@@ -164,13 +167,13 @@ public class SwerveConstants {
      * causes them to jitter. Thus, we hereby define the maximum driving speed that is
      * considered 'in-place'.
      */
-    static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.01 * MAX_SPEED;
+    static final double SWERVE_IN_PLACE_DRIVE_MPS = 0.01 * MAX_SPEED_MPS;
 
     public static final class AutoConstants {
         static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                 new PIDConstants(TRANSLATION_CONTROLLER_P, 0.0, 0.0), // Translation PID constants
                 new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
-                MAX_SPEED,
+                MAX_SPEED_MPS,
                 DRIVE_BASE_RADIUS,
                 new ReplanningConfig(true, true));
     }

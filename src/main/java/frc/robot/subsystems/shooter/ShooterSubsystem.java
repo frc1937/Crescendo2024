@@ -103,7 +103,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setReference(Reference reference) {
         pitch.setGoal(reference.pitchPosition);
-        setTangentialFlywheelsVelocity(reference.flywheelTangentialVelocity);
+        setTangentialFlywheelsVelocity(reference.flywheelVelocityMPS);
     }
 
     public void reset() {
@@ -135,38 +135,32 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * Set the target tangential velocity of the flywheels.
      * This method accounts for the difference in wheel size
-     * @param tangentialVelocity - the target tangential velocity in metres per second
+     *
+     * @param velocityMPS - the target tangential velocity in metres per second
      */
-    public void setTangentialFlywheelsVelocity(Measure<Velocity<Distance>> tangentialVelocity) {
-        double leftFlywheelRPM = rpmFromTangentialVelocity(tangentialVelocity, LEFT_FLYWHEEL_DIAMETER);
-        double rightFlywheelRPM = rpmFromTangentialVelocity(tangentialVelocity, RIGHT_FLYWHEEL_DIAMETER);
+    public void setTangentialFlywheelsVelocity(double velocityMPS) {
+        double leftFlywheelRPM = rpmFromTangentialVelocity(velocityMPS, LEFT_FLYWHEEL_DIAMETER);
+        double rightFlywheelRPM = rpmFromTangentialVelocity(velocityMPS, RIGHT_FLYWHEEL_DIAMETER);
 
         leftFlywheel.setGoal(RPM.of(leftFlywheelRPM));
         rightFlywheel.setGoal(RPM.of(rightFlywheelRPM));
     }
 
-    public static class Reference implements Interpolatable<Reference> {
+    public static class Reference {
         private Rotation2d pitchPosition = PITCH_DEFAULT_ANGLE;
-        private Measure<Velocity<Distance>> flywheelTangentialVelocity = MetersPerSecond.of(0);
+        private double flywheelVelocityMPS = 0;
 
         public Reference(Rotation2d pitchPosition,
-                         Measure<Velocity<Distance>> flywheelTangentialVelocity) {
+                         double flywheelVelocityMPS) {
             this.pitchPosition = pitchPosition;
-            this.flywheelTangentialVelocity = flywheelTangentialVelocity;
+            this.flywheelVelocityMPS = flywheelVelocityMPS;
         }
 
         public Reference(Rotation2d pitchPosition) {
             this.pitchPosition = pitchPosition;
         }
 
-        public Reference() {}
-
-        @Override
-        public Reference interpolate(Reference endValue, double t) {
-            return new Reference(
-                    pitchPosition.interpolate(endValue.pitchPosition, t),
-                    MeasureUtils.interpolate(flywheelTangentialVelocity, endValue.flywheelTangentialVelocity, t)
-            );
+        public Reference() {
         }
     }
 

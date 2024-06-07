@@ -3,8 +3,11 @@ package frc.robot;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
 
 class ButtonTest {
     private  double shooterLength = 2;
@@ -53,7 +56,7 @@ class ButtonTest {
             }
         }
 
-        AprilTag.generate36h11AprilTagImage(3);
+        System.out.println("The max speed of swerve calculated: " +  MAX_SPEED_MPS);
     }
 
     private void printPose3dNicely(Pose3d pose, String name) {
