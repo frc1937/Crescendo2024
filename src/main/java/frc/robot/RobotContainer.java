@@ -34,6 +34,26 @@ import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 
+//TODO:
+// * TunableNumber impl
+// * Go over all swerve constants. Also fix the Swerve FF. It's not even in the correct units lmfao.
+// * Get value from NT (Photonvision) instead of classes ,cause it runs faster than periodic.
+//TODO
+// * Adding on the above, look into a robot state. Everything feeds data to it, and it interpolates to account for latency.
+// * Link for above (https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2022-build-thread/398645/106)
+// * Also, (https://github.com/Mechanical-Advantage/RobotCode2022/blob/main/src/main/java/frc/robot/RobotState.java)
+// * Great simulations tutorial. (https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2022-build-thread/398645/109?u=wihy)
+//TODO
+// * Get into simulations. seems very interesting.
+// * Wheel radius characterizations seem interesting. look into them
+// * Log Match Time amount - perhaps you could make autons faster! (Latency cause of FIRST. Nice!)
+
+// * Look into trying state machines. Everything has CONSTANT states, and the system will try to achieve them. More reading required.
+// * attempt to move the camera to the end of the shooter, AKA non-constant translations. Cheers!
+// * When only 1 controller is connected, combine from Operator and Driver. When two, split to their desired controllers.
+// * Align with tag command. Should be very simp le.
+// * Gyro fallback - use odom velocities instead.
+
 public class RobotContainer {
     private static final Controller driveController = new Controller(0);
     private static final Controller operatorController = new Controller(1);
