@@ -78,10 +78,11 @@ public final class Constants {
         /**
          * Physical location of the camera on the robot, relative to the center of the robot. NEEDS TUNING
          */
-        public static final Transform3d
-                ROBOT_TO_FRONT_CAMERA = new Transform3d(
-                0.346407, -0.175245, 0.397225,
-                new Rotation3d(0, -17.5, 0));
+        public static final Transform3d ROBOT_TO_FRONT_CAMERA =
+                new Transform3d(
+                        0.346407, 0.175245/*-0.175245*/, 0.397225,
+                        new Rotation3d(0, -35, 0)
+                );
     }
 
     public static final class LEDsConstants {
@@ -115,7 +116,7 @@ public final class Constants {
         public static final Vector<N3> STATES_AMBIGUITY = VecBuilder.fill(0.003, 0.003, 0.0002);
         public static final double POSE_BUFFER_SIZE_SECONDS = 2.0;
 
-        public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(10, 5, Rotation2d.fromDegrees(0));
+        public static final AlliancePose2d DEFAULT_POSE = fromCorrectPose(0, 0, Rotation2d.fromDegrees(180));
 
         public static final double TRANSLATION_STD_EXPONENT = 0.005;
         public static final double ROTATION_STD_EXPONENT = 0.01;
@@ -127,7 +128,7 @@ public final class Constants {
                 TAG_ID_TO_POSE.put(aprilTag.ID, aprilTag.pose);
         }
 
-        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.2, 0.0, 0.49081 + 0.18), new Rotation3d()));
+        public static final Pose3d BLUE_SPEAKER = VisionConstants.TAG_ID_TO_POSE.get(7).plus(new Transform3d(new Translation3d(0.2, 0.0, 0.49081 + 0.28), new Rotation3d()));
         public static final Pose3d RED_SPEAKER = AlliancePose2d.AllianceUtils.mirrorPose(BLUE_SPEAKER);
 
         public static final PhotonPoseEstimator.PoseStrategy PRIMARY_POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;

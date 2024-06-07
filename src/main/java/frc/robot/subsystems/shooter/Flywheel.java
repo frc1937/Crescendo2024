@@ -60,7 +60,7 @@ public class Flywheel {
         if (goal == null)
             return false;
 
-        return getVelocity().isNear(goal, FLYWHEEL_TOLERANCE.in(RPM));
+        return Math.abs(getVelocity().in(RPM) - goal.in(RPM)) < FLYWHEEL_TOLERANCE.in(RPM);
     }
 
     public Measure<Velocity<Angle>> getVelocity() {
@@ -107,10 +107,11 @@ public class Flywheel {
     }
 
     private void logFlywheel() {
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/currentVelocity [RPS]", getVelocity().in(RotationsPerSecond));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/goalVelocity [RPM]", getVelocity().in(RPM));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/currentVelocity [RPM]", getVelocity().in(RPM));
         SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/feedbackOutput [Volts]", feedbackOutput);
         SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/feedforwardOutput [Volts]", feedforwardOutput);
-        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/voltage", getVoltage().in(Volt));
+        SmartDashboard.putNumber("flywheel/" + motor.getDeviceId() + "/voltage [Volts]", getVoltage().in(Volt));
     }
 
     private void configureEncoder() {

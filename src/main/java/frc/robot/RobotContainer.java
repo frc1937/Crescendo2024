@@ -48,6 +48,7 @@ import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 // * Wheel radius characterizations seem interesting. look into them
 // * Log Match Time amount - perhaps you could make autons faster! (Latency cause of FIRST. Nice!)
 
+//TODO
 // * Look into trying state machines. Everything has CONSTANT states, and the system will try to achieve them. More reading required.
 // * attempt to move the camera to the end of the shooter, AKA non-constant translations. Cheers!
 // * When only 1 controller is connected, combine from Operator and Driver. When two, split to their desired controllers.
