@@ -26,7 +26,31 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KD;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KI;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KD;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KI;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KS;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KV;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_MOTOR_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_STATOR_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED;
+import static frc.robot.subsystems.swerve.SwerveConstants.OPEN_LOOP_RAMP;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_IN_PLACE_DRIVE_MPS;
 
 public class SwerveModule5990 {
     public final SwerveConstants.SwerveModuleConstants swerveModuleConstants;
@@ -134,10 +158,7 @@ public class SwerveModule5990 {
             return;
         }
 
-        driveMotor.setControl(driveVelocityRequest
-                .withVelocity(targetVelocity.in(MetersPerSecond))
-//                .withFeedForward(driveFeedforward.calculate(targetVelocity.in(MetersPerSecond))) todo test
-        );
+        driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocity.in(MetersPerSecond)));
     }
 
     private void setTargetAngle(SwerveModuleState targetState) {
@@ -148,7 +169,6 @@ public class SwerveModule5990 {
         steerMotor.restoreFactoryDefaults();
 
         steerMotor.setSmartCurrentLimit(ANGLE_CURRENT_LIMIT);
-
         steerMotor.setInverted(ANGLE_MOTOR_INVERT);
         steerMotor.setIdleMode(ANGLE_NEUTRAL_MODE);
         steerMotor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
@@ -164,38 +184,34 @@ public class SwerveModule5990 {
         swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
         applyConfig(steerEncoder, swerveCanCoderConfig);
+        steerEncoder.optimizeBusUtilization();
 
         steerPositionSignal = steerEncoder.getPosition().clone();
         steerVelocitySignal = steerEncoder.getVelocity().clone();
 
         steerPositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
         steerVelocitySignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
-
-        steerEncoder.optimizeBusUtilization();
     }
 
     private void configureDriveMotor() {
         TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
 
-        swerveDriveFXConfig.Audio.BeepOnConfig = false;
-        swerveDriveFXConfig.Audio.BeepOnBoot = false; //WHY DOES THIS NOT WORK!!!!!!
-        swerveDriveFXConfig.Audio.AllowMusicDurDisable = false;
-        swerveDriveFXConfig.Audio.withBeepOnBoot(false);
-        swerveDriveFXConfig.Audio.withBeepOnConfig(false);
+        swerveDriveFXConfig.Audio.BeepOnBoot = false;
 
         swerveDriveFXConfig.MotorOutput.Inverted = DRIVE_MOTOR_INVERT;
         swerveDriveFXConfig.MotorOutput.NeutralMode = DRIVE_NEUTRAL_MODE;
 
-        /* Gear Ratio Config */
         swerveDriveFXConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
 
         /* Current Limiting */
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_CONTINUOUS_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = DRIVE_PEAK_CURRENT_LIMIT;
         swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = DRIVE_PEAK_CURRENT_DURATION;
 
-        /* PID Config */
+        /* PID-FF Config */
         swerveDriveFXConfig.Slot0.kP = DRIVE_KP;
         swerveDriveFXConfig.Slot0.kI = DRIVE_KI;
         swerveDriveFXConfig.Slot0.kD = DRIVE_KD;
@@ -206,19 +222,15 @@ public class SwerveModule5990 {
 
         /* Open and Closed Loop Ramping */
         swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = OPEN_LOOP_RAMP;
-        swerveDriveFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = OPEN_LOOP_RAMP;
-
         swerveDriveFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = CLOSED_LOOP_RAMP;
-        swerveDriveFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = CLOSED_LOOP_RAMP;
 
         applyConfig(driveMotor, swerveDriveFXConfig);
+        driveMotor.optimizeBusUtilization();
 
         drivePositionSignal = driveMotor.getPosition().clone();
         driveVelocitySignal = driveMotor.getVelocity().clone();
 
         drivePositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
         driveVelocitySignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
-
-        driveMotor.optimizeBusUtilization();
     }
 }

@@ -64,10 +64,14 @@ public class SwerveConstants {
     //TODO XXX WARNING: Check if CounterClockwise is IN FACT the equivalent of false!!!
 
     /* SwerveSubsystem Current Limiting */
-    static final int ANGLE_CURRENT_LIMIT = 25;
-    static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 35;
-    static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
+    static final int ANGLE_CURRENT_LIMIT = 30;
+    static final int DRIVE_SUPPLY_CURRENT_LIMIT = 35;
+    static final int DRIVE_STATOR_CURRENT_LIMIT = 50;
+
+    //These two determine for how long and what current needs to be applied in order to be ramped down.
+    static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
     static final double DRIVE_PEAK_CURRENT_DURATION = 0.1;
+
     static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
 
     /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
