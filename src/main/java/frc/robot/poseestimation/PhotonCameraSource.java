@@ -70,6 +70,10 @@ public class PhotonCameraSource {
         cachedPose = getUnCachedRobotPose();
     }
 
+    public PhotonTrackedTarget getTags() {
+        return photonCamera.getLatestResult().getBestTarget();
+    }
+
     public String getName() {
         return name;
     }

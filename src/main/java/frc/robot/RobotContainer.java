@@ -98,6 +98,7 @@ public class RobotContainer {
     /* Commands */
     private final ShooterCommands shooterCommands;
     private final ShooterPhysicsCalculations shooterPhysicsCalculations;
+    private final AlignWithTag alignWithTag;
     private final Flashing flashingLEDs = new Flashing(leds);
 
     /* CONTROLS */
@@ -107,8 +108,10 @@ public class RobotContainer {
         DriverStation.silenceJoystickConnectionWarning(true);
         PoseEstimator6328 poseEstimator6328 = new PoseEstimator6328();
 
+        PhotonCameraSource frontCamera = new PhotonCameraSource(FRONT_CAMERA_NAME, ROBOT_TO_FRONT_CAMERA);
+
         poseEstimator5990 = new PoseEstimator5990(poseEstimator6328,
-                new PhotonCameraSource(FRONT_CAMERA_NAME, ROBOT_TO_FRONT_CAMERA)
+                frontCamera
         );
 
         swerve5990 = new Swerve5990(poseEstimator5990);
@@ -116,6 +119,8 @@ public class RobotContainer {
 
         shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, poseEstimator5990);
         shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, swerve5990, shooterPhysicsCalculations);
+
+        alignWithTag = new AlignWithTag(swerve5990, poseEstimator5990, frontCamera);
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -155,7 +160,7 @@ public class RobotContainer {
         swerve5990.infrequentPeriodic();
 
 
-        if(RobotController.getBatteryVoltage() < 12) {
+        if (RobotController.getBatteryVoltage() < 12) {
             flashingLEDs.schedule();
         } else {
             flashingLEDs.end(true);
@@ -183,6 +188,7 @@ public class RobotContainer {
         drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
+        drRightBumper.whileTrue(alignWithTag.driveToTag(10));
 
         drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
@@ -218,7 +224,7 @@ public class RobotContainer {
     }
 
     private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
-        drAButton.whileTrue( new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false));//, 5.1m/s
+        drAButton.whileTrue(new MaxDrivetrainSpeedCharacterization(swerve5990, translationSup, strafeSup, rotationSup, () -> false));//, 5.1m/s
         drBButton.whileTrue(new MaxFlywheelSpeedCharacterization(shooterSubsystem)); //5500 rpm flywheel
 
         drXButton.whileTrue(new WheelRadiusCharacterization(swerve5990, WheelRadiusCharacterization.Direction.CLOCKWISE));
