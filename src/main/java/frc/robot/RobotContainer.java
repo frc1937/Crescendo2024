@@ -35,37 +35,6 @@ import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 
-//TODO:
-// * TunableNumber impl
-// * Go over all swerve constants. Also fix the Swerve FF. It's not even in the correct units lmfao.
-// * Get value from NT (Photonvision) instead of classes ,cause it runs faster than periodic.
-//TODO
-// * Adding on the above, look into a robot state. Everything feeds data to it, and it interpolates to account for latency.
-// * Link for above (https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2022-build-thread/398645/106)
-// * Also, (https://github.com/Mechanical-Advantage/RobotCode2022/blob/main/src/main/java/frc/robot/RobotState.java)
-// * Great simulations tutorial. (https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2022-build-thread/398645/109?u=wihy)
-//TODO
-// * Get into simulations. seems very interesting.
-// * Wheel radius characterizations seem interesting. look into them
-// * Log Match Time amount - perhaps you could make longer autons! (Latency cause of FMS, might add around 0.3s for each mode.)
-
-//TODO
-// * Look into trying state machines. Everything has CONSTANT states, and the system will try to achieve them. More reading required.
-// * attempt to move the camera to the end of the shooter, AKA non-constant translations. Cheers!
-// * When only 1 controller is connected, combine from Operator and Driver. When two, split to their desired controllers.
-// * Align with tag command. Should be very simp le.
-// * Gyro fallback - use odom velocities instead.
-
-//TODO
-// * Look into traj generation.
-// * https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2023-build-thread/420691/179?u=wihy
-// * ^ Coolest auton managing I've ever seen. Look into implementing something similar. Instead of having rigid routines, have setpoints to get to and performs actions at.
-// * read when bored: https://docs.wpilib.org/en/stable/docs/software/telemetry/index.html might have useful info.
-// * If battery is low: change LEDs colours.
-// * Follow tag command https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/FollowDemoTag.java
-// * End of MATCH LEDs flashing would be SOOO useful.
-
-
 public class RobotContainer {
     private static final Controller driveController = new Controller(0);
     private static final Controller operatorController = new Controller(1);
