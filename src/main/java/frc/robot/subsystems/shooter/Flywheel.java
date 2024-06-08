@@ -60,6 +60,7 @@ public class Flywheel {
         if (goal == null)
             return false;
 
+        //todo: wtf is going on here.
         return Math.abs(getVelocity().in(RPM) - goal.in(RPM)) < FLYWHEEL_TOLERANCE.in(RPM);
     }
 

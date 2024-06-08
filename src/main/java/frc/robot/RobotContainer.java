@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +14,7 @@ import frc.lib.util.Controller;
 import frc.robot.commands.*;
 import frc.robot.commands.calibration.*;
 import frc.robot.commands.leds.ColourByShooter;
+import frc.robot.commands.leds.Flashing;
 import frc.robot.poseestimation.PhotonCameraSource;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.poseestimation.PoseEstimator6328;
@@ -54,6 +56,7 @@ import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 // * Align with tag command. Should be very simp le.
 // * Gyro fallback - use odom velocities instead.
 
+//TODO
 // * Look into traj generation.
 // * https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2023-build-thread/420691/179?u=wihy
 // * ^ Coolest auton managing I've ever seen. Look into implementing something similar. Instead of having rigid routines, have setpoints to get to and performs actions at.
@@ -95,7 +98,7 @@ public class RobotContainer {
     /* Commands */
     private final ShooterCommands shooterCommands;
     private final ShooterPhysicsCalculations shooterPhysicsCalculations;
-
+    private final Flashing flashingLEDs = new Flashing(leds);
 
     /* CONTROLS */
     private final Trigger hasNote = new Trigger(shooterSubsystem::isLoaded);
@@ -150,6 +153,13 @@ public class RobotContainer {
 
     public void infrequentPeriodic() {
         swerve5990.infrequentPeriodic();
+
+
+        if(RobotController.getBatteryVoltage() < 12) {
+            flashingLEDs.schedule();
+        } else {
+            flashingLEDs.end(true);
+        }
     }
 
     public void frequentPeriodic() {
