@@ -123,8 +123,8 @@ public class SwerveModule5990 {
         if (targetVelocityMPS <= SWERVE_IN_PLACE_DRIVE_MPS) {
             return;
         }
-        double targetVelocityRPS = metersPerSecondToRotationsPerSecond(targetVelocityMPS, wheelDiameter);
 
+        double targetVelocityRPS = metersPerSecondToRotationsPerSecond(targetVelocityMPS, wheelDiameter);
         driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocityRPS));
     }
 

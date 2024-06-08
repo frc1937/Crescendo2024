@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 
@@ -12,7 +11,7 @@ public class ShooterConstants {
     static final Rotation2d FORWARD_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(10);
     static final Rotation2d REVERSE_PITCH_SOFT_LIMIT = Rotation2d.fromDegrees(-15);
 
-    public static final int FLYWHEEL_MAX_RPM = 5400;
+    public static final int FLYWHEEL_MAX_RPM = 5500;
 
     static final double CONSIDERED_NOISELESS_THRESHOLD = 20;
     static final double GRAVITY_FORCE = 9.8;
@@ -70,7 +69,7 @@ public class ShooterConstants {
     public static final ShooterSubsystem.Reference ASSIST = new ShooterSubsystem.Reference(
             Rotation2d.fromDegrees(48), 15);
     public static final ShooterSubsystem.Reference INTAKE = new ShooterSubsystem.Reference(
-            PIVOT_BOTTOM_ANGLE, -3);
+            PIVOT_BOTTOM_ANGLE, -10);
     public static final ShooterSubsystem.Reference AMP_INIT =
             new ShooterSubsystem.Reference(Rotation2d.fromDegrees(102), 3);
 }

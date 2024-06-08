@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.Controller;
@@ -46,7 +45,7 @@ import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 //TODO
 // * Get into simulations. seems very interesting.
 // * Wheel radius characterizations seem interesting. look into them
-// * Log Match Time amount - perhaps you could make autons faster! (Latency cause of FIRST. Nice!)
+// * Log Match Time amount - perhaps you could make longer autons! (Latency cause of FMS, might add around 0.3s for each mode.)
 
 //TODO
 // * Look into trying state machines. Everything has CONSTANT states, and the system will try to achieve them. More reading required.
@@ -54,6 +53,15 @@ import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 // * When only 1 controller is connected, combine from Operator and Driver. When two, split to their desired controllers.
 // * Align with tag command. Should be very simp le.
 // * Gyro fallback - use odom velocities instead.
+
+// * Look into traj generation.
+// * https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2023-build-thread/420691/179?u=wihy
+// * ^ Coolest auton managing I've ever seen. Look into implementing something similar. Instead of having rigid routines, have setpoints to get to and performs actions at.
+// * read when bored: https://docs.wpilib.org/en/stable/docs/software/telemetry/index.html might have useful info.
+// * If battery is low: change LEDs colours.
+// * Follow tag command https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/FollowDemoTag.java
+// * End of MATCH LEDs flashing would be SOOO useful.
+
 
 public class RobotContainer {
     private static final Controller driveController = new Controller(0);
