@@ -137,7 +137,7 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
+        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.MAX_SPEEDS_CHARACTERIZATION);
     }
 
 

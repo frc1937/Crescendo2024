@@ -258,10 +258,13 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     /**
-     * Get the position of all drive wheels in radians.
+     * Get the position of all drive wheels in meters.
      */
     public double[] getWheelPositions() {
-        return IntStream.range(0, NUMBER_OF_MODULES).mapToDouble(i -> modules[i].getCurrentAngle().getRadians()).toArray();
+        return IntStream.range(0, NUMBER_OF_MODULES)
+                .mapToDouble(i ->
+                        modules[i].getWheelDistanceTraveledRadians()
+                ).toArray();
     }
 
 

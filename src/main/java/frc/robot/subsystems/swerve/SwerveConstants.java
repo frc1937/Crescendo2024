@@ -81,7 +81,7 @@ public class SwerveConstants {
     static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    static final TunableNumber ANGLE_KP = new TunableNumber("Swerve angle kP", 0.1);
+    static final TunableNumber ANGLE_KP = new TunableNumber("Swerve angle kP", 2.5);
     static final double ANGLE_KI = 0;
     static final double ANGLE_KD = 0;
 

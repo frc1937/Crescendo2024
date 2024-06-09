@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_BASE_RADIUS;
 
 public class WheelRadiusCharacterization extends Command {
-    private final TunableNumber characterizationSpeed = new TunableNumber("Characterization/Drive/Characterization Speed ", 0.1);
+    private final TunableNumber characterizationSpeed = new TunableNumber("Omega Speed Wheel Characterization ", 0.4);
     private final DoubleSupplier gyroYawRadsSupplier;
 
     public enum Direction {
@@ -80,15 +80,17 @@ public class WheelRadiusCharacterization extends Command {
             averageWheelPosition += Math.abs(currentWheelPositions[i] - wheelStartingPositions[i]);
         }
 
+        SmartDashboard.putNumber("averageWheelPosition", averageWheelPosition);
+
         averageWheelPosition /= 4.0;
 
-        if(averageWheelPosition != 0) {
+        if (averageWheelPosition != 0) {
             currentEffectiveWheelRadius = (accumGyroYawRads * DRIVE_BASE_RADIUS) / averageWheelPosition;
         }
 
         SmartDashboard.putNumber("Characterization/Drive/DrivePosition", averageWheelPosition);
         SmartDashboard.putNumber("Characterization/Drive/AccumGyroYawRads", accumGyroYawRads);
-        SmartDashboard.putNumber("Characterization/Drive/CurrentWheelRadiusInches", Units.metersToInches(currentEffectiveWheelRadius));
+        SmartDashboard.putNumber("Characterization/Drive/CurrentWheelRadius [M]", currentEffectiveWheelRadius);
         SmartDashboard.putNumber("Characterization/Drive/OmegaSpeed", omegaSpeed);
     }
 
