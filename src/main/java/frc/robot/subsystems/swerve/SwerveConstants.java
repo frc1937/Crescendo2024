@@ -13,8 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSFalconSwerveConstants;
-
-import static edu.wpi.first.units.Units.Meters;
+import frc.lib.util.TunableNumber;
 
 public class SwerveConstants {
     public static final double AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85);
@@ -82,7 +81,7 @@ public class SwerveConstants {
     static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    static final double ANGLE_KP = 0.1;
+    static final TunableNumber ANGLE_KP = new TunableNumber("Swerve angle kP", 0.1);
     static final double ANGLE_KI = 0;
     static final double ANGLE_KD = 0;
 

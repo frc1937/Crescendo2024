@@ -29,7 +29,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
 public final class Constants {
-    public static boolean tuningMode = false;
+    public static boolean IS_TUNING_MODE = true;
 
     public static final double POSE_HISTORY_DURATION = 0.3;
 

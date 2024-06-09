@@ -8,12 +8,15 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.CTREModuleState;
@@ -22,55 +25,70 @@ import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KD;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KI;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KD;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KI;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KS;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KV;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_MOTOR_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_STATOR_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.OPEN_LOOP_RAMP;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_IN_PLACE_DRIVE_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.WHEEL_CIRCUMFERENCE;
 
 public class SwerveModule5990 {
+    private static final double WHEEL_DIAMETER = WHEEL_CIRCUMFERENCE / Math.PI;
+
     public final SwerveConstants.SwerveModuleConstants swerveModuleConstants;
+    private final int moduleId;
 
-    private final TalonFX driveMotor;
-    private final CANSparkMax steerMotor;
-    private final PIDController steerController = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD);
-    private final CANcoder steerEncoder;
-
-    private final double wheelDiameter = WHEEL_CIRCUMFERENCE / Math.PI;
-    /**
-     * Rotations
-     */
-    private StatusSignal<Double> steerPositionSignal;
-    /**
-     * The position of the drive motor in rotations
-     */
-    private StatusSignal<Double> drivePositionSignal;
-    private StatusSignal<Double> driveVelocitySignal;
+    private TalonFX driveMotor;
+    private CANSparkMax steerMotor;
+    private SparkPIDController steerController;
+    private RelativeEncoder steerRelativeEncoder;
 
     private final DutyCycleOut driveDutyCycleRequest = new DutyCycleOut(0);
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
+
+    /** Rotations */
+    private StatusSignal<Double> steerPositionSignal;
+    /** Position is in rotations. Velocity is in rotations per second */
+    private StatusSignal<Double> drivePositionSignal, driveVelocitySignal;
 
     private SwerveModuleState targetState;
 
     public SwerveModule5990(SwerveConstants.SwerveModuleConstants constants) {
         this.swerveModuleConstants = constants;
+        this.moduleId = constants.moduleNumber();
 
-        this.driveMotor = new TalonFX(swerveModuleConstants.driveMotorID());
-        this.steerEncoder = new CANcoder(swerveModuleConstants.canCoderID());
-        this.steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
-
-        steerController.setP(ANGLE_KP);
-        steerController.setI(ANGLE_KI);
-        steerController.setD(ANGLE_KD);
-
-        configureSteerEncoder();
         configureDriveMotor();
         configureSteerMotor();
+        configureSteerAbsoluteEncoder();
+        configureSteerRelativeEncoder();
+        configureSteerController();
     }
 
-    public void setTargetState(SwerveModuleState targetState, boolean closedLoop) {
-        targetState = CTREModuleState.optimize(targetState, getCurrentAngle());
+    public void setTargetState(final SwerveModuleState targetState, boolean closedLoop) {
+        this.targetState = CTREModuleState.optimize(targetState, getCurrentAngle());
 
-        setTargetVelocity(targetState, closedLoop);
-        setTargetAngle(targetState);
-
-        this.targetState = targetState;
+        driveToTargetVelocity(closedLoop);
+        driveToTargetAngle();
     }
 
     public SwerveModuleState getTargetState() {
@@ -79,14 +97,14 @@ public class SwerveModule5990 {
 
     public SwerveModuleState getCurrentState() {
         return new SwerveModuleState(
-                Conversions.rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue(), wheelDiameter),
+                Conversions.rotationsPerSecondToMetersPerSecond(driveVelocitySignal.refresh().getValue(), WHEEL_DIAMETER),
                 getCurrentAngle()
         );
     }
 
     public SwerveModulePosition getCurrentPosition() {
         return new SwerveModulePosition(
-                Conversions.rotationsToMeters(drivePositionSignal.refresh().getValue(), wheelDiameter),
+                Conversions.rotationsToMeters(drivePositionSignal.refresh().getValue(), WHEEL_DIAMETER),
                 getCurrentAngle()
         );
     }
@@ -100,10 +118,18 @@ public class SwerveModule5990 {
         driveMotor.stopMotor();
     }
 
+    public void periodic() {
+        steerRelativeEncoder.setPosition(getCurrentAngle().getRotations());
+        steerController.setP(ANGLE_KP.get());
+
+        SmartDashboard.putNumber(moduleId + "steer-relative-pose-", steerRelativeEncoder.getPosition());
+        SmartDashboard.putNumber(moduleId + "steer-absolute-pose-", getCurrentAngle().getRotations());
+    }
+
     /**
      * Sets the target velocity for the module.
      */
-    private void setTargetVelocity(SwerveModuleState targetState, boolean closedLoop) {
+    private void driveToTargetVelocity(boolean closedLoop) {
         double targetVelocityMPS = CTREModuleState.reduceSkew(targetState.speedMetersPerSecond, targetState.angle, getCurrentAngle());
 
         if (closedLoop)
@@ -113,10 +139,8 @@ public class SwerveModule5990 {
     }
 
     private void setTargetOpenLoopVelocity(double targetVelocityMPS) {
-        // Scale metres per second to [-1, 1]
-        double power = targetVelocityMPS / MAX_SPEED_MPS;
-
-        driveMotor.setControl(driveDutyCycleRequest.withOutput(power));
+        double powerPercentage = targetVelocityMPS / MAX_SPEED_MPS;
+        driveMotor.setControl(driveDutyCycleRequest.withOutput(powerPercentage));
     }
 
     private void setTargetClosedLoopVelocity(double targetVelocityMPS) {
@@ -124,15 +148,18 @@ public class SwerveModule5990 {
             return;
         }
 
-        double targetVelocityRPS = metersPerSecondToRotationsPerSecond(targetVelocityMPS, wheelDiameter);
+        double targetVelocityRPS = metersPerSecondToRotationsPerSecond(targetVelocityMPS, WHEEL_DIAMETER);
         driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocityRPS));
     }
 
-    private void setTargetAngle(SwerveModuleState targetState) {
-        steerMotor.setVoltage(steerController.calculate(getCurrentAngle().getDegrees(), targetState.angle.getDegrees()));
+    private void driveToTargetAngle() {
+        steerController.setReference(targetState.angle.getRotations(), CANSparkBase.ControlType.kPosition);
+        SmartDashboard.putNumber("target state angle", targetState.angle.getDegrees());
     }
 
     private void configureSteerMotor() {
+        steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
+
         steerMotor.restoreFactoryDefaults();
 
         steerMotor.setSmartCurrentLimit(ANGLE_CURRENT_LIMIT);
@@ -144,20 +171,24 @@ public class SwerveModule5990 {
         steerMotor.burnFlash();
     }
 
-    private void configureSteerEncoder() {
+    private void configureSteerAbsoluteEncoder() {
+        CANcoder steerAbsoluteEncoder = new CANcoder(swerveModuleConstants.canCoderID());
+
         CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
 
         swerveCanCoderConfig.MagnetSensor.SensorDirection = CAN_CODER_INVERT;
         swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
-        applyConfig(steerEncoder, swerveCanCoderConfig);
-        steerEncoder.optimizeBusUtilization();
+        applyConfig(steerAbsoluteEncoder, swerveCanCoderConfig);
+        steerAbsoluteEncoder.optimizeBusUtilization();
 
-        steerPositionSignal = steerEncoder.getPosition().clone();
+        steerPositionSignal = steerAbsoluteEncoder.getPosition().clone();
         steerPositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
     }
 
     private void configureDriveMotor() {
+        driveMotor = new TalonFX(swerveModuleConstants.driveMotorID());
+
         TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
 
         swerveDriveFXConfig.Audio.BeepOnBoot = false;
@@ -196,5 +227,21 @@ public class SwerveModule5990 {
 
         drivePositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
         driveVelocitySignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
+    }
+
+
+    private void configureSteerController() {
+        steerController = steerMotor.getPIDController();
+
+        steerController.setP(ANGLE_KP.get());
+        steerController.setI(ANGLE_KI);
+        steerController.setD(ANGLE_KD);
+    }
+
+    private void configureSteerRelativeEncoder() {
+        steerRelativeEncoder = steerMotor.getEncoder();
+
+        steerRelativeEncoder.setPosition(getCurrentAngle().getRotations());
+        steerRelativeEncoder.setPositionConversionFactor(7.0 / 150.0);
     }
 }

@@ -51,7 +51,7 @@ public class TunableNumber implements DoubleSupplier {
             hasDefault = true;
             this.defaultValue = defaultValue;
 
-            if (Constants.tuningMode) {
+            if (Constants.IS_TUNING_MODE) {
                 SmartDashboard.putNumber(key, SmartDashboard.getNumber(key, defaultValue));
             }
         }
@@ -66,7 +66,7 @@ public class TunableNumber implements DoubleSupplier {
         if (!hasDefault) {
             return 0.0;
         } else {
-            return Constants.tuningMode ? SmartDashboard.getNumber(key, defaultValue) : defaultValue;
+            return Constants.IS_TUNING_MODE ? SmartDashboard.getNumber(key, defaultValue) : defaultValue;
         }
     }
 

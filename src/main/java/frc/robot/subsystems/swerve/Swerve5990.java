@@ -32,8 +32,25 @@ import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_CONSTRAINTS;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_D;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_I;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_P;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE;
 import static frc.robot.subsystems.swerve.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.subsystems.swerve.SwerveConstants.INVERT_GYRO;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module0;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module1;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module2;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module3;
+import static frc.robot.subsystems.swerve.SwerveConstants.NUMBER_OF_MODULES;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_ACCELERATION;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_MAX_VELOCITY;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -86,6 +103,10 @@ public class Swerve5990 extends SubsystemBase {
                         robotPose.plus(ROBOT_TO_FRONT_CAMERA.inverse())
                 }
         );
+
+        for (int i = 0; i < NUMBER_OF_MODULES; i++) {
+            modules[i].periodic();
+        }
     }
 
     public ChassisSpeeds getSelfRelativeVelocity() {
@@ -102,10 +123,12 @@ public class Swerve5990 extends SubsystemBase {
                 right = new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
                 left = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
 
-        modules[0].setTargetState(left, true);
-        modules[1].setTargetState(right, true);
-        modules[2].setTargetState(right, true);
-        modules[3].setTargetState(left, true);
+        modules[0].setTargetState(right, false);
+        modules[1].setTargetState(left, false);
+        modules[2].setTargetState(left, false);
+        modules[3].setTargetState(left, false);
+
+
     }
 
     public Rotation2d getGyroAzimuth() {
@@ -224,7 +247,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     /** Get the position of all drive wheels in radians. */
-    public double[] getWheelRadiusCharacterizationPosition() {
+    public double[] getWheelPositions() {
         return IntStream.range(0, NUMBER_OF_MODULES).mapToDouble(i -> modules[i].getCurrentAngle().getRadians()).toArray();
     }
 
