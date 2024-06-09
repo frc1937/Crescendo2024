@@ -1,16 +1,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.util.AlliancePose2d;
 import frc.robot.Constants;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
-import frc.lib.util.AlliancePose2d;
 
 import java.util.function.DoubleSupplier;
 
@@ -48,9 +47,8 @@ public class ShootOnTheMove extends Command {
         double targetStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.STICK_DEADBAND);
 
         Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
-        Pose2d robotPose = poseEstimator5990.getCurrentPose().getCorrectPose();
 
-        Pose3d newTarget = shooterPhysicsCalculations.getNewTargetFromRobotVelocity(robotPose, targetPose, tangentialVelocity, swerve5990.getSelfRelativeVelocity());
+        Pose3d newTarget = shooterPhysicsCalculations.getNewTargetFromRobotVelocity(targetPose, tangentialVelocity, swerve5990.getSelfRelativeVelocity());
 
         Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(newTarget);
 

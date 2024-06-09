@@ -39,14 +39,13 @@ public class ShooterPhysicsCalculations {
      * @param tangentialVelocity - the tangential velocity of the flywheel
      * @return - the required pitch angle
      * @link <a href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">Formula is taken from wikipedia</a>
-     * //     * @param robotPose - The robot's pose, using the correct alliance
      */
     public Rotation2d getPitchAnglePhysics(Pose3d targetPose, double tangentialVelocity) {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
         //This is the distance of the pivot off the floor when parallel to the ground
-        double z = (targetPose.getZ()) - getNoteExitPose(robotPose, targetPose).getZ();
-        double distance = getDistanceToTarget(robotPose, targetPose);
+        double z = (targetPose.getZ()) - getNoteExitPose(targetPose).getZ();
+        double distance = getDistanceToTarget(targetPose);
 
         double sqrt = Math.sqrt(vSquared * vSquared - GRAVITY_FORCE * (GRAVITY_FORCE * distance * distance + 2 * vSquared * z));
         double theta = Math.atan((vSquared - sqrt) / (GRAVITY_FORCE * distance));
@@ -64,16 +63,15 @@ public class ShooterPhysicsCalculations {
 
     /**
      * We assume the robot isn't moving to get the time of flight
-     * //     * @param robotPose - The robot's pose, using the correct alliance
      *
      * @param targetPose         - The target pose of the NOTE, using the correct alliance
      * @param tangentialVelocity - The tangential velocity of the flywheels
      * @return - the time of flight in seconds
      */
-    public double getTimeOfFlight(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity) {
+    public double getTimeOfFlight(Pose3d targetPose, double tangentialVelocity) {
         Rotation2d theta = getPitchAnglePhysics(targetPose, tangentialVelocity);
 
-        double distance = getDistanceToTarget(robotPose, targetPose);
+        double distance = getDistanceToTarget(targetPose);
         double speed = tangentialVelocity * theta.getCos();
 
         return distance / speed;
@@ -95,14 +93,13 @@ public class ShooterPhysicsCalculations {
     /**
      * Get the target's offset after taking into account the robot's velocity
      *
-     * @param robotPose          - The robot's pose, using the correct alliance
      * @param targetPose         - The target pose, using the correct alliance
      * @param tangentialVelocity - The tangential velocity of the flywheels
      * @param robotVelocity      - The robot's current velocity
      * @return - The new pose of the target, after applying the offset
      */
-    public Pose3d getNewTargetFromRobotVelocity(Pose2d robotPose, Pose3d targetPose, double tangentialVelocity, ChassisSpeeds robotVelocity) {
-        double timeOfFlight = getTimeOfFlight(robotPose, targetPose, tangentialVelocity);
+    public Pose3d getNewTargetFromRobotVelocity(Pose3d targetPose, double tangentialVelocity, ChassisSpeeds robotVelocity) {
+        double timeOfFlight = getTimeOfFlight(targetPose, tangentialVelocity);
 
         Transform3d targetOffset = new Transform3d(
                 robotVelocity.vxMetersPerSecond * timeOfFlight,
@@ -117,24 +114,21 @@ public class ShooterPhysicsCalculations {
     /**
      * Get the distance from the NOTE's exit position to the target
      *
-     * @param robotPose  - The robot's pose, using the correct alliance
      * @param targetPose - The target pose, using the correct alliance
      * @return - The distance in metres
      */
-    private double getDistanceToTarget(Pose2d robotPose, Pose3d targetPose) {
-        return getNoteExitPose(robotPose, targetPose).getTranslation()
-                .getDistance(targetPose.getTranslation());
+    private double getDistanceToTarget(Pose3d targetPose) {
+        return getNoteExitPose(targetPose).getTranslation().getDistance(targetPose.getTranslation());
     }
 
     /**
      * Get the field-relative end of the shooter, AKA the NOTE's point of exit, from field-relative robot pose.
      * Using the correct alliance.
      *
-     * @param robotPose  - The robot's pose, using the correct alliance
      * @param targetPose - The target's pose, using the correct alliance
      * @return the shooter's end, AKA the NOTE's point of exit
      */
-    private Pose3d getNoteExitPose(Pose2d robotPose, Pose3d targetPose) {
+    private Pose3d getNoteExitPose(Pose3d targetPose) {
         Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), targetPose.getRotation().toRotation2d()));
 
         Transform3d robotToPivot = new Transform3d(

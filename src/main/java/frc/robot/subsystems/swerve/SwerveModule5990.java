@@ -62,13 +62,18 @@ public class SwerveModule5990 {
     private CANSparkMax steerMotor;
     private SparkPIDController steerController;
     private RelativeEncoder steerRelativeEncoder;
+    private CANcoder steerAbsoluteEncoder;
 
     private final DutyCycleOut driveDutyCycleRequest = new DutyCycleOut(0);
     private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
 
-    /** Rotations */
+    /**
+     * Rotations
+     */
     private StatusSignal<Double> steerPositionSignal;
-    /** Position is in rotations. Velocity is in rotations per second */
+    /**
+     * Position is in rotations. Velocity is in rotations per second
+     */
     private StatusSignal<Double> drivePositionSignal, driveVelocitySignal;
 
     private SwerveModuleState targetState;
@@ -77,11 +82,19 @@ public class SwerveModule5990 {
         this.swerveModuleConstants = constants;
         this.moduleId = constants.moduleNumber();
 
+        driveMotor = new TalonFX(swerveModuleConstants.driveMotorID());
+        steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
+        steerAbsoluteEncoder = new CANcoder(swerveModuleConstants.canCoderID());
+
         configureDriveMotor();
         configureSteerMotor();
         configureSteerAbsoluteEncoder();
-        configureSteerRelativeEncoder();
+
+        steerRelativeEncoder = steerMotor.getEncoder();
+        steerController = steerMotor.getPIDController();
+
         configureSteerController();
+        configureSteerRelativeEncoder();
     }
 
     public void setTargetState(final SwerveModuleState targetState, boolean closedLoop) {
@@ -154,12 +167,10 @@ public class SwerveModule5990 {
 
     private void driveToTargetAngle() {
         steerController.setReference(targetState.angle.getRotations(), CANSparkBase.ControlType.kPosition);
-        SmartDashboard.putNumber("target state angle", targetState.angle.getDegrees());
+        SmartDashboard.putNumber(moduleId + " TargetStateAngle", targetState.angle.getDegrees());
     }
 
     private void configureSteerMotor() {
-        steerMotor = new CANSparkMax(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
-
         steerMotor.restoreFactoryDefaults();
 
         steerMotor.setSmartCurrentLimit(ANGLE_CURRENT_LIMIT);
@@ -172,8 +183,6 @@ public class SwerveModule5990 {
     }
 
     private void configureSteerAbsoluteEncoder() {
-        CANcoder steerAbsoluteEncoder = new CANcoder(swerveModuleConstants.canCoderID());
-
         CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
 
         swerveCanCoderConfig.MagnetSensor.SensorDirection = CAN_CODER_INVERT;
@@ -187,8 +196,6 @@ public class SwerveModule5990 {
     }
 
     private void configureDriveMotor() {
-        driveMotor = new TalonFX(swerveModuleConstants.driveMotorID());
-
         TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
 
         swerveDriveFXConfig.Audio.BeepOnBoot = false;
@@ -231,16 +238,12 @@ public class SwerveModule5990 {
 
 
     private void configureSteerController() {
-        steerController = steerMotor.getPIDController();
-
         steerController.setP(ANGLE_KP.get());
         steerController.setI(ANGLE_KI);
         steerController.setD(ANGLE_KD);
     }
 
     private void configureSteerRelativeEncoder() {
-        steerRelativeEncoder = steerMotor.getEncoder();
-
         steerRelativeEncoder.setPosition(getCurrentAngle().getRotations());
         steerRelativeEncoder.setPositionConversionFactor(7.0 / 150.0);
     }

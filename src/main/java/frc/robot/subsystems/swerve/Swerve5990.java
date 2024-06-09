@@ -18,6 +18,8 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.RobotStateHistory;
 import frc.robot.poseestimation.PoseEstimator5990;
@@ -123,12 +125,21 @@ public class Swerve5990 extends SubsystemBase {
                 right = new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
                 left = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
 
-        modules[0].setTargetState(right, false);
-        modules[1].setTargetState(left, false);
-        modules[2].setTargetState(left, false);
-        modules[3].setTargetState(left, false);
+        ParallelRaceGroup functionalCommand = new FunctionalCommand(
+                () -> {},
+                () -> {
+                    modules[0].setTargetState(left, false);
+                    modules[1].setTargetState(right, false);
+                    modules[2].setTargetState(right, false);
+                    modules[3].setTargetState(left, false);
+                },
+                interrupt -> {},
+                () -> false,
 
+                this
+        ).withTimeout(0.3);
 
+        functionalCommand.schedule();
     }
 
     public Rotation2d getGyroAzimuth() {
@@ -246,7 +257,9 @@ public class Swerve5990 extends SubsystemBase {
         driveSelfRelative(speeds);
     }
 
-    /** Get the position of all drive wheels in radians. */
+    /**
+     * Get the position of all drive wheels in radians.
+     */
     public double[] getWheelPositions() {
         return IntStream.range(0, NUMBER_OF_MODULES).mapToDouble(i -> modules[i].getCurrentAngle().getRadians()).toArray();
     }
