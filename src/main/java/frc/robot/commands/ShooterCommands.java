@@ -55,13 +55,14 @@ public class ShooterCommands {
 
         return new FunctionalCommand(
                 () -> {
-                    Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics(targetPose, tangentialVelocity);
+                    //TODO: Redo this class. WTF is going on my guy.
+                    Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics();
                     ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, tangentialVelocity);
 
                     SmartDashboard.putString("physics/targetPose", targetPose.toString());
                     SmartDashboard.putNumber("physics/theta", theta.getDegrees());
 
-                    Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget(targetPose);
+                    Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 
                     swerve5990.driveWithTargetAzimuth(0, 0, targetAngle);
                     initializeShooter(false, reference);
@@ -153,6 +154,10 @@ public class ShooterCommands {
                 shooterSubsystem::isLoaded,
                 shooterSubsystem
         );
+    }
+
+    private void driveToReference(ShooterSubsystem.Reference reference) {
+        initializeShooter(false, reference);
     }
 
     private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {

@@ -106,7 +106,7 @@ public class RobotContainer {
         swerve5990 = new Swerve5990(poseEstimator5990);
         poseEstimator5990.setSwerve(swerve5990);
 
-        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, poseEstimator5990);
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, 20);
         shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, swerve5990, shooterPhysicsCalculations);
 
         alignWithTag = new AlignWithTag(swerve5990, poseEstimator5990, frontCamera);
@@ -155,7 +155,6 @@ public class RobotContainer {
 
     public void frequentPeriodic() {
         poseEstimator5990.periodic();
-        shooterPhysicsCalculations.feedRobotPose(poseEstimator5990.getCurrentPose().getBluePose());
     }
 
     private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, ButtonLayout layout) {
@@ -170,7 +169,7 @@ public class RobotContainer {
     private void teleopButtonsLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
         drAButton.whileTrue(shooterCommands.shootPhysics(19));
-        drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, poseEstimator5990, shooterCommands, swerve5990, translationSup, strafeSup, 16, shooterPhysicsCalculations));
+        drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, shooterCommands, swerve5990, poseEstimator5990, translationSup, strafeSup, 16, shooterPhysicsCalculations));
         drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));

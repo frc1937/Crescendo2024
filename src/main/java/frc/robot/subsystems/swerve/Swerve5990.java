@@ -261,12 +261,8 @@ public class Swerve5990 extends SubsystemBase {
      * Get the position of all drive wheels in meters.
      */
     public double[] getWheelPositions() {
-        return IntStream.range(0, NUMBER_OF_MODULES)
-                .mapToDouble(i ->
-                        modules[i].getWheelDistanceTraveledRadians()
-                ).toArray();
+        return IntStream.range(0, NUMBER_OF_MODULES).mapToDouble(i -> modules[i].getWheelDistanceTraveledRadians()).toArray();
     }
-
 
     /**
      * Returns whether the given chassis speeds are considered to be "still" by the swerve neutral deadband.

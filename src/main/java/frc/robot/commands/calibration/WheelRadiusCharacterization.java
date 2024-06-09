@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_BASE_RADIUS;
 
 public class WheelRadiusCharacterization extends Command {
-    private final TunableNumber characterizationSpeed = new TunableNumber("Omega Speed Wheel Characterization ", 0.4);
+    private final TunableNumber characterizationSpeed = new TunableNumber("Omega Speed Wheel Characterization ", 0.6);
     private final DoubleSupplier gyroYawRadsSupplier;
 
     public enum Direction {
@@ -35,10 +35,10 @@ public class WheelRadiusCharacterization extends Command {
     private final Direction omegaDirection;
     private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(1.0);
 
-    private double lastGyroYawRads = 0.0;
-    private double accumGyroYawRads = 0.0;
+    private double lastGyroYawRadians = 0.0;
+    private double accumulatedGyroYawRadians = 0.0;
 
-    private double[] wheelStartingPositions;
+    private double[] wheelStartingPositionsRadians;
 
     private double currentEffectiveWheelRadius = 0.0;
 
@@ -54,10 +54,10 @@ public class WheelRadiusCharacterization extends Command {
     @Override
     public void initialize() {
         // Reset
-        lastGyroYawRads = gyroYawRadsSupplier.getAsDouble();
-        accumGyroYawRads = 0.0;
+        lastGyroYawRadians = gyroYawRadsSupplier.getAsDouble();
+        accumulatedGyroYawRadians = 0.0;
 
-        wheelStartingPositions = swerve5990.getWheelPositions();
+        wheelStartingPositionsRadians = swerve5990.getWheelPositions();
 
         omegaLimiter.reset(0);
     }
@@ -70,33 +70,33 @@ public class WheelRadiusCharacterization extends Command {
         swerve5990.drive(0, 0, omegaSpeed, false);
 
         // Get yaw and wheel positions
-        accumGyroYawRads += MathUtil.angleModulus(gyroYawRadsSupplier.getAsDouble() - lastGyroYawRads);
-        lastGyroYawRads = gyroYawRadsSupplier.getAsDouble();
+        accumulatedGyroYawRadians += MathUtil.angleModulus(gyroYawRadsSupplier.getAsDouble() - lastGyroYawRadians);
+        lastGyroYawRadians = gyroYawRadsSupplier.getAsDouble();
 
-        double averageWheelPosition = 0.0;
+        double averageWheelPositionRadians = 0.0;
         double[] currentWheelPositions = swerve5990.getWheelPositions();
 
         for (int i = 0; i < 4; i++) {
-            averageWheelPosition += Math.abs(currentWheelPositions[i] - wheelStartingPositions[i]);
+            averageWheelPositionRadians += Math.abs(currentWheelPositions[i] - wheelStartingPositionsRadians[i]);
         }
 
-        SmartDashboard.putNumber("averageWheelPosition", averageWheelPosition);
+        SmartDashboard.putNumber("averageWheelPosition", averageWheelPositionRadians);
 
-        averageWheelPosition /= 4.0;
+        averageWheelPositionRadians /= 4.0;
 
-        if (averageWheelPosition != 0) {
-            currentEffectiveWheelRadius = (accumGyroYawRads * DRIVE_BASE_RADIUS) / averageWheelPosition;
+        if (averageWheelPositionRadians != 0) {
+            currentEffectiveWheelRadius = (accumulatedGyroYawRadians * DRIVE_BASE_RADIUS) / averageWheelPositionRadians;
         }
 
-        SmartDashboard.putNumber("Characterization/Drive/DrivePosition", averageWheelPosition);
-        SmartDashboard.putNumber("Characterization/Drive/AccumGyroYawRads", accumGyroYawRads);
+        SmartDashboard.putNumber("Characterization/Drive/DrivePosition", averageWheelPositionRadians);
+        SmartDashboard.putNumber("Characterization/Drive/AccumGyroYawRads", accumulatedGyroYawRadians);
         SmartDashboard.putNumber("Characterization/Drive/CurrentWheelRadius [M]", currentEffectiveWheelRadius);
         SmartDashboard.putNumber("Characterization/Drive/OmegaSpeed", omegaSpeed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (accumGyroYawRads <= Math.PI * 2.0) {
+        if (accumulatedGyroYawRadians <= Math.PI * 2.0) {
             System.out.println("Not enough data for characterization");
         } else {
             System.out.println(
