@@ -155,6 +155,7 @@ public class RobotContainer {
 
     public void frequentPeriodic() {
         poseEstimator5990.periodic();
+        shooterPhysicsCalculations.feedRobotPose(poseEstimator5990.getCurrentPose().getCorrectPose());
     }
 
     private void initializeButtons(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, ButtonLayout layout) {
@@ -175,7 +176,7 @@ public class RobotContainer {
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drRightBumper.whileTrue(alignWithTag.driveToTag(10));
 
-        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake().withTimeout(0.65));
+        drLeftTrigger.toggleOnFalse(shooterCommands.postIntake());
         drLeftTrigger.whileTrue((shooterCommands.floorIntake()));
 
         drRightTrigger.whileTrue(new IntakeCommands(intakeSubsystem).enableIntake(-0.9, true));
@@ -191,9 +192,6 @@ public class RobotContainer {
     private void flywheelCharacterizationLayout() {
         FlywheelSysIdCharacterization flywheelCharacterization = new FlywheelSysIdCharacterization(shooterSubsystem);
         characterizeByCharacterization(flywheelCharacterization);
-
-        drLeftBumper.whileTrue(shooterCommands.setFlywheelSetpoint(14));
-
     }
 
     private void pitchCharacterizationLayout() {

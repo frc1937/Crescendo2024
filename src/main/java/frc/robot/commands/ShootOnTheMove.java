@@ -1,10 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.util.AlliancePose2d;
 import frc.robot.Constants;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
@@ -14,8 +12,6 @@ import frc.robot.subsystems.swerve.Swerve5990;
 import java.util.function.DoubleSupplier;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
-import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
 import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_AZIMUTH_TOLERANCE;
 
 public class ShootOnTheMove extends Command {
@@ -43,10 +39,7 @@ public class ShootOnTheMove extends Command {
 
     @Override
     public void execute() {
-        shooterPhysicsCalculations.updateValuesForSpeakerAlignment(
-                poseEstimator5990.getCurrentPose().getBluePose(),
-                swerve5990.getSelfRelativeVelocity()
-        );
+        shooterPhysicsCalculations.updateValuesForSpeakerAlignment(swerve5990.getSelfRelativeVelocity());
 
         double targetTranslation = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.STICK_DEADBAND);
         double targetStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.STICK_DEADBAND);

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.lib.util.AlliancePose2d;
 import frc.robot.Constants;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -16,12 +15,7 @@ import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
-import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
-import static frc.robot.subsystems.shooter.ShooterConstants.INTAKE;
-import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_BACKWARDS;
-import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_FORWARD;
+import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -31,8 +25,7 @@ public class ShooterCommands {
     private final IntakeCommands intakeCommands;
     private final ShooterPhysicsCalculations shooterPhysicsCalculations;
 
-    private final StructArrayPublisher<Pose3d> targetPoses = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("TargetPoses", Pose3d.struct).publish();
+    private final StructArrayPublisher<Pose3d> targetPoses = NetworkTableInstance.getDefault().getStructArrayTopic("TargetPoses", Pose3d.struct).publish();
 
     public ShooterCommands(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem, LEDsSubsystem leds, Swerve5990 swerve5990, ShooterPhysicsCalculations shooterPhysicsCalculations) {
         this.shooterSubsystem = shooterSubsystem;
@@ -44,37 +37,27 @@ public class ShooterCommands {
     }
 
     public Command shootPhysics(double tangentialVelocity) {
-        Pose3d targetPose = AlliancePose2d.AllianceUtils.isBlueAlliance() ? BLUE_SPEAKER : RED_SPEAKER;
-
-        targetPoses.set(
-                new Pose3d[]{
-                        targetPose,
-                        Constants.VisionConstants.TAG_ID_TO_POSE.get(7)
-                }
-        );
-
         return new FunctionalCommand(
+                () -> {},
                 () -> {
-                    //TODO: Redo this class. WTF is going on my guy.
-                    Rotation2d theta = shooterPhysicsCalculations.getPitchAnglePhysics();
-                    ShooterSubsystem.Reference reference = new ShooterSubsystem.Reference(theta, tangentialVelocity);
+                    shooterPhysicsCalculations.updateValuesForSpeakerAlignment(swerve5990.getSelfRelativeVelocity());
 
-                    SmartDashboard.putString("physics/targetPose", targetPose.toString());
-                    SmartDashboard.putNumber("physics/theta", theta.getDegrees());
+                    targetPoses.set(new Pose3d[]{
+                                    shooterPhysicsCalculations.getTargetPose(),
+                                    Constants.VisionConstants.TAG_ID_TO_POSE.get(7)
+                            }
+                    );
 
-                    Rotation2d targetAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
+                    Rotation2d targetPitchAngle = shooterPhysicsCalculations.getPitchAnglePhysics();
+                    Rotation2d targetAzimuthAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 
-                    swerve5990.driveWithTargetAzimuth(0, 0, targetAngle);
-                    initializeShooter(false, reference);
-                },
-                () -> {
-                    SmartDashboard.putBoolean("shooter/isLoaded", shooterSubsystem.isLoaded());
-                    SmartDashboard.putBoolean("shooter/flywheelsAtReference", shooterSubsystem.flywheelsAtReference());
-                    SmartDashboard.putBoolean("shooter/pitchAtReference", shooterSubsystem.pitchAtReference());
+                    shooterSubsystem.setReference(new ShooterSubsystem.Reference(targetPitchAngle, tangentialVelocity));
+                    swerve5990.driveWithTargetAzimuth(0, 0, targetAzimuthAngle);
 
-                    if (shooterSubsystem.isLoaded() && shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference()) {
+                    logShooterConditions();
+
+                    if (hasMetShootingConditions())
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
-                    }
                 },
                 interrupted -> shooterSubsystem.reset(),
                 () -> false,
@@ -85,15 +68,12 @@ public class ShooterCommands {
 
     public Command shootNote(ShooterSubsystem.Reference reference) {
         return new FunctionalCommand(
-                () -> initializeShooter(false, reference),
+                () -> shooterSubsystem.setReference(reference),
                 () -> {
-                    SmartDashboard.putBoolean("shooter/isLoaded", shooterSubsystem.isLoaded());
-                    SmartDashboard.putBoolean("shooter/flywheelsAtReference", shooterSubsystem.flywheelsAtReference());
-                    SmartDashboard.putBoolean("shooter/pitchAtReference", shooterSubsystem.pitchAtReference());
+                    logShooterConditions();
 
-                    if (shooterSubsystem.isLoaded() && shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference()) {
+                    if (hasMetShootingConditions())
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
-                    }
                 },
                 interrupted -> shooterSubsystem.reset(),
                 () -> false,
@@ -104,22 +84,11 @@ public class ShooterCommands {
 
     public Command setPitchPosition(double degrees) {
         return new FunctionalCommand(
-                () -> initializeShooter(false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees))),
+                () -> shooterSubsystem.setReference(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(degrees))),
                 () -> {
                 },
                 interrupted -> {
                 },
-                () -> false,
-                shooterSubsystem
-        );
-    }
-
-    public Command setFlywheelSetpoint(double targetTangentialVelocity) {
-        return new FunctionalCommand(
-                () -> initializeShooter(
-                        false, new ShooterSubsystem.Reference(Rotation2d.fromDegrees(0), targetTangentialVelocity)),
-                () -> {},
-                interrupted -> shooterSubsystem.stopFlywheels(),
                 () -> false,
 
                 shooterSubsystem
@@ -134,36 +103,36 @@ public class ShooterCommands {
                 },
                 () -> {
                 },
-                interrupted ->
-                        shooterSubsystem.reset(),
+                interrupted -> shooterSubsystem.reset(),
                 () -> false,
+
                 shooterSubsystem
-        )).alongWith(intakeCommands.stopIntake(0.4));
+        )).alongWith(intakeCommands.stopIntake(0.2));
     }
 
     public Command floorIntake() {
         return new FunctionalCommand(
                 () -> {
-                    initializeShooter(true, INTAKE);
-                    intakeCommands.enableIntake(0.8, false).schedule();
+                    shooterSubsystem.setReference(INTAKE);
+                    shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
                 },
                 () -> {
                 },
                 interrupted -> {
                 },
                 shooterSubsystem::isLoaded,
+
                 shooterSubsystem
-        );
+        ).alongWith(intakeCommands.enableIntake(0.8, false));
     }
 
-    private void driveToReference(ShooterSubsystem.Reference reference) {
-        initializeShooter(false, reference);
+    private boolean hasMetShootingConditions() {
+        return shooterSubsystem.isLoaded() && shooterSubsystem.flywheelsAtReference() && shooterSubsystem.pitchAtReference();
     }
 
-    private void initializeShooter(boolean shouldUseKicker, ShooterSubsystem.Reference reference) {
-        if (shouldUseKicker)
-            shooterSubsystem.setKickerSpeed(KICKER_SPEED_BACKWARDS);
-
-        shooterSubsystem.setReference(reference);
+    private void logShooterConditions() {
+        SmartDashboard.putBoolean("shooter/isLoaded", shooterSubsystem.isLoaded());
+        SmartDashboard.putBoolean("shooter/flywheelsAtReference", shooterSubsystem.flywheelsAtReference());
+        SmartDashboard.putBoolean("shooter/pitchAtReference", shooterSubsystem.pitchAtReference());
     }
 }

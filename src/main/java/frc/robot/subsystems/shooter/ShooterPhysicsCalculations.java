@@ -38,13 +38,26 @@ public class ShooterPhysicsCalculations {
      * We want to update the angle as frequently as possible for less approximation error.
      * Thus, we will run this periodically every time we run a command which uses the physics angle to slowly approach the correct value.
      */
-    public void updateValuesForSpeakerAlignment(Pose2d robotPose, ChassisSpeeds robotSpeed) {
+    public void updateValuesForSpeakerAlignment(ChassisSpeeds robotSpeed) {
         boolean isBlueAlliance = AlliancePose2d.AllianceUtils.isBlueAlliance();
 
         targetPose = isBlueAlliance ? BLUE_SPEAKER : RED_SPEAKER;
         targetPose = getNewTargetFromRobotVelocity(robotSpeed);
 
         targetAngle = getPitchAnglePhysics();
+    }
+
+    /**
+     * This is seperated from {@link  #updateValuesForSpeakerAlignment(ChassisSpeeds)} for robot pose updates separately;
+     *
+     * @param robotPose - The robot pose from the correct alliance
+     */
+    public void feedRobotPose(Pose2d robotPose) {
+        this.robotPose = robotPose;
+    }
+
+    public Pose3d getTargetPose() {
+        return targetPose;
     }
 
     /**
