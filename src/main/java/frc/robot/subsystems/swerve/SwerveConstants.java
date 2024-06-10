@@ -21,11 +21,15 @@ public class SwerveConstants {
 
     static final int NUMBER_OF_MODULES = 4;
 
+    static final TunableNumber AZIMUTH_CONTROLLER_P = new TunableNumber("Swerve Yaw (Azimuth) kP", 0.05),
+                AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve Yaw (Azimuth) Max Velocity", 1.5),
+                AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve Yaw (Azimuth) Max Acceleration", 1);
+
+
     static final double
-            AZIMUTH_CONTROLLER_P = 9.4,
             AZIMUTH_CONTROLLER_I = 0,
             AZIMUTH_CONTROLLER_D = 0,
-            AZIMUTH_CONTROLLER_DEADBAND = 0.12,
+            AZIMUTH_CONTROLLER_DEADBAND = 0.1,
 
             TRANSLATION_CONTROLLER_P = 1.366,
 
@@ -158,8 +162,7 @@ public class SwerveConstants {
     static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI * Math.PI;
 
     static final TrapezoidProfile.Constraints AZIMUTH_CONTROLLER_CONSTRAINTS =
-            new TrapezoidProfile.Constraints(
-                    MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+            new TrapezoidProfile.Constraints(1, 2);
 
     /**
      * We avoid steering the swerve wheels below a certain driving speed, for in-place turning
@@ -171,7 +174,7 @@ public class SwerveConstants {
     public static final class AutoConstants {
         static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                 new PIDConstants(TRANSLATION_CONTROLLER_P, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(AZIMUTH_CONTROLLER_P, AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
+                new PIDConstants(AZIMUTH_CONTROLLER_P.get(), AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                 MAX_SPEED_MPS,
                 DRIVE_BASE_RADIUS,
                 new ReplanningConfig(true, true));

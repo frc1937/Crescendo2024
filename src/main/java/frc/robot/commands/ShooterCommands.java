@@ -15,7 +15,9 @@ import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
 
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.INTAKE;
+import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_BACKWARDS;
+import static frc.robot.subsystems.shooter.ShooterConstants.KICKER_SPEED_FORWARD;
 
 public class ShooterCommands {
     private final ShooterSubsystem shooterSubsystem;
@@ -52,7 +54,9 @@ public class ShooterCommands {
                     Rotation2d targetAzimuthAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 
                     shooterSubsystem.setReference(new ShooterSubsystem.Reference(targetPitchAngle, tangentialVelocity));
-                    swerve5990.driveWithTargetAzimuth(0, 0, targetAzimuthAngle);
+//                    swerve5990.driveWithTargetAzimuth(0, 0, targetAzimuthAngle);
+
+                    SmartDashboard.putNumber("shooter/physicsAngle [DEG]", targetPitchAngle.getDegrees());
 
                     logShooterConditions();
 
@@ -75,7 +79,9 @@ public class ShooterCommands {
                     if (hasMetShootingConditions())
                         shooterSubsystem.setKickerSpeed(KICKER_SPEED_FORWARD);
                 },
-                interrupted -> shooterSubsystem.reset(),
+                interrupted -> {
+                    shooterSubsystem.reset();
+                },
                 () -> false,
 
                 shooterSubsystem
@@ -107,7 +113,7 @@ public class ShooterCommands {
                 () -> false,
 
                 shooterSubsystem
-        )).alongWith(intakeCommands.stopIntake(0.2));
+        ).withTimeout(0.4)).alongWith(intakeCommands.stopIntake(0.4));
     }
 
     public Command floorIntake() {

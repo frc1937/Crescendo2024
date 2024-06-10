@@ -18,7 +18,7 @@ public class ShooterConstants {
 
     static final double PITCH_GEAR_RATIO = 1.0 / 149;
 
-    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(0);
+    static final Rotation2d PITCH_DEFAULT_ANGLE = Rotation2d.fromDegrees(20);
     static final Rotation2d PIVOT_ENCODER_OFFSET = Rotation2d.fromDegrees(21.478516);
     static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-18.984374625);
 
@@ -58,7 +58,7 @@ public class ShooterConstants {
     static final double SHOOTER_LENGTH_METRES = 0.485;
 
     public static final double KICKER_SPEED_BACKWARDS = -0.6;
-    public static final double KICKER_SPEED_FORWARD = 0.9;
+    public static final double KICKER_SPEED_FORWARD = 0.5;
 
     //Some presets.
     public static final ShooterSubsystem.Reference SPEAKER_FRONT = new ShooterSubsystem.Reference(

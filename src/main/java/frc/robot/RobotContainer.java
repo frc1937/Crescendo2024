@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,6 +18,7 @@ import frc.robot.commands.ShootOnTheMove;
 import frc.robot.commands.ShootToAmp;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.TeleOpDrive;
+import frc.robot.commands.TeleOpRotate;
 import frc.robot.commands.calibration.FlywheelSysIdCharacterization;
 import frc.robot.commands.calibration.GearRatioCharacterization;
 import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
@@ -137,7 +139,7 @@ public class RobotContainer {
 
         leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
 
-        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.MAX_SPEEDS_CHARACTERIZATION);
+        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
     }
 
 
@@ -146,8 +148,6 @@ public class RobotContainer {
     }
 
     public void infrequentPeriodic() {
-        swerve5990.infrequentPeriodic();
-
 //        if (RobotController.getBatteryVoltage() < 11.8) {
 //            flashingLEDs.schedule();
 //        }
@@ -171,7 +171,8 @@ public class RobotContainer {
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
         drAButton.whileTrue(shooterCommands.shootPhysics(19));
         drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, shooterCommands, swerve5990, poseEstimator5990, translationSup, strafeSup, 16, shooterPhysicsCalculations));
-        drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
+//        drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
+        drYButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(45), 12)));
 
         drLeftBumper.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drRightBumper.whileTrue(alignWithTag.driveToTag(10));
@@ -212,6 +213,9 @@ public class RobotContainer {
 
         drXButton.whileTrue(new WheelRadiusCharacterization(swerve5990, WheelRadiusCharacterization.Direction.CLOCKWISE));
         drYButton.whileTrue(new WheelRadiusCharacterization(swerve5990, WheelRadiusCharacterization.Direction.COUNTER_CLOCKWISE));
+
+        drLeftBumper.whileTrue(new TeleOpRotate(swerve5990, Rotation2d.fromDegrees(90)));
+
     }
 
     private enum ButtonLayout {

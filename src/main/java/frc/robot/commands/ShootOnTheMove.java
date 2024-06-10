@@ -46,7 +46,7 @@ public class ShootOnTheMove extends Command {
 
         Rotation2d targetAzimuthAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 
-        swerve5990.driveWithTargetAzimuth(targetTranslation, targetStrafe, targetAzimuthAngle);
+        swerve5990.driveFieldRelative(targetTranslation, targetStrafe, targetAzimuthAngle);
         shootNote(tangentialVelocity);
     }
 
