@@ -22,8 +22,7 @@ public class ShootToAmp extends SequentialCommandGroup {
      */
     public ShootToAmp(ShooterSubsystem shooter, Swerve5990 swerve5990, LEDsSubsystem leds) {
         Command prepare = new ParallelCommandGroup(
-                new TeleOpDrive(swerve5990, () -> 0.1, () -> 0, () -> 0, () -> true).withTimeout(0.2),
-//                new DriveForward(swerve5990, 0.1).withTimeout(0.2), //0.19
+                new TeleOpDrive(swerve5990, () -> 0.3, () -> 0, () -> 0, () -> true).withTimeout(0.2),
                 new PrepareShooter(shooter, AMP_INIT).withTimeout(1.9 + 0.37)
         );
 
@@ -34,8 +33,7 @@ public class ShootToAmp extends SequentialCommandGroup {
                         shooter.setFlywheelsSpeed(RPM.of(500));
                     },
                     shooter::reset
-            )//,
-            //new AlternatingDots(leds, shooter)
+            )
         ).withTimeout(1.5);
 
         addCommands(
@@ -43,31 +41,4 @@ public class ShootToAmp extends SequentialCommandGroup {
                 release
         );
     }
-//
-//    @Deprecated
-//    private static class DriveForward extends Command {
-//        private final Swerve5990 swerve5990;
-//        private final double translationValue;
-//
-//        public DriveForward(Swerve5990 swerve5990, double translationValue) {
-//            this.swerve5990 = swerve5990;
-//            this.translationValue = translationValue;
-//
-//            addRequirements(swerve5990);
-//        }
-//
-//        @Override
-//        public void execute() {
-//            swerve5990.drive(
-//                    -translationValue,
-//                    0,
-//                    0, true
-//            );
-//        }
-//
-//        @Override
-//        public void end(boolean interrupt) {
-//            swerve5990.stop();
-//        }
-//    }
 }

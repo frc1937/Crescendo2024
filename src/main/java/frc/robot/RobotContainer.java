@@ -8,26 +8,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.Controller;
-import frc.robot.commands.AlignWithAmp;
-import frc.robot.commands.AlignWithTag;
-import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.ShootOnTheMove;
-import frc.robot.commands.ShootToAmp;
-import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.TeleOpDrive;
-import frc.robot.commands.TeleOpRotate;
-import frc.robot.commands.calibration.FlywheelSysIdCharacterization;
-import frc.robot.commands.calibration.GearRatioCharacterization;
-import frc.robot.commands.calibration.MaxDrivetrainSpeedCharacterization;
-import frc.robot.commands.calibration.MaxFlywheelSpeedCharacterization;
-import frc.robot.commands.calibration.PitchSysIdCharacterization;
-import frc.robot.commands.calibration.SysIdCharacterization;
-import frc.robot.commands.calibration.WheelRadiusCharacterization;
-import frc.robot.commands.leds.ColourByShooter;
-import frc.robot.commands.leds.Flashing;
+import frc.robot.commands.*;
+import frc.robot.commands.calibration.*;
 import frc.robot.poseestimation.PhotonCameraSource;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.poseestimation.PoseEstimator6328;
@@ -39,17 +25,8 @@ import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
-import static frc.lib.util.Controller.Axis.LEFT_X;
-import static frc.lib.util.Controller.Axis.LEFT_Y;
-import static frc.lib.util.Controller.Axis.RIGHT_X;
-import static frc.lib.util.Controller.Inputs.A;
-import static frc.lib.util.Controller.Inputs.B;
-import static frc.lib.util.Controller.Inputs.BACK;
-import static frc.lib.util.Controller.Inputs.LEFT_BUMPER;
-import static frc.lib.util.Controller.Inputs.RIGHT_BUMPER;
-import static frc.lib.util.Controller.Inputs.START;
-import static frc.lib.util.Controller.Inputs.X;
-import static frc.lib.util.Controller.Inputs.Y;
+import static frc.lib.util.Controller.Axis.*;
+import static frc.lib.util.Controller.Inputs.*;
 import static frc.lib.util.Controller.Stick.LEFT_STICK;
 import static frc.lib.util.Controller.Stick.RIGHT_STICK;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
@@ -80,17 +57,16 @@ public class RobotContainer {
     private final Trigger opXButton = operatorController.getButton(X);
     /* Subsystems */
     private final PoseEstimator5990 poseEstimator5990;
-
     private final Swerve5990 swerve5990;
-
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final LEDsSubsystem leds = new LEDsSubsystem();
+
+    final LEDsSubsystem leds = new LEDsSubsystem();
+
     /* Commands */
     private final ShooterCommands shooterCommands;
     private final ShooterPhysicsCalculations shooterPhysicsCalculations;
     private final AlignWithTag alignWithTag;
-    private final Flashing flashingLEDs = new Flashing(leds);
 
     /* CONTROLS */
     private final Trigger hasNote = new Trigger(shooterSubsystem::isLoaded);
@@ -121,7 +97,14 @@ public class RobotContainer {
 
 
     private void configureBindings() {
+        leds.setLEDsState(LEDsSubsystem.LEDState.DEFAULT);
+
         hasNote.toggleOnTrue(new InstantCommand(() -> driveController.rumble(10, 2)));
+
+        hasNote.toggleOnTrue(new InstantCommand(() -> leds.setLEDsState(LEDsSubsystem.LEDState.SHOOTER_LOADED)));
+        hasNote.toggleOnFalse(new InstantCommand(() -> leds.setLEDsState(LEDsSubsystem.LEDState.SHOOTER_EMPTY))
+                .andThen(new WaitCommand(5))
+                .andThen(new InstantCommand(() -> leds.setLEDsState(LEDsSubsystem.LEDState.DEFAULT))));
 
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(LEFT_Y);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
@@ -137,20 +120,12 @@ public class RobotContainer {
                 )
         );
 
-        leds.setDefaultCommand(new ColourByShooter(leds, shooterSubsystem));
-
         initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
     }
 
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
-    }
-
-    public void infrequentPeriodic() {
-//        if (RobotController.getBatteryVoltage() < 11.8) {
-//            flashingLEDs.schedule();
-//        }
     }
 
     public void frequentPeriodic() {

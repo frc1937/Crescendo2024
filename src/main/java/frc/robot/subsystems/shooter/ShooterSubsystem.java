@@ -4,13 +4,14 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.units.*;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.math.MeasureUtils;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.lib.math.Conversions.rpmFromTangentialVelocity;
@@ -18,6 +19,7 @@ import static frc.robot.Constants.CanIDConstants.*;
 import static frc.robot.subsystems.shooter.ShooterConstants.*;
 
 public class ShooterSubsystem extends SubsystemBase {
+
     private final DigitalInput beamBreaker = new DigitalInput(0);
     private final WPI_TalonSRX kickerMotor = new WPI_TalonSRX(KICKER_ID);
 
@@ -28,6 +30,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private int consecutiveNoteInsideSamples = 0;
 
     public ShooterSubsystem() {
+
         configureKickerMotor();
     }
 

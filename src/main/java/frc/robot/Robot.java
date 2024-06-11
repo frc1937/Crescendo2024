@@ -5,22 +5,24 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-import static frc.robot.Constants.INFREQUENT_PERIODIC_HERTZ;
+import frc.robot.subsystems.LEDsSubsystem;
 
 public class Robot extends TimedRobot {
     private Command autonomousCommand;
     private CommandScheduler commandScheduler;
     private RobotContainer robotContainer;
 
-    Timer garbageCollectorTimer = new Timer();
+    private final Timer garbageCollectorTimer = new Timer();
+    private final Timer disabledTimer = new Timer();
 
     public Robot() {
-        addPeriodic(() -> robotContainer.infrequentPeriodic(), 1/ INFREQUENT_PERIODIC_HERTZ);
+//        addPeriodic(() -> robotContainer.infrequentPeriodic(), 1/ INFREQUENT_PERIODIC_HERTZ);
         addPeriodic(() -> robotContainer.frequentPeriodic(), 1 / Constants.PERIODIC_FREQUENCY_HERTZ, 0.05);
     }
 
@@ -36,8 +38,12 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         commandScheduler.run();
 
-        if (garbageCollectorTimer.advanceIfElapsed(5)) {
-            System.gc();
+        if (garbageCollectorTimer.advanceIfElapsed(5)) System.gc();
+
+        if (DriverStation.isEnabled()) disabledTimer.reset();
+
+        if (RobotController.getBatteryVoltage() <= 12.8 && disabledTimer.hasElapsed(1.5)) {
+            robotContainer.leds.setLEDsState(LEDsSubsystem.LEDState.BATTERY_LOW);
         }
     }
 
