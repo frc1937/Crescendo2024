@@ -87,20 +87,6 @@ public class ShooterPhysicsCalculations {
     }
 
     /**
-     * We assume the robot isn't moving to get the time of flight
-     *
-     * @return - the time of flight in seconds
-     */
-    public double getTimeOfFlight() {
-        Rotation2d theta = getPitchAnglePhysics();
-
-        double distance = getDistanceToTarget();
-        double speed = tangentialVelocity * theta.getCos();
-
-        return distance / speed;
-    }
-
-    /**
      * Returns the required angle the robot has to rotate to face the target
      *
      * @return - the target azimuth angle
@@ -113,12 +99,26 @@ public class ShooterPhysicsCalculations {
     }
 
     /**
+     * We assume the robot isn't moving to get the time of flight
+     *
+     * @return - the time of flight in seconds
+     */
+    private double getTimeOfFlight() {
+        Rotation2d theta = getPitchAnglePhysics();
+
+        double distance = getDistanceToTarget();
+        double speed = tangentialVelocity * theta.getCos();
+
+        return distance / speed;
+    }
+
+    /**
      * Get the target's offset after taking into account the robot's velocity
      *
      * @param robotVelocity - The robot's current velocity
      * @return - The new pose of the target, after applying the offset
      */
-    public Pose3d getNewTargetFromRobotVelocity(ChassisSpeeds robotVelocity) {
+    private Pose3d getNewTargetFromRobotVelocity(ChassisSpeeds robotVelocity) {
         double timeOfFlight = getTimeOfFlight();
 
         Transform3d targetOffset = new Transform3d(robotVelocity.vxMetersPerSecond * timeOfFlight, robotVelocity.vyMetersPerSecond * timeOfFlight, 0, new Rotation3d());

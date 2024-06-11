@@ -156,25 +156,6 @@ public class Swerve5990 extends SubsystemBase {
         driveSelfRelative(speeds);
     }
 
-    private double determineProfiledSpeedToAngle(Rotation2d targetAngle) {
-        Rotation2d currentAngle = getGyroAzimuth();
-
-        ChassisSpeeds chassisSpeeds = driveController.calculate(
-                new Pose2d(0, 0, currentAngle),
-                new Pose2d(0, 0, targetAngle),
-                0,
-                targetAngle
-        ); //this returns the speeds in radians. Do everything in radians, therefore.
-
-        double omegaSpeedRadiansPerSecond = MathUtil.applyDeadband(chassisSpeeds.omegaRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
-
-        SmartDashboard.putNumber("Omega/Speed RadPerSec Azimuth", omegaSpeedRadiansPerSecond);
-        SmartDashboard.putNumber("Omega/Speed Target Azimuth [DEG]", targetAngle.getDegrees());
-        SmartDashboard.putNumber("Omega/Speed Current Angle [DEG Gyro]", currentAngle.getDegrees());
-
-        return omegaSpeedRadiansPerSecond;
-    }
-
     public boolean azimuthAtGoal() {
         return azimuthAtReferenceCount > 3;
     }
@@ -295,6 +276,25 @@ public class Swerve5990 extends SubsystemBase {
         }
 
         return states;
+    }
+
+    private double determineProfiledSpeedToAngle(Rotation2d targetAngle) {
+        Rotation2d currentAngle = getGyroAzimuth();
+
+        ChassisSpeeds chassisSpeeds = driveController.calculate(
+                new Pose2d(0, 0, currentAngle),
+                new Pose2d(0, 0, targetAngle),
+                0,
+                targetAngle
+        ); //this returns the speeds in radians. Do everything in radians, therefore.
+
+        double omegaSpeedRadiansPerSecond = MathUtil.applyDeadband(chassisSpeeds.omegaRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
+
+        SmartDashboard.putNumber("Omega/Speed RadPerSec Azimuth", omegaSpeedRadiansPerSecond);
+        SmartDashboard.putNumber("Omega/Speed Target Azimuth [DEG]", targetAngle.getDegrees());
+        SmartDashboard.putNumber("Omega/Speed Current Angle [DEG Gyro]", currentAngle.getDegrees());
+
+        return omegaSpeedRadiansPerSecond;
     }
 
     private SwerveModule5990[] getModules() {

@@ -246,7 +246,6 @@ class ButtonTest {
 }
 
 //TODO:
-// * TunableNumber impl
 // * Go over all swerve constants. Also fix the Swerve FF. It's not even in the correct units lmfao.
 // * Get value from NT (Photonvision) instead of classes ,cause it runs faster than periodic.
 //TODO
@@ -256,7 +255,6 @@ class ButtonTest {
 // * Great simulations tutorial. (https://www.chiefdelphi.com/t/frc-6328-mechanical-advantage-2022-build-thread/398645/109?u=wihy)
 //TODO
 // * Get into simulations. seems very interesting.
-// * Wheel radius characterizations seem interesting. look into them
 // * Log Match Time amount - perhaps you could make longer autons! (Latency cause of FMS, might add around 0.3s for each mode.)
 
 //TODO
@@ -272,8 +270,10 @@ class ButtonTest {
 // * ^ Coolest auton managing I've ever seen. Look into implementing something similar. Instead of having rigid routines, have setpoints to get to and performs actions at.
 // * read when bored: https://docs.wpilib.org/en/stable/docs/software/telemetry/index.html might have useful info.
 // * End of MATCH LEDs flashing would be SOOO useful.
-
+// * A better LED system. Please!
 
 // DONE:
+// * Wheel radius characterizations seem interesting. look into them
+// * TunableNumber impl
 // * If battery is low: change LEDs colours.
 // * Follow tag command https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/FollowDemoTag.java

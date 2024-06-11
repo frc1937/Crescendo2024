@@ -54,7 +54,7 @@ public class ShooterCommands {
                     Rotation2d targetAzimuthAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 
                     shooterSubsystem.setReference(new ShooterSubsystem.Reference(targetPitchAngle, tangentialVelocity));
-//                    swerve5990.driveWithTargetAzimuth(0, 0, targetAzimuthAngle);
+                    swerve5990.driveFieldRelative(0, 0, targetAzimuthAngle);
 
                     SmartDashboard.putNumber("shooter/physicsAngle [DEG]", targetPitchAngle.getDegrees());
 
