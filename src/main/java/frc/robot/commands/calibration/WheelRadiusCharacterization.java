@@ -95,6 +95,11 @@ public class WheelRadiusCharacterization extends Command {
     }
 
     @Override
+    public boolean isFinished() {
+        return accumulatedGyroYawRadians > Math.PI * 2;
+    }
+
+    @Override
     public void end(boolean interrupted) {
         if (accumulatedGyroYawRadians <= Math.PI * 2.0) {
             System.out.println("Not enough data for characterization");
