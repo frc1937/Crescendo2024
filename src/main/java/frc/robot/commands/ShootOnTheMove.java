@@ -11,9 +11,6 @@ import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_AZIMUTH_TOLERANCE;
-
 public class ShootOnTheMove extends Command {
     private final ShooterSubsystem shooterSubsystem;
     private final ShooterCommands shooterCommands;
@@ -59,7 +56,7 @@ public class ShootOnTheMove extends Command {
 
     @Override
     public boolean isFinished() {
-        return swerve5990.azimuthAtGoal(Radians.of(SWERVE_AZIMUTH_TOLERANCE)) && shooterSubsystem.atReference();
+        return swerve5990.azimuthAtGoal() && shooterSubsystem.atReference();
     }
 
     private void shootNote(double tangentialVelocity) {

@@ -1,19 +1,23 @@
 package frc.robot;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Random;
+
 import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
 
 class ButtonTest {
-    private  double shooterLength = 2;
+    private double shooterLength = 2;
 
-    @Test
-    void testButton() {
-        DriverStation.silenceJoystickConnectionWarning(true);
-//
+    private void notWorkingMethod() {
 //        double rpm = Conversions.RPMFromTangentialVelocity(MetersPerSecond.of(2), Inches.of(4));
 //
 //        System.out.println(rpm);
@@ -24,13 +28,116 @@ class ButtonTest {
 //            TAG_ID_TO_POSE.put(aprilTag.ID, aprilTag.pose);
 //
 //
-////        for (AprilTagFieldLayout.TagPosition tagPosition : AprilTagFieldLayout()) {
-//        System.out.println("Y:" + TAG_ID_TO_POSE.get(7).getY()); //Y:5.547867999999999
-//        System.out.println("X:" + TAG_ID_TO_POSE.get(7).getX()); //X:-0.038099999999999995
-////        }
+//        for (AprilTagFieldLayout.TagPosition tagPosition : AprilTagFieldLayout()) {
+//            System.out.println("Y:" + TAG_ID_TO_POSE.get(7).getY()); //Y:5.547867999999999
+//            System.out.println("X:" + TAG_ID_TO_POSE.get(7).getX()); //X:-0.038099999999999995
+//        }
 //
-//        //Testing noteExitPos
+    }
 
+    @Test
+    void testButton() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
+        Random random = new Random();
+        TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
+
+        for (int i = 0; i < 100; i++) {
+            setpoint = testTrapezoidalPIDController((int) Math.pow(i, 2), setpoint);//* random.nextInt(10));
+        }
+    }
+
+    private void testProfiledPIDController(int additionToCurrentAngle) {
+        final ProfiledPIDController profiledPIDController = new ProfiledPIDController(1, 0, 0,
+                new TrapezoidProfile.Constraints(1, 1));
+
+        Rotation2d currentAngle = Rotation2d.fromDegrees(20 + additionToCurrentAngle);
+        Rotation2d targetAngle = Rotation2d.fromDegrees(70);
+
+        profiledPIDController.reset(currentAngle.getRadians());
+        profiledPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
+        double radsPerSec = profiledPIDController.calculate(currentAngle.getRadians(), targetAngle.getRadians());
+
+        System.out.println("RadsPerSec: " + radsPerSec);
+    }
+
+    private void testPIDController(int doubleToAddToCurrent) {
+        PIDController controller = new PIDController(1, 0, 0);
+
+        controller.enableContinuousInput(-180, 180);
+
+        Rotation2d currentAngle = Rotation2d.fromDegrees(20 + doubleToAddToCurrent);
+        Rotation2d targetAngle = Rotation2d.fromDegrees(70);
+
+        double degreesPerSecond = toNDecimals(controller.calculate(currentAngle.getDegrees(), targetAngle.getDegrees()), 4);
+        double radiansPerSecond = toNDecimals(controller.calculate(currentAngle.getRadians(), targetAngle.getRadians()), 4);
+        double distanceFromSetpoint = targetAngle.minus(currentAngle).getDegrees();
+
+        System.out.println("NEW - POINT!");
+        System.out.println("Distance from setpoint [DEGS]: " + distanceFromSetpoint);
+        System.out.println("DegreesPerSecond [DEGS P S]: " + degreesPerSecond);
+        System.out.println("RadiansPerSecond [RADS P S]: " + radiansPerSecond);
+
+        System.out.println("(" + Math.round(distanceFromSetpoint) + ", " + Math.round(degreesPerSecond) + ")");
+    }
+
+    private double toNDecimals(double input, int n) {
+        return Math.floor(input * Math.pow(10, n)) / Math.pow(10, n);
+    }
+
+    private TrapezoidProfile.State testTrapezoidalPIDController(int additionToCurrentAngle, TrapezoidProfile.State setpoint) {
+        final PIDController controller = new PIDController(1, 0, 0);
+
+        final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.5, 1);
+        final TrapezoidProfile.State goal = new TrapezoidProfile.State(50, 0);
+
+        TrapezoidProfile profile = new TrapezoidProfile(constraints);
+
+        setpoint = profile.calculate(0.02, setpoint, goal);
+
+//        System.out.println("Setpoint loc: " + setpoint.position);
+//        System.out.println("Erm, what the result? " + controller.calculate(additionToCurrentAngle, setpoint.position));
+
+        System.out.println("(" + additionToCurrentAngle + ", " + controller.calculate(additionToCurrentAngle, setpoint.position)+ ")");
+
+        return setpoint;
+    }
+
+    private void testHolonomicProfiledPIDController(int doubleToAddToCurrent) {
+        final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.5, 1);
+
+        final HolonomicDriveController driveController =
+                new HolonomicDriveController(
+                        new PIDController(0, 0, 0),
+                        new PIDController(0, 0, 0),
+                        new ProfiledPIDController(50000, 0, 0, constraints)
+                );
+
+        driveController.getThetaController().enableContinuousInput(-180, 180);
+        driveController.setTolerance(new Pose2d(0.2, 0.2, Rotation2d.fromDegrees(1.2)));
+
+        Rotation2d currentAngle = Rotation2d.fromDegrees(20 + doubleToAddToCurrent);
+        Rotation2d targetAngle = Rotation2d.fromDegrees(70);
+
+        ChassisSpeeds chassisSpeeds = driveController.calculate(
+                new Pose2d(0, 0, currentAngle),
+                new Pose2d(0, 0, targetAngle),
+                0,
+                targetAngle
+        );
+
+        double omegaRads = Math.round(chassisSpeeds.omegaRadiansPerSecond);
+        double difference = Math.round((targetAngle.minus(currentAngle).getDegrees()));
+
+//        System.out.println("Another iteration of PID");
+//        System.out.println("Current angle: " + currentAngle.getDegrees() + ", Target angle: " + targetAngle.getDegrees() +
+//                ", Difference: " + difference);
+//        System.out.println("Omega rads: " + omegaRads);
+        System.out.println("(" + difference + ", " + omegaRads + ")");
+    }
+
+    private void testWhetherTheShooterThingWorks() {
         int[] testValuesYaw = {0, 90, 180, 270};
         int[] testValuesPitch = {0, 20, 40, 90};
 
@@ -54,7 +161,7 @@ class ButtonTest {
             }
         }
 
-        System.out.println("The max speed of swerve calculated: " +  MAX_SPEED_MPS);
+        System.out.println("The max speed of swerve calculated: " + MAX_SPEED_MPS);
     }
 
     private void printPose3dNicely(Pose3d pose, String name) {

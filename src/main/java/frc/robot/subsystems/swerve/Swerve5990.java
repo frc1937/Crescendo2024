@@ -3,47 +3,31 @@ package frc.robot.subsystems.swerve;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.TunableNumber;
 import frc.robot.poseestimation.PoseEstimator5990;
 
 import java.util.stream.IntStream;
 
-import static edu.wpi.first.units.Units.Degree;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
-import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.*;
 import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_DEADBAND;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_P;
-import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_MAX_VELOCITY;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 import static frc.robot.subsystems.swerve.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
-import static frc.robot.subsystems.swerve.SwerveConstants.INVERT_GYRO;
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module0;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module1;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module2;
-import static frc.robot.subsystems.swerve.SwerveConstants.Module3;
-import static frc.robot.subsystems.swerve.SwerveConstants.NUMBER_OF_MODULES;
-import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -51,13 +35,15 @@ public class Swerve5990 extends SubsystemBase {
     private final PoseEstimator5990 poseEstimator5990;
     private final SwerveModule5990[] modules;
 
-    //    private final ProfiledPIDController azimuthController = new ProfiledPIDController(
-//            AZIMUTH_CONTROLLER_P.get(), 0, 0,
-//            new TrapezoidProfile.Constraints(AZIMUTH_MAX_VELOCITY.get(), AZIMUTH_MAX_ACCELERATION.get())
-//    );
-    private final PIDController azimuthController = new PIDController(AZIMUTH_CONTROLLER_P.get(), 0, 0);
+    private final HolonomicDriveController driveController =
+            new HolonomicDriveController(
+                    new PIDController(TRANSLATION_CONTROLLER_P, 0, 0),
+                    new PIDController(TRANSLATION_CONTROLLER_P, 0, 0),
+                    new ProfiledPIDController(AZIMUTH_CONTROLLER_P.get(), 0, 0,
+                            new TrapezoidProfile.Constraints(AZIMUTH_MAX_VELOCITY.get(), AZIMUTH_MAX_ACCELERATION.get()))
+            );
 
-    private final TunableNumber targetAzimuthAngle = new TunableNumber("targetAngle", 90);
+    private int azimuthAtReferenceCount = 0;
 
     private final StructArrayPublisher<SwerveModuleState> currentStates = NetworkTableInstance.getDefault().getStructArrayTopic("CurrentStates", SwerveModuleState.struct).publish();
     private final StructArrayPublisher<SwerveModuleState> targetStates = NetworkTableInstance.getDefault().getStructArrayTopic("TargetStates", SwerveModuleState.struct).publish();
@@ -71,14 +57,18 @@ public class Swerve5990 extends SubsystemBase {
 
         modules = getModules();
 
-        setupAzimuthController();
+        driveController.setTolerance(new Pose2d(0.2, 0.2, Rotation2d.fromDegrees(AZIMUTH_CONTROLLER_TOLERANCE_DEG.get())));
+        driveController.getThetaController().reset(getGyroAzimuth().getDegrees());
+
         configurePathPlanner();
     }
 
     @Override
     public void periodic() {
-        azimuthController.setP(AZIMUTH_CONTROLLER_P.get());
-//        azimuthController.setConstraints(new TrapezoidProfile.Constraints(AZIMUTH_MAX_VELOCITY.get(), AZIMUTH_MAX_ACCELERATION.get()));
+        driveController.setTolerance(new Pose2d(0.2, 0.2, Rotation2d.fromDegrees(AZIMUTH_CONTROLLER_TOLERANCE_DEG.get())));
+
+        if (driveController.atReference()) azimuthAtReferenceCount++;
+        else azimuthAtReferenceCount = 0;
 
         //logging data n shit
         currentStates.set(getModuleStates());
@@ -122,7 +112,6 @@ public class Swerve5990 extends SubsystemBase {
                 interrupt -> {
                 },
                 () -> false,
-
                 this
         ).withTimeout(0.3);
 
@@ -152,17 +141,6 @@ public class Swerve5990 extends SubsystemBase {
         return new SwerveDriveWheelPositions(positions);
     }
 
-    private void setupAzimuthController() {
-//        azimuthController.reset(poseEstimator5990.getCurrentPose().getBluePose().getRotation().getDegrees());
-
-        azimuthController.setTolerance(0.01);
-        azimuthController.enableContinuousInput(0, 360);
-    }
-
-    public boolean azimuthAtGoal(Measure<Angle> tolerance) {
-        return Math.abs(azimuthController.getPositionError()) < tolerance.in(Degree);
-    }
-
     /**
      * Drive the robot according to the given inputs.
      *
@@ -190,23 +168,37 @@ public class Swerve5990 extends SubsystemBase {
         driveSelfRelative(selfRelativeSpeeds);
     }
 
+    public void driveToPose(Pose2d targetPose) {
+        ChassisSpeeds speeds = driveController.calculate(poseEstimator5990.getCurrentPose().getBluePose(),
+                targetPose, 0.3,
+                targetPose.getRotation());
+
+        driveSelfRelative(speeds);
+    }
+
     private double determineProfiledSpeedToAngle(Rotation2d targetAngle) {
-        double currentAngle = getGyroAzimuth().getDegrees();
-        // poseEstimator5990.getCurrentPose().getBluePose().getRotation().getDegrees();
-        double omegaSpeedRadiansPerSecond = //DegreesPerSecond.of(
-                azimuthController.calculate(
-                        currentAngle,
-                        targetAzimuthAngle.get()
-                );//).in(RadiansPerSecond);
+        Rotation2d currentAngle = getGyroAzimuth();
+
+        ChassisSpeeds chassisSpeeds = this.driveController.calculate(
+                new Pose2d(0, 0, currentAngle),
+                new Pose2d(0, 0, targetAngle),
+                0,
+                targetAngle
+        );
+
+        double omegaSpeedRadiansPerSecond = chassisSpeeds.omegaRadiansPerSecond;
 
         omegaSpeedRadiansPerSecond = MathUtil.applyDeadband(omegaSpeedRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
 
-        SmartDashboard.putNumber("Omega Speed RadPerSec Azimuth", omegaSpeedRadiansPerSecond);
-        SmartDashboard.putNumber("Omega Speed Target Azimuth [DEG]", targetAngle.getDegrees());
-        SmartDashboard.putNumber("Omega Speed Current Angle [DEG PoseEstimator]", currentAngle);
-        SmartDashboard.putNumber("Omega Speed Currnet Angle [DEG Gyro]", getGyroAzimuth().getDegrees());
+        SmartDashboard.putNumber("Omega/Speed RadPerSec Azimuth", omegaSpeedRadiansPerSecond);
+        SmartDashboard.putNumber("Omega/Speed Target Azimuth [DEG]", targetAngle.getDegrees());
+        SmartDashboard.putNumber("Omega/Speed Current Angle [DEG Gyro]", currentAngle.getDegrees());
 
         return omegaSpeedRadiansPerSecond;
+    }
+
+    public boolean azimuthAtGoal() {
+        return azimuthAtReferenceCount > 3;
     }
 
     public void driveFieldRelative(double xPower, double yPower, double thetaPower) {

@@ -34,9 +34,7 @@ public class AlignWithTag extends SequentialCommandGroup {
     public Command driveToTag(int id) {
         return new FunctionalCommand(
                 () -> {},
-                () -> {
-//                    swerve5990.pidToPose(getTransformedTagPose(id))
-                },
+                () -> swerve5990.driveToPose(getTransformedTagPose(id)),
                 (interrupt) -> {},
                 () -> false,
 

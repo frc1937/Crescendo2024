@@ -10,29 +10,23 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.TunableNumber;
 
 public class SwerveConstants {
-    public static final double AZIMUTH_CONTROLLER_TOLERANCE = Units.degreesToRadians(1.85);
-    public static final double SWERVE_AZIMUTH_TOLERANCE = 1;
-
     static final int NUMBER_OF_MODULES = 4;
 
-    static final TunableNumber AZIMUTH_CONTROLLER_P = new TunableNumber("Swerve Yaw (Azimuth) kP", 0.05),
-                AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve Yaw (Azimuth) Max Velocity", 1.5),
-                AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve Yaw (Azimuth) Max Acceleration", 1);
+    static final TunableNumber AZIMUTH_CONTROLLER_P = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 0.05),
+            AZIMUTH_CONTROLLER_TOLERANCE_DEG = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Tolerance", 1),
+            AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Velocity", 1.5),
+            AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Acceleration", 1);
 
 
     static final double
             AZIMUTH_CONTROLLER_I = 0,
             AZIMUTH_CONTROLLER_D = 0,
             AZIMUTH_CONTROLLER_DEADBAND = 0.1,
-
             TRANSLATION_CONTROLLER_P = 1.366,
-
             TRANSLATION_MAX_VELOCITY = 2.7,
             TRANSLATION_MAX_ACCELERATION = 3;
 
@@ -66,7 +60,6 @@ public class SwerveConstants {
 
     /* Angle Encoder Invert */
     static final SensorDirectionValue CAN_CODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;// CHOSEN_MODULE.canCoderInvert;
-    //TODO XXX WARNING: Check if CounterClockwise is IN FACT the equivalent of false!!!
 
     /* SwerveSubsystem Current Limiting */
     static final int ANGLE_CURRENT_LIMIT = 30;
@@ -85,7 +78,7 @@ public class SwerveConstants {
     static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    static final TunableNumber ANGLE_KP = new TunableNumber("Swerve angle kP", 2.5);
+    static final TunableNumber ANGLE_KP = new TunableNumber("Swerve/Angle MOTOR(Azimuth of WHEEL) kP", 2.5);
     static final double ANGLE_KI = 0;
     static final double ANGLE_KD = 0;
 
@@ -98,13 +91,8 @@ public class SwerveConstants {
     /* Drive Motor Characterization Values */
     // Convert the values calculated by SysId from volts to [-1, 1], which TalonFX uses.
     DRIVE_KS = 0.27053 / 12.d,
-    DRIVE_KV = 0.10861 / 12.d,
-    DRIVE_KA = 0.023132 / 12.d;
-
-    /**
-     * Radians per Second
-     */
-    static final double MAX_ANGULAR_VELOCITY = 9.2;  //TODO: Get this from SYSID. idk how we got this value lmfao
+            DRIVE_KV = 0.10861 / 12.d,
+            DRIVE_KA = 0.023132 / 12.d;
 
     /**
      * Meters per Second
@@ -157,12 +145,6 @@ public class SwerveConstants {
         static final SwerveModuleConstants CONSTANTS =
                 new SwerveModuleConstants(3, DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ROTATIONS_OFFSET);
     }
-
-    static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
-    static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI * Math.PI;
-
-    static final TrapezoidProfile.Constraints AZIMUTH_CONTROLLER_CONSTRAINTS =
-            new TrapezoidProfile.Constraints(1, 2);
 
     /**
      * We avoid steering the swerve wheels below a certain driving speed, for in-place turning
