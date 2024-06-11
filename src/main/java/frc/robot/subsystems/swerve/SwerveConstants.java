@@ -16,11 +16,10 @@ import frc.lib.util.TunableNumber;
 public class SwerveConstants {
     static final int NUMBER_OF_MODULES = 4;
 
-    static final TunableNumber AZIMUTH_CONTROLLER_P = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 0.05),
+    static final TunableNumber AZIMUTH_CONTROLLER_KP = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 0.05),
             AZIMUTH_CONTROLLER_TOLERANCE_DEG = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Tolerance", 1),
-            AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Velocity", 1.5),
-            AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Acceleration", 1);
-
+            AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Velocity [DEG PS]", 2 * Math.PI),
+            AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Acceleration [DEG PS]", 2 * Math.PI);
 
     static final double
             AZIMUTH_CONTROLLER_I = 0,
@@ -156,7 +155,7 @@ public class SwerveConstants {
     public static final class AutoConstants {
         static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                 new PIDConstants(TRANSLATION_CONTROLLER_P, 0.0, 0.0), // Translation PID constants
-                new PIDConstants(AZIMUTH_CONTROLLER_P.get(), AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
+                new PIDConstants(AZIMUTH_CONTROLLER_KP.get(), AZIMUTH_CONTROLLER_I, AZIMUTH_CONTROLLER_D), // Rotation PID constants
                 MAX_SPEED_MPS,
                 DRIVE_BASE_RADIUS,
                 new ReplanningConfig(true, true));

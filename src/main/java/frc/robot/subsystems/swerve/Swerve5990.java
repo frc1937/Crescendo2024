@@ -39,7 +39,7 @@ public class Swerve5990 extends SubsystemBase {
             new HolonomicDriveController(
                     new PIDController(TRANSLATION_CONTROLLER_P, 0, 0),
                     new PIDController(TRANSLATION_CONTROLLER_P, 0, 0),
-                    new ProfiledPIDController(AZIMUTH_CONTROLLER_P.get(), 0, 0,
+                    new ProfiledPIDController(AZIMUTH_CONTROLLER_KP.get(), 0, 0,
                             new TrapezoidProfile.Constraints(AZIMUTH_MAX_VELOCITY.get(), AZIMUTH_MAX_ACCELERATION.get()))
             );
 
@@ -58,15 +58,18 @@ public class Swerve5990 extends SubsystemBase {
         modules = getModules();
 
         driveController.setTolerance(new Pose2d(0.2, 0.2, Rotation2d.fromDegrees(AZIMUTH_CONTROLLER_TOLERANCE_DEG.get())));
-        driveController.getThetaController().reset(getGyroAzimuth().getDegrees());
 
+        initializeAzimuthController();
         configurePathPlanner();
+    }
+
+    private void initializeAzimuthController() {
+        driveController.getThetaController().reset(getGyroAzimuth().getRadians());
+        driveController.getThetaController().enableContinuousInput(-Math.PI, Math.PI);
     }
 
     @Override
     public void periodic() {
-        driveController.setTolerance(new Pose2d(0.2, 0.2, Rotation2d.fromDegrees(AZIMUTH_CONTROLLER_TOLERANCE_DEG.get())));
-
         if (driveController.atReference()) azimuthAtReferenceCount++;
         else azimuthAtReferenceCount = 0;
 
@@ -93,29 +96,6 @@ public class Swerve5990 extends SubsystemBase {
 
     public void setHeading(Rotation2d heading) {
         gyro.setYaw(heading.getDegrees());
-    }
-
-    public void lockSwerve() {
-        final SwerveModuleState
-                right = new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-                left = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-
-        ParallelRaceGroup functionalCommand = new FunctionalCommand(
-                () -> {
-                },
-                () -> {
-                    modules[0].setTargetState(left, false);
-                    modules[1].setTargetState(right, false);
-                    modules[2].setTargetState(right, false);
-                    modules[3].setTargetState(left, false);
-                },
-                interrupt -> {
-                },
-                () -> false,
-                this
-        ).withTimeout(0.3);
-
-        functionalCommand.schedule();
     }
 
     public Rotation2d getGyroAzimuth() {
@@ -179,16 +159,14 @@ public class Swerve5990 extends SubsystemBase {
     private double determineProfiledSpeedToAngle(Rotation2d targetAngle) {
         Rotation2d currentAngle = getGyroAzimuth();
 
-        ChassisSpeeds chassisSpeeds = this.driveController.calculate(
+        ChassisSpeeds chassisSpeeds = driveController.calculate(
                 new Pose2d(0, 0, currentAngle),
                 new Pose2d(0, 0, targetAngle),
                 0,
                 targetAngle
-        );
+        ); //this returns the speeds in radians. Do everything in radians, therefore.
 
-        double omegaSpeedRadiansPerSecond = chassisSpeeds.omegaRadiansPerSecond;
-
-        omegaSpeedRadiansPerSecond = MathUtil.applyDeadband(omegaSpeedRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
+        double omegaSpeedRadiansPerSecond = MathUtil.applyDeadband(chassisSpeeds.omegaRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
 
         SmartDashboard.putNumber("Omega/Speed RadPerSec Azimuth", omegaSpeedRadiansPerSecond);
         SmartDashboard.putNumber("Omega/Speed Target Azimuth [DEG]", targetAngle.getDegrees());
@@ -252,6 +230,29 @@ public class Swerve5990 extends SubsystemBase {
         for (SwerveModule5990 mod : modules) {
             mod.setTargetState(swerveModuleStates[mod.swerveModuleConstants.moduleNumber()], false);
         }
+    }
+
+    public void lockSwerve() {
+        final SwerveModuleState
+                right = new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+                left = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+
+        ParallelRaceGroup functionalCommand = new FunctionalCommand(
+                () -> {
+                },
+                () -> {
+                    modules[0].setTargetState(left, false);
+                    modules[1].setTargetState(right, false);
+                    modules[2].setTargetState(right, false);
+                    modules[3].setTargetState(left, false);
+                },
+                interrupt -> {
+                },
+                () -> false,
+                this
+        ).withTimeout(0.3);
+
+        functionalCommand.schedule();
     }
 
     private ChassisSpeeds powersToSpeeds(double xPower, double yPower, double thetaPower) {
