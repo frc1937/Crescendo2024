@@ -150,7 +150,7 @@ public class ShooterPhysicsCalculations {
 
         Pose3d shooterEndPose = new Pose3d().transformBy(robotToPivot).plus(pivotToShooterEnd);
         Transform3d robotToShooterEnd = shooterEndPose.minus(new Pose3d());
-
+//todo: make this just do
         return robotPose3d.transformBy(robotToShooterEnd);
     }
 }

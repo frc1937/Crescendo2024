@@ -1,6 +1,12 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -33,55 +39,87 @@ public class AlignWithTag extends SequentialCommandGroup {
 
     public Command driveToTag(int id) {
         return new FunctionalCommand(
-                () -> {},
-                () -> swerve5990.driveToPose(getTransformedTagPose(id)),
-                (interrupt) -> {},
+                () -> {
+                },
+                () ->
+                        swerve5990.driveFieldRelative(0, 0,
+                                swerve5990.getGyroAzimuth().plus(getTransformedTagPose(id))),
+                interrupt -> {
+                },
                 () -> false,
 
                 swerve5990
         );
     }
 
-    public Pose2d getTransformedTagPose(int id) {
+    public Rotation2d getTransformedTagPose(int id) {
         Pose2d robotPose = poseEstimator5990.getCurrentPose().getBluePose();
         Optional<Pose3d> tagPose = getTagPose(robotPose, id);
 
         if (tagPose.isEmpty()) {
-            return robotPose;
+            return robotPose.getRotation();
         }
+
+        Translation2d robotTranslation = robotPose.getTranslation();
+        Translation2d differenceInXY = tagPose.get().toPose2d().getTranslation().minus(robotTranslation);
+
+        SmartDashboard.putNumber("NIG/robotTranslation", robotTranslation.getNorm());
+        SmartDashboard.putNumber("NIG/tagTranslation", tagPose.get().toPose2d().getTranslation().getNorm());
+        SmartDashboard.putNumber("NIG/differenceXY", differenceInXY.getNorm());
+
+        SmartDashboard.putNumber("NIG/atan of diff", Math.atan2(Math.abs(differenceInXY.getY()), Math.abs(differenceInXY.getX())));
+
+        SmartDashboard.putNumber("X difference: ", differenceInXY.getX());
+        SmartDashboard.putNumber("Y difference; ", differenceInXY.getY());
+
+        Rotation2d desiredAnge = Rotation2d.fromRadians(Math.atan2(
+                differenceInXY.getY(),
+                -differenceInXY.getX()));
+
+//        while (desiredAnge.getDegrees() < 0) {
+//            desiredAnge.plus(Rotation2d.fromDegrees(360));
+//        }
+
+        SmartDashboard.putNumber("NIG/Desired angle (From robot): ", desiredAnge.getDegrees());
+        SmartDashboard.putNumber("NIG/Current angle (Of robot):", robotPose.getRotation().getDegrees());
+
+        return desiredAnge;
 
         // Determine tag rotation
-        double maxZ = 0.0;
-        int maxIndex = 0;
-        int index = 0;
+//        double maxZ = 0.0;
+//        int maxIndex = 0;
+//        int index = 0;
+//
+//        for (var translation : new Translation3d[]{upTranslation, leftTranslation, downTranslation, rightTranslation}) {
+//            double z = tagPose
+//                            .get()
+//                            .transformBy(new Transform3d(translation, new Rotation3d()))
+//                            .getZ();
+//
+//            if (z > maxZ) {
+//                maxZ = z;
+//                maxIndex = index;
+//            }
+//
+//            index++;
+//        }
 
-        for (var translation : new Translation3d[]{upTranslation, leftTranslation, downTranslation, rightTranslation}) {
-            double z = tagPose
-                            .get()
-                            .transformBy(new Transform3d(translation, new Rotation3d()))
-                            .getZ();
-
-            if (z > maxZ) {
-                maxZ = z;
-                maxIndex = index;
-            }
-
-            index++;
-        }
-
-        Rotation2d robotRotation = new Rotation2d(Math.PI + Math.PI / 2.0 * maxIndex);
-
-        // Calculate robot pose
-        return tagPose
-                .get()
-                .toPose2d()
-                .transformBy(new Transform2d(new Translation2d(targetDistance, 0.0), robotRotation));
+//        Rotation2d robotRotation = new Rotation2d(Math.PI + Math.PI / 2.0 * maxIndex);
+//
+//        SmartDashboard.putNumber("Get tag rotation in deg from robo: ", tagPose.get().toPose2d().getRotation().getDegrees());
+//
+//         Calculate robot pose
+//        return new Pose2d(0, 0, tagPose.get().toPose2d().getRotation());
+//        return tagPose
+//                .get()
+//                .toPose2d()
+//                .transformBy(new Transform2d(new Translation2d(targetDistance, 0.0), robotRotation));
     }
 
     public Optional<Pose3d> getTagPose(Pose2d robotPose, int id) {
         PhotonTrackedTarget target = photonCameraSource.getTags();
 
-        if (target.getFiducialId() != id) {
+        if (target == null || target.getFiducialId() != id) {
             return Optional.empty();
         }
 

@@ -12,6 +12,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+//todo: Physics using the pivot
+//todo: make code nice - (add characterization for everything - including max azimuth speed)
+//todo: wheel radius characterization do 10 rots instead of 1 - also fix it
+
+// TODO new akit template - generic, anything that can be in a library should be in a library
+// TODO generic motor class
+// TODO generic get to setpoint (POS/VEL)
+
+
 import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
 
 class ButtonTest {

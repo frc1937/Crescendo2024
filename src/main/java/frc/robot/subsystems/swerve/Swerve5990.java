@@ -2,14 +2,17 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -21,13 +24,27 @@ import frc.robot.poseestimation.PoseEstimator5990;
 
 import java.util.stream.IntStream;
 
-import static frc.lib.util.AlliancePose2d.AllianceUtils.*;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.getCorrectRotation;
+import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
 import static frc.robot.Constants.CanIDConstants.PIGEON_ID;
 import static frc.robot.Constants.DRIVE_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.ROTATION_NEUTRAL_DEADBAND;
 import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_CONTROLLER_TOLERANCE_DEG;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_MAX_ACCELERATION;
+import static frc.robot.subsystems.swerve.SwerveConstants.AZIMUTH_MAX_VELOCITY;
 import static frc.robot.subsystems.swerve.SwerveConstants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG;
+import static frc.robot.subsystems.swerve.SwerveConstants.INVERT_GYRO;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module0;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module1;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module2;
+import static frc.robot.subsystems.swerve.SwerveConstants.Module3;
+import static frc.robot.subsystems.swerve.SwerveConstants.NUMBER_OF_MODULES;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
+import static frc.robot.subsystems.swerve.SwerveConstants.TRANSLATION_CONTROLLER_P;
 
 public class Swerve5990 extends SubsystemBase {
     private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(PIGEON_ID);
@@ -99,7 +116,14 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     public Rotation2d getGyroAzimuth() {
-        return INVERT_GYRO ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        //Ensure gyro is always -180 to 180
+        double currentYaw = gyro.getYaw();
+
+        if (currentYaw < 0) {
+            currentYaw += 360;
+        }
+
+        return INVERT_GYRO ? Rotation2d.fromDegrees(360 - currentYaw) : Rotation2d.fromDegrees(currentYaw);
     }
 
     public void stop() {
@@ -179,7 +203,7 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     /**
-     * Get the position of all drive wheels in meters.
+     * Get the position of all drive wheels in radians.
      */
     public double[] getWheelPositions() {
         return IntStream.range(0, NUMBER_OF_MODULES).mapToDouble(i -> modules[i].getWheelDistanceTraveledRadians()).toArray();
@@ -288,10 +312,15 @@ public class Swerve5990 extends SubsystemBase {
                 targetAngle
         ); //this returns the speeds in radians. Do everything in radians, therefore.
 
-        double omegaSpeedRadiansPerSecond = MathUtil.applyDeadband(chassisSpeeds.omegaRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
+        double omegaSpeedRadiansPerSecond = chassisSpeeds.omegaRadiansPerSecond;//MathUtil.applyDeadband(chassisSpeeds.omegaRadiansPerSecond, AZIMUTH_CONTROLLER_DEADBAND);
+
+        SmartDashboard.putNumber("Omega/Speed No deadband: ", chassisSpeeds.omegaRadiansPerSecond);
 
         SmartDashboard.putNumber("Omega/Speed RadPerSec Azimuth", omegaSpeedRadiansPerSecond);
         SmartDashboard.putNumber("Omega/Speed Target Azimuth [DEG]", targetAngle.getDegrees());
+
+        if (currentAngle.getDegrees() < 0) currentAngle.plus(Rotation2d.fromDegrees(360));
+
         SmartDashboard.putNumber("Omega/Speed Current Angle [DEG Gyro]", currentAngle.getDegrees());
 
         return omegaSpeedRadiansPerSecond;

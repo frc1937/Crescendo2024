@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         commandScheduler.run();
 
-        if (garbageCollectorTimer.advanceIfElapsed(5)) System.gc();
+        if(garbageCollectorTimer.advanceIfElapsed(15)) System.gc();
 
         if (DriverStation.isEnabled()) disabledTimer.reset();
 

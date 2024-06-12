@@ -22,7 +22,7 @@ public class ShootToAmp extends SequentialCommandGroup {
      */
     public ShootToAmp(ShooterSubsystem shooter, Swerve5990 swerve5990, LEDsSubsystem leds) {
         Command prepare = new ParallelCommandGroup(
-                new TeleOpDrive(swerve5990, () -> 0.3, () -> 0, () -> 0, () -> true).withTimeout(0.2),
+                new TeleOpDrive(swerve5990, () -> 0, () -> 0, () -> 0, () -> true).withTimeout(0.2),
                 new PrepareShooter(shooter, AMP_INIT).withTimeout(1.9 + 0.37)
         );
 

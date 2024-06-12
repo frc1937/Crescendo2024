@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_BASE_RADIUS;
 
 public class WheelRadiusCharacterization extends Command {
-    private final TunableNumber characterizationSpeed = new TunableNumber("Omega Speed Wheel Characterization ", 0.6);
+    private final TunableNumber wheelsSpeed = new TunableNumber("Characterisation/Wheels/Radius/Wheel Velocity [rad/s]", 0.6);
     private final DoubleSupplier gyroYawRadsSupplier;
 
     public enum Direction {
@@ -46,7 +46,7 @@ public class WheelRadiusCharacterization extends Command {
         this.swerve5990 = swerve5990;
         this.omegaDirection = omegaDirection;
 
-        gyroYawRadsSupplier = () -> swerve5990.getGyroAzimuth().getRadians();
+        gyroYawRadsSupplier = swerve5990.getGyroAzimuth()::getRadians;
 
         addRequirements(swerve5990);
     }
@@ -64,7 +64,7 @@ public class WheelRadiusCharacterization extends Command {
 
     @Override
     public void execute() {
-        double characterizationSpeedValue = characterizationSpeed.get();
+        double characterizationSpeedValue = wheelsSpeed.get();
         double omegaSpeed = omegaLimiter.calculate(omegaDirection.getValue() * characterizationSpeedValue);
 
         swerve5990.drive(0, 0, omegaSpeed, false);

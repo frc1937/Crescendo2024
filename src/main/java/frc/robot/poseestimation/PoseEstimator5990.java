@@ -73,7 +73,7 @@ public class PoseEstimator5990 implements AutoCloseable {
     }
 
     public void periodic() {
-        updateFromVision();
+        //updateFromVision();
 
         robotPose = fromBluePose(swerveDrivePoseEstimator.getEstimatedPose());
         field.setRobotPose(getCurrentPose().getBluePose());

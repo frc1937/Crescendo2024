@@ -97,7 +97,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        leds.setLEDsState(LEDsSubsystem.LEDState.DEFAULT);
+        leds.setLEDsState(LEDsSubsystem.LEDState.SHOOTER_EMPTY);
 
         hasNote.toggleOnTrue(new InstantCommand(() -> driveController.rumble(10, 2)));
 

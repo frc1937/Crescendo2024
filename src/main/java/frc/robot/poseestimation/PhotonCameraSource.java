@@ -71,7 +71,10 @@ public class PhotonCameraSource {
     }
 
     public PhotonTrackedTarget getTags() {
-        return photonCamera.getLatestResult().getBestTarget();
+        if(photonCamera.getLatestResult().hasTargets() && photonCamera.getLatestResult() != null && photonCamera.getLatestResult().getBestTarget() != null)
+            return photonCamera.getLatestResult().getBestTarget();
+
+        return null;
     }
 
     public String getName() {
