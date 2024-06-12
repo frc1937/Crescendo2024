@@ -66,7 +66,7 @@ public class LEDsSubsystem extends SubsystemBase {
         }
     }
 
-    //Switches between 2 colours quickly.
+    //Switches between colours quickly.
     private void setBufferToFlashing(Color8Bit... colours) {
         if (counter % 35 == 0) //Make sure there's a delay between colour switching
             setBufferToWholeColour(colours[previousColour++]);
@@ -87,9 +87,10 @@ public class LEDsSubsystem extends SubsystemBase {
         setBufferToWholeColour(new Color8Bit((int) red, (int) green, (int) blue));
     }
 
+    //todo: make this support infinite colours
     private void setBufferToCircling(Color8Bit c1, Color8Bit c2) {
         int halfLength = LEDS_COUNT / 2;
-        //todo: make this support infinite colours
+
         int c1_start = wrapIndex((int) (Timer.getFPGATimestamp() * 46 % LEDS_COUNT));
         int c1_end = c1_start + (halfLength - 1);
 
@@ -106,10 +107,8 @@ public class LEDsSubsystem extends SubsystemBase {
     }
 
     private int wrapIndex(int i) {
-        while (i >= LEDS_COUNT) {
+        while (i >= LEDS_COUNT)
             i -= LEDS_COUNT;
-        }
-
         return i;
     }
 }

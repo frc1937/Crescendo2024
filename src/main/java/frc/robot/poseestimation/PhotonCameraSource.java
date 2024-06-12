@@ -71,7 +71,7 @@ public class PhotonCameraSource {
     }
 
     public PhotonTrackedTarget getTags() {
-        if(photonCamera.getLatestResult().hasTargets() && photonCamera.getLatestResult() != null && photonCamera.getLatestResult().getBestTarget() != null)
+        if(photonCamera.getLatestResult().hasTargets())
             return photonCamera.getLatestResult().getBestTarget();
 
         return null;
