@@ -29,8 +29,8 @@ public class LEDsSubsystem extends SubsystemBase {
     public void periodic() {
         switch (currentState) {
             case SHOOTER_LOADED -> setBufferToBreathe(new Color8Bit(Color.kGreen), new Color8Bit(Color.kFloralWhite), Timer.getFPGATimestamp());
-            case SHOOTER_EMPTY -> setBufferToCircling(new Color8Bit(Color.kOrange), new Color8Bit(Color.kRed));
-            case BATTERY_LOW -> setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite));
+            case SHOOTER_EMPTY -> setBufferToCircling(new Color8Bit(Color.kDarkRed), new Color8Bit(Color.kRed));
+            case BATTERY_LOW -> setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite), new Color8Bit(Color.kGreen), new Color8Bit(1, 1, 1));
             case DEFAULT -> setBufferToRainbow();
         }
 
@@ -68,7 +68,7 @@ public class LEDsSubsystem extends SubsystemBase {
 
     //Switches between colours quickly.
     private void setBufferToFlashing(Color8Bit... colours) {
-        if (counter % 35 == 0) //Make sure there's a delay between colour switching
+        if (counter % 25 == 0) //Make sure there's a delay between colour switching
             setBufferToWholeColour(colours[previousColour++]);
 
         previousColour %= colours.length;
@@ -91,17 +91,17 @@ public class LEDsSubsystem extends SubsystemBase {
     private void setBufferToCircling(Color8Bit c1, Color8Bit c2) {
         int halfLength = LEDS_COUNT / 2;
 
-        int c1_start = wrapIndex((int) (Timer.getFPGATimestamp() * 46 % LEDS_COUNT));
-        int c1_end = c1_start + (halfLength - 1);
+        int startC1 = wrapIndex((int) (Timer.getFPGATimestamp() * 46 % LEDS_COUNT));
+        int endC1 = startC1 + (halfLength - 1);
 
-        int c2_start = c1_end + 1;
-        int c2_end = c2_start + (halfLength - 1);
+        int startC2 = endC1 + 1;
+        int endC2 = startC2 + (halfLength - 1);
 
-        for (int i = c1_start; i < c1_end; i++) {
+        for (int i = startC1; i < endC1; i++) {
             buffer.setLED(wrapIndex(i), c1);
         }
 
-        for (int i = c2_start; i < c2_end; i++) {
+        for (int i = startC2; i < endC2; i++) {
             buffer.setLED(wrapIndex(i), c2);
         }
     }

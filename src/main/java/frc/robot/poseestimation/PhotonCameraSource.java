@@ -1,6 +1,11 @@
 package frc.robot.poseestimation;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -11,12 +16,17 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import java.util.List;
 import java.util.Optional;
 
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.VisionConstants.APRILTAG_AMBIGUITY_THRESHOLD;
+import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
+import static frc.robot.Constants.VisionConstants.PRIMARY_POSE_STRATEGY;
+import static frc.robot.Constants.VisionConstants.SECONDARY_POSE_STRATEGY;
 
 /**
  * A pose source is a class that provides the robot's pose, from a camera.
  */
 public class PhotonCameraSource {
+    private final StructArrayPublisher<Pose2d> cameraPoses = NetworkTableInstance.getDefault().getStructArrayTopic("CameraPose VISUs", Pose2d.struct).publish();
+
     private final PhotonCamera photonCamera;
     private final PhotonPoseEstimator photonPoseEstimator;
     private final String name;
@@ -67,7 +77,15 @@ public class PhotonCameraSource {
             cameraPose = new Pose3d();
         }
 
+
         cachedPose = getUnCachedRobotPose();
+
+        cameraPoses.set(
+                new Pose2d[]{
+                        cachedPose
+
+                }
+        );
     }
 
     public PhotonTrackedTarget getTags() {

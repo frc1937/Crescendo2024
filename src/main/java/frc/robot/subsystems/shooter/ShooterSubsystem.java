@@ -13,10 +13,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.math.Conversions.rpmFromTangentialVelocity;
-import static frc.robot.Constants.CanIDConstants.*;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.Constants.CanIDConstants.FLYWHEEL_LEFT_ID;
+import static frc.robot.Constants.CanIDConstants.FLYWHEEL_RIGHT_ID;
+import static frc.robot.Constants.CanIDConstants.KICKER_ID;
+import static frc.robot.subsystems.shooter.ShooterConstants.CONSIDERED_NOISELESS_THRESHOLD;
+import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_LEFT_P;
+import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_LEFT_S;
+import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_LEFT_V;
+import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_RIGHT_P;
+import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_RIGHT_S;
+import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_RIGHT_V;
+import static frc.robot.subsystems.shooter.ShooterConstants.LEFT_FLYWHEEL_DIAMETER;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.subsystems.shooter.ShooterConstants.RIGHT_FLYWHEEL_DIAMETER;
 
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -30,7 +44,15 @@ public class ShooterSubsystem extends SubsystemBase {
     private int consecutiveNoteInsideSamples = 0;
 
     public ShooterSubsystem() {
-
+        this.setDefaultCommand(
+                startEnd(
+                        () -> {
+                            resetController();
+                            pitch.setGoal(PITCH_DEFAULT_ANGLE);
+                            stopFlywheels();
+                        },
+                        this::resetController
+                ));
         configureKickerMotor();
     }
 
@@ -43,6 +65,10 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.periodic();
 
         logShooter();
+    }
+
+    public void resetController() {
+        pitch.resetController();
     }
 
     public void setPitchVoltage(Measure<Voltage> volts) {
@@ -98,10 +124,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Rotation2d getPitchGoal() {
         return pitch.getGoalPosition();
-    }
-
-    public void setPitchGoal(Rotation2d goal) {
-        pitch.setGoal(goal);
     }
 
     public void setReference(Reference reference) {

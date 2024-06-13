@@ -40,7 +40,9 @@ public class ShooterCommands {
 
     public Command shootPhysics(double tangentialVelocity) {
         return new FunctionalCommand(
-                () -> {},
+                () -> {
+                    shooterSubsystem.resetController();
+                },
                 () -> {
                     shooterPhysicsCalculations.updateValuesForSpeakerAlignment(swerve5990.getSelfRelativeVelocity());
 
@@ -53,8 +55,10 @@ public class ShooterCommands {
                     Rotation2d targetPitchAngle = shooterPhysicsCalculations.getPitchAnglePhysics();
                     Rotation2d targetAzimuthAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 
-                    shooterSubsystem.setReference(new ShooterSubsystem.Reference(targetPitchAngle, tangentialVelocity));
-//                    swerve5990.driveFieldRelative(0, 0, targetAzimuthAngle);
+                    shooterSubsystem.setReference(new ShooterSubsystem.Reference(targetPitchAngle,
+                    tangentialVelocity
+                    ));
+                    swerve5990.driveFieldRelative(0, 0, targetAzimuthAngle);
 
                     SmartDashboard.putNumber("shooter/physicsAngle [DEG]", targetPitchAngle.getDegrees());
 

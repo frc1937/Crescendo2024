@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AlliancePose2d;
 
@@ -25,6 +27,9 @@ public class ShooterPhysicsCalculations {
     private Pose2d robotPose = new Pose2d();
     private Pose3d targetPose = new Pose3d();
 
+    private final StructArrayPublisher<Pose3d> physicsTargetPose = NetworkTableInstance.getDefault().getStructArrayTopic("lolll", Pose3d.struct).publish();
+
+
     public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem, double tangentialVelocity) {
         this.shooterSubsystem = shooterSubsystem;
         this.tangentialVelocity = tangentialVelocity;
@@ -42,7 +47,7 @@ public class ShooterPhysicsCalculations {
         boolean isBlueAlliance = AlliancePose2d.AllianceUtils.isBlueAlliance();
 
         targetPose = isBlueAlliance ? BLUE_SPEAKER : RED_SPEAKER;
-        targetPose = getNewTargetFromRobotVelocity(robotSpeed);
+//        targetPose = getNewTargetFromRobotVelocity(robotSpeed);
 
         targetAngle = getPitchAnglePhysics();
     }
@@ -95,7 +100,9 @@ public class ShooterPhysicsCalculations {
         Translation2d robotTranslation = robotPose.getTranslation();
         Translation2d differenceInXY = targetPose.toPose2d().getTranslation().minus(robotTranslation);
 
-        return Rotation2d.fromRadians(Math.atan2(Math.abs(differenceInXY.getY()), Math.abs(differenceInXY.getY())));
+        return Rotation2d.fromRadians(Math.atan2(
+                differenceInXY.getY(),
+                -differenceInXY.getX()));
     }
 
     /**
@@ -144,13 +151,19 @@ public class ShooterPhysicsCalculations {
     private Pose3d getNoteExitPose() {
         Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), targetPose.getRotation().toRotation2d()));
 
-        Transform3d robotToPivot = new Transform3d(PIVOT_POINT_X_OFFSET_METRES, 0, PIVOT_POINT_Z_OFFSET_METRES, new Rotation3d(0, -shooterSubsystem.getPitchGoal().getRadians(), 0));
+        Pose3d robotToPivot = new Pose3d(PIVOT_POINT_X_OFFSET_METRES, 0, PIVOT_POINT_Z_OFFSET_METRES, new Rotation3d(0, -shooterSubsystem.getPitchGoal().getRadians(), 0));
 
         Transform3d pivotToShooterEnd = new Transform3d(SHOOTER_LENGTH_METRES, 0, 0, new Rotation3d());
 
-        Pose3d shooterEndPose = new Pose3d().transformBy(robotToPivot).plus(pivotToShooterEnd);
+        Pose3d shooterEndPose = robotToPivot.plus(pivotToShooterEnd);
         Transform3d robotToShooterEnd = shooterEndPose.minus(new Pose3d());
-//todo: make this just do
+
+        physicsTargetPose.set(
+                new Pose3d[] {
+                        robotPose3d.transformBy(robotToShooterEnd)
+                }
+        );
+
         return robotPose3d.transformBy(robotToShooterEnd);
     }
 }

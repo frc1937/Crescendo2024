@@ -12,7 +12,7 @@ public class PitchSysIdCharacterization implements SysIdCharacterization {
     public PitchSysIdCharacterization(ShooterSubsystem shooterSubsystem) {
         SysIdRoutine.Config config = new SysIdRoutine.Config(
                 Volts.per(Second).of(0.5),
-                Volts.of(3),
+                Volts.of(2),
                 Seconds.of(10)
         );
 

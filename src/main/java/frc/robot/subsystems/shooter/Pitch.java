@@ -10,7 +10,7 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -19,26 +19,34 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.CANSparkMaxUtil;
 
-import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.lib.math.Conversions.SEC_PER_MIN;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.Constants.CanIDConstants.PIVOT_ID;
-import static frc.robot.Constants.ROBORIO_LOOP_TIME_SECONDS;
 import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
-import static frc.robot.subsystems.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_GEAR_RATIO;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KD;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KG;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KI;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KP;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KS;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KV;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_ACCELERATION;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_MAX_VELOCITY;
+import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_TOLERANCE;
+import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
 
 public class Pitch {
     private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
     private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
     private RelativeEncoder encoder;
 
-    private final PIDController feedback = new PIDController(PITCH_KP, PITCH_KI, PITCH_KD);
-    private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
-
     private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION);
-    private final TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    private final ProfiledPIDController feedback = new ProfiledPIDController(PITCH_KP, PITCH_KI, PITCH_KD, constraints);
+    private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
     private double previousVelocitySetpoint;
 
@@ -65,6 +73,7 @@ public class Pitch {
      * If no goal is set, this method will do nothing.
      */
     public void periodic() {
+//        encoder.setPosition(getPosition().getRotations());
         if (goal != null) {
             drivePitchPeriodic();
             logPitch();
@@ -134,7 +143,7 @@ public class Pitch {
      * @Units Volts
      */
     public Measure<Voltage> getVoltage() {
-        return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
+        return Volts.of(motor.getAppliedOutput() * 12);
     }
 
     /**
@@ -184,40 +193,38 @@ public class Pitch {
 
     private void configureController() {
         feedback.setTolerance(PITCH_TOLERANCE);
-        feedback.reset();
     }
 
     private void drivePitchPeriodic() {
-        state = profile.calculate(ROBORIO_LOOP_TIME_SECONDS, state, goal);
-        drivePitchToSetpoint(state);
+        drivePitchToSetpoint();
 
         previousVelocitySetpoint = state.velocity;
     }
 
-    private void drivePitchToSetpoint(TrapezoidProfile.State setpoint) {
-        final double feedforwardOutput = feedforward.calculate(
-                Units.rotationsToRadians(setpoint.position),
-                setpoint.velocity,
-                (setpoint.velocity - previousVelocitySetpoint) / ROBORIO_LOOP_TIME_SECONDS
-        );
-
+    private void drivePitchToSetpoint() {
         final double controllerOutput = feedback.calculate(
-                getPosition().getRotations(),
-                setpoint.position
+                getPosition().getRotations()
         );
+        final double feedforwardOutput = feedforward.calculate(
+                Units.rotationsToRadians(feedback.getSetpoint().position),
+                feedback.getSetpoint().velocity
+//                (setpoint.velocity - previousVelocitySetpoint) / ROBORIO_LOOP_TIME_SECONDS
+        );
+        SmartDashboard.putNumber("nigggaaa", feedback.getSetpoint().position * 360);
 
-        final double voltageOutput = applyDeadband(feedforwardOutput + controllerOutput, 0.02);
+        final double voltageOutput = feedforwardOutput + controllerOutput;
 
         motor.setVoltage(voltageOutput);
     }
 
+    public void resetController() {
+        feedback.reset(getPosition().getRotations(), getVelocity());
+    }
+
     private void setGoal(TrapezoidProfile.State goal) {
-        final double currentVelocity = getVelocity();
+        feedback.setGoal(goal);
 
-        feedback.reset();
-        state = new TrapezoidProfile.State(getPosition().getRotations(), currentVelocity);
-
-        previousVelocitySetpoint = currentVelocity;
+        previousVelocitySetpoint = getVelocity();
         this.goal = goal;
     }
 
@@ -235,7 +242,7 @@ public class Pitch {
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
         motor.setSmartCurrentLimit(40);
 
-        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
+        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kAll);
 
         motor.burnFlash();
     }

@@ -23,16 +23,16 @@ public class ShooterConstants {
     static final Rotation2d PIVOT_BOTTOM_ANGLE = Rotation2d.fromDegrees(-18.984374625);
 
     static final double
-            PITCH_KS = 0.16255,
-            PITCH_KV = 15.528,
-            PITCH_KA = 0.41253,
-            PITCH_KG = 0.17103,
+            PITCH_KS = 0,
+            PITCH_KV = 14,
+            PITCH_KA = 1.2632,
+            PITCH_KG = 0.23,
 
-            PITCH_KP = 50.0,
+            PITCH_KP = 40,
             PITCH_KI = 0.0,
             PITCH_KD = 0.0,
 
-            PITCH_MAX_VELOCITY = 2.2,
+            PITCH_MAX_VELOCITY = 0.5,
             PITCH_MAX_ACCELERATION = 0.5;
 
     static final double PITCH_TOLERANCE = Rotation2d.fromDegrees(0.3).getRotations();
@@ -53,7 +53,7 @@ public class ShooterConstants {
             FLYWHEEL_LEFT_S = 0.02426,
             FLYWHEEL_LEFT_V = 0.0969743;
 
-    static final double PIVOT_POINT_Z_OFFSET_METRES = 0.21;
+    static final double PIVOT_POINT_Z_OFFSET_METRES = 0.29;
     static final double PIVOT_POINT_X_OFFSET_METRES = -0.31;
     static final double SHOOTER_LENGTH_METRES = 0.485;
 

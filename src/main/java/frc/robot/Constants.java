@@ -82,8 +82,8 @@ public final class Constants {
          */
         public static final Transform3d ROBOT_TO_FRONT_CAMERA =
                 new Transform3d(
-                        0.346407, 0.175245/*-0.175245*/, 0.397225,
-                        new Rotation3d(0, -35, 0)
+                        0.4, 0.175245/*-0.175245*/, 0.46,
+                        new Rotation3d(0, Units.degreesToRadians(-28), 0)
                 );
     }
 

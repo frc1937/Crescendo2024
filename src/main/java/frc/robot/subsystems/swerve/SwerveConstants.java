@@ -16,7 +16,8 @@ import frc.lib.util.TunableNumber;
 public class SwerveConstants {
     static final int NUMBER_OF_MODULES = 4;
 
-    static final TunableNumber AZIMUTH_CONTROLLER_KP = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 2),
+    static final TunableNumber
+            AZIMUTH_CONTROLLER_KP = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 5),
             AZIMUTH_CONTROLLER_TOLERANCE_DEG = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Tolerance", 1),
             AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Velocity [DEG PS]", Math.PI),
             AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Acceleration [DEG PS]", Math.PI);

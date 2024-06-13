@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.AlliancePose2d;
 import frc.robot.poseestimation.PoseEstimator5990;
 
 import java.util.stream.IntStream;
@@ -64,14 +65,13 @@ public class Swerve5990 extends SubsystemBase {
 
     private final StructArrayPublisher<SwerveModuleState> currentStates = NetworkTableInstance.getDefault().getStructArrayTopic("CurrentStates", SwerveModuleState.struct).publish();
     private final StructArrayPublisher<SwerveModuleState> targetStates = NetworkTableInstance.getDefault().getStructArrayTopic("TargetStates", SwerveModuleState.struct).publish();
+
     private final StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault().getStructArrayTopic("CameraPoses", Pose3d.struct).publish();
 
     public Swerve5990(PoseEstimator5990 poseEstimator5990) {
         this.poseEstimator5990 = poseEstimator5990;
 
         gyro.configFactoryDefault();
-        resetGyro();
-
         modules = getModules();
 
         driveController.setTolerance(new Pose2d(0.2, 0.2, Rotation2d.fromDegrees(AZIMUTH_CONTROLLER_TOLERANCE_DEG.get())));
@@ -98,7 +98,8 @@ public class Swerve5990 extends SubsystemBase {
 
         cameraPoses.set(
                 new Pose3d[]{
-                        robotPose.plus(ROBOT_TO_FRONT_CAMERA.inverse())
+                        robotPose.plus(ROBOT_TO_FRONT_CAMERA)
+
                 }
         );
 
@@ -133,7 +134,14 @@ public class Swerve5990 extends SubsystemBase {
     }
 
     public void resetGyro() {
-        gyro.setYaw(0);
+        final AlliancePose2d currentPose = poseEstimator5990.getCurrentPose();
+        final AlliancePose2d resetPose = AlliancePose2d.AllianceUtils.fromBluePose(
+                new Pose2d(
+                        currentPose.getBluePose().getTranslation(),
+                        new Rotation2d(0)
+                )
+        );
+        poseEstimator5990.resetPose(resetPose);
     }
 
     public SwerveDriveWheelPositions getModulePositions() {
