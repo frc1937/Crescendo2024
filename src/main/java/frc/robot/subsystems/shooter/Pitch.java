@@ -136,6 +136,11 @@ public class Pitch {
         return encoder.getVelocity();
     }
 
+
+    public void setBrake(boolean shouldBrake) {
+        motor.setIdleMode(shouldBrake ? CANSparkBase.IdleMode.kBrake : CANSparkBase.IdleMode.kCoast);
+    }
+
     /**
      * Returns the voltage the motor
      *
@@ -200,6 +205,8 @@ public class Pitch {
 
         previousVelocitySetpoint = state.velocity;
     }
+
+
 
     private void drivePitchToSetpoint() {
         final double controllerOutput = feedback.calculate(

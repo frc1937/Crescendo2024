@@ -4,9 +4,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -37,6 +39,7 @@ import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swerve.Swerve5990;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.DoubleSupplier;
 
 import static frc.lib.util.Controller.Axis.LEFT_X;
@@ -61,6 +64,9 @@ public class RobotContainer {
     private static final Controller driveController = new Controller(0);
     private static final Controller operatorController = new Controller(1);
     private final SendableChooser<Command> autoChooser;
+
+    /* DEBUGGING */
+    private final Trigger userButton = new Trigger(RobotController::getUserButton);
 
     /* MAIN-DRIVER */
     private final Trigger drAButton = driveController.getButton(A);
@@ -115,6 +121,10 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
+
+        RobotController.getUserButton();
+
+
         configureBindings();
     }
 
@@ -143,8 +153,8 @@ public class RobotContainer {
                 )
         );
 
-        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP
-        );
+        setUserButton();
+        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
     }
 
 
@@ -207,7 +217,9 @@ public class RobotContainer {
 
         drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 0.5, 4));
 
-        shooterSubsystem.setDefaultCommand(new StartEndCommand(() -> {}, () -> {}, shooterSubsystem));
+        shooterSubsystem.setDefaultCommand(new StartEndCommand(() -> {
+        }, () -> {
+        }, shooterSubsystem));
     }
 
     private void maxSpeedsCharacterizationLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
@@ -236,5 +248,26 @@ public class RobotContainer {
         drBButton.whileTrue(characterization.sysIdDynamicTest(reverse));
         drYButton.whileTrue(characterization.sysIdQuastaticTest(forward));
         drXButton.whileTrue(characterization.sysIdQuastaticTest(reverse));
+    }
+
+    private void setUserButton() {
+        AtomicInteger counter = new AtomicInteger();
+
+        userButton.toggleOnTrue(new FunctionalCommand(
+                () -> {
+                    shooterSubsystem.setPitchBrakeStatus(false);
+                    leds.setLEDsState(LEDsSubsystem.LEDState.DEBUG_MODE);
+                },
+                () -> {
+                    counter.addAndGet(1);
+                },
+                (interrupt) -> {
+                    shooterSubsystem.setPitchBrakeStatus(true);
+                    leds.setLEDsState(LEDsSubsystem.LEDState.DEFAULT);
+                    counter.set(0);
+                },
+                () -> userButton.getAsBoolean() && counter.get() > 7
+
+        ).ignoringDisable(true));
     }
 }

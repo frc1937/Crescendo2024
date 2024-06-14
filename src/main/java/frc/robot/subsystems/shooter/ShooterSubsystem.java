@@ -71,6 +71,10 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.resetController();
     }
 
+    public void setPitchBrakeStatus(boolean shouldBrake) {
+        pitch.setBrake(shouldBrake);
+    }
+
     public void setPitchVoltage(Measure<Voltage> volts) {
         pitch.setRawVoltage(volts.in(Volts));
     }

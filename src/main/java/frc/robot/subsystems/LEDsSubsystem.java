@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -27,10 +29,17 @@ public class LEDsSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if(!DriverStation.isEnabled() && RobotController.getBatteryVoltage() < 12.1) {
+            setLEDsState(LEDState.BATTERY_LOW);
+        }
+
         switch (currentState) {
             case SHOOTER_LOADED -> setBufferToBreathe(new Color8Bit(Color.kGreen), new Color8Bit(Color.kFloralWhite), Timer.getFPGATimestamp());
             case SHOOTER_EMPTY -> setBufferToCircling(new Color8Bit(Color.kDarkRed), new Color8Bit(Color.kRed));
-            case BATTERY_LOW -> setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite), new Color8Bit(Color.kGreen), new Color8Bit(1, 1, 1));
+
+            case DEBUG_MODE -> setBufferToCircling(new Color8Bit(Color.kWhite), new Color8Bit(Color.kAliceBlue));
+
+            case BATTERY_LOW -> setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite));
             case DEFAULT -> setBufferToRainbow();
         }
 
@@ -44,6 +53,7 @@ public class LEDsSubsystem extends SubsystemBase {
     public enum LEDState {
         SHOOTER_LOADED,
         SHOOTER_EMPTY,
+        DEBUG_MODE,
         BATTERY_LOW,
         DEFAULT
     }
