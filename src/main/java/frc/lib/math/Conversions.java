@@ -1,13 +1,6 @@
 package frc.lib.math;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.swerve.SwerveConstants.WHEEL_CIRCUMFERENCE;
 
 public class Conversions {
     public static final double

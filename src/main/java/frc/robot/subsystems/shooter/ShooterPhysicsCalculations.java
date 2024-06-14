@@ -23,11 +23,14 @@ public class ShooterPhysicsCalculations {
     private final ShooterSubsystem shooterSubsystem;
     private final double tangentialVelocity;
 
-    private Rotation2d targetAngle = Rotation2d.fromDegrees(20);
+    private Rotation2d targetPitch = Rotation2d.fromDegrees(20);
     private Pose2d robotPose = new Pose2d();
     private Pose3d targetPose = new Pose3d();
+    private double previousDistanceToTarget = 0;
 
     private final StructArrayPublisher<Pose3d> physicsTargetPose = NetworkTableInstance.getDefault().getStructArrayTopic("lolll", Pose3d.struct).publish();
+    private final StructArrayPublisher<Pose3d> poses1 = NetworkTableInstance.getDefault().getStructArrayTopic("poses1", Pose3d.struct).publish();
+    private final StructArrayPublisher<Pose3d> poses2 = NetworkTableInstance.getDefault().getStructArrayTopic("poses2", Pose3d.struct).publish();
 
 
     public ShooterPhysicsCalculations(ShooterSubsystem shooterSubsystem, double tangentialVelocity) {
@@ -36,7 +39,7 @@ public class ShooterPhysicsCalculations {
     }
 
     public Rotation2d getTargetAnglePhysics() {
-        return targetAngle;
+        return targetPitch;
     }
 
     /**
@@ -48,8 +51,10 @@ public class ShooterPhysicsCalculations {
 
         targetPose = isBlueAlliance ? BLUE_SPEAKER : RED_SPEAKER;
 //        targetPose = getNewTargetFromRobotVelocity(robotSpeed);
+        final Pose3d noteExitPose = getNoteExitPose();
+        previousDistanceToTarget = getDistanceToTarget(noteExitPose);
 
-        targetAngle = getPitchAnglePhysics();
+        targetPitch = getPitchPhysics(noteExitPose);
     }
 
     /**
@@ -65,17 +70,25 @@ public class ShooterPhysicsCalculations {
         return targetPose;
     }
 
+    public Rotation2d getTargetPitch() {
+        return targetPitch;
+    }
+
+    public double getTangentialVelocity() {
+        return tangentialVelocity;
+    }
+
     /**
      * Get the needed pitch theta for the pivot using physics.
      *
      * @return - the required pitch angle
      * @link <a href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)">Formula is taken from wikipedia</a>
      */
-    public Rotation2d getPitchAnglePhysics() {
+    private Rotation2d getPitchPhysics(Pose3d noteExitPose) {
         double vSquared = tangentialVelocity * tangentialVelocity;
 
-        double z = (targetPose.getZ()) - getNoteExitPose().getZ();
-        double distance = getDistanceToTarget();
+        double z = (targetPose.getZ()) - noteExitPose.getZ();
+        double distance = previousDistanceToTarget;
 
         double sqrt = Math.sqrt(vSquared * vSquared - GRAVITY_FORCE * (GRAVITY_FORCE * distance * distance + 2 * vSquared * z));
         double theta = Math.atan((vSquared - sqrt) / (GRAVITY_FORCE * distance));
@@ -102,7 +115,7 @@ public class ShooterPhysicsCalculations {
 
         return Rotation2d.fromRadians(Math.atan2(
                 differenceInXY.getY(),
-                -differenceInXY.getX()));
+                differenceInXY.getX()));
     }
 
     /**
@@ -111,9 +124,9 @@ public class ShooterPhysicsCalculations {
      * @return - the time of flight in seconds
      */
     private double getTimeOfFlight() {
-        Rotation2d theta = getPitchAnglePhysics();
+        Rotation2d theta = shooterSubsystem.getPitchGoal();
 
-        double distance = getDistanceToTarget();
+        double distance = previousDistanceToTarget;
         double speed = tangentialVelocity * theta.getCos();
 
         return distance / speed;
@@ -138,8 +151,8 @@ public class ShooterPhysicsCalculations {
      *
      * @return - The distance in metres
      */
-    private double getDistanceToTarget() {
-        return getNoteExitPose().getTranslation().getDistance(targetPose.getTranslation());
+    private double getDistanceToTarget(Pose3d noteExitPose) {
+        return noteExitPose.getTranslation().getDistance(targetPose.getTranslation());
     }
 
     /**
@@ -149,9 +162,14 @@ public class ShooterPhysicsCalculations {
      * @return the shooter's end, AKA the NOTE's point of exit
      */
     private Pose3d getNoteExitPose() {
-        Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), targetPose.getRotation().toRotation2d()));
+        Pose3d robotPose3d = new Pose3d(new Pose2d(robotPose.getTranslation(), getAzimuthAngleToTarget()));
 
-        Pose3d robotToPivot = new Pose3d(PIVOT_POINT_X_OFFSET_METRES, 0, PIVOT_POINT_Z_OFFSET_METRES, new Rotation3d(0, -shooterSubsystem.getPitchGoal().getRadians(), 0));
+        Pose3d robotToPivot = new Pose3d(PIVOT_POINT_X_OFFSET_METRES, 0, PIVOT_POINT_Z_OFFSET_METRES,
+                new Rotation3d(0, -shooterSubsystem.getPitchGoal().getRadians(), 0));
+
+        poses1.set(
+                new Pose3d[]{robotPose3d.transformBy(robotToPivot.minus(new Pose3d()))}
+        );
 
         Transform3d pivotToShooterEnd = new Transform3d(SHOOTER_LENGTH_METRES, 0, 0, new Rotation3d());
 

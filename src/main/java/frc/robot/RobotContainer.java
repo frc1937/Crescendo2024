@@ -98,16 +98,16 @@ public class RobotContainer {
         DriverStation.silenceJoystickConnectionWarning(true);
         PoseEstimator6328 poseEstimator6328 = new PoseEstimator6328();
 
-        PhotonCameraSource frontCamera = new PhotonCameraSource(FRONT_CAMERA_NAME, ROBOT_TO_FRONT_CAMERA);
 
-        poseEstimator5990 = new PoseEstimator5990(poseEstimator6328,
-                frontCamera
-        );
+        poseEstimator5990 = new PoseEstimator5990(poseEstimator6328);
 
+        PhotonCameraSource frontCamera = new PhotonCameraSource(FRONT_CAMERA_NAME, ROBOT_TO_FRONT_CAMERA, poseEstimator5990);
         swerve5990 = new Swerve5990(poseEstimator5990);
-        poseEstimator5990.setSwerve(swerve5990);
 
-        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, 20);
+        poseEstimator5990.setSwerve(swerve5990);
+        poseEstimator5990.setPhotonCameraSources(frontCamera);
+
+        shooterPhysicsCalculations = new ShooterPhysicsCalculations(shooterSubsystem, 15);
         shooterCommands = new ShooterCommands(shooterSubsystem, intakeSubsystem, leds, swerve5990, shooterPhysicsCalculations);
 
         alignWithTag = new AlignWithTag(swerve5990, poseEstimator5990, frontCamera);
@@ -143,7 +143,8 @@ public class RobotContainer {
                 )
         );
 
-        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP);
+        initializeButtons(translationSup, strafeSup, rotationSup, ButtonLayout.TELEOP
+        );
     }
 
 
@@ -167,7 +168,7 @@ public class RobotContainer {
 
     private void teleopButtonsLayout(DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         drXButton.whileTrue(new ShootToAmp(shooterSubsystem, swerve5990, leds));
-        drAButton.whileTrue(shooterCommands.shootPhysics(19));
+        drAButton.whileTrue(shooterCommands.shootPhysics());
         drBButton.whileTrue(new ShootOnTheMove(shooterSubsystem, shooterCommands, swerve5990, poseEstimator5990, translationSup, strafeSup, 16, shooterPhysicsCalculations));
 //        drYButton.whileTrue(new AlignWithAmp(swerve5990, translationSup, strafeSup));
         drYButton.whileTrue(shooterCommands.shootNote(new ShooterSubsystem.Reference(Rotation2d.fromDegrees(45), 12)));

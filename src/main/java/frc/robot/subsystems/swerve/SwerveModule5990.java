@@ -33,7 +33,6 @@ import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
 import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KD;
@@ -43,10 +42,6 @@ import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KS;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KV;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_MOTOR_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_NEUTRAL_MODE;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_STATOR_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
 import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
 import static frc.robot.subsystems.swerve.SwerveConstants.OPEN_LOOP_RAMP;
 import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_IN_PLACE_DRIVE_MPS;
@@ -201,12 +196,12 @@ public class SwerveModule5990 {
         swerveDriveFXConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
 
         /* Current Limiting */
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = DRIVE_PEAK_CURRENT_LIMIT;
-        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = DRIVE_PEAK_CURRENT_DURATION;
+//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = DRIVE_PEAK_CURRENT_LIMIT;
+//        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = DRIVE_PEAK_CURRENT_DURATION;
 
         /* PID-FF Config */
         swerveDriveFXConfig.Slot0.kP = DRIVE_KP;

@@ -89,7 +89,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public void logFlywheels(SysIdRoutineLog log) {
         log.motor("FlywheelRight")
                 .voltage(rightFlywheel.getVoltage())
-                .angularPosition(rightFlywheel.getPosition())
                 .angularVelocity(rightFlywheel.getVelocity());
     }
 

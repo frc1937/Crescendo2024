@@ -17,10 +17,10 @@ public class SwerveConstants {
     static final int NUMBER_OF_MODULES = 4;
 
     static final TunableNumber
-            AZIMUTH_CONTROLLER_KP = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 5),
+            AZIMUTH_CONTROLLER_KP = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) kP", 3),
             AZIMUTH_CONTROLLER_TOLERANCE_DEG = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Tolerance", 1),
-            AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Velocity [DEG PS]", Math.PI),
-            AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Acceleration [DEG PS]", Math.PI);
+            AZIMUTH_MAX_VELOCITY = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Velocity [DEG PS]", 4 * Math.PI),
+            AZIMUTH_MAX_ACCELERATION = new TunableNumber("Swerve/Yaw (Azimuth of ROBOT) Max Acceleration [DEG PS]", 4 * Math.PI);
 
     static final double
             AZIMUTH_CONTROLLER_I = 0,
@@ -74,7 +74,7 @@ public class SwerveConstants {
 
     /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
      * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-    static final double OPEN_LOOP_RAMP = 0.25;
+    static final double OPEN_LOOP_RAMP = 0.1;
     static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */

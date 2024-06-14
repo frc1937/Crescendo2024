@@ -4,12 +4,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
-import org.photonvision.EstimatedRobotPose;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.poseestimation.photonposeestimator.EstimatedRobotPose;
+import frc.robot.poseestimation.photonposeestimator.PhotonPoseEstimator;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.estimation.TargetModel;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -18,17 +19,16 @@ import java.util.Optional;
 
 import static frc.robot.Constants.VisionConstants.APRILTAG_AMBIGUITY_THRESHOLD;
 import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
-import static frc.robot.Constants.VisionConstants.PRIMARY_POSE_STRATEGY;
-import static frc.robot.Constants.VisionConstants.SECONDARY_POSE_STRATEGY;
+import static org.photonvision.estimation.TargetModel.kAprilTag36h11;
 
 /**
  * A pose source is a class that provides the robot's pose, from a camera.
  */
 public class PhotonCameraSource {
-    private final StructArrayPublisher<Pose2d> cameraPoses = NetworkTableInstance.getDefault().getStructArrayTopic("CameraPose VISUs", Pose2d.struct).publish();
+    private final StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault().getStructArrayTopic("CameraPose VISUs", Pose3d.struct).publish();
 
     private final PhotonCamera photonCamera;
-    private final PhotonPoseEstimator photonPoseEstimator;
+    private final frc.robot.poseestimation.photonposeestimator.PhotonPoseEstimator photonPoseEstimator;
     private final String name;
     private final Transform3d robotToCamera;
     private double lastUpdatedTimestamp;
@@ -40,7 +40,7 @@ public class PhotonCameraSource {
     private double lastResultTimestamp = 0;
     private Pose3d cameraPose = new Pose3d();
 
-    public PhotonCameraSource(String name, Transform3d robotToCamera) {
+    public PhotonCameraSource(String name, Transform3d robotToCamera, PoseEstimator5990 poseEstimator5990) {
         this.name = name;
         this.robotToCamera = robotToCamera;
 
@@ -48,13 +48,14 @@ public class PhotonCameraSource {
 
         photonPoseEstimator = new PhotonPoseEstimator(
                 APRIL_TAG_FIELD_LAYOUT,
-                PRIMARY_POSE_STRATEGY,
+                PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 photonCamera,
-                robotToCamera
+                robotToCamera,
+                poseEstimator5990
         );
 
-        photonPoseEstimator.setMultiTagFallbackStrategy(SECONDARY_POSE_STRATEGY);
-        photonPoseEstimator.setTagModel(TargetModel.kAprilTag36h11);
+        photonPoseEstimator.setMultiTagFallbackStrategy(PhotonPoseEstimator.PoseStrategy.AVERAGE_BEST_TARGETS);
+        photonPoseEstimator.setTagModel(kAprilTag36h11);
     }
 
     public void update() {
@@ -77,15 +78,19 @@ public class PhotonCameraSource {
             cameraPose = new Pose3d();
         }
 
-
-        cachedPose = getUnCachedRobotPose();
-
         cameraPoses.set(
-                new Pose2d[]{
-                        cachedPose
+                new Pose3d[]{
+                        cameraPose
 
                 }
         );
+
+        SmartDashboard.putNumber("niggiiekafe", Units.radiansToDegrees(cameraPose.getRotation().getY()));
+
+
+        cachedPose = cameraPose.toPose2d();
+
+
     }
 
     public PhotonTrackedTarget getTags() {
@@ -117,13 +122,6 @@ public class PhotonCameraSource {
 
     public double getLastResultTimestamp() {
         return lastResultTimestamp;
-    }
-
-    private Pose2d getUnCachedRobotPose() {
-        if (cameraPose == null)
-            return null;
-
-        return cameraPose.transformBy(robotToCamera.inverse()).toPose2d();
     }
 
     private boolean isNewTimestamp() {

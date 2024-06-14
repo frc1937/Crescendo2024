@@ -79,7 +79,7 @@ public class Flywheel {
      * @Units Volts
      */
     public Measure<Voltage> getVoltage() {
-        return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
+        return Volts.of(motor.getAppliedOutput() * 12);
     }
 
     public void setRawVoltage(double voltage) {
@@ -129,9 +129,9 @@ public class Flywheel {
         motor.setInverted(invert);
 
         motor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
-        motor.setSmartCurrentLimit(30);
+        motor.setSmartCurrentLimit(60);
 
-        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kVelocityOnly);
+        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kAll);
 
         motor.burnFlash();
     }

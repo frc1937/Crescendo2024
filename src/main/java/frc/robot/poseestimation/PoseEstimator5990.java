@@ -34,7 +34,7 @@ import static frc.robot.Constants.VisionConstants.TRANSLATION_STD_EXPONENT;
  */
 public class PoseEstimator5990 implements AutoCloseable {
     private final Field2d field = new Field2d();
-    private final PhotonCameraSource[] photonCameraSources;
+    private PhotonCameraSource[] photonCameraSources;
     private final PoseEstimator6328 swerveDrivePoseEstimator;
     private Swerve5990 swerve5990;
 
@@ -46,10 +46,8 @@ public class PoseEstimator5990 implements AutoCloseable {
     /**
      * Constructs a new PoseEstimator.
      *
-     * @param photonCameraSources the sources that should update the pose estimator apart from the odometry. This should be cameras etc.
      */
-    public PoseEstimator5990(PoseEstimator6328 swerveDrivePoseEstimator, PhotonCameraSource... photonCameraSources) {
-        this.photonCameraSources = photonCameraSources;
+    public PoseEstimator5990(PoseEstimator6328 swerveDrivePoseEstimator) {
         this.swerveDrivePoseEstimator = swerveDrivePoseEstimator;
 
         putAprilTagsOnFieldWidget();
@@ -64,6 +62,10 @@ public class PoseEstimator5990 implements AutoCloseable {
 
     public void setSwerve(Swerve5990 swerve5990) {
         this.swerve5990 = swerve5990;
+    }
+
+    public void setPhotonCameraSources(PhotonCameraSource... photonCameraSources) {
+        this.photonCameraSources = photonCameraSources;
     }
 
     @Override

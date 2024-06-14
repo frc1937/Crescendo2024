@@ -54,8 +54,8 @@ public class ShooterConstants {
             FLYWHEEL_LEFT_V = 0.0969743;
 
     static final double PIVOT_POINT_Z_OFFSET_METRES = 0.29;
-    static final double PIVOT_POINT_X_OFFSET_METRES = -0.31;
-    static final double SHOOTER_LENGTH_METRES = 0.485;
+    static final double PIVOT_POINT_X_OFFSET_METRES = -0.27;
+    static final double SHOOTER_LENGTH_METRES = 0.5;
 
     public static final double KICKER_SPEED_BACKWARDS = -0.6;
     public static final double KICKER_SPEED_FORWARD = 0.5;
