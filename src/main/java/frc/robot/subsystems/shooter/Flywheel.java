@@ -129,9 +129,9 @@ public class Flywheel {
         motor.setInverted(invert);
 
         motor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
-        motor.setSmartCurrentLimit(60);
+        motor.setSmartCurrentLimit(80);
 
-        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kAll);
+        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kVelocityOnly);
 
         motor.burnFlash();
     }

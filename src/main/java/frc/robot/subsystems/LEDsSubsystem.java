@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,6 +19,8 @@ public class LEDsSubsystem extends SubsystemBase {
     private int counter;
     private int previousColour = 0;
 
+    private final Timer timer = new Timer();
+
     private int rainbowFirstPixel;
     private LEDState currentState;
 
@@ -25,6 +28,8 @@ public class LEDsSubsystem extends SubsystemBase {
         leds.setLength(LEDS_COUNT);
         leds.setData(buffer);
         leds.start();
+
+        timer.start();
     }
 
     @Override
@@ -39,7 +44,8 @@ public class LEDsSubsystem extends SubsystemBase {
 
             case DEBUG_MODE -> setBufferToCircling(new Color8Bit(Color.kWhite), new Color8Bit(Color.kAliceBlue));
 
-            case BATTERY_LOW -> setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite));
+            case BATTERY_LOW -> setBufferToOutwardy(Color.kRed);
+                    //setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite));
             case DEFAULT -> setBufferToRainbow();
         }
 
@@ -62,7 +68,7 @@ public class LEDsSubsystem extends SubsystemBase {
         int hue;
 
         for (var i = 0; i < LEDS_COUNT; i++) {
-            hue = (rainbowFirstPixel + (i * 180 / buffer.getLength())) % 180;
+            hue = (rainbowFirstPixel + (i * 180 / LEDS_COUNT)) % 180;
             buffer.setHSV(i, hue, 255, 128);
         }
 
@@ -88,13 +94,7 @@ public class LEDsSubsystem extends SubsystemBase {
     //Slowly switch between two colours
     private void setBufferToBreathe(Color8Bit c1, Color8Bit c2, double timestamp) {
         double x = ((timestamp) * 2.0 * Math.PI);
-        double ratio = (Math.sin(x) + 1.0) / 2.0;
-
-        double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
-        double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
-        double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
-
-        setBufferToWholeColour(new Color8Bit((int) red, (int) green, (int) blue));
+        setBufferToWholeColour(getRGBFromXAndColours(x, c1, c2));
     }
 
     //todo: make this support infinite colours
@@ -116,9 +116,46 @@ public class LEDsSubsystem extends SubsystemBase {
         }
     }
 
+    private void setBufferToOutwardy(Color c1) {
+        setBufferToWholeColour(new Color8Bit(Color.kBlack));
+
+        int quarter = LEDS_COUNT / 4;
+
+        final double time = timer.get();
+
+        int x = time == (int)time ?  ((int) (time) % 11) : ((int) (time * 16 % 11));
+
+        SmartDashboard.putNumber("x", x);
+
+        for (int i = quarter - 1 - x; i < quarter + 1 + x; i++) {
+            final int adder = i / 10;
+
+            buffer.setLED(i, new Color8Bit((int) c1.red * adder, (int) c1.green * adder, (int) c1.blue * adder));
+        }
+
+        for (int i = quarter*3 - x; i < 2 + quarter*3 + x; i++) {
+            buffer.setLED(i, c1);
+        }
+    }
+
     private int wrapIndex(int i) {
         while (i >= LEDS_COUNT)
             i -= LEDS_COUNT;
+
+        while (i < 0) {
+            i+= LEDS_COUNT;
+        }
+
         return i;
+    }
+
+    private Color8Bit getRGBFromXAndColours(double x, Color8Bit c1, Color8Bit c2) {
+        double ratio = (Math.sin(x) + 1.0) / 2.0;
+
+        double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
+        double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
+        double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
+
+        return new Color8Bit((int) red, (int) green, (int) blue);
     }
 }

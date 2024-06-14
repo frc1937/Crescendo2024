@@ -123,14 +123,12 @@ public class RobotContainer {
 
 
         RobotController.getUserButton();
-
-
         configureBindings();
     }
 
 
     private void configureBindings() {
-        leds.setLEDsState(LEDsSubsystem.LEDState.DEFAULT);
+        leds.setLEDsState(LEDsSubsystem.LEDState.BATTERY_LOW);
 
         hasNote.toggleOnTrue(new InstantCommand(() -> driveController.rumble(10, 2)));
 

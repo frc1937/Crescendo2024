@@ -249,7 +249,7 @@ public class Pitch {
         motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
         motor.setSmartCurrentLimit(40);
 
-        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kAll);
+        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
 
         motor.burnFlash();
     }
