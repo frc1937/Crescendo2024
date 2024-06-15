@@ -98,6 +98,10 @@ public class Conversions {
         return power * saturation;
     }
 
+    public static double hertzToMs(double hertz) {
+        return 1000 / hertz;
+    }
+
     /**
      * Scales a TrapezoidProfile.Constraints object by a given percentage.
      *

@@ -8,11 +8,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -25,27 +21,7 @@ import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KD;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KI;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
-import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
-import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
-import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KD;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KI;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KP;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KS;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KV;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_MOTOR_INVERT;
-import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_NEUTRAL_MODE;
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
-import static frc.robot.subsystems.swerve.SwerveConstants.OPEN_LOOP_RAMP;
-import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_IN_PLACE_DRIVE_MPS;
-import static frc.robot.subsystems.swerve.SwerveConstants.WHEEL_CIRCUMFERENCE;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 public class SwerveModule5990 {
     private static final double WHEEL_DIAMETER = WHEEL_CIRCUMFERENCE / Math.PI;
@@ -196,12 +172,10 @@ public class SwerveModule5990 {
         swerveDriveFXConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
 
         /* Current Limiting */
-//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
-//        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
-//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
-//        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
-//        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = DRIVE_PEAK_CURRENT_LIMIT;
-//        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = DRIVE_PEAK_CURRENT_DURATION;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = DRIVE_ENABLE_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
 
         /* PID-FF Config */
         swerveDriveFXConfig.Slot0.kP = DRIVE_KP;

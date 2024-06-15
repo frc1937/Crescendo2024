@@ -27,10 +27,15 @@ public class CANSparkMaxUtil {
      */
     public static void setCANSparkFlexBusUsage(CANSparkBase motor, Usage usage, boolean enableFollowing) {
         if (enableFollowing) {
-            motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 10);
+            motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 10); //follower = 0
         } else {
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 500);
         }
+
+        //follower updateFreq = 0
+        //position updateFrq= 2
+        //velocity updateFreq= 1
+        //voltage updateFreq= 3
 
         if (usage == Usage.kAll) {
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus1, 20);
@@ -38,10 +43,10 @@ public class CANSparkMaxUtil {
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus3, 50);
         } else if (usage == Usage.kPositionOnly) {
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus1, 500);
-            motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus2, 20);
+            motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus2, 20); //2 = position
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus3, 500);
         } else if (usage == Usage.kVelocityOnly) {
-            motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus1, 20);
+            motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus1, 20); //1 == velocity
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus2, 500);
             motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus3, 500);
         } else if (usage == Usage.kMinimal) {
