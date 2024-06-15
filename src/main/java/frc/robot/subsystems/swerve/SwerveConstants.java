@@ -1,15 +1,13 @@
 package frc.robot.subsystems.swerve;
 
 
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import frc.lib.motor.MotorProperties;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.TunableNumber;
 
@@ -56,7 +54,7 @@ public class SwerveConstants {
 
     /* Motor Inverts */
     static final boolean ANGLE_MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
-    static final InvertedValue DRIVE_MOTOR_INVERT = InvertedValue.CounterClockwise_Positive;
+    static final boolean DRIVE_MOTOR_INVERT = false;
 
     /* Angle Encoder Invert */
     static final SensorDirectionValue CAN_CODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;// CHOSEN_MODULE.canCoderInvert;
@@ -101,8 +99,8 @@ public class SwerveConstants {
     // MAX_ANGULAR_VELOCITY / DRIVE_BASE_RADIUS; //This gives like 22Mps lmfao no it's not true
 
     /* Neutral Modes */
-    static final com.revrobotics.CANSparkBase.IdleMode ANGLE_NEUTRAL_MODE = CANSparkBase.IdleMode.kBrake;
-    static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
+    static final MotorProperties.IdleMode ANGLE_NEUTRAL_MODE = MotorProperties.IdleMode.BRAKE;
+    static final MotorProperties.IdleMode DRIVE_NEUTRAL_MODE = MotorProperties.IdleMode.BRAKE;
 
     /* Module Specific Constants */
 

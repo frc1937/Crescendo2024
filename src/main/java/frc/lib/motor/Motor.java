@@ -1,9 +1,13 @@
 package frc.lib.motor;
 
 public interface Motor {
+    void setP(double kP, int slot);
+
     void setOutput(MotorProperties.ControlMode controlMode, double output);
     void setOutput(MotorProperties.ControlMode controlMode, double output, double feedforward);
     void stopMotor();
+
+    void setMotorPosition(double position);
 
     /** No gearing applied*/
     double getMotorPosition();

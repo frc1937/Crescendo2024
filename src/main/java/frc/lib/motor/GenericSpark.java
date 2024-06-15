@@ -2,13 +2,13 @@ package frc.lib.motor;
 
 import com.revrobotics.*;
 
-public class SparkController extends CANSparkMax implements Motor {
+public class GenericSpark extends CANSparkMax implements Motor {
     private final RelativeEncoder encoder;
     private final SparkPIDController controller;
 
     private int slotToUse = 0;
 
-    public SparkController(int deviceId, MotorType type) {
+    public GenericSpark(int deviceId, MotorType type) {
         super(deviceId, type);
 
         optimizeBusUsage();
@@ -33,6 +33,16 @@ public class SparkController extends CANSparkMax implements Motor {
             case VOLTAGE -> controller.setReference(output, ControlType.kVoltage, slotToUse);
             case CURRENT -> controller.setReference(output, ControlType.kCurrent, slotToUse);
         }
+    }
+
+    @Override
+    public void setMotorPosition(double position) {
+        encoder.setPosition(position);
+    }
+
+    @Override
+    public void setP(double kP, int slot) {
+        controller.setP(kP, slot);
     }
 
     @Override
@@ -62,7 +72,7 @@ public class SparkController extends CANSparkMax implements Motor {
 
     @Override
     public void setFollowerOf(int masterPort) {
-        super.follow(new SparkController(masterPort, MotorType.kBrushless));
+        super.follow(new GenericSpark(masterPort, MotorType.kBrushless));
         super.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 10);
     }
 

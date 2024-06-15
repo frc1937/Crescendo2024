@@ -1,5 +1,7 @@
 package frc.lib.motor;
 
+import com.ctre.phoenix6.signals.GravityTypeValue;
+
 public class MotorProperties {
     public enum IdleMode {
         COAST, BRAKE
@@ -18,5 +20,9 @@ public class MotorProperties {
         SIMPLE, ARM, ELEVATOR
     }
 
-    public record Slot(double kP, double kD, double kI, double kV, double kA, double kS, double kG) {}
+    public enum GravityType {
+        ELEVATOR, ARM
+    }
+
+    public record Slot(double kP, double kD, double kI, double kV, double kA, double kS, double kG, GravityTypeValue gravityType) { }
 }
