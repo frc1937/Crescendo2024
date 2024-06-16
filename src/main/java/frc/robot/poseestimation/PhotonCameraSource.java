@@ -69,9 +69,9 @@ public class PhotonCameraSource {
         if (hasResult) {
             EstimatedRobotPose estimatedRobotPose = optionalEstimatedRobotPose.get();
 
-            cameraPose = estimatedRobotPose.estimatedPose;
-            lastResultTimestamp = estimatedRobotPose.timestampSeconds;
-            visibleTags = estimatedRobotPose.targetsUsed.size();
+            cameraPose = estimatedRobotPose.estimatedPose();
+            lastResultTimestamp = estimatedRobotPose.timestampSeconds();
+            visibleTags = estimatedRobotPose.targetsUsed().size();
             averageDistanceFromTags = getAverageDistanceFromTags(latestResult);
         } else {
             visibleTags = 0;
@@ -133,10 +133,10 @@ public class PhotonCameraSource {
     }
 
     private boolean hasResult(EstimatedRobotPose estimatedRobotPose) {
-        if (estimatedRobotPose.strategy == PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)
+        if (estimatedRobotPose.strategy() == PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)
             return true;
 
-        return estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity() < APRILTAG_AMBIGUITY_THRESHOLD;
+        return estimatedRobotPose.targetsUsed().get(0).getPoseAmbiguity() < APRILTAG_AMBIGUITY_THRESHOLD;
     }
 
     private double getAverageDistanceFromTags(PhotonPipelineResult result) {
