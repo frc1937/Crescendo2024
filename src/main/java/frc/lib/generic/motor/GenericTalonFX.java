@@ -132,6 +132,9 @@ public class GenericTalonFX extends TalonFX implements Motor {
         talonConfig.Audio.BeepOnBoot = false;
         talonConfig.Audio.BeepOnConfig = false;
 
+        talonConfig.Voltage.PeakForwardVoltage = 12;
+        talonConfig.Voltage.PeakReverseVoltage = -12;
+
         talonConfig.Feedback.SensorToMechanismRatio = configuration.conversionFactor;
 
         setConfig0();
