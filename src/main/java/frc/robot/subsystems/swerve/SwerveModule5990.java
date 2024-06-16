@@ -9,8 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import frc.lib.generic.motor.*;
 import frc.lib.math.Conversions;
-import frc.lib.motor.*;
 import frc.lib.util.CTREModuleState;
 
 import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
@@ -126,6 +126,7 @@ public class SwerveModule5990 {
         steerConfiguration.conversionFactor = ANGLE_GEAR_RATIO;// 7.0 / 150.0;
 
         steerMotor.setMotorPosition(getCurrentAngle().getRotations());
+        steerMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, 50);
 
         steerMotor.configure(steerConfiguration);
     }
@@ -165,6 +166,9 @@ public class SwerveModule5990 {
         /* Open and Closed Loop Ramping */
         driveConfiguration.dutyCycleOpenLoopRampPeriod = OPEN_LOOP_RAMP;
         driveConfiguration.dutyCycleCloseLoopRampPeriod = CLOSED_LOOP_RAMP;
+
+        driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.VELOCITY, ODOMETRY_FREQUENCY_HERTZ);
+        driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, ODOMETRY_FREQUENCY_HERTZ);
 
         driveMotor.configure(driveConfiguration);
     }

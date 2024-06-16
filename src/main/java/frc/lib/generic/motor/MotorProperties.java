@@ -1,4 +1,4 @@
-package frc.lib.motor;
+package frc.lib.generic.motor;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 

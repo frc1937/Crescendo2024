@@ -7,7 +7,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.lib.motor.MotorProperties;
+import frc.lib.generic.motor.MotorProperties;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.TunableNumber;
 

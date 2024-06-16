@@ -1,8 +1,9 @@
-package frc.lib.motor;
+package frc.lib.generic;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import frc.lib.generic.motor.MotorProperties;
 
 public class Feedforward {
     private final double kS; //Volts required to overcome the force of static friction

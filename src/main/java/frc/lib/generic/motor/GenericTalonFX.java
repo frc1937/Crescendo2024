@@ -1,4 +1,4 @@
-package frc.lib.motor;
+package frc.lib.generic.motor;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -12,7 +12,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 public class GenericTalonFX extends TalonFX implements Motor {
     private int slotToUse = 0;
 
-    private final StatusSignal<Double> positionSignal, velocitySignal, voltageSignal, currentSignal;
+    private final StatusSignal<Double> positionSignal, velocitySignal, voltageSignal, currentSignal, temperatureSignal;
     private final TalonFXConfiguration talonConfig = new TalonFXConfiguration();
     private final TalonFXConfigurator talonConfigurator;
 
@@ -33,6 +33,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
         velocitySignal = super.getVelocity().clone();
         voltageSignal = super.getMotorVoltage().clone();
         currentSignal = super.getSupplyCurrent().clone();
+        temperatureSignal = super.getDeviceTemp().clone();
     }
 
     @Override
@@ -44,7 +45,8 @@ public class GenericTalonFX extends TalonFX implements Motor {
             case POSITION -> super.setControl(positionVoltageRequest.withPosition(output).withSlot(slotToUse));
             case VELOCITY -> super.setControl(velocityVoltageRequest.withVelocity(output).withSlot(slotToUse));
 
-            case CURRENT -> throw new UnsupportedOperationException("CTRE is money hungry, and wants you to pay $150 for CURRENT control. Nuh uh!");
+            case CURRENT ->
+                    throw new UnsupportedOperationException("CTRE is money hungry, and wants you to pay $150 for CURRENT control. Nuh uh!");
         }
     }
 
@@ -95,6 +97,11 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
+    public double getTemperature() {
+        return temperatureSignal.refresh().getValue();
+    }
+
+    @Override
     public double getCurrent() {
         return currentSignal.refresh().getValue();
     }
@@ -105,12 +112,12 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
-    public void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequency) {
+    public void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequencyHz) {
         switch (signalType) {
-            case VELOCITY -> velocitySignal.setUpdateFrequency(updateFrequency);
-            case POSITION -> positionSignal.setUpdateFrequency(updateFrequency);
-            case VOLTAGE -> voltageSignal.setUpdateFrequency(updateFrequency);
-            case CURRENT -> currentSignal.setUpdateFrequency(updateFrequency);
+            case VELOCITY -> velocitySignal.setUpdateFrequency(updateFrequencyHz);
+            case POSITION -> positionSignal.setUpdateFrequency(updateFrequencyHz);
+            case VOLTAGE -> voltageSignal.setUpdateFrequency(updateFrequencyHz);
+            case CURRENT -> currentSignal.setUpdateFrequency(updateFrequencyHz);
         }
     }
 
@@ -149,7 +156,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
         talonConfig.Slot0.kV = currentConfiguration.slot0.kV();
         talonConfig.Slot0.kG = currentConfiguration.slot0.kG();
 
-        if(currentConfiguration.slot0.gravityType() != null)
+        if (currentConfiguration.slot0.gravityType() != null)
             talonConfig.Slot0.GravityType = currentConfiguration.slot0.gravityType();
     }
 
@@ -162,7 +169,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
         talonConfig.Slot1.kV = currentConfiguration.slot1.kV();
         talonConfig.Slot1.kG = currentConfiguration.slot1.kG();
 
-        if(currentConfiguration.slot1.gravityType() != null)
+        if (currentConfiguration.slot1.gravityType() != null)
             talonConfig.Slot1.GravityType = currentConfiguration.slot1.gravityType();
     }
 
@@ -175,7 +182,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
         talonConfig.Slot2.kV = currentConfiguration.slot2.kV();
         talonConfig.Slot2.kG = currentConfiguration.slot2.kG();
 
-        if(currentConfiguration.slot2.gravityType() != null)
+        if (currentConfiguration.slot2.gravityType() != null)
             talonConfig.Slot2.GravityType = currentConfiguration.slot2.gravityType();
     }
 
@@ -188,7 +195,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
             talonConfig.CurrentLimits.StatorCurrentLimit = currentConfiguration.statorCurrentLimit;
         }
 
-        if(currentConfiguration.supplyCurrentLimit != -1) {
+        if (currentConfiguration.supplyCurrentLimit != -1) {
             talonConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
             talonConfig.CurrentLimits.SupplyCurrentLimit = currentConfiguration.supplyCurrentLimit;
         }

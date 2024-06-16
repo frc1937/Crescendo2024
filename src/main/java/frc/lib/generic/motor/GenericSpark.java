@@ -1,4 +1,4 @@
-package frc.lib.motor;
+package frc.lib.generic.motor;
 
 import com.revrobotics.*;
 
@@ -61,6 +61,11 @@ public class GenericSpark extends CANSparkMax implements Motor {
     }
 
     @Override
+    public double getTemperature() {
+        return getMotorTemperature();
+    }
+
+    @Override
     public double getSystemPosition() {
         return encoder.getPosition();
     }
@@ -78,8 +83,8 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     /**Explanation here: <a href="https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames">REV DOCS</a>*/
     @Override
-    public void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequency) {
-        int ms = (int) (1000 / updateFrequency);
+    public void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequencyHz) {
+        int ms = (int) (1000 / updateFrequencyHz);
 
         switch (signalType) {
             case VELOCITY, CURRENT -> super.setPeriodicFramePeriod(PeriodicFrame.kStatus1, ms);

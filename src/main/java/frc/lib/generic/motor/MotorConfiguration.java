@@ -1,4 +1,4 @@
-package frc.lib.motor;
+package frc.lib.generic.motor;
 
 /**
  * Generic configurations class with default values
