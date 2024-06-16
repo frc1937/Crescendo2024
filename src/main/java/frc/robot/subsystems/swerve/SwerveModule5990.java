@@ -21,6 +21,8 @@ import static frc.robot.subsystems.swerve.SwerveConstants.*;
 public class SwerveModule5990 {
     private static final double WHEEL_DIAMETER = WHEEL_CIRCUMFERENCE / Math.PI;
 
+    private int highTemperatureCounter;
+
     public final SwerveConstants.SwerveModuleConstants swerveModuleConstants;
 
     private Motor driveMotor;
@@ -80,6 +82,8 @@ public class SwerveModule5990 {
     }
 
     public void periodic() {
+        this.keepTemperatureInCheck();
+
         steerMotor.setMotorPosition(getCurrentAngle().getRotations());
         steerMotor.setP(ANGLE_KP.get(), 0);
     }
@@ -171,5 +175,16 @@ public class SwerveModule5990 {
         driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, ODOMETRY_FREQUENCY_HERTZ);
 
         driveMotor.configure(driveConfiguration);
+    }
+
+    public void keepTemperatureInCheck() {
+        double currentTemperature = (float) driveMotor.getTemperature();
+
+        if (currentTemperature > 70) highTemperatureCounter++;
+        else highTemperatureCounter = 0;
+
+        if (highTemperatureCounter > 200) {
+            System.out.println("Stop driving!!! " + this.swerveModuleConstants.moduleNumber() + " is at " + currentTemperature + " Celsius!!!");
+        }
     }
 }
