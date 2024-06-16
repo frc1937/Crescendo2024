@@ -147,6 +147,7 @@ public class SwerveModule5990 {
         steerAbsoluteEncoder.optimizeBusUtilization();
 
         steerPositionSignal = steerAbsoluteEncoder.getPosition().clone();
+
         steerPositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
     }
 

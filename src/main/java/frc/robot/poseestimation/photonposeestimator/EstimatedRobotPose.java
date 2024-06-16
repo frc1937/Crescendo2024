@@ -31,42 +31,20 @@ import java.util.List;
 
 /**
  * An estimated pose based on pipeline result
+ *
+ * @param estimatedPose    The estimated pose
+ * @param timestampSeconds The estimated time the frame used to derive the robot pose was taken
+ * @param targetsUsed      A list of the targets used to compute this pose
+ * @param strategy         The strategy actually used to produce this pose
  */
-public class EstimatedRobotPose {
-    /**
-     * The estimated pose
-     */
-    public final Pose3d estimatedPose;
-
-    /**
-     * The estimated time the frame used to derive the robot pose was taken
-     */
-    public final double timestampSeconds;
-
-    /**
-     * A list of the targets used to compute this pose
-     */
-    public final List<PhotonTrackedTarget> targetsUsed;
-
-    /**
-     * The strategy actually used to produce this pose
-     */
-    public final PhotonPoseEstimator.PoseStrategy strategy;
-
+public record EstimatedRobotPose(Pose3d estimatedPose, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed,
+                                 PhotonPoseEstimator.PoseStrategy strategy) {
     /**
      * Constructs an EstimatedRobotPose
      *
      * @param estimatedPose    estimated pose
      * @param timestampSeconds timestamp of the estimate
      */
-    public EstimatedRobotPose(
-            Pose3d estimatedPose,
-            double timestampSeconds,
-            List<PhotonTrackedTarget> targetsUsed,
-            PhotonPoseEstimator.PoseStrategy strategy) {
-        this.estimatedPose = estimatedPose;
-        this.timestampSeconds = timestampSeconds;
-        this.targetsUsed = targetsUsed;
-        this.strategy = strategy;
+    public EstimatedRobotPose {
     }
 }

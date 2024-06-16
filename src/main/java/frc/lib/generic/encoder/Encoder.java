@@ -4,8 +4,8 @@ public interface Encoder {
 
     void reset();
 
-    void getPosition();
-    void getVelocity();
+    double getEncoderPosition();
+    double getEncoderVelocity();
 
     boolean configure();
 
