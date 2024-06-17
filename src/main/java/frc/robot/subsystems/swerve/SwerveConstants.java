@@ -1,7 +1,6 @@
 package frc.robot.subsystems.swerve;
 
 
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -57,8 +56,7 @@ public class SwerveConstants {
     static final boolean DRIVE_MOTOR_INVERT = false;
 
     /* Angle Encoder Invert */
-    static final SensorDirectionValue CAN_CODER_INVERT =
-            SensorDirectionValue.CounterClockwise_Positive;
+    static final boolean CAN_CODER_INVERT = false;
 
     /* SwerveSubsystem Current Limiting */
     static final int ANGLE_CURRENT_LIMIT = 30;
@@ -68,8 +66,6 @@ public class SwerveConstants {
     //These two determine for how long and what current needs to be applied in order to be ramped down.
     static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
     static final double DRIVE_PEAK_CURRENT_DURATION = 0.1;
-
-    static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
 
     /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
      * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */

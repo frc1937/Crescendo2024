@@ -24,6 +24,7 @@ import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_GEAR_RATIO;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
@@ -160,7 +161,7 @@ public class SwerveModule5990 {
 
         EncoderConfiguration encoderConfiguration = new EncoderConfiguration();
 
-        encoderConfiguration.invert = false;
+        encoderConfiguration.invert = CAN_CODER_INVERT;
         encoderConfiguration.sensorRange = EncoderProperties.SensorRange.ZeroToOne;
         encoderConfiguration.offsetRotations = -swerveModuleConstants.angleOffset();
 
