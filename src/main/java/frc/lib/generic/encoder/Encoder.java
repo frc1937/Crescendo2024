@@ -1,12 +1,12 @@
 package frc.lib.generic.encoder;
 
+import frc.lib.generic.Properties;
+
 public interface Encoder {
-
-    void reset();
-
     double getEncoderPosition();
     double getEncoderVelocity();
 
-    boolean configure();
+    void setSignalUpdateFrequency(Properties.SignalType signalType, double updateFrequencyHz);
 
+    boolean configure(EncoderConfiguration encoderConfiguration);
 }

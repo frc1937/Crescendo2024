@@ -1,10 +1,13 @@
 package frc.lib.generic.motor;
 
+import frc.lib.generic.Properties;
+
 public interface Motor {
     void setP(double kP, int slot);
 
     void setOutput(MotorProperties.ControlMode controlMode, double output);
     void setOutput(MotorProperties.ControlMode controlMode, double output, double feedforward);
+
     void stopMotor();
 
     void setMotorPosition(double position);
@@ -26,7 +29,7 @@ public interface Motor {
     double getSystemVelocity();
 
     void setFollowerOf(int masterPort);
-    void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequencyHz);
+    void setSignalUpdateFrequency(Properties.SignalType signalType, double updateFrequencyHz);
 
     boolean configure(MotorConfiguration configuration);
 }

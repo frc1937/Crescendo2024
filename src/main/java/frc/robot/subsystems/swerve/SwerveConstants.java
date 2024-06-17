@@ -57,7 +57,8 @@ public class SwerveConstants {
     static final boolean DRIVE_MOTOR_INVERT = false;
 
     /* Angle Encoder Invert */
-    static final SensorDirectionValue CAN_CODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;// CHOSEN_MODULE.canCoderInvert;
+    static final SensorDirectionValue CAN_CODER_INVERT =
+            SensorDirectionValue.CounterClockwise_Positive;
 
     /* SwerveSubsystem Current Limiting */
     static final int ANGLE_CURRENT_LIMIT = 30;

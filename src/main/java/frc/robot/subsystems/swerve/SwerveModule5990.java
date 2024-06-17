@@ -1,13 +1,14 @@
 package frc.robot.subsystems.swerve;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import frc.lib.generic.Properties;
+import frc.lib.generic.encoder.Encoder;
+import frc.lib.generic.encoder.EncoderConfiguration;
+import frc.lib.generic.encoder.EncoderProperties;
+import frc.lib.generic.encoder.GenericCanCoder;
 import frc.lib.generic.motor.GenericSpark;
 import frc.lib.generic.motor.GenericTalonFX;
 import frc.lib.generic.motor.Motor;
@@ -17,14 +18,12 @@ import frc.lib.math.Conversions;
 import frc.lib.util.CTREModuleState;
 
 import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
-import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_GEAR_RATIO;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
-import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
 import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
 import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
@@ -52,10 +51,7 @@ public class SwerveModule5990 {
     private Motor driveMotor;
     private Motor steerMotor;
 
-    /**
-     * Rotations
-     */
-    private StatusSignal<Double> steerPositionSignal;
+    private Encoder steerAbsoluteEncoder;
 
     private SwerveModuleState targetState;
 
@@ -97,7 +93,7 @@ public class SwerveModule5990 {
     }
 
     public Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(steerPositionSignal.refresh().getValue() - swerveModuleConstants.angleOffset());
+        return Rotation2d.fromRotations(steerAbsoluteEncoder.getEncoderPosition());
     }
 
     public void stop() {
@@ -139,9 +135,7 @@ public class SwerveModule5990 {
     }
 
     private void driveToTargetAngle() {
-        steerMotor.setOutput(
-                MotorProperties.ControlMode.POSITION, targetState.angle.getRotations()
-        );
+        steerMotor.setOutput(MotorProperties.ControlMode.POSITION, targetState.angle.getRotations());
     }
 
     private void configureSteerMotor() {
@@ -156,24 +150,23 @@ public class SwerveModule5990 {
         steerConfiguration.conversionFactor = ANGLE_GEAR_RATIO;
 
         steerMotor.setMotorPosition(getCurrentAngle().getRotations());
-        steerMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, 50);
+        steerMotor.setSignalUpdateFrequency(Properties.SignalType.POSITION, 50);
 
         steerMotor.configure(steerConfiguration);
     }
 
     private void configureSteerAbsoluteEncoder() {
-        CANcoder steerAbsoluteEncoder = new CANcoder(swerveModuleConstants.canCoderID());
+        steerAbsoluteEncoder = new GenericCanCoder(swerveModuleConstants.canCoderID());
 
-        CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
+        EncoderConfiguration encoderConfiguration = new EncoderConfiguration();
 
-        swerveCanCoderConfig.MagnetSensor.SensorDirection = CAN_CODER_INVERT;
-        swerveCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        encoderConfiguration.invert = false;
+        encoderConfiguration.sensorRange = EncoderProperties.SensorRange.ZeroToOne;
+        encoderConfiguration.offsetRotations = -swerveModuleConstants.angleOffset();
 
-        applyConfig(steerAbsoluteEncoder, swerveCanCoderConfig);
-        steerAbsoluteEncoder.optimizeBusUtilization();
+        steerAbsoluteEncoder.configure(encoderConfiguration);
 
-        steerPositionSignal = steerAbsoluteEncoder.getPosition().clone();
-        steerPositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
+        steerAbsoluteEncoder.setSignalUpdateFrequency(Properties.SignalType.POSITION, ODOMETRY_FREQUENCY_HERTZ);
     }
 
     private void configureDriveMotor() {
@@ -197,9 +190,9 @@ public class SwerveModule5990 {
         driveConfiguration.dutyCycleOpenLoopRampPeriod = OPEN_LOOP_RAMP;
         driveConfiguration.dutyCycleCloseLoopRampPeriod = CLOSED_LOOP_RAMP;
 
-        driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.VELOCITY, ODOMETRY_FREQUENCY_HERTZ);
-        driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, ODOMETRY_FREQUENCY_HERTZ);
-        driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.TEMPERATURE, 50);
+        driveMotor.setSignalUpdateFrequency(Properties.SignalType.VELOCITY, ODOMETRY_FREQUENCY_HERTZ);
+        driveMotor.setSignalUpdateFrequency(Properties.SignalType.POSITION, ODOMETRY_FREQUENCY_HERTZ);
+        driveMotor.setSignalUpdateFrequency(Properties.SignalType.TEMPERATURE, 50);
 
         driveMotor.configure(driveConfiguration);
     }

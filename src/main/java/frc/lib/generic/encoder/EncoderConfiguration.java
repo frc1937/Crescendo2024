@@ -1,7 +1,7 @@
 package frc.lib.generic.encoder;
 
 public class EncoderConfiguration { 
-    /** The offset to zero the cancoder, in rotations */
+    /** The offset to zero the cancoder, in rotations <p> This gets added to all reported encoder positions </p> */
     public double offsetRotations = 0;
 
     /** False -> direction is CCW+ CW-. True -> direction is CW+ CCW- */

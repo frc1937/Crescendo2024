@@ -2,6 +2,7 @@ package frc.lib.generic.motor;
 
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.generic.Properties;
 
 public class GenericSpark extends CANSparkMax implements Motor {
     private final RelativeEncoder encoder;
@@ -90,7 +91,7 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     /**Explanation here: <a href="https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames">REV DOCS</a>*/
     @Override
-    public void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequencyHz) {
+    public void setSignalUpdateFrequency(Properties.SignalType signalType, double updateFrequencyHz) {
         int ms = (int) (1000 / updateFrequencyHz);
 
         switch (signalType) {

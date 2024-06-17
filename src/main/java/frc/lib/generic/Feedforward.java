@@ -3,7 +3,6 @@ package frc.lib.generic;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import frc.lib.generic.motor.MotorProperties;
 
 public class Feedforward {
     private final double kS; //Volts required to overcome the force of static friction
@@ -11,13 +10,13 @@ public class Feedforward {
     private final double kA; //Volts required to accelerate the mechanism by one unit
     private final double kG; //Volts required to overcome the force of gravity
 
-    private final MotorProperties.FeedforwardType type;
+    private final Properties.FeedforwardType type;
 
     private final ArmFeedforward armFeedforward;
     private final ElevatorFeedforward elevatorFeedforward;
     private final SimpleMotorFeedforward simpleFeedforward;
 
-    public Feedforward(MotorProperties.FeedforwardType type, double kS, double kV, double kA) {
+    public Feedforward(Properties.FeedforwardType type, double kS, double kV, double kA) {
         this.kS = kS;
         this.kV = kV;
         this.kA = kA;
@@ -30,7 +29,7 @@ public class Feedforward {
         simpleFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
     }
 
-    public Feedforward(MotorProperties.FeedforwardType type, double kS, double kV, double kA, double kG) {
+    public Feedforward(Properties.FeedforwardType type, double kS, double kV, double kA, double kG) {
         this.kS = kS;
         this.kV = kV;
         this.kA = kA;

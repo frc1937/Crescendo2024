@@ -4,10 +4,15 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import frc.lib.generic.Properties;
 
 public class GenericTalonFX extends TalonFX implements Motor {
     private int slotToUse = 0;
@@ -112,7 +117,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
-    public void setSignalUpdateFrequency(MotorProperties.SignalType signalType, double updateFrequencyHz) {
+    public void setSignalUpdateFrequency(Properties.SignalType signalType, double updateFrequencyHz) {
         switch (signalType) {
             case VELOCITY -> velocitySignal.setUpdateFrequency(updateFrequencyHz);
             case POSITION -> positionSignal.setUpdateFrequency(updateFrequencyHz);
