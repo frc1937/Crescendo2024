@@ -1,6 +1,7 @@
 package frc.lib.generic.motor;
 
 import com.revrobotics.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class GenericSpark extends CANSparkMax implements Motor {
     private final RelativeEncoder encoder;
@@ -8,8 +9,8 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     private int slotToUse = 0;
 
-    public GenericSpark(int deviceId, MotorType type) {
-        super(deviceId, type);
+    public GenericSpark(int deviceId) {
+        super(deviceId, CANSparkLowLevel.MotorType.kBrushless);
 
         optimizeBusUsage();
 
@@ -28,7 +29,10 @@ public class GenericSpark extends CANSparkMax implements Motor {
             case PERCENTAGE_OUTPUT -> controller.setReference(output, ControlType.kDutyCycle);
 
             case VELOCITY -> controller.setReference(output, ControlType.kVelocity, slotToUse, feedforward);
-            case POSITION -> controller.setReference(output, ControlType.kPosition, slotToUse, feedforward);
+            case POSITION -> {
+                SmartDashboard.putNumber("output reference kPosition [Rotations]", output);
+                controller.setReference(output, ControlType.kPosition, slotToUse, feedforward);
+            }
 
             case VOLTAGE -> controller.setReference(output, ControlType.kVoltage, slotToUse);
             case CURRENT -> controller.setReference(output, ControlType.kCurrent, slotToUse);
@@ -38,6 +42,9 @@ public class GenericSpark extends CANSparkMax implements Motor {
     @Override
     public void setMotorPosition(double position) {
         encoder.setPosition(position);
+        SmartDashboard.putNumber("output encoder setpoint position [Rotations]", position);
+        SmartDashboard.putNumber("output encoder current position [Rotations]", encoder.getPosition());
+        //Position to set the motor to, after gear ratio is applied
     }
 
     @Override
@@ -77,7 +84,7 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     @Override
     public void setFollowerOf(int masterPort) {
-        super.follow(new GenericSpark(masterPort, MotorType.kBrushless));
+        super.follow(new GenericSpark(masterPort));
         super.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 10);
     }
 

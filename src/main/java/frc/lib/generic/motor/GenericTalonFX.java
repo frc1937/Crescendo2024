@@ -118,6 +118,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
             case POSITION -> positionSignal.setUpdateFrequency(updateFrequencyHz);
             case VOLTAGE -> voltageSignal.setUpdateFrequency(updateFrequencyHz);
             case CURRENT -> currentSignal.setUpdateFrequency(updateFrequencyHz);
+            case TEMPERATURE -> temperatureSignal.setUpdateFrequency(updateFrequencyHz);
         }
     }
 

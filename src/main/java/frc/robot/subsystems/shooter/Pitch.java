@@ -237,6 +237,7 @@ public class Pitch {
 
     private void configureInternalEncoder() {
         encoder = motor.getEncoder();
+
         encoder.setPositionConversionFactor(PITCH_GEAR_RATIO);
         encoder.setVelocityConversionFactor(PITCH_GEAR_RATIO / SEC_PER_MIN);
         encoder.setPosition(getPosition().getRotations());

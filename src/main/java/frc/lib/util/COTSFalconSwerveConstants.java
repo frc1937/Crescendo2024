@@ -1,8 +1,5 @@
 package frc.lib.util;
 
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -39,7 +36,7 @@ public class COTSFalconSwerveConstants {
         double wheelDiameter = Meters.convertFrom(4, Inch);
 
         /** (150 / 7) : 1 */
-        double angleGearRatio = (150.0 / 7.0);
+        double angleGearRatio = (7.0 / 150.0);
 
         double angleKP = 0.3;
         double angleKI = 0.0;

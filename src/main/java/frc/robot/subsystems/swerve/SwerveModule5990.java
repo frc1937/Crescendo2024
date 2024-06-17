@@ -4,19 +4,43 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.CANSparkLowLevel;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import frc.lib.generic.motor.*;
+import frc.lib.generic.motor.GenericSpark;
+import frc.lib.generic.motor.GenericTalonFX;
+import frc.lib.generic.motor.Motor;
+import frc.lib.generic.motor.MotorConfiguration;
+import frc.lib.generic.motor.MotorProperties;
 import frc.lib.math.Conversions;
 import frc.lib.util.CTREModuleState;
 
 import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
 import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_GEAR_RATIO;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_MOTOR_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.CAN_CODER_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.CLOSED_LOOP_RAMP;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_GEAR_RATIO;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KA;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KD;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KI;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KP;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KS;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_KV;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_MOTOR_INVERT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_NEUTRAL_MODE;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_STATOR_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_SPEED_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.OPEN_LOOP_RAMP;
+import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_IN_PLACE_DRIVE_MPS;
+import static frc.robot.subsystems.swerve.SwerveConstants.WHEEL_CIRCUMFERENCE;
 
 public class SwerveModule5990 {
     private static final double WHEEL_DIAMETER = WHEEL_CIRCUMFERENCE / Math.PI;
@@ -38,9 +62,9 @@ public class SwerveModule5990 {
     public SwerveModule5990(SwerveConstants.SwerveModuleConstants constants) {
         this.swerveModuleConstants = constants;
 
+        configureSteerAbsoluteEncoder();
         configureDriveMotor();
         configureSteerMotor();
-        configureSteerAbsoluteEncoder();
     }
 
     public void setTargetState(final SwerveModuleState targetState, boolean closedLoop) {
@@ -115,11 +139,14 @@ public class SwerveModule5990 {
     }
 
     private void driveToTargetAngle() {
-        steerMotor.setOutput(MotorProperties.ControlMode.POSITION, targetState.angle.getRotations());
+        steerMotor.setOutput(
+//                MotorProperties.ControlMode.VELOCITY, 1
+                MotorProperties.ControlMode.POSITION, targetState.angle.getRotations()
+        );
     }
 
     private void configureSteerMotor() {
-        steerMotor = new GenericSpark(swerveModuleConstants.steerMotorID(), CANSparkLowLevel.MotorType.kBrushless);
+        steerMotor = new GenericSpark(swerveModuleConstants.steerMotorID());
 
         MotorConfiguration steerConfiguration = new MotorConfiguration();
 
@@ -147,7 +174,6 @@ public class SwerveModule5990 {
         steerAbsoluteEncoder.optimizeBusUtilization();
 
         steerPositionSignal = steerAbsoluteEncoder.getPosition().clone();
-
         steerPositionSignal.setUpdateFrequency(ODOMETRY_FREQUENCY_HERTZ);
     }
 
@@ -174,6 +200,7 @@ public class SwerveModule5990 {
 
         driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.VELOCITY, ODOMETRY_FREQUENCY_HERTZ);
         driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, ODOMETRY_FREQUENCY_HERTZ);
+        driveMotor.setSignalUpdateFrequency(MotorProperties.SignalType.TEMPERATURE, 50);
 
         driveMotor.configure(driveConfiguration);
     }
@@ -185,7 +212,7 @@ public class SwerveModule5990 {
         else highTemperatureCounter = 0;
 
         if (highTemperatureCounter > 200) {
-            System.out.println("Stop driving!!! " + this.swerveModuleConstants.moduleNumber() + " is at " + currentTemperature + " Celsius!!!");
+            System.out.println("Module #" + swerveModuleConstants.moduleNumber() + " is at " + currentTemperature + " Celsius");
         }
     }
 }

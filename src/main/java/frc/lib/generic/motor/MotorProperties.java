@@ -8,8 +8,7 @@ public class MotorProperties {
     }
 
     public enum SignalType {
-        CURRENT, POSITION, VELOCITY, VOLTAGE
-
+        CURRENT, POSITION, VELOCITY, VOLTAGE, TEMPERATURE
     }
 
     public enum ControlMode {
