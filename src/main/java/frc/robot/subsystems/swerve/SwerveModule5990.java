@@ -140,7 +140,6 @@ public class SwerveModule5990 {
 
     private void driveToTargetAngle() {
         steerMotor.setOutput(
-//                MotorProperties.ControlMode.VELOCITY, 1
                 MotorProperties.ControlMode.POSITION, targetState.angle.getRotations()
         );
     }
@@ -154,7 +153,7 @@ public class SwerveModule5990 {
         steerConfiguration.inverted = ANGLE_MOTOR_INVERT;
         steerConfiguration.idleMode = ANGLE_NEUTRAL_MODE;
 
-        steerConfiguration.conversionFactor = ANGLE_GEAR_RATIO;// 7.0 / 150.0;
+        steerConfiguration.conversionFactor = ANGLE_GEAR_RATIO;
 
         steerMotor.setMotorPosition(getCurrentAngle().getRotations());
         steerMotor.setSignalUpdateFrequency(MotorProperties.SignalType.POSITION, 50);

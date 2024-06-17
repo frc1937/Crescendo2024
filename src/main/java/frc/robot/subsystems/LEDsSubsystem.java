@@ -44,7 +44,7 @@ public class LEDsSubsystem extends SubsystemBase {
 
             case DEBUG_MODE -> setBufferToCircling(new Color8Bit(Color.kWhite), new Color8Bit(Color.kAliceBlue));
 
-            case BATTERY_LOW -> setBufferToOutwardy(Color.kRed);
+            case BATTERY_LOW -> setBufferToOutwardy(Color.kGreen);
                     //setBufferToFlashing(new Color8Bit(Color.kRed), new Color8Bit(Color.kWhite));
             case DEFAULT -> setBufferToRainbow();
         }
@@ -128,13 +128,11 @@ public class LEDsSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("x", x);
 
         for (int i = quarter - 1 - x; i < quarter + 1 + x; i++) {
-            final int adder = i / 10;
-
-            buffer.setLED(i, new Color8Bit((int) c1.red * adder, (int) c1.green * adder, (int) c1.blue * adder));
+            buffer.setLED(i, new Color(c1.red, c1.green,c1.blue ));
         }
 
         for (int i = quarter*3 - x; i < 2 + quarter*3 + x; i++) {
-            buffer.setLED(i, c1);
+            buffer.setLED(i, new Color(c1.red, c1.green,c1.blue));
         }
     }
 
