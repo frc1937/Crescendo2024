@@ -234,7 +234,7 @@ public class RobotContainer {
                 },
 
                 shooterSubsystem).ignoringDisable(true)
-        );
+        ).debounce(0.5);
 //
 //        AtomicInteger counter = new AtomicInteger();
 //
