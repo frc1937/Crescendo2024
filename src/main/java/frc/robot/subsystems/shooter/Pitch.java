@@ -48,15 +48,13 @@ public class Pitch {
     private final ProfiledPIDController feedback = new ProfiledPIDController(PITCH_KP, PITCH_KI, PITCH_KD, constraints);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
-    private double previousVelocitySetpoint;
-
     /**
      * The position is in rotations.
      * The velocity is in rotations per second.
      */
     private StatusSignal<Double> encoderPositionSignal;
 
-    private TrapezoidProfile.State state;
+    private final TrapezoidProfile.State state;
     private TrapezoidProfile.State goal;
 
     public Pitch() {
@@ -73,7 +71,6 @@ public class Pitch {
      * If no goal is set, this method will do nothing.
      */
     public void periodic() {
-//        encoder.setPosition(getPosition().getRotations());
         if (goal != null) {
             drivePitchPeriodic();
             logPitch();
@@ -202,11 +199,7 @@ public class Pitch {
 
     private void drivePitchPeriodic() {
         drivePitchToSetpoint();
-
-        previousVelocitySetpoint = state.velocity;
     }
-
-
 
     private void drivePitchToSetpoint() {
         final double controllerOutput = feedback.calculate(
@@ -215,8 +208,8 @@ public class Pitch {
         final double feedforwardOutput = feedforward.calculate(
                 Units.rotationsToRadians(feedback.getSetpoint().position),
                 feedback.getSetpoint().velocity
-//                (setpoint.velocity - previousVelocitySetpoint) / ROBORIO_LOOP_TIME_SECONDS
         );
+
         SmartDashboard.putNumber("nigggaaa", feedback.getSetpoint().position * 360);
 
         final double voltageOutput = feedforwardOutput + controllerOutput;
@@ -230,8 +223,6 @@ public class Pitch {
 
     private void setGoal(TrapezoidProfile.State goal) {
         feedback.setGoal(goal);
-
-        previousVelocitySetpoint = getVelocity();
         this.goal = goal;
     }
 
