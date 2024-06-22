@@ -54,7 +54,6 @@ public class Pitch {
      */
     private StatusSignal<Double> encoderPositionSignal;
 
-    private final TrapezoidProfile.State state;
     private TrapezoidProfile.State goal;
 
     public Pitch() {
@@ -62,8 +61,6 @@ public class Pitch {
         configureExternalEncoder();
         configureController();
         configureInternalEncoder();
-
-        state = new TrapezoidProfile.State(getPosition().getRotations(), getVelocity());
     }
 
     /**
@@ -72,7 +69,7 @@ public class Pitch {
      */
     public void periodic() {
         if (goal != null) {
-            drivePitchPeriodic();
+            drivePitchToSetpoint();
             logPitch();
         }
     }
@@ -133,7 +130,6 @@ public class Pitch {
         return encoder.getVelocity();
     }
 
-
     public void setBrake(boolean shouldBrake) {
         motor.setIdleMode(shouldBrake ? CANSparkBase.IdleMode.kBrake : CANSparkBase.IdleMode.kCoast);
     }
@@ -168,19 +164,8 @@ public class Pitch {
         motor.setVoltage(voltage);
     }
 
-    private void configureExternalEncoder() {
-        CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
-
-        canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        canCoderConfig.MagnetSensor.MagnetOffset = PIVOT_ENCODER_OFFSET.getRotations();
-
-        applyConfig(absoluteEncoder, canCoderConfig);
-
-        encoderPositionSignal = absoluteEncoder.getPosition().clone();
-        encoderPositionSignal.setUpdateFrequency(50);
-
-        absoluteEncoder.optimizeBusUtilization();
+    public void resetController() {
+        feedback.reset(getPosition().getRotations(), getVelocity());
     }
 
     private void logPitch() {
@@ -197,28 +182,17 @@ public class Pitch {
         feedback.setTolerance(PITCH_TOLERANCE);
     }
 
-    private void drivePitchPeriodic() {
-        drivePitchToSetpoint();
-    }
-
     private void drivePitchToSetpoint() {
-        final double controllerOutput = feedback.calculate(
-                getPosition().getRotations()
-        );
+        final double controllerOutput = feedback.calculate(getPosition().getRotations());
+
         final double feedforwardOutput = feedforward.calculate(
                 Units.rotationsToRadians(feedback.getSetpoint().position),
                 feedback.getSetpoint().velocity
         );
 
-        SmartDashboard.putNumber("nigggaaa", feedback.getSetpoint().position * 360);
-
         final double voltageOutput = feedforwardOutput + controllerOutput;
 
         motor.setVoltage(voltageOutput);
-    }
-
-    public void resetController() {
-        feedback.reset(getPosition().getRotations(), getVelocity());
     }
 
     private void setGoal(TrapezoidProfile.State goal) {
@@ -244,5 +218,20 @@ public class Pitch {
         CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
 
         motor.burnFlash();
+    }
+
+    private void configureExternalEncoder() {
+        CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
+
+        canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        canCoderConfig.MagnetSensor.MagnetOffset = PIVOT_ENCODER_OFFSET.getRotations();
+
+        applyConfig(absoluteEncoder, canCoderConfig);
+
+        encoderPositionSignal = absoluteEncoder.getPosition().clone();
+        encoderPositionSignal.setUpdateFrequency(50);
+
+        absoluteEncoder.optimizeBusUtilization();
     }
 }
