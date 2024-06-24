@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.lib.generic.motor.MotorProperties;
 import frc.lib.util.Controller;
 import frc.robot.commands.*;
 import frc.robot.commands.calibration.*;
@@ -224,12 +225,12 @@ public class RobotContainer {
     private void setUserButton() {
         userButton.toggleOnTrue(Commands.startEnd(
                 () -> {
-                    shooterSubsystem.setPitchBrakeStatus(false);
+                    shooterSubsystem.setPitchIdleMode(MotorProperties.IdleMode.COAST);
                     leds.setLEDsState(LEDsSubsystem.LEDState.DEBUG_MODE);
                 },
 
                 () -> {
-                    shooterSubsystem.setPitchBrakeStatus(true);
+                    shooterSubsystem.setPitchIdleMode(MotorProperties.IdleMode.BRAKE);
                     leds.setLEDsState(LEDsSubsystem.LEDState.DEFAULT);
                 },
 

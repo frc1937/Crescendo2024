@@ -60,6 +60,12 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
+    public void setIdleMode(MotorProperties.IdleMode idleMode) {
+        currentConfiguration.idleMode = idleMode;
+        configure(currentConfiguration);
+    }
+
+    @Override
     public void setP(double kP, int slot) {
         if (slot == 0 && talonConfig.Slot0.kP == kP) return;
         if (slot == 1 && talonConfig.Slot1.kP == kP) return;
@@ -116,12 +122,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
 
     @Override
     public double getVoltage() {
-        System.out.println("Motor voltage: " + getMotorVoltage().getValue());
         return getMotorVoltage().getValue();
-
-//        System.out.println("Motor /**/voltage: " + voltageSignal.refresh().getValue());
-//
-//        return voltageSignal.refresh().getValue();
     }
 
     @Override

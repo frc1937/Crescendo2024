@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder;
 import frc.lib.generic.Properties;
 
 public class GenericSpark extends CANSparkBase implements Motor {
@@ -43,6 +44,11 @@ public class GenericSpark extends CANSparkBase implements Motor {
             case VOLTAGE -> controller.setReference(output, ControlType.kVoltage, slotToUse);
             case CURRENT -> controller.setReference(output, ControlType.kCurrent, slotToUse);
         }
+    }
+
+    @Override
+    public void setIdleMode(MotorProperties.IdleMode idleMode) {
+        setIdleMode(idleMode == MotorProperties.IdleMode.COAST ? IdleMode.kCoast : IdleMode.kBrake);
     }
 
     @Override
@@ -184,6 +190,6 @@ public class GenericSpark extends CANSparkBase implements Motor {
 
     @Override
     public RelativeEncoder getEncoder() {
-        return null;
+        return getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
     }
 }

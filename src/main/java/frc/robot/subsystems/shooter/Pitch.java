@@ -1,14 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,14 +8,19 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.lib.util.CANSparkMaxUtil;
+import frc.lib.generic.Properties;
+import frc.lib.generic.encoder.Encoder;
+import frc.lib.generic.encoder.EncoderConfiguration;
+import frc.lib.generic.encoder.EncoderProperties;
+import frc.lib.generic.encoder.GenericCanCoder;
+import frc.lib.generic.motor.GenericSpark;
+import frc.lib.generic.motor.Motor;
+import frc.lib.generic.motor.MotorConfiguration;
+import frc.lib.generic.motor.MotorProperties;
 
 import static edu.wpi.first.units.Units.Volts;
-import static frc.lib.math.Conversions.SEC_PER_MIN;
-import static frc.lib.util.CTREUtil.applyConfig;
 import static frc.robot.GlobalConstants.CanIDConstants.PIVOT_CAN_CODER;
 import static frc.robot.GlobalConstants.CanIDConstants.PIVOT_ID;
-import static frc.robot.GlobalConstants.VOLTAGE_COMPENSATION_SATURATION;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_DEFAULT_ANGLE;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_GEAR_RATIO;
 import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_KA;
@@ -40,9 +36,8 @@ import static frc.robot.subsystems.shooter.ShooterConstants.PITCH_TOLERANCE;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_ENCODER_OFFSET;
 
 public class Pitch {
-    private final CANSparkFlex motor = new CANSparkFlex(PIVOT_ID, CANSparkLowLevel.MotorType.kBrushless);
-    private final CANcoder absoluteEncoder = new CANcoder(PIVOT_CAN_CODER);
-    private RelativeEncoder encoder;
+    private final Motor motor = new GenericSpark(PIVOT_ID, MotorProperties.SparkType.FLEX);
+    private final Encoder absoluteEncoder = new GenericCanCoder(PIVOT_CAN_CODER);
 
     private final TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(PITCH_MAX_VELOCITY, PITCH_MAX_ACCELERATION);
     private final ProfiledPIDController feedback = new ProfiledPIDController(PITCH_KP, PITCH_KI, PITCH_KD, constraints);
@@ -52,7 +47,7 @@ public class Pitch {
      * The position is in rotations.
      * The velocity is in rotations per second.
      */
-    private StatusSignal<Double> encoderPositionSignal;
+//    private StatusSignal<Double> encoderPositionSignal;
 
     private TrapezoidProfile.State goal;
 
@@ -60,7 +55,6 @@ public class Pitch {
         configurePitchMotor();
         configureExternalEncoder();
         configureController();
-        configureInternalEncoder();
     }
 
     /**
@@ -117,7 +111,10 @@ public class Pitch {
      * @return The current position of the pitch.
      */
     public Rotation2d getPosition() {
-        return Rotation2d.fromRotations(encoderPositionSignal.refresh().getValue());
+        return Rotation2d.fromRotations(
+                absoluteEncoder.getEncoderPosition()
+//                encoderPositionSignal.refresh().getValue()
+        );
     }
 
     /**
@@ -127,11 +124,11 @@ public class Pitch {
      * @Units Rotations per second
      */
     public double getVelocity() {
-        return encoder.getVelocity();
+        return motor.getSystemVelocity() / 60;
     }
 
-    public void setBrake(boolean shouldBrake) {
-        motor.setIdleMode(shouldBrake ? CANSparkBase.IdleMode.kBrake : CANSparkBase.IdleMode.kCoast);
+    public void setIdleMode(MotorProperties.IdleMode idleMode) {
+        motor.setIdleMode(idleMode);
     }
 
     /**
@@ -141,7 +138,7 @@ public class Pitch {
      * @Units Volts
      */
     public Measure<Voltage> getVoltage() {
-        return Volts.of(motor.getAppliedOutput() * 12);
+        return Volts.of(motor.getVoltage() * 12);
     }
 
     /**
@@ -151,7 +148,7 @@ public class Pitch {
      * @Units Rotations of the motor
      */
     public double getRelativeEncoderPosition() {
-        return encoder.getPosition();
+        return motor.getSystemPosition();
     }
 
     /**
@@ -161,7 +158,7 @@ public class Pitch {
      * @Units Volts
      */
     public void setRawVoltage(double voltage) {
-        motor.setVoltage(voltage);
+        motor.setOutput(MotorProperties.ControlMode.VOLTAGE, voltage);
     }
 
     public void resetController() {
@@ -174,7 +171,7 @@ public class Pitch {
         SmartDashboard.putNumber("pitch/goalPosition [DEG]", Rotation2d.fromRotations(goal.position).getDegrees());
         SmartDashboard.putNumber("pitch/goalVelocity [RotPS]", goal.velocity);
         SmartDashboard.putBoolean("pitch/isAtGoal", isAtGoal());
-        SmartDashboard.putNumber("pitch/ElectricityCurrent [A]", motor.getOutputCurrent());
+        SmartDashboard.putNumber("pitch/ElectricityCurrent [A]", motor.getCurrent());
         SmartDashboard.putNumber("pitch/ElectricityVoltage [V]", getVoltage().in(Volts));
     }
 
@@ -192,7 +189,7 @@ public class Pitch {
 
         final double voltageOutput = feedforwardOutput + controllerOutput;
 
-        motor.setVoltage(voltageOutput);
+        motor.setOutput(MotorProperties.ControlMode.VOLTAGE, voltageOutput);
     }
 
     private void setGoal(TrapezoidProfile.State goal) {
@@ -200,38 +197,38 @@ public class Pitch {
         this.goal = goal;
     }
 
-    private void configureInternalEncoder() {
-        encoder = motor.getEncoder();
-
-        encoder.setPositionConversionFactor(PITCH_GEAR_RATIO);
-        encoder.setVelocityConversionFactor(PITCH_GEAR_RATIO / SEC_PER_MIN);
-        encoder.setPosition(getPosition().getRotations());
-    }
-
     private void configurePitchMotor() {
-        motor.restoreFactoryDefaults();
+        MotorConfiguration configuration = new MotorConfiguration();
 
-        motor.enableVoltageCompensation(VOLTAGE_COMPENSATION_SATURATION);
-        motor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        motor.setSmartCurrentLimit(40);
+        configuration.conversionFactor = PITCH_GEAR_RATIO;
 
-        CANSparkMaxUtil.setCANSparkBusUsage(motor, CANSparkMaxUtil.Usage.kMinimal);
+        configuration.idleMode = MotorProperties.IdleMode.BRAKE;
+        configuration.supplyCurrentLimit = 40;
 
-        motor.burnFlash();
+        motor.setMotorPosition(getPosition().getRotations());
     }
 
     private void configureExternalEncoder() {
-        CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
+        EncoderConfiguration encoderConfiguration = new EncoderConfiguration();
 
-        canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        canCoderConfig.MagnetSensor.MagnetOffset = PIVOT_ENCODER_OFFSET.getRotations();
+        encoderConfiguration.invert = true;
+        encoderConfiguration.offsetRotations = PIVOT_ENCODER_OFFSET.getRotations();
+        encoderConfiguration.sensorRange = EncoderProperties.SensorRange.NegativeHalfToHalf;
 
-        applyConfig(absoluteEncoder, canCoderConfig);
+//        CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
 
-        encoderPositionSignal = absoluteEncoder.getPosition().clone();
-        encoderPositionSignal.setUpdateFrequency(50);
+//        canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+//        canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+//        canCoderConfig.MagnetSensor.MagnetOffset = PIVOT_ENCODER_OFFSET.getRotations();
+//
+//        applyConfig(absoluteEncoder, canCoderConfig);
 
-        absoluteEncoder.optimizeBusUtilization();
+        absoluteEncoder.configure(encoderConfiguration);
+
+        absoluteEncoder.setSignalUpdateFrequency(Properties.SignalType.POSITION, 50);
+//        encoderPositionSignal = absoluteEncoder.getPosition().clone();
+//        encoderPositionSignal.setUpdateFrequency(50);
+
+//        absoluteEncoder.optimizeBusUtilization();
     }
 }

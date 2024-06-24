@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.generic.motor.MotorProperties;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
@@ -71,8 +72,8 @@ public class ShooterSubsystem extends SubsystemBase {
         pitch.resetController();
     }
 
-    public void setPitchBrakeStatus(boolean shouldBrake) {
-        pitch.setBrake(shouldBrake);
+    public void setPitchIdleMode(MotorProperties.IdleMode idleMode) {
+        pitch.setIdleMode(idleMode);
     }
 
     public void setPitchVoltage(Measure<Voltage> volts) {

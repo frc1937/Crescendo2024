@@ -9,6 +9,8 @@ public interface Motor {
     void setOutput(MotorProperties.ControlMode controlMode, double output);
     void setOutput(MotorProperties.ControlMode controlMode, double output, double feedforward);
 
+    void setIdleMode(MotorProperties.IdleMode idleMode);
+
     void stopMotor();
 
     void setMotorPosition(double position);
