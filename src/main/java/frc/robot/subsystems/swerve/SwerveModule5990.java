@@ -140,7 +140,7 @@ public class SwerveModule5990 {
     }
 
     private void configureSteerMotor() {
-        steerMotor = new GenericSpark(swerveModuleConstants.steerMotorID());
+        steerMotor = new GenericSpark(swerveModuleConstants.steerMotorID(), MotorProperties.SparkType.MAX);
 
         MotorConfiguration steerConfiguration = new MotorConfiguration();
 
