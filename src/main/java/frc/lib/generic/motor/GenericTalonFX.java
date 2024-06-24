@@ -4,20 +4,17 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.StrictFollower;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import frc.lib.generic.Properties;
 
 public class GenericTalonFX extends TalonFX implements Motor {
     private int slotToUse = 0;
 
-    private final StatusSignal<Double> positionSignal, velocitySignal, voltageSignal, currentSignal, temperatureSignal;
+    private final StatusSignal<Double> positionSignal, velocitySignal, voltageSignal, currentSignal, temperatureSignal, closedLoopTarget;
     private final TalonFXConfiguration talonConfig = new TalonFXConfiguration();
     private final TalonFXConfigurator talonConfigurator;
 
@@ -39,6 +36,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
         voltageSignal = super.getMotorVoltage().clone();
         currentSignal = super.getSupplyCurrent().clone();
         temperatureSignal = super.getDeviceTemp().clone();
+        closedLoopTarget = super.getClosedLoopReference().clone();
     }
 
     @Override
@@ -97,6 +95,11 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
+    public double getClosedLoopTarget() {
+        return closedLoopTarget.refresh().getValue();
+    }
+
+    @Override
     public double getSystemVelocity() {
         return velocitySignal.refresh().getValue();
     }
@@ -112,6 +115,11 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
+    public double getVoltage() {
+        return voltageSignal.refresh().getValue();
+    }
+
+    @Override
     public void setFollowerOf(int masterPort) {
         setControl(new StrictFollower(masterPort)); //check if this should be called 1 times or once is enough
     }
@@ -124,8 +132,15 @@ public class GenericTalonFX extends TalonFX implements Motor {
             case VOLTAGE -> voltageSignal.setUpdateFrequency(updateFrequencyHz);
             case CURRENT -> currentSignal.setUpdateFrequency(updateFrequencyHz);
             case TEMPERATURE -> temperatureSignal.setUpdateFrequency(updateFrequencyHz);
+            case CLOSED_LOOP_TARGET -> closedLoopTarget.setUpdateFrequency(updateFrequencyHz);
         }
     }
+
+    @Override
+    public TalonFXSimState getSimulationState() {
+        return super.getSimState();
+    }
+
 
     @Override
     public boolean configure(MotorConfiguration configuration) {

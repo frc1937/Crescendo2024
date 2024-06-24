@@ -11,6 +11,6 @@ public class Properties {
     }
 
     public enum SignalType {
-        CURRENT, POSITION, VELOCITY, VOLTAGE, TEMPERATURE
+        CURRENT, POSITION, VELOCITY, VOLTAGE, TEMPERATURE, CLOSED_LOOP_TARGET
     }
 }

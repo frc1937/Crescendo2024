@@ -1,12 +1,15 @@
 package frc.lib.generic.motor;
 
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.generic.Properties;
 
 public class GenericSpark extends CANSparkMax implements Motor {
     private final RelativeEncoder encoder;
     private final SparkPIDController controller;
+
+    private MotorConfiguration configuration;
+    private double closedLoopTarget;
 
     private int slotToUse = 0;
 
@@ -26,14 +29,13 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     @Override
     public void setOutput(MotorProperties.ControlMode mode, double output, double feedforward) {
+        closedLoopTarget = output;
+
         switch (mode) { //todo: this method, correctly.
             case PERCENTAGE_OUTPUT -> controller.setReference(output, ControlType.kDutyCycle);
 
             case VELOCITY -> controller.setReference(output, ControlType.kVelocity, slotToUse, feedforward);
-            case POSITION -> {
-                SmartDashboard.putNumber("output reference kPosition [Rotations]", output);
-                controller.setReference(output, ControlType.kPosition, slotToUse, feedforward);
-            }
+            case POSITION -> controller.setReference(output, ControlType.kPosition, slotToUse, feedforward);
 
             case VOLTAGE -> controller.setReference(output, ControlType.kVoltage, slotToUse);
             case CURRENT -> controller.setReference(output, ControlType.kCurrent, slotToUse);
@@ -43,8 +45,6 @@ public class GenericSpark extends CANSparkMax implements Motor {
     @Override
     public void setMotorPosition(double position) {
         encoder.setPosition(position);
-        SmartDashboard.putNumber("output encoder setpoint position [Rotations]", position);
-        SmartDashboard.putNumber("output encoder current position [Rotations]", encoder.getPosition());
         //Position to set the motor to, after gear ratio is applied
     }
 
@@ -79,6 +79,16 @@ public class GenericSpark extends CANSparkMax implements Motor {
     }
 
     @Override
+    public double getClosedLoopTarget() {
+        return closedLoopTarget;
+    }
+
+    @Override
+    public double getVoltage() {
+        return super.getBusVoltage();
+    }
+
+    @Override
     public double getSystemVelocity() {
         return encoder.getVelocity();
     }
@@ -102,7 +112,18 @@ public class GenericSpark extends CANSparkMax implements Motor {
     }
 
     @Override
+    public TalonFXSimState getSimulationState() {
+        Motor motor = new GenericTalonFX(getDeviceId());
+
+        motor.configure(configuration);
+        //todo: This is absolutely ridiculous! Check if works...
+        return motor.getSimulationState();
+    }
+
+    @Override
     public boolean configure(MotorConfiguration configuration) {
+        this.configuration = configuration;
+
         super.restoreFactoryDefaults();
 
         super.setIdleMode(configuration.idleMode.equals(MotorProperties.IdleMode.BRAKE) ? IdleMode.kBrake : IdleMode.kCoast);
