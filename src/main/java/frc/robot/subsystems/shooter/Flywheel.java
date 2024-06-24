@@ -111,7 +111,7 @@ public class Flywheel {
     }
 
     private void configureMotor(int motorId, boolean invert) {
-        motor = new GenericSpark(motorId);
+        motor = new GenericSpark(motorId, MotorProperties.SparkType.FLEX);
 
         MotorConfiguration configuration = new MotorConfiguration();
 

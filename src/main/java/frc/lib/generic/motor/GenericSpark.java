@@ -1,13 +1,13 @@
 package frc.lib.generic.motor;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import frc.lib.generic.Properties;
 
-public class GenericSpark extends CANSparkMax implements Motor {
+public class GenericSpark extends CANSparkBase implements Motor {
     private final RelativeEncoder encoder;
     private final SparkPIDController controller;
 
@@ -15,12 +15,13 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     private int slotToUse = 0;
 
-    public GenericSpark(int deviceId) {
-        super(deviceId, MotorType.kBrushless);
+    public GenericSpark(int deviceId, MotorProperties.SparkType sparkType) {
+        super(deviceId, MotorType.kBrushless,
+                sparkType == MotorProperties.SparkType.MAX ? SparkModel.SparkMax : SparkModel.SparkFlex);
 
         optimizeBusUsage();
 
-        encoder = super.getEncoder();
+        encoder = getEncoder();
         controller = super.getPIDController();
     }
 
@@ -102,7 +103,7 @@ public class GenericSpark extends CANSparkMax implements Motor {
 
     @Override
     public void setFollowerOf(int masterPort) {
-        super.follow(new GenericSpark(masterPort));
+//        super.follow(new GenericSpark(masterPort, super./)); //TODO: FiX
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
     }
 
@@ -179,5 +180,10 @@ public class GenericSpark extends CANSparkMax implements Motor {
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 10000);
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 10000);
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 10000);
+    }
+
+    @Override
+    public RelativeEncoder getEncoder() {
+        return null;
     }
 }
