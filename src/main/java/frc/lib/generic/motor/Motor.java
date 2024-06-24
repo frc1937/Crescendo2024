@@ -13,6 +13,8 @@ public interface Motor {
 
     void setMotorPosition(double position);
 
+    int getDeviceID();
+
     /** No gearing applied*/
     double getMotorPosition();
     /** No gearing applied*/

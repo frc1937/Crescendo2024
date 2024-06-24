@@ -51,6 +51,11 @@ public class GenericSpark extends CANSparkMax implements Motor {
     }
 
     @Override
+    public int getDeviceID() {
+        return getDeviceId();
+    }
+
+    @Override
     public void setP(double kP, int slot) {
         controller.setP(kP, slot);
     }
