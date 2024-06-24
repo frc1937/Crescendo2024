@@ -122,5 +122,7 @@ public class Flywheel {
         configuration.statorCurrentLimit = 100;
 
         motor.configure(configuration);
+
+        motor.setSignalUpdateFrequency(Properties.SignalType.VELOCITY, 50);
     }
 }
