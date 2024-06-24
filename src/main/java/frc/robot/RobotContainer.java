@@ -187,7 +187,7 @@ public class RobotContainer {
 
 //        drStartButton.whileTrue(new StaticFrictionCharacterization(shooterCommands));
 
-        drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 0.5, 4));
+//        drBackButton.whileTrue(new GearRatioCharacterization(shooterSubsystem.getPitch(), 0.5, 4));
 
         shooterSubsystem.setDefaultCommand(new StartEndCommand(() -> {
         }, () -> {

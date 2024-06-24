@@ -6,9 +6,12 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.generic.Properties;
 
 public class GenericSpark extends CANSparkBase implements Motor {
+    private final MotorProperties.SparkType model;
+
     private final RelativeEncoder encoder;
     private final SparkPIDController controller;
 
@@ -17,8 +20,10 @@ public class GenericSpark extends CANSparkBase implements Motor {
     private int slotToUse = 0;
 
     public GenericSpark(int deviceId, MotorProperties.SparkType sparkType) {
-        super(deviceId, MotorType.kBrushless,
-                sparkType == MotorProperties.SparkType.MAX ? SparkModel.SparkMax : SparkModel.SparkFlex);
+        super(deviceId, MotorType.kBrushless, sparkType == MotorProperties.SparkType.MAX ? SparkModel.SparkMax : SparkModel.SparkFlex);
+        model = sparkType;
+
+        SmartDashboard.putString("MODEL OF SPARK: " + deviceId, model.toString());
 
         optimizeBusUsage();
 
@@ -68,13 +73,13 @@ public class GenericSpark extends CANSparkBase implements Motor {
     }
 
     @Override
-    public double getMotorVelocity() {
-        return getSystemVelocity() / encoder.getVelocityConversionFactor();
+    public double getMotorPosition() {
+        return getSystemPosition() / encoder.getPositionConversionFactor();
     }
 
     @Override
-    public double getMotorPosition() {
-        return getSystemPosition() / encoder.getPositionConversionFactor();
+    public double getMotorVelocity() {
+        return encoder.getVelocity() / encoder.getVelocityConversionFactor();
     }
 
     @Override
@@ -93,6 +98,11 @@ public class GenericSpark extends CANSparkBase implements Motor {
     }
 
     @Override
+    public double getSystemVelocity() {
+        return encoder.getVelocity();
+    }
+
+    @Override
     public double getClosedLoopTarget() {
         return closedLoopTarget;
     }
@@ -102,14 +112,10 @@ public class GenericSpark extends CANSparkBase implements Motor {
         return super.getBusVoltage();
     }
 
-    @Override
-    public double getSystemVelocity() {
-        return encoder.getVelocity();
-    }
 
     @Override
     public void setFollowerOf(int masterPort) {
-//        super.follow(new GenericSpark(masterPort, super./)); //TODO: FiX
+        super.follow(new GenericSpark(masterPort, model));
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
     }
 
@@ -151,7 +157,8 @@ public class GenericSpark extends CANSparkBase implements Motor {
 
         super.enableVoltageCompensation(12);
 
-        super.setSmartCurrentLimit((int) configuration.statorCurrentLimit);
+        if (configuration.statorCurrentLimit != -1) super.setSmartCurrentLimit((int) configuration.statorCurrentLimit);
+        if (configuration.supplyCurrentLimit != -1) super.setSmartCurrentLimit((int) configuration.supplyCurrentLimit);
 
         configurePID(configuration);
 
@@ -190,6 +197,16 @@ public class GenericSpark extends CANSparkBase implements Motor {
 
     @Override
     public RelativeEncoder getEncoder() {
-        return getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
+        switch (model) {
+            case MAX -> {
+                return getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
+            }
+            case FLEX -> {
+                return getEncoder(SparkRelativeEncoder.Type.kQuadrature, 7168);
+            }
+        }
+
+        return null;
+
     }
 }

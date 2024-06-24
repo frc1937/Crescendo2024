@@ -43,12 +43,6 @@ public class Pitch {
     private final ProfiledPIDController feedback = new ProfiledPIDController(PITCH_KP, PITCH_KI, PITCH_KD, constraints);
     private final ArmFeedforward feedforward = new ArmFeedforward(PITCH_KS, PITCH_KG, PITCH_KV, PITCH_KA);
 
-    /**
-     * The position is in rotations.
-     * The velocity is in rotations per second.
-     */
-//    private StatusSignal<Double> encoderPositionSignal;
-
     private TrapezoidProfile.State goal;
 
     public Pitch() {
@@ -111,10 +105,7 @@ public class Pitch {
      * @return The current position of the pitch.
      */
     public Rotation2d getPosition() {
-        return Rotation2d.fromRotations(
-                absoluteEncoder.getEncoderPosition()
-//                encoderPositionSignal.refresh().getValue()
-        );
+        return Rotation2d.fromRotations(absoluteEncoder.getEncoderPosition());
     }
 
     /**
@@ -215,20 +206,8 @@ public class Pitch {
         encoderConfiguration.offsetRotations = PIVOT_ENCODER_OFFSET.getRotations();
         encoderConfiguration.sensorRange = EncoderProperties.SensorRange.NegativeHalfToHalf;
 
-//        CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
-
-//        canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-//        canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-//        canCoderConfig.MagnetSensor.MagnetOffset = PIVOT_ENCODER_OFFSET.getRotations();
-//
-//        applyConfig(absoluteEncoder, canCoderConfig);
-
         absoluteEncoder.configure(encoderConfiguration);
 
         absoluteEncoder.setSignalUpdateFrequency(Properties.SignalType.POSITION, 50);
-//        encoderPositionSignal = absoluteEncoder.getPosition().clone();
-//        encoderPositionSignal.setUpdateFrequency(50);
-
-//        absoluteEncoder.optimizeBusUtilization();
     }
 }

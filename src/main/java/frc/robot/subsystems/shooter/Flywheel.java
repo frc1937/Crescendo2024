@@ -58,7 +58,7 @@ public class Flywheel {
     }
 
     public Measure<Velocity<Angle>> getVelocity() {
-        return RPM.of(motor.getMotorVelocity());
+        return RPM.of(motor.getSystemVelocity());
     }
 
     public void stopMotor() {

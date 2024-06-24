@@ -127,6 +127,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getPitchGoal() {
+//        return Rotation2d.fromRotations(0);
         return pitch.getGoalPosition();
     }
 
@@ -144,7 +145,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public Pitch getPitch() {
         return pitch;
     }
-
+//
     public Rotation2d getPitchPosition() {
         return pitch.getPosition();
     }
@@ -153,7 +154,9 @@ public class ShooterSubsystem extends SubsystemBase {
         return leftFlywheel.isAtGoal() && rightFlywheel.isAtGoal();
     }
 
-    public boolean pitchAtReference() {
+    public boolean pitchAtReference()
+    {
+//        return  true;
         return pitch.isAtGoal();
     }
 
