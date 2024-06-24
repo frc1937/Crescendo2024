@@ -23,9 +23,12 @@ public abstract class GenericSimulation {
         REGISTERED_SIMULATIONS.add(this);
 
         motor = new GenericTalonFX(REGISTERED_SIMULATIONS.size() - 1);
+
         motor.setSignalUpdateFrequency(Properties.SignalType.CLOSED_LOOP_TARGET, 1.0 / ROBORIO_LOOP_TIME);
+        motor.setSignalUpdateFrequency(Properties.SignalType.VOLTAGE, 1.0 / ROBORIO_LOOP_TIME);
 
         motorSimulationState = motor.getSimulationState();
+        motorSimulationState.setSupplyVoltage(12); //Voltage compensation.
     }
 
     /**
@@ -63,9 +66,9 @@ public abstract class GenericSimulation {
 
     public abstract double getPositionRotations();
     public abstract double getVelocityRotationsPerSecond();
-
-    public abstract void update();
-
     public abstract double getCurrent();
-    public abstract void setVoltage(double voltage);
+
+    //These have weaker access because they're used here only.
+    abstract void update();
+    abstract void setVoltage(double voltage);
 }

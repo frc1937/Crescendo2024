@@ -4,18 +4,18 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class Conversions {
     public static final double
-            DEGREES_PER_REVOLUTIONS = 360,
+            DEGREES_PER_ROTATIONS = 360,
             HUNDRED_MS_PER_SEC = 10,
             SEC_PER_MIN = 60;
 
     /**
-     * Converts degrees to revolutions.
+     * Converts degrees to rotations.
      *
      * @param degrees degrees
-     * @return revolutions
+     * @return rotations
      */
-    public static double degreesToRevolutions(double degrees) {
-        return degrees / DEGREES_PER_REVOLUTIONS;
+    public static double degreesToRotations(double degrees) {
+        return degrees / DEGREES_PER_ROTATIONS;
     }
 
     public static double rpmToRotationsPerSecond(double rpm) {
@@ -23,13 +23,13 @@ public class Conversions {
     }
 
     /**
-     * Converts revolutions to degrees.
+     * Converts rotations to degrees.
      *
-     * @param revolutions revolutions
+     * @param rotations rotations
      * @return degrees
      */
-    public static double revolutionsToDegrees(double revolutions) {
-        return revolutions * DEGREES_PER_REVOLUTIONS;
+    public static double rotationsToDegrees(double rotations) {
+        return rotations * DEGREES_PER_ROTATIONS;
     }
 
     /**
@@ -76,14 +76,29 @@ public class Conversions {
     }
 
     /**
-     * Converts rotations per second to meters per second.
+     * Converts metres per second to rotations per second.
+     * This is the same as converting metres to rotations.
      *
-     * @param velocityMetersPerSecond rotations per second
-     * @return meters per second
+     * @param velocityMetersPerSecond      the velocity in metres per second
+     * @param wheelDiameterMeters the wheel diameter in metres
+     * @return the rotations
      */
     public static double metersPerSecondToRotationsPerSecond(double velocityMetersPerSecond, double wheelDiameterMeters) {
-        return velocityMetersPerSecond / (Math.PI * wheelDiameterMeters);
+        return metresToRotations(velocityMetersPerSecond, wheelDiameterMeters);
     }
+
+    /**
+     * Converts metres to rotations.
+     * This is the same as converting metres per second to rotations per second.
+     *
+     * @param metres      the distance
+     * @param wheelDiameter the wheel diameter
+     * @return the rotations
+     */
+    public static double metresToRotations(double metres, double wheelDiameter) {
+        return metres / (wheelDiameter * Math.PI);
+    }
+    
 
     /**
      * Converts a target output percentage output to voltage when voltage compensation is enabled.
