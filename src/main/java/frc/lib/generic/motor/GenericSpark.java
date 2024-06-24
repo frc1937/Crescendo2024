@@ -1,20 +1,22 @@
 package frc.lib.generic.motor;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import com.revrobotics.*;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import frc.lib.generic.Properties;
 
 public class GenericSpark extends CANSparkMax implements Motor {
     private final RelativeEncoder encoder;
     private final SparkPIDController controller;
 
-    private MotorConfiguration configuration;
     private double closedLoopTarget;
 
     private int slotToUse = 0;
 
     public GenericSpark(int deviceId) {
-        super(deviceId, CANSparkLowLevel.MotorType.kBrushless);
+        super(deviceId, MotorType.kBrushless);
 
         optimizeBusUsage();
 
@@ -96,10 +98,12 @@ public class GenericSpark extends CANSparkMax implements Motor {
     @Override
     public void setFollowerOf(int masterPort) {
         super.follow(new GenericSpark(masterPort));
-        super.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 10);
+        super.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
     }
 
-    /**Explanation here: <a href="https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames">REV DOCS</a>*/
+    /**
+     * Explanation here: <a href="https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames">REV DOCS</a>
+     */
     @Override
     public void setSignalUpdateFrequency(Properties.SignalType signalType, double updateFrequencyHz) {
         int ms = (int) (1000 / updateFrequencyHz);
@@ -112,18 +116,19 @@ public class GenericSpark extends CANSparkMax implements Motor {
     }
 
     @Override
-    public TalonFXSimState getSimulationState() {
-        Motor motor = new GenericTalonFX(getDeviceId());
+    public void setSignalsUpdateFrequency(double updateFrequencyHz, Properties.SignalType... signalTypes) {
+        for (Properties.SignalType signalType : signalTypes) {
+            setSignalUpdateFrequency(signalType, updateFrequencyHz);
+        }
+    }
 
-        motor.configure(configuration);
-        //todo: This is absolutely ridiculous! Check if works...
-        return motor.getSimulationState();
+    @Override
+    public TalonFXSimState getSimulationState() {
+        throw new UnsupportedOperationException("Not supported. Use GenericTalonFX");
     }
 
     @Override
     public boolean configure(MotorConfiguration configuration) {
-        this.configuration = configuration;
-
         super.restoreFactoryDefaults();
 
         super.setIdleMode(configuration.idleMode.equals(MotorProperties.IdleMode.BRAKE) ? IdleMode.kBrake : IdleMode.kCoast);
@@ -162,7 +167,7 @@ public class GenericSpark extends CANSparkMax implements Motor {
      * Only call this ONCE at the beginning.
      */
     private void optimizeBusUsage() {
-        super.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 500);
+        super.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 500);
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10000);
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10000);
         super.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 10000);

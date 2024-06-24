@@ -36,7 +36,9 @@ public interface Motor {
     double getSystemVelocity();
 
     void setFollowerOf(int masterPort);
+
     void setSignalUpdateFrequency(Properties.SignalType signalType, double updateFrequencyHz);
+    void setSignalsUpdateFrequency(double updateFrequencyHz, Properties.SignalType... signalTypes);
 
     TalonFXSimState getSimulationState();
 

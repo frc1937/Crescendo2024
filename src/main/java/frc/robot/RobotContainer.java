@@ -28,8 +28,8 @@ import static frc.lib.util.Controller.Axis.*;
 import static frc.lib.util.Controller.Inputs.*;
 import static frc.lib.util.Controller.Stick.LEFT_STICK;
 import static frc.lib.util.Controller.Stick.RIGHT_STICK;
-import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
-import static frc.robot.Constants.VisionConstants.FRONT_CAMERA_NAME;
+import static frc.robot.GlobalConstants.Transforms.ROBOT_TO_FRONT_CAMERA;
+import static frc.robot.GlobalConstants.VisionConstants.FRONT_CAMERA_NAME;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_BACK;
 import static frc.robot.subsystems.shooter.ShooterConstants.SPEAKER_FRONT;
 
@@ -112,7 +112,7 @@ public class RobotContainer {
 
         DoubleSupplier translationSup = () -> -driveController.getRawAxis(LEFT_Y);
         DoubleSupplier strafeSup = () -> -driveController.getRawAxis(LEFT_X);
-        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), Constants.STICK_DEADBAND);
+        DoubleSupplier rotationSup = () -> MathUtil.applyDeadband(-driveController.getRawAxis(RIGHT_X), GlobalConstants.STICK_DEADBAND);
 
         swerve5990.setDefaultCommand(
                 new TeleOpDrive(

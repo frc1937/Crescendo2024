@@ -22,7 +22,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.VOLTAGE_COMPENSATION_SATURATION;
+import static frc.robot.GlobalConstants.VOLTAGE_COMPENSATION_SATURATION;
 import static frc.robot.subsystems.shooter.ShooterConstants.FLYWHEEL_TOLERANCE;
 
 public class Flywheel {

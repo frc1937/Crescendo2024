@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Constants.LEDsConstants.LEDS_COUNT;
+import static frc.robot.GlobalConstants.LEDsConstants.LEDS_COUNT;
 
 public class LEDsSubsystem extends SubsystemBase {
     private final AddressableLED leds = new AddressableLED(0);

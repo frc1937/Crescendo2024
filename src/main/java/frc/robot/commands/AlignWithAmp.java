@@ -7,7 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.GlobalConstants;
 import frc.robot.subsystems.swerve.Swerve5990;
 
 import java.util.function.DoubleSupplier;
@@ -27,8 +27,8 @@ public class AlignWithAmp extends Command {
 
     @Override
     public void execute() {
-        double deadbandTranslation = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.STICK_DEADBAND);
-        double deadbandStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.STICK_DEADBAND);
+        double deadbandTranslation = MathUtil.applyDeadband(translationSupplier.getAsDouble(), GlobalConstants.STICK_DEADBAND);
+        double deadbandStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), GlobalConstants.STICK_DEADBAND);
 
         swerve5990.driveFieldRelative(
                 deadbandTranslation,

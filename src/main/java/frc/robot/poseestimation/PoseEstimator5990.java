@@ -23,11 +23,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static frc.lib.util.AlliancePose2d.AllianceUtils.fromBluePose;
-import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
-import static frc.robot.Constants.VisionConstants.DEFAULT_POSE;
-import static frc.robot.Constants.VisionConstants.ROTATION_STD_EXPONENT;
-import static frc.robot.Constants.VisionConstants.TAG_ID_TO_POSE;
-import static frc.robot.Constants.VisionConstants.TRANSLATION_STD_EXPONENT;
+import static frc.robot.GlobalConstants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.GlobalConstants.VisionConstants.DEFAULT_POSE;
+import static frc.robot.GlobalConstants.VisionConstants.ROTATION_STD_EXPONENT;
+import static frc.robot.GlobalConstants.VisionConstants.TAG_ID_TO_POSE;
+import static frc.robot.GlobalConstants.VisionConstants.TRANSLATION_STD_EXPONENT;
 
 /**
  * A class that estimates the robot's pose using team 6328's custom pose estimator.

@@ -12,8 +12,8 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AlliancePose2d;
 
-import static frc.robot.Constants.VisionConstants.BLUE_SPEAKER;
-import static frc.robot.Constants.VisionConstants.RED_SPEAKER;
+import static frc.robot.GlobalConstants.VisionConstants.BLUE_SPEAKER;
+import static frc.robot.GlobalConstants.VisionConstants.RED_SPEAKER;
 import static frc.robot.subsystems.shooter.ShooterConstants.GRAVITY_FORCE;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_POINT_X_OFFSET_METRES;
 import static frc.robot.subsystems.shooter.ShooterConstants.PIVOT_POINT_Z_OFFSET_METRES;

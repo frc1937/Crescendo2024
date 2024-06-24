@@ -12,7 +12,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.util.Optional;
 
-import static frc.robot.Constants.Transforms.ROBOT_TO_FRONT_CAMERA;
+import static frc.robot.GlobalConstants.Transforms.ROBOT_TO_FRONT_CAMERA;
 
 public class AlignWithTag extends SequentialCommandGroup {
     private final Swerve5990 swerve5990;

@@ -1,7 +1,7 @@
 package frc.lib.util;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
+import frc.robot.GlobalConstants;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public class TunableNumber implements DoubleSupplier {
             hasDefault = true;
             this.defaultValue = defaultValue;
 
-            if (Constants.IS_TUNING_MODE) {
+            if (GlobalConstants.IS_TUNING_MODE) {
                 SmartDashboard.putNumber(key, SmartDashboard.getNumber(key, defaultValue));
             }
         }
@@ -66,7 +66,7 @@ public class TunableNumber implements DoubleSupplier {
         if (!hasDefault) {
             return 0.0;
         } else {
-            return Constants.IS_TUNING_MODE ? SmartDashboard.getNumber(key, defaultValue) : defaultValue;
+            return GlobalConstants.IS_TUNING_MODE ? SmartDashboard.getNumber(key, defaultValue) : defaultValue;
         }
     }
 

@@ -2,11 +2,6 @@ package frc.lib.util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-
-import static edu.wpi.first.units.Units.MetersPerSecond;
 
 public class CTREModuleState {
 

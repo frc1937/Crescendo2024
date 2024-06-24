@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
+import frc.robot.GlobalConstants;
 import frc.robot.subsystems.LEDsSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
@@ -49,7 +49,7 @@ public class ShooterCommands {
 
                     targetPoses.set(new Pose3d[]{
                                     shooterPhysicsCalculations.getTargetPose(),
-                                    Constants.VisionConstants.TAG_ID_TO_POSE.get(7)
+                                    GlobalConstants.VisionConstants.TAG_ID_TO_POSE.get(7)
                             }
                     );
 

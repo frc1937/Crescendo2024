@@ -17,8 +17,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import java.util.List;
 import java.util.Optional;
 
-import static frc.robot.Constants.VisionConstants.APRILTAG_AMBIGUITY_THRESHOLD;
-import static frc.robot.Constants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
+import static frc.robot.GlobalConstants.VisionConstants.APRILTAG_AMBIGUITY_THRESHOLD;
+import static frc.robot.GlobalConstants.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
 import static org.photonvision.estimation.TargetModel.kAprilTag36h11;
 
 /**

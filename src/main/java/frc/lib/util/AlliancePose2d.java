@@ -7,9 +7,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
-import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.Constants.FIELD_LENGTH_METRES;
 import static frc.lib.util.AlliancePose2d.AllianceUtils.isBlueAlliance;
+import static frc.robot.GlobalConstants.FIELD_LENGTH_METRES;
 
 public class AlliancePose2d {
     private final Pose2d bluePose;
@@ -106,7 +105,7 @@ public class AlliancePose2d {
 
         public static Pose3d mirrorPose(Pose3d pose) {
             return new Pose3d(
-                    FIELD_LENGTH_METRES.in(Meters) - pose.getX(),
+                    FIELD_LENGTH_METRES - pose.getX(),
                     pose.getY(),
                     pose.getZ(),
                     getCorrectRotation(pose.getRotation())
@@ -116,7 +115,7 @@ public class AlliancePose2d {
 
     private Pose2d mirrorPose(Pose2d pose) {
         return new Pose2d(
-                FIELD_LENGTH_METRES.in(Meters) - pose.getX(),
+                FIELD_LENGTH_METRES - pose.getX(),
                 pose.getY(),
                 new Rotation2d(Math.PI).minus(pose.getRotation())
         );

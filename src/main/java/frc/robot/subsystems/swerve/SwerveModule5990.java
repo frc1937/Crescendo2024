@@ -18,7 +18,7 @@ import frc.lib.math.Conversions;
 import frc.lib.util.CTREModuleState;
 
 import static frc.lib.math.Conversions.metersPerSecondToRotationsPerSecond;
-import static frc.robot.Constants.ODOMETRY_FREQUENCY_HERTZ;
+import static frc.robot.GlobalConstants.ODOMETRY_FREQUENCY_HERTZ;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_CURRENT_LIMIT;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_GEAR_RATIO;
 import static frc.robot.subsystems.swerve.SwerveConstants.ANGLE_KP;

@@ -19,13 +19,15 @@ public abstract class GenericSimulation {
     private final Motor motor;
     private final TalonFXSimState motorSimulationState;
 
-    GenericSimulation() {
+    protected GenericSimulation() {
         REGISTERED_SIMULATIONS.add(this);
 
         motor = new GenericTalonFX(REGISTERED_SIMULATIONS.size() - 1);
 
-        motor.setSignalUpdateFrequency(Properties.SignalType.CLOSED_LOOP_TARGET, 1.0 / ROBORIO_LOOP_TIME);
-        motor.setSignalUpdateFrequency(Properties.SignalType.VOLTAGE, 1.0 / ROBORIO_LOOP_TIME);
+        //This is simulation. we don't give a damn fuck! about performance.
+        Properties.SignalType[] signalTypes = Properties.SignalType.values();
+
+        motor.setSignalsUpdateFrequency(1.0 / ROBORIO_LOOP_TIME, signalTypes);
 
         motorSimulationState = motor.getSimulationState();
         motorSimulationState.setSupplyVoltage(12); //Voltage compensation.

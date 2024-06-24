@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
 
     public Robot() {
 //        addPeriodic(() -> robotContainer.infrequentPeriodic(), 1/ INFREQUENT_PERIODIC_HERTZ);
-        addPeriodic(() -> robotContainer.frequentPeriodic(), 1 / Constants.PERIODIC_FREQUENCY_HERTZ, 0.05);
+        addPeriodic(() -> robotContainer.frequentPeriodic(), 1 / GlobalConstants.PERIODIC_FREQUENCY_HERTZ, 0.05);
     }
 
     @Override

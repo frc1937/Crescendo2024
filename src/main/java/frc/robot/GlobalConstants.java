@@ -6,16 +6,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.lib.util.AlliancePose2d;
@@ -24,11 +18,10 @@ import org.photonvision.PhotonPoseEstimator;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.lib.util.AlliancePose2d.AllianceUtils.fromCorrectPose;
 
-public final class Constants {
+public final class GlobalConstants {
     public static boolean IS_TUNING_MODE = true;
 
     public static final double POSE_HISTORY_DURATION = 0.3;
@@ -53,8 +46,8 @@ public final class Constants {
 
     public static final double ROBORIO_LOOP_TIME_SECONDS = 0.02;
 
-    public static final Measure<Distance> FIELD_LENGTH_METRES = Meters.of(16.48);
-    public static final Measure<Distance> FIELD_WIDTH_METRES = Meters.of(8.02);
+    public static final double FIELD_LENGTH_METRES = 16.48;
+    public static final double FIELD_WIDTH_METRES = 8.02;
 
     /**
      * Once how much time, in Hertz (1/hertz = seconds), to run the infrequent periodic procedure

@@ -3,7 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.GlobalConstants;
 import frc.robot.poseestimation.PoseEstimator5990;
 import frc.robot.subsystems.shooter.ShooterPhysicsCalculations;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -38,8 +38,8 @@ public class ShootOnTheMove extends Command {
     public void execute() {
         shooterPhysicsCalculations.updateValuesForSpeakerAlignment(swerve5990.getSelfRelativeVelocity());
 
-        double targetTranslation = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.STICK_DEADBAND);
-        double targetStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.STICK_DEADBAND);
+        double targetTranslation = MathUtil.applyDeadband(translationSupplier.getAsDouble(), GlobalConstants.STICK_DEADBAND);
+        double targetStrafe = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), GlobalConstants.STICK_DEADBAND);
 
         Rotation2d targetAzimuthAngle = shooterPhysicsCalculations.getAzimuthAngleToTarget();
 

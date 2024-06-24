@@ -16,8 +16,8 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static frc.robot.Constants.VisionConstants.POSE_BUFFER_SIZE_SECONDS;
-import static frc.robot.Constants.VisionConstants.STATES_AMBIGUITY;
+import static frc.robot.GlobalConstants.VisionConstants.POSE_BUFFER_SIZE_SECONDS;
+import static frc.robot.GlobalConstants.VisionConstants.STATES_AMBIGUITY;
 import static frc.robot.subsystems.swerve.SwerveConstants.SWERVE_KINEMATICS;
 
 public class PoseEstimator6328 {

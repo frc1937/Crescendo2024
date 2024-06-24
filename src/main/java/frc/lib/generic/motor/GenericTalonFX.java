@@ -43,7 +43,7 @@ public class GenericTalonFX extends TalonFX implements Motor {
     public void setOutput(MotorProperties.ControlMode mode, double output) {
         switch (mode) { //todo: add more (NECESSARY) control types
             case PERCENTAGE_OUTPUT -> super.setControl(dutyCycleRequest.withOutput(output));
-            case VOLTAGE -> super.setControl(voltageRequest.withOutput(output));
+            case VOLTAGE -> this.setControl(voltageRequest.withOutput(output).withEnableFOC(false));
 
             case POSITION -> super.setControl(positionVoltageRequest.withPosition(output).withSlot(slotToUse));
             case VELOCITY -> super.setControl(velocityVoltageRequest.withVelocity(output).withSlot(slotToUse));
@@ -116,7 +116,12 @@ public class GenericTalonFX extends TalonFX implements Motor {
 
     @Override
     public double getVoltage() {
-        return voltageSignal.refresh().getValue();
+        System.out.println("Motor voltage: " + getMotorVoltage().getValue());
+        return getMotorVoltage().getValue();
+
+//        System.out.println("Motor /**/voltage: " + voltageSignal.refresh().getValue());
+//
+//        return voltageSignal.refresh().getValue();
     }
 
     @Override
@@ -137,8 +142,15 @@ public class GenericTalonFX extends TalonFX implements Motor {
     }
 
     @Override
+    public void setSignalsUpdateFrequency(double updateFrequencyHz, Properties.SignalType... signalTypes) {
+        for (Properties.SignalType type : signalTypes) {
+            setSignalUpdateFrequency(type, updateFrequencyHz);
+        }
+    }
+
+    @Override
     public TalonFXSimState getSimulationState() {
-        return super.getSimState();
+        return this.getSimState();
     }
 
 
