@@ -8,7 +8,11 @@ public class MotorProperties {
     }
 
     public enum ControlMode {
-        CURRENT, POSITION, VELOCITY, VOLTAGE, PERCENTAGE_OUTPUT
+        CURRENT, POSITION, VOLTAGE,
+        PERCENTAGE_OUTPUT,
+
+        /** In rotations per second*/
+        VELOCITY
     }
 
     public enum SparkType {
