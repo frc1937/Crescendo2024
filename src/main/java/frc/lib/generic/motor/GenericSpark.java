@@ -1,12 +1,7 @@
 package frc.lib.generic.motor;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.REVLibError;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.*;
 import frc.lib.generic.Properties;
 
 public class GenericSpark extends CANSparkBase implements Motor {
@@ -22,8 +17,6 @@ public class GenericSpark extends CANSparkBase implements Motor {
     public GenericSpark(int deviceId, MotorProperties.SparkType sparkType) {
         super(deviceId, MotorType.kBrushless, sparkType == MotorProperties.SparkType.MAX ? SparkModel.SparkMax : SparkModel.SparkFlex);
         model = sparkType;
-
-        SmartDashboard.putString("MODEL OF SPARK: " + deviceId, model.toString());
 
         optimizeBusUsage();
 
@@ -201,12 +194,12 @@ public class GenericSpark extends CANSparkBase implements Motor {
             case MAX -> {
                 return getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
             }
+
             case FLEX -> {
                 return getEncoder(SparkRelativeEncoder.Type.kQuadrature, 7168);
             }
         }
 
         return null;
-
     }
 }

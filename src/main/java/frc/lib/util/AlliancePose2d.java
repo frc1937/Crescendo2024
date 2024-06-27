@@ -24,7 +24,6 @@ public class AlliancePose2d {
         }
     }
 
-
     /**
      * Get the correct pose based on the current alliance
      */
@@ -110,7 +109,7 @@ public class AlliancePose2d {
                     pose.getZ(),
                     getCorrectRotation(pose.getRotation())
             );
-        } //TODO: cleanup this bullshit arse code
+        }
     }
 
     private Pose2d mirrorPose(Pose2d pose) {
